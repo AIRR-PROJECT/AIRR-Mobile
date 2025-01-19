@@ -12,10 +12,9 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+export default function AuthLayout() {
   // Get the current color scheme (dark or light)
   const colorScheme = useColorScheme();
-  const userLoggedIn = false; // Replace with actual user authentication check
   // Load custom fonts
   const [loaded] = useFonts({
     SpaceMono: require('@/assets/fonts/SpaceMono-Regular.ttf'),
@@ -41,33 +40,12 @@ export default function RootLayout() {
         {/* Define the screens for the navigation stack */}
         <Stack.Screen 
           name="index"
-          redirect={userLoggedIn}
           options={{ headerShown: false }} 
         />
         
-        {/* Auth group */}
-        <Stack.Screen
-          name="(auth)"
-          options={{
-            headerShown: false,
-          }}
-        />
-        
-        {/* Authenticated group */}
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false,
-          }}
-        />
       </Stack>
 
-      {userLoggedIn ? (
-        <Redirect href="/(tabs)" />
-      ) : (
-        <Redirect href="/(auth)" />
-      )}
-      {/* Set the status bar style */}
+  
       <StatusBar style="auto" />
     </ThemeProvider>
   );

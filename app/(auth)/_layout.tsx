@@ -36,17 +36,20 @@ export default function AuthLayout() {
   // Render the app layout with theme provider and navigation stack
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack >
         {/* Define the screens for the navigation stack */}
         <Stack.Screen 
           name="index"
           options={{ headerShown: false }} 
         />
-        
+        <Stack.Screen name='login' options={{ headerShown: false }}>
+          
+        </Stack.Screen>
       </Stack>
 
   
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
     </ThemeProvider>
+    
   );
 }

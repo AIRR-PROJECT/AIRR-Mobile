@@ -1,4 +1,4 @@
-import { Link, Stack } from 'expo-router';
+import { Link, Redirect, Stack, useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -8,14 +8,18 @@ import Button from '@/components/auth/button';
 import ImageViewer from '@/components/auth/imageViewer';
 const logo = require('@/assets/images/auth/Logo.svg');
 export default function AuthScreen() {
+  const router = useRouter();
+  const handleLogin = () => {
+    router.push('/login')
+  }
   return (
-    <ThemedView style={styles.container} darkColor='#110F0F' lightColor='#110F0F'> 
-      <ThemedView style={styles.imageContainer} darkColor='#110F0F' lightColor='#110F0F'>
+    <ThemedView style={styles.container} darkColor='#1E1E1E' lightColor='#1E1E1E'> 
+      <ThemedView style={styles.imageContainer} darkColor='#1E1E1E' lightColor='#1E1E1E'>
        <ImageViewer imgSource={logo}></ImageViewer>
       </ThemedView>
-      <ThemedView style={styles.footerContainer} darkColor='#110F0F' lightColor='#110F0F'>
-        <Button label="Choose a photo" />
-        <Button label="Use this photo" />
+      <ThemedView style={styles.footerContainer} darkColor='#1E1E1E' lightColor='#1E1E1E'>
+        <Button label="Log In" onPress={handleLogin}/>
+        <Button label="Sign Up" />
         <Button label="Continue as guest" />
       </ThemedView>
     </ThemedView>

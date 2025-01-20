@@ -68,7 +68,7 @@ export default function RootLayout() {
         <Redirect href="/(auth)" />
       )}
       {/* Set the status bar style */}
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
     </ThemeProvider>
   );
 }

@@ -1,16 +1,25 @@
-import { StyleSheet, View, Pressable, Text } from 'react-native';
+import { StyleSheet, Pressable } from 'react-native';
+import { ThemedView } from '../ThemedView';
+import { ThemedText } from '../ThemedText';
 
 type Props = {
   label: string;
+  onPress?: () => void;
+  style?: object; // Allow custom styles for the button container
+  buttonStyle?: object; // Allow custom button styles
+  labelStyle?: object; // Allow custom label styles
+  defaultAction?: () => void; // Fallback action if no onPress is passed
 };
 
-export default function Button({ label }: Props) {
+export default function Button({ label, onPress, style, buttonStyle, labelStyle, defaultAction }: Props) {
+  const handlePress = onPress || defaultAction || (() => alert('You pressed a button.')); // Default action if no onPress is provided
+
   return (
-    <View style={styles.buttonContainer}>
-      <Pressable style={styles.button} onPress={() => alert('You pressed a button.')}>
-        <Text style={styles.buttonLabel}>{label}</Text>
+    <ThemedView style={[styles.buttonContainer, style]} darkColor='#1E1E1E' lightColor='#1E1E1E'>
+      <Pressable style={[styles.button, buttonStyle]} onPress={handlePress}>
+        <ThemedText style={[styles.buttonLabel, labelStyle]}>{label}</ThemedText>
       </Pressable>
-    </View>
+    </ThemedView>
   );
 }
 

@@ -1,26 +1,100 @@
-import { Link, Redirect, Stack, useRouter } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { Link, Redirect, Stack, useRouter } from "expo-router";
+import { StyleSheet } from "react-native";
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import Button from '@/components/auth/button';
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import Button from "@/components/auth/button";
 
-import ImageViewer from '@/components/auth/imageViewer';
-const logo = require('@/assets/images/auth/Logo.svg');
+import ImageViewer from "@/components/auth/imageViewer";
+import ButtonGradient from "@/components/auth/button_gradient";
+
+import { Dimensions } from "react-native";
+
+import { LinearGradient } from "expo-linear-gradient";
+const height = Dimensions.get("window").height;
+const width = Dimensions.get("window").width;
+
+const logo = require("@/assets/images/auth/Logo.svg");
 export default function AuthScreen() {
   const router = useRouter();
   const handleLogin = () => {
-    router.push('/login')
-  }
+    router.push("/login");
+  };
   return (
-    <ThemedView style={styles.container} darkColor='#1E1E1E' lightColor='#1E1E1E'> 
-      <ThemedView style={styles.imageContainer} darkColor='#1E1E1E' lightColor='#1E1E1E'>
-       <ImageViewer imgSource={logo}></ImageViewer>
+    <ThemedView
+      style={styles.container}
+      darkColor="#1E1E1E"
+      lightColor="#1E1E1E"
+    >
+      <ThemedView
+        style={styles.imageContainer}
+        darkColor="#1E1E1E"
+        lightColor="#1E1E1E"
+      >
+        <LinearGradient
+          colors={["rgba(196, 255, 127, 0.1)", "rgba(196, 255, 127, 0)"]}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            borderRadius: 80,
+          }}
+        />
+        <LinearGradient
+          colors={["rgba(196, 255, 127, 0.1)", "rgba(196, 255, 127, 0)"]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 0.8 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            borderRadius: 80,
+          }}
+        />
+        <LinearGradient
+          colors={["rgba(196, 255, 127, 0.1)", "rgba(196, 255, 127, 0)"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0.8, y: 0.8 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            borderRadius: 80,
+          }}
+        />
+        <LinearGradient
+          colors={["rgba(196, 255, 127, 0.1)", "rgba(196, 255, 127, 0)"]}
+          start={{ x: 0.8, y: 0 }}
+          end={{ x: 0, y: 0.8 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            borderRadius: 80,
+          }}
+        />
+        <ImageViewer imgSource={logo} />
       </ThemedView>
-      <ThemedView style={styles.footerContainer} darkColor='#1E1E1E' lightColor='#1E1E1E'>
-        <Button label="Log In" onPress={handleLogin}/>
+      <ThemedView
+        style={styles.footerContainer}
+        darkColor="#1E1E1E"
+        lightColor="#1E1E1E"
+      >
+        <ButtonGradient label="Log In" onPress={handleLogin} />
         <Button label="Sign Up" />
-        <Button label="Continue as guest" />
+        <ThemedText type="link" style={{ color: "white" }}>
+          Continue as guest
+        </ThemedText>
       </ThemedView>
     </ThemedView>
   );
@@ -29,17 +103,18 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  
-    alignItems: 'center',
+
+    alignItems: "center",
   },
   imageContainer: {
     flex: 0.8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 50,
   },
   footerContainer: {
-    flex: 1 / 3,
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1 / 2,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

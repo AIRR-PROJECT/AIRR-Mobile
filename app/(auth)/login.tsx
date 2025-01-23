@@ -128,7 +128,7 @@ export default function LoginScreen() {
         
         {/* Or Google or Facebook */}
         <View style={[styles.section, {justifyContent: 'space-between'}]}>
-          <Pressable style={[styles.section]}>
+          <Pressable >
             <Text>
               Google
             </Text>

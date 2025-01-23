@@ -1,13 +1,17 @@
 // Import necessary modules and components from various libraries
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Redirect, Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { Redirect, Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import "react-native-reanimated";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -18,7 +22,7 @@ export default function RootLayout() {
   const userLoggedIn = false; // Replace with actual user authentication check
   // Load custom fonts
   const [loaded] = useFonts({
-    SpaceMono: require('@/assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   // Hide the splash screen once fonts are loaded
@@ -33,18 +37,17 @@ export default function RootLayout() {
     return null;
   }
 
-  
   // Render the app layout with theme provider and navigation stack
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         {/* Define the screens for the navigation stack */}
-        <Stack.Screen 
+        <Stack.Screen
           name="index"
           redirect={userLoggedIn}
-          options={{ headerShown: false }} 
+          options={{ headerShown: false }}
         />
-        
+
         {/* Auth group */}
         <Stack.Screen
           name="(auth)"
@@ -52,7 +55,7 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
-        
+
         {/* Authenticated group */}
         <Stack.Screen
           name="(tabs)"
@@ -62,11 +65,7 @@ export default function RootLayout() {
         />
       </Stack>
 
-      {userLoggedIn ? (
-        <Redirect href="/(tabs)" />
-      ) : (
-        <Redirect href="/(auth)" />
-      )}
+      {userLoggedIn ? <Redirect href="/(tabs)" /> : <Redirect href="/(auth)" />}
       {/* Set the status bar style */}
       <StatusBar style="light" />
     </ThemeProvider>

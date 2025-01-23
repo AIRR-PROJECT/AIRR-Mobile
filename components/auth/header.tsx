@@ -3,8 +3,8 @@ import { StyleSheet, Pressable } from "react-native";
 import { Image } from "expo-image";
 
 const icon_air_tech = require("@/assets/images/logo/logo_icon-air-tech.svg");
-import { ThemedText } from "../ThemedText";
 
+import ButtonGradient from "./button_gradient";
 export default function AuthHeader() {
   return (
     <ThemedView
@@ -13,11 +13,7 @@ export default function AuthHeader() {
       lightColor="#1E1E1E"
     >
       <Image source={icon_air_tech} style={styles.image} contentFit="contain" />
-      <ThemedView style={styles.buttonContainer}>
-        <Pressable style={styles.button}>
-          <ThemedText style={styles.buttonLabel}>Sign Up</ThemedText>
-        </Pressable>
-      </ThemedView>
+      <ButtonGradient style={styles.buttonContainer} buttonStyle={styles.button} labelStyle={styles.buttonLabel} label="Sign Up" />
     </ThemedView>
   );
 }
@@ -26,9 +22,10 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row", // Arrange items in a row
     alignItems: "center", // Vertically center items
-    justifyContent: "space-between", // Distribute items evenly
+    justifyContent: "space-evenly", // Distribute items evenly
     marginRight: "15%",
-    padding: 20,
+    marginTop: 20,
+    padding: 10,
   },
   image: {
     width: 300,
@@ -36,7 +33,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: 100,
-    height: 68,
+    height: 46,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
@@ -49,10 +46,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    backgroundColor: "#0070f3",
+    
   },
   buttonLabel: {
-    color: "#fff",
+    color: "#000",
     fontSize: 16,
   },
 });

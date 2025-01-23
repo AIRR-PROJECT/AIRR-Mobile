@@ -1,12 +1,14 @@
-import { StyleSheet, Pressable } from 'react-native';
-import { ThemedView } from '../ThemedView';
-import { ThemedText } from '../ThemedText';
-import { Dimensions } from 'react-native';
+import { StyleSheet, Pressable, } from "react-native";
+import { ThemedView } from "../ThemedView";
+import { ThemedText } from "../ThemedText";
+import { Dimensions } from "react-native";
+import { useColorScheme } from "@/hooks/useColorScheme";
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
-
-
+import { LinearGradient } from "expo-linear-gradient";
+import { View } from "react-native";
+import { Text } from "react-native";
 type Props = {
   label: string;
   onPress?: () => void;
@@ -16,41 +18,74 @@ type Props = {
   defaultAction?: () => void; // Fallback action if no onPress is passed
 };
 
-export default function ButtonTransaparent({ label, onPress, style, buttonStyle, labelStyle, defaultAction }: Props) {
-  const handlePress = onPress || defaultAction || (() => alert('You pressed a button.')); // Default action if no onPress is provided
 
+
+export default function ButtonTransaparent({
+  label,
+  onPress,
+  style,
+  buttonStyle,
+  labelStyle,
+  defaultAction,
+}: Props) {
+  const handlePress =
+    onPress || defaultAction || (() => alert("You pressed a button.")); // Default action if no onPress is provided
+  const colorTheme = useColorScheme();
+  // light or dark theme
+  const innerBgColor = colorTheme === "light" ? "#1E1E1E" : "#1E1E1E"; //same color because UI not designed for light mode yet
   return (
-    <ThemedView style={[styles.buttonContainer, style]} darkColor='#1E1E1E' lightColor='#1E1E1E'>
+    <LinearGradient
+      style={[styles.buttonContainer, style]}
+      colors={["#B9FF66", "#9DE8EE"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+    >
+      <View style={[styles.innerContainer,{backgroundColor: innerBgColor}]}>
       <Pressable style={[styles.button, buttonStyle]} onPress={handlePress}>
-        <ThemedText style={[styles.buttonLabel, labelStyle]}>{label}</ThemedText>
-      </Pressable>
-    </ThemedView>
+          <ThemedText style={[styles.buttonLabel, labelStyle]}>
+            {label}
+          </ThemedText>
+        </Pressable>
+        
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: 320,
-    height: windowHeight * 0.08 , // 8% of height device screen
-    marginHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 200,
+    height: windowHeight * 0.08, // 8% of height device screen
+   
+    alignItems: "center",
+    justifyContent: "center",
     padding: 3,
     marginBottom: 15,
+    borderRadius: 80,
+    color: 'transparent',
+  },
+
+  innerContainer: {
+    width: "100%",
+    height: "100%", 
+    borderRadius: 80, // <-- Inner Border Radius
+    flex: 0,
+    margin: 5, // <-- Border Width
+    justifyContent: "center",
   },
   button: {
     borderRadius: 80,
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    backgroundColor: '#fff',
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    backgroundColor: "transparent",
   },
   buttonLabel: {
-    color: '#000000',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
-
+    fontWeight: "bold",
+    
   },
 });

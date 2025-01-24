@@ -5,7 +5,21 @@ import { Image } from "expo-image";
 const icon_air_tech = require("@/assets/images/logo/logo_icon-air-tech.svg");
 
 import ButtonGradient from "./button_gradient";
-export default function AuthHeader() {
+import { useRouter } from "expo-router";
+type AuthHeaderProps = {
+  // Props type definition
+  signUp?: boolean;
+};
+export default function AuthHeader({ signUp = true }: AuthHeaderProps) {
+  const router = useRouter();
+  const handlePress = () => {
+    if (signUp) {
+      router.push("/sign-up");
+    } else {
+      router.push("/login");
+    }
+  };
+  const label = signUp ? "Sign Up" : "Login";
   return (
     <ThemedView
       style={styles.headerContainer}
@@ -13,7 +27,13 @@ export default function AuthHeader() {
       lightColor="#1E1E1E"
     >
       <Image source={icon_air_tech} style={styles.image} contentFit="contain" />
-      <ButtonGradient style={styles.buttonContainer} buttonStyle={styles.button} labelStyle={styles.buttonLabel} label="Sign Up" />
+      <ButtonGradient
+        style={styles.buttonContainer}
+        buttonStyle={styles.button}
+        labelStyle={styles.buttonLabel}
+        label={label}
+        onPress={handlePress}
+      />
     </ThemedView>
   );
 }
@@ -46,7 +66,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    
   },
   buttonLabel: {
     color: "#000",

@@ -17,14 +17,16 @@ import Checkbox from "expo-checkbox";
 import Button from "@/components/auth/button";
 import GradientText from "@/components/GradientText";
 import { LinearGradient } from "expo-linear-gradient";
-import Ionicons from '@expo/vector-icons/Ionicons';
-import ButtonTransaparent from "@/components/auth/button_transparent";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import ButtonTransparent from "@/components/auth/button_transparent";
+import { useRouter } from "expo-router";
 type FormData = {
   email: string;
   password: string;
 };
 
 export default function LoginScreen() {
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -32,11 +34,19 @@ export default function LoginScreen() {
   } = useForm<FormData>();
   const onSubmit = (data: any) => {
     Alert.alert("Login Successful", `Welcome, ${data.email}`);
+    router.replace("/(tabs)");
   };
 
   const [isRememberChecked, setRememberChecked] = useState(false);
   const handleToggleCheckbox = () => {
     setRememberChecked(!isRememberChecked);
+  };
+  const handleForgotPassword = () => {
+    router.push("/forgot-password");
+  };
+
+  const handleSignUp = () => {
+    router.push("/sign-up");
   };
   return (
     <ThemedView
@@ -110,14 +120,11 @@ export default function LoginScreen() {
                 colors={["#B9FF66", "#9DE8EE"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                style={{ borderRadius: 20 }}
+                style={[{ borderRadius: 20 }]}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <TextInput
-                    style={[
-                      styles.input,
-                      errors.password && styles.errorInput,
-                    ]}
+                    style={[styles.input, errors.password && styles.errorInput]}
                     placeholder="Password"
                     placeholderTextColor="#999"
                     secureTextEntry={!showPassword} // Toggle secure text entry
@@ -151,7 +158,6 @@ export default function LoginScreen() {
             {errors.password.message}
           </ThemedText>
         )}
-        {/* Forgot Password */}
 
         <View style={[styles.section, { justifyContent: "space-between" }]}>
           {/* Remember Me */}
@@ -165,19 +171,27 @@ export default function LoginScreen() {
             />
             <Text style={styles.paragraph}>Remember me</Text>
           </Pressable>
-          <GradientText
-            style={[
-              styles.text,
-              { textDecorationLine: "underline", fontSize: 15 },
-            ]}
-            colors={["#B9FF66", "#9DE8EE"]}
-          >
-            Forgot password?
-          </GradientText>
+
+          {/* Forgot Password */}
+          <Pressable onPress={handleForgotPassword}>
+            <GradientText
+              style={[
+                styles.text,
+                { textDecorationLine: "underline", fontSize: 15 },
+              ]}
+              colors={["#B9FF66", "#9DE8EE"]}
+            >
+              Forgot password?
+            </GradientText>
+          </Pressable>
         </View>
 
         {/* Submit Button */}
-        <ButtonGradient label="Sign In" onPress={handleSubmit(onSubmit)} />
+        <ButtonGradient
+          label="Sign In"
+          onPress={handleSubmit(onSubmit)}
+          style={[{ marginTop: 10, width: "100%", marginHorizontal: 0 }]}
+        />
 
         {/* Other Options */}
         <ThemedText
@@ -185,23 +199,42 @@ export default function LoginScreen() {
           style={[{ color: "#fff", alignSelf: "center" }]}
         >
           Or
-        </ThemedText>      
+        </ThemedText>
         {/* Or Google or Facebook */}
         <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <ButtonTransaparent label="Google" style={styles.otherButton}/>
-          
-          <ButtonTransaparent label="Facebook" style={styles.otherButton}/>
+          <ButtonTransparent label="Google" style={styles.otherButton} />
+
+          <ButtonTransparent label="Facebook" style={styles.otherButton} />
         </View>
       </ThemedView>
-      <ThemedText type="link" style={[{ color: "#fff", alignSelf: "flex-start", marginTop: 5,textDecorationLine: "underline" }]}>
-        Don't have a account,{" "}
+
+      {/* Sign Up Link*/}
+      <Pressable style={{ alignSelf:'flex-start', marginHorizontal: 10 }} onPress={handleSignUp}>
         <ThemedText
           type="link"
-          style={[{color:'#fff', textDecorationLine: "underline", fontWeight: "bold", }]}
+          style={[
+            {
+              color: "#fff",
+              alignSelf: "flex-start",
+              marginTop: 5,
+              textDecorationLine: "underline",
+            },
+          ]}
         >
-          Sign Up
+          Don't have a account,{" "}
+          <ThemedText
+            type="link"
+            style={[
+              {
+                color: "#fff",
+                fontWeight: "bold",
+              },
+            ]}
+          >
+            Sign Up
+          </ThemedText>
         </ThemedText>
-      </ThemedText>
+      </Pressable>
     </ThemedView>
   );
 }
@@ -229,7 +262,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 20,
-    marginBottom: 10,
+    marginBottom: 5,
     color: "#000",
     backgroundColor: "#fff",
   },
@@ -239,6 +272,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginBottom: 10,
+    padding: 10,
     fontSize: 12,
   },
 
@@ -260,7 +294,14 @@ const styles = StyleSheet.create({
     width: "45%",
     alignItems: "center",
     justifyContent: "center",
-    
   },
 
+  gradient: {
+    width: "auto",
+    height: 50,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 0, // Space for the gradient to show
+  },
 });

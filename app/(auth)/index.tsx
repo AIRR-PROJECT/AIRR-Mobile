@@ -20,6 +20,9 @@ export default function AuthScreen() {
   const handleLogin = () => {
     router.push("/login");
   };
+  const handleSignUp = () => {
+    router.push("/sign-up");
+  };
   return (
     <ThemedView
       style={styles.container}
@@ -91,7 +94,7 @@ export default function AuthScreen() {
         lightColor="#1E1E1E"
       >
         <ButtonGradient label="Log In" onPress={handleLogin} />
-        <Button label="Sign Up" />
+        <Button label="Sign Up" onPress={handleSignUp}/>
         <ThemedText type="link" style={{ color: "white" }}>
           Continue as guest
         </ThemedText>

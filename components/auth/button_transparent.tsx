@@ -20,7 +20,7 @@ type Props = {
 
 
 
-export default function ButtonTransaparent({
+export default function ButtonTransparent({
   label,
   onPress,
   style,

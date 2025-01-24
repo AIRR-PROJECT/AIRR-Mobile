@@ -1,12 +1,14 @@
-import Button from "@/components/auth/button";
+
 import ButtonGradient from "@/components/auth/button_gradient";
 import AuthHeader from "@/components/auth/header";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
-import { Controller, Form, useForm } from "react-hook-form";
+import { useRouter } from "expo-router";
+import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
-
+import GradientText from "@/components/GradientText";
+import ButtonTransparent from "@/components/auth/button_transparent";
 type FormData = {
   email: string;
 };
@@ -17,21 +19,45 @@ export default function ForgotPasswordScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
+  const router = useRouter();
+  const onSubmit = (data: any) => {
+    router.push("/verify-otp");
+  };
+  const handleBackToLogin = () => {
+    router.push("/login");
+  };
 
   return (
-    <ThemedView>
+    <ThemedView
+      style={styles.container}
+      darkColor="#1E1E1E"
+      lightColor="#1E1E1E"
+    >
       <AuthHeader />
-      <ThemedText>{"< "}Back to login</ThemedText>
-      <LinearGradient colors={["#9DE8EE", "#B9FF66"]} style={{ flex: 1 }}>
-        <ThemedText>Forgot password?</ThemedText>
-      </LinearGradient>
+      <Pressable
+        onPress={handleBackToLogin}
+        style={{ alignSelf: "flex-start", padding: 10 }}
+      >
+        <ThemedText style={[{ color: "white" }]}>
+          {" < "}Back to login
+        </ThemedText>
+      </Pressable>
 
-      <ThemedText>
-        Don’t worry, happens to all of us. Enter your email below to recover
-        your password
-      </ThemedText>
-
-      <ThemedView>
+      <View style={{ alignSelf: "flex-start", flexDirection: "row", paddingHorizontal: 10 }}>
+        <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
+          Forgot password?
+        </GradientText>
+      </View>
+      
+      <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
+        <ThemedText style={styles.paragraph}>
+          Don't worry, happens to all of us. Enter your email below to recover
+          your password.
+        </ThemedText>
+      </View>
+      <ThemedView style={styles.formContainer}>
+        {/* Email Input */}
+        <Text style={[styles.paragraph]}>Username</Text>
         <Controller
           control={control}
           rules={{
@@ -42,40 +68,71 @@ export default function ForgotPasswordScreen() {
             },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, errors.email && styles.errorInput]}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Email"
-            />
+            <LinearGradient
+              colors={["#B9FF66", "#9DE8EE"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ borderRadius: 20 }}
+            >
+              <TextInput
+                style={[styles.input, errors.email && styles.errorInput]}
+                placeholder="Email"
+                placeholderTextColor="#999"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </LinearGradient>
           )}
           name="email"
-          defaultValue=""
         />
         {errors.email && (
           <ThemedText style={styles.errorText}>
             {errors.email.message}
           </ThemedText>
         )}
-        <ButtonGradient label="Reset Password" />
+        <ButtonGradient
+          label="Reset Password"
+          onPress={handleSubmit(onSubmit)}
+          style={[{ marginTop: 15, width: "100%", marginHorizontal: 0 }]}
+        />
 
-        <Text>Or</Text>
-
+        {/* Other Options */}
+        <ThemedText
+          type="default"
+          style={[{ color: "#fff", alignSelf: "center" }]}
+        >
+          Or
+        </ThemedText>
+        {/* Or Google or Facebook */}
         <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <Pressable>
-            <Text>Google</Text>
-          </Pressable>
-          <Pressable>
-            <Text>Facebook</Text>
-          </Pressable>
+          <ButtonTransparent label="Google" style={styles.otherButton} />
+
+          <ButtonTransparent label="Facebook" style={styles.otherButton} />
         </View>
 
-        <ThemedText type="link">
+        <ThemedText
+          type="link"
+          style={[
+            {
+              color: "#fff",
+              alignSelf: "flex-start",
+              marginTop: 5,
+              textDecorationLine: "underline",
+              marginHorizontal: 10,
+            },
+          ]}
+        >
           Don't have a account,{" "}
           <ThemedText
             type="link"
-            style={[{ textDecorationLine: "underline", fontWeight: "bold" }]}
+            style={[
+              {
+                color: "#fff",
+                textDecorationLine: "underline",
+                fontWeight: "bold",
+              },
+            ]}
           >
             Sign Up
           </ThemedText>
@@ -92,7 +149,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text: {
-    fontSize: 50,
+    fontSize: 40,
     fontWeight: "bold",
     marginVertical: 10,
     color: "#fff",
@@ -100,7 +157,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: "100%",
-    marginTop: 20,
+    marginTop: 10,
     backgroundColor: "transparent",
   },
   input: {
@@ -108,8 +165,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 10,
+    borderRadius: 20,
+    marginBottom: 5,
     color: "#000",
     backgroundColor: "#fff",
   },
@@ -119,6 +176,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginBottom: 10,
+    padding: 10,
     fontSize: 12,
   },
 
@@ -134,5 +192,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "white",
     padding: 10,
+  },
+
+  otherButton: {
+    width: "45%",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

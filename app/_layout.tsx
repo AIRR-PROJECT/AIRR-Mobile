@@ -10,8 +10,9 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet, Platform, Text } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Image } from "expo-image";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -34,22 +35,38 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
+      <StatusBar style="auto" />
       {/* <SafeAreaView style={styles.safeArea}> */}
-        <View style={styles.container}>
-          <Stack>
-            <Stack.Screen
-              name="index"
-              redirect={userLoggedIn}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
-          {userLoggedIn ? <Redirect href="/(tabs)" /> : <Redirect href="/(auth)" />}
-        </View>
+      <View style={styles.container}>
+        <Stack>
+          <Stack.Screen
+            name="index"
+            redirect={userLoggedIn}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: true,
+              headerLeft: () => (
+                <Text>
+                  Hehe
+                </Text>
+              ),
+              headerTitle: "",
+              headerRight: () => (null),
+            }}
+          />
+        </Stack>
+        {userLoggedIn ? (
+          <Redirect href="/(tabs)" />
+        ) : (
+          <Redirect href="/(auth)" />
+        )}
+      </View>
       {/* </SafeAreaView> */}
-      <StatusBar style="light" />
     </ThemeProvider>
   );
 }

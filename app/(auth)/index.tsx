@@ -7,7 +7,7 @@ import Button from "@/components/auth/button";
 
 import ImageViewer from "@/components/auth/imageViewer";
 import ButtonGradient from "@/components/auth/button_gradient";
-
+import { Pressable } from "react-native";
 import { Dimensions } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,6 +23,9 @@ export default function AuthScreen() {
   const handleSignUp = () => {
     router.push("/sign-up");
   };
+  const handleGuest = () => {
+    router.push("/(tabs)");
+  }
   return (
     <ThemedView
       style={styles.container}
@@ -95,9 +98,12 @@ export default function AuthScreen() {
       >
         <ButtonGradient label="Log In" onPress={handleLogin} />
         <Button label="Sign Up" onPress={handleSignUp}/>
-        <ThemedText type="link" style={{ color: "white" }}>
-          Continue as guest
-        </ThemedText>
+        <Pressable onPress={handleGuest}>
+          <ThemedText type="link" style={{ color: "white" }}>
+            Continue as guest
+          </ThemedText>
+
+        </Pressable>
       </ThemedView>
     </ThemedView>
   );

@@ -24,7 +24,7 @@ type FormData = {
   email: string;
   password: string;
 };
-
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function LoginScreen() {
   const router = useRouter();
   const {

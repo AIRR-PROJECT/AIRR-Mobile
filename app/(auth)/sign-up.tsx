@@ -393,7 +393,6 @@ export default function SignUpScreen() {
             </ThemedText>
           </ThemedText>
         </Pressable>
-        
       </ThemedView>
     </ScrollView>
   );

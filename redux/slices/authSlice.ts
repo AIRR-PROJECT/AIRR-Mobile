@@ -1,5 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { isLoading } from "expo-font";
+import * as SecureStore from 'expo-secure-store';
+
+const initialState = {
+    userAccessToken: null,
+    userRefreshToken: null,
+    isLoading: true,
+};
 
 // Async thunks 
 export const login = createAsyncThunk(
@@ -10,18 +16,22 @@ export const login = createAsyncThunk(
     }
 )
 
-const initialState = {
-    userId: null,
-    userAccessToken: null,
-    isLoading: true,
-};
+export const loadToken = createAsyncThunk(
+    'auth/loadToken',
+    async () => {
+        // Perform async operation here
+        const accessToken = await SecureStore.getItemAsync('accessToken');
+        const refreshToken = await SecureStore.getItemAsync('refreshToken');   
+        return { accessToken, refreshToken }; 
+    }
+)
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
         setAuthData(state, action) {
-            state.userId = action.payload.userId;
+           
             state.userAccessToken = action.payload.userAccessToken;
         },
 
@@ -30,10 +40,15 @@ const authSlice = createSlice({
         },
 
         logout(state) {
-            state.userId = null;
             state.userAccessToken = null;
+            state.userRefreshToken = null;
+            SecureStore.deleteItemAsync('accessToken');
+            SecureStore.deleteItemAsync('refreshToken');
         },
 
+    },
+    extraReducers: (builder) => {
+        
     },
 });
 

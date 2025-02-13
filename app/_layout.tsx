@@ -54,7 +54,6 @@ export default function RootLayout() {
             options={{
               headerShown: true,
               headerStyle:{
-
               },
               headerLeft: () => <LeftHeader/>,
               headerTitle: "",

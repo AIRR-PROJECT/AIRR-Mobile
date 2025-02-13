@@ -7,7 +7,8 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Tab } from "@rneui/base";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -43,6 +44,24 @@ export default function TabLayout() {
           title: "My Feed",
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="newspaper" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="career-path"
+        options={{
+          title: "Career Path",
+          tabBarIcon: ({ color }) => (
+            <Entypo size={28} name="line-graph" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="group"
+        options={{
+          title: "Group",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons size={28} name="account-group" color={color} />
           ),
         }}
       />

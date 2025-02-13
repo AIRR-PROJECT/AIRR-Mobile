@@ -1,32 +1,51 @@
-import type {
-  ParamListBase,
-  TabNavigationState,
-} from "@react-navigation/native";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import type {
-  MaterialTopTabNavigationOptions,
-  MaterialTopTabNavigationEventMap,
-} from "@react-navigation/material-top-tabs";
-import { withLayoutContext } from "expo-router";
-import { ThemedView } from "@/components/ThemedView";
+import { Tabs, withLayoutContext } from "expo-router";
+import React from "react";
+import { Platform } from "react-native";
 
-const { Navigator } = createMaterialTopTabNavigator();
-
-export const MaterialTopTabs = withLayoutContext<
-  MaterialTopTabNavigationOptions,
-  typeof Navigator,
-  TabNavigationState<ParamListBase>,
-  MaterialTopTabNavigationEventMap
->(Navigator);
-import { ThemedText } from "@/components/ThemedText";
-import Constants  from "expo-constants";
-import { StatusBar } from "expo-status-bar";
+import { HapticTab } from "@/components/HapticTab";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import TabBarBackground from "@/components/ui/TabBarBackground";
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
+  const colorScheme = useColorScheme();
+
   return (
-    <MaterialTopTabs style={{ flex: 1,  }}>
-      <MaterialTopTabs.Screen name="index" options={{ title: "TAB1" }} />
-      <MaterialTopTabs.Screen name="explore" options={{ title: "TAB2" }} />
-    </MaterialTopTabs>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        headerShown: false,
+        tabBarButton: HapticTab,
+        tabBarBackground: TabBarBackground,
+        tabBarStyle: Platform.select({
+          ios: {
+            // Use a transparent background on iOS to show the blur effect
+            position: "absolute",
+          },
+          default: {},
+        }),
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Dashboard",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="house.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="my-feed"
+        options={{
+          title: "My Feed",
+          tabBarIcon: ({ color }) => (
+            <Ionicons size={28} name="newspaper" color={color} />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }

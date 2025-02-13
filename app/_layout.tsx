@@ -13,6 +13,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { View, StyleSheet, Platform, Text } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Image } from "expo-image";
+import LeftHeader from "@/components/tabs/left_header";
+import RightHeader from "@/components/tabs/right_header";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -23,7 +25,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
-
+  const streak = 1; // Replace with actual streak count
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -35,8 +37,9 @@ export default function RootLayout() {
   }
 
   return (
+    // change to dark later
     <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
-      <StatusBar style="auto" />
+      {/* <StatusBar style="auto" /> */}
       {/* <SafeAreaView style={styles.safeArea}> */}
       <View style={styles.container}>
         <Stack>
@@ -50,13 +53,12 @@ export default function RootLayout() {
             name="(tabs)"
             options={{
               headerShown: true,
-              headerLeft: () => (
-                <Text>
-                  Hehe
-                </Text>
-              ),
+              headerStyle:{
+
+              },
+              headerLeft: () => <LeftHeader/>,
               headerTitle: "",
-              headerRight: () => (null),
+              headerRight: () => <RightHeader streak={streak}/>,
             }}
           />
         </Stack>

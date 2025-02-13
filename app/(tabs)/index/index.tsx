@@ -1,49 +1,47 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
+import { Image, StyleSheet, } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import ButtonGradient from '@/components/ButtonGradient';
+import BlogPreview from '@/components/tabs/BlogPreview';
+import { Blog } from '@/interfaces/blogInterface';
+import { loremIpsum } from 'lorem-ipsum';
 
+const mockBlog: Blog = {
+  title: 'Blog Title',
+  image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65YSxnV0O5BzHbIQh-SdECVMcA57w2oxt8Q&s',
+  description: 'Blog Description',
+  content: loremIpsum({ count: 50, units: 'paragraphs' }),
+  timestamp: new Date().toISOString(),
+  blogAuthor: {
+    name: 'Name of the Author',
+    avatar: 'https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg',
+    email: 'sample_email@gmail.com',
+    phoneNumber: '1234567890',
+    location: 'Location',
+    bio: 'Bio',
+    socials: [],
+    groups: [],
+    blogs: [],
+  },
+  tags: ['Frontend', 'Backend', 'React', 'NodeJS', 'Express'],
+};
 export default function DashboardScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!s</ThemedText>
-        <HelloWave />
+    // correct the darkColor and lightColor values later
+    <ParallaxScrollView style={{ flex: 1,  }}>
+      {/* Title */}
+      <ThemedView style={styles.titleContainer} darkColor='#1E1E1E' lightColor='#1E1E1E'>
+        <ThemedText style={styles.titleText} type="title" darkColor='#fff' lightColor='#fff'>Let's Post A New Blog</ThemedText>
+        <ButtonGradient style={styles.titleButton} label='POST NOW'></ButtonGradient>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
+      {/*  */}
+      <ThemedView style={styles.longTextContainer}>
+        <ThemedText type="default" lightColor='#fff' darkColor='#fff'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quis non commodi ad, nostrum quod facere magni facilis esse atque dolor doloremque aut corporis optio at praesentium mollitia fuga, pariatur quas.</ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
+      {/* Blog Preview */}
+      <BlogPreview blog={mockBlog} />
+      
     </ParallaxScrollView>
   );
 }
@@ -52,10 +50,23 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-evenly',
   },
-  stepContainer: {
-    gap: 8,
+  titleText:{
+    flex:1,
+    flexWrap: 'wrap',
+    width: '100%',
+  },
+  titleButton:{
+    width: 150,
+    height: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  longTextContainer: {
+    backgroundColor: 'transparent',
+    gap: 0,
     marginBottom: 8,
   },
   reactLogo: {

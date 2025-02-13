@@ -1,6 +1,6 @@
 
-import ButtonGradient from "@/components/auth/button_gradient";
-import AuthHeader from "@/components/auth/header";
+import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
+import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
@@ -8,7 +8,7 @@ import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 import GradientText from "@/components/GradientText";
-import ButtonTransparent from "@/components/auth/button_transparent";
+import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 type FormData = {
   email: string;
 };
@@ -21,10 +21,10 @@ export default function ForgotPasswordScreen() {
   } = useForm<FormData>();
   const router = useRouter();
   const onSubmit = (data: any) => {
-    router.push("/verify-otp");
+    router.push("/auth/verify-otp");
   };
   const handleBackToLogin = () => {
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   return (
@@ -91,7 +91,7 @@ export default function ForgotPasswordScreen() {
             {errors.email.message}
           </ThemedText>
         )}
-        <ButtonGradient
+        <AuthButtonGradient
           label="Reset Password"
           onPress={handleSubmit(onSubmit)}
           style={[{ marginTop: 15, width: "100%", marginHorizontal: 0 }]}
@@ -106,9 +106,9 @@ export default function ForgotPasswordScreen() {
         </ThemedText>
         {/* Or Google or Facebook */}
         <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <ButtonTransparent label="Google" style={styles.otherButton} />
+          <AuthButtonTransparent label="Google" style={styles.otherButton} />
 
-          <ButtonTransparent label="Facebook" style={styles.otherButton} />
+          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
         </View>
 
         <ThemedText

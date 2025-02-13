@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons"
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { Divider } from '@rneui/themed';
 import { ThemedText } from "../ThemedText";
+import { useRouter } from "expo-router";
 const sample_avatar = require("@/assets/images/sample-avatar.png")
 
 type RightHeaderProps = {
@@ -14,7 +15,11 @@ type RightHeaderProps = {
     avatar?: string;
 }
 export default function RightHeader({streak, avatar}: RightHeaderProps) {
-
+    const route = useRouter();
+    const handleAvatarPress = () => {
+        console.log("Avatar Pressed")
+        route.push("/profile")
+    }
     return(
         <View style={styles.container}>
             {/* feed setting button */}
@@ -31,7 +36,7 @@ export default function RightHeader({streak, avatar}: RightHeaderProps) {
             </View>
             <Divider orientation="vertical" width={1}/>
             {/* Avatar (Cricle Container)*/}
-            <Pressable style={styles.avatar_container}>
+            <Pressable style={styles.avatar_container} onPress={handleAvatarPress}>
                 <Image source={avatar ? {uri: avatar} : sample_avatar} style={styles.avatar}/>
             </Pressable>
         </View>

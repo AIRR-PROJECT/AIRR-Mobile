@@ -1,5 +1,5 @@
-import ButtonGradient from "@/components/auth/button_gradient";
-import AuthHeader from "@/components/auth/header";
+import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
+import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,7 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 
 import { ScrollView } from "react-native";
-import ButtonTransparent from "@/components/auth/button_transparent";
+import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -49,11 +49,11 @@ export default function SignUpScreen() {
     if (!isTermChecked) {
       Alert.alert("Please accept the terms and conditions");
     } else {
-      router.push("/login");
+      router.push("/auth/login");
     }
   };
   const handleBackToLogin = () => {
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   return (
@@ -345,7 +345,7 @@ export default function SignUpScreen() {
         </Pressable>
 
         {/* Sign Up Button */}
-        <ButtonGradient
+        <AuthButtonGradient
           label="Sign Up"
           onPress={handleSubmit(onSubmit)}
           style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
@@ -360,9 +360,9 @@ export default function SignUpScreen() {
         </ThemedText>
         {/* Or Google or Facebook */}
         <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <ButtonTransparent label="Google" style={styles.otherButton} />
+          <AuthButtonTransparent label="Google" style={styles.otherButton} />
 
-          <ButtonTransparent label="Facebook" style={styles.otherButton} />
+          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
         </View>
 
         {/* Sign In Link*/}

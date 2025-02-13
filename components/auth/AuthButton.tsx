@@ -16,7 +16,7 @@ type Props = {
   defaultAction?: () => void; // Fallback action if no onPress is passed
 };
 
-export default function Button({ label, onPress, style, buttonStyle, labelStyle, defaultAction }: Props) {
+export default function AuthButton({ label, onPress, style, buttonStyle, labelStyle, defaultAction }: Props) {
   const handlePress = onPress || defaultAction || (() => alert('You pressed a button.')); // Default action if no onPress is provided
 
   return (

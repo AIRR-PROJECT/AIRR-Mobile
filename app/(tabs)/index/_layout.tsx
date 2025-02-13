@@ -5,8 +5,10 @@ export default function DashboardTabLayout() {
       style={{ flex: 1 }}
       screenOptions={{
         tabBarStyle: { height: 'auto' }, // Adjust the height of the tab bar
-        tabBarLabelStyle: { fontSize: 14 }, // Adjust the font size of tab labels
+        tabBarLabelStyle: { fontSize: 12 }, // Adjust the font size of tab labels
         tabBarIndicatorStyle: { height: 2 }, // Change the indicator thickness
+        tabBarItemStyle: { width: 'auto' }, // Adjust the width of the tab bar items
+        
       }}
     >
       <MaterialTopTabs.Screen name="index" options={{ title: "Home" }} />

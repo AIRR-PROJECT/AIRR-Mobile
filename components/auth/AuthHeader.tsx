@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 
 const icon_air_tech = require("@/assets/images/logo/logo_icon-air-tech.svg");
 
-import ButtonGradient from "./button_gradient";
+import AuthButtonGradient from "./AuthButtonGradient";
 import { useRouter } from "expo-router";
 type AuthHeaderProps = {
   // Props type definition
@@ -14,9 +14,9 @@ export default function AuthHeader({ signUp = true }: AuthHeaderProps) {
   const router = useRouter();
   const handlePress = () => {
     if (signUp) {
-      router.push("/sign-up");
+      router.push("/auth/sign-up");
     } else {
-      router.push("/login");
+      router.push("/auth/login");
     }
   };
   const label = signUp ? "Sign Up" : "Login";
@@ -27,7 +27,7 @@ export default function AuthHeader({ signUp = true }: AuthHeaderProps) {
       lightColor="#1E1E1E"
     >
       <Image source={icon_air_tech} style={styles.image} contentFit="contain" />
-      <ButtonGradient
+      <AuthButtonGradient
         style={styles.buttonContainer}
         buttonStyle={styles.button}
         labelStyle={styles.buttonLabel}

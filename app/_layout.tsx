@@ -48,7 +48,7 @@ export default function RootLayout() {
             redirect={userLoggedIn}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
           <Stack.Screen
             name="(tabs)"
             options={{
@@ -60,11 +60,16 @@ export default function RootLayout() {
               headerRight: () => <RightHeader streak={streak}/>,
             }}
           />
+          <Stack.Screen name="profile" 
+            options={{
+              headerTitle: "Profile",
+            }}
+          />
         </Stack>
         {userLoggedIn ? (
           <Redirect href="/(tabs)" />
         ) : (
-          <Redirect href="/(auth)" />
+          <Redirect href="/auth" />
         )}
       </View>
       {/* </SafeAreaView> */}

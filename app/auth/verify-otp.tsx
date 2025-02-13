@@ -1,5 +1,5 @@
-import ButtonGradient from "@/components/auth/button_gradient";
-import AuthHeader from "@/components/auth/header";
+import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
+import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,10 +21,10 @@ export default function SignUpScreen() {
 
   const router = useRouter();
   const onSubmit = (data: any) => {
-    router.push("/set-password");
+    router.push("/auth/set-password");
   };
   const handleBackToLogin = () => {
-    router.push("/login");
+    router.push("/auth/login");
   };
   return (
     <ThemedView
@@ -119,7 +119,7 @@ export default function SignUpScreen() {
             Resend
           </ThemedText>
         </ThemedText>
-        <ButtonGradient
+        <AuthButtonGradient
           style={{ width: "100%", marginTop: 10, marginHorizontal: 0 }}
           label="Verify OTP"
           onPress={handleSubmit(onSubmit)}

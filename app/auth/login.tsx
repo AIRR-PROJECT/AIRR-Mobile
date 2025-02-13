@@ -6,19 +6,19 @@ import {
   Text,
   Pressable,
 } from "react-native";
-import AuthHeader from "@/components/auth/header";
+import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { Controller, useForm } from "react-hook-form";
-import ButtonGradient from "@/components/auth/button_gradient";
+import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import { TouchableOpacity } from "react-native";
 import { useState } from "react";
 import Checkbox from "expo-checkbox";
-import Button from "@/components/auth/button";
+import AuthButton from "@/components/auth/AuthButton";
 import GradientText from "@/components/GradientText";
 import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import ButtonTransparent from "@/components/auth/button_transparent";
+import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 import { useRouter } from "expo-router";
 type FormData = {
   email: string;
@@ -42,11 +42,11 @@ export default function LoginScreen() {
     setRememberChecked(!isRememberChecked);
   };
   const handleForgotPassword = () => {
-    router.push("/forgot-password");
+    router.push("/auth/forgot-password");
   };
 
   const handleSignUp = () => {
-    router.push("/sign-up");
+    router.push("/auth/sign-up");
   };
   return (
     <ThemedView
@@ -187,7 +187,7 @@ export default function LoginScreen() {
         </View>
 
         {/* Submit Button */}
-        <ButtonGradient
+        <AuthButtonGradient
           label="Sign In"
           onPress={handleSubmit(onSubmit)}
           style={[{ marginTop: 10, width: "100%", marginHorizontal: 0 }]}
@@ -202,9 +202,9 @@ export default function LoginScreen() {
         </ThemedText>
         {/* Or Google or Facebook */}
         <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <ButtonTransparent label="Google" style={styles.otherButton} />
+          <AuthButtonTransparent label="Google" style={styles.otherButton} />
 
-          <ButtonTransparent label="Facebook" style={styles.otherButton} />
+          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
         </View>
       </ThemedView>
 

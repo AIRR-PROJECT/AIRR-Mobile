@@ -1,18 +1,39 @@
-import { Tabs, withLayoutContext } from "expo-router";
-import React from "react";
-import { Platform } from "react-native";
+import { Tabs,  } from "expo-router";
+import { Platform, View } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Tab } from "@rneui/base";
+import { AntDesign, Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Pressable } from "react-native";
 
+const MiddleButton = () => (
+  <Pressable 
+    style={{
+      flex: 1,
+      alignSelf: 'center',
+      backgroundColor: 'transparent',
+      width: 60,
+      height: 60,
+      justifyContent: 'center',
+      // alignItems: 'center',
+      // elevation: 4,
+      shadowColor: '#1E1E1E',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    }}
+  >
+    <AntDesign name="plussquare" size={40} color="#B9FF66" style={{alignSelf: "center"}}/>
+  </Pressable>
+);
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
+  const handleMiddleButtonPress = () => {
+    console.log("Middle Button Press");
+  };
   return (
     <Tabs
       screenOptions={{
@@ -27,6 +48,7 @@ export default function TabLayout() {
           },
           default: {},
         }),
+       
       }}
     >
       <Tabs.Screen
@@ -45,6 +67,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="newspaper" color={color} />
           ),
+        }}
+      />
+       {/* Middle Button with Function */}
+       <Tabs.Screen
+        name="create"
+        options={{
+          title: "",
+          tabBarButton: (props) => <MiddleButton {...props} />,
         }}
       />
       <Tabs.Screen

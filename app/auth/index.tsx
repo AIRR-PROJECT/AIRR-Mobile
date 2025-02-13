@@ -3,10 +3,10 @@ import { StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import Button from "@/components/auth/button";
+import AuthButton from "@/components/auth/AuthButton";
 
 import ImageViewer from "@/components/auth/imageViewer";
-import ButtonGradient from "@/components/auth/button_gradient";
+import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import { Pressable } from "react-native";
 import { Dimensions } from "react-native";
 
@@ -18,10 +18,10 @@ const logo = require("@/assets/images/auth/Logo.svg");
 export default function AuthScreen() {
   const router = useRouter();
   const handleLogin = () => {
-    router.push("/login");
+    router.push("/auth/login");
   };
   const handleSignUp = () => {
-    router.push("/sign-up");
+    router.push("/auth/sign-up");
   };
   const handleGuest = () => {
     router.push("/(tabs)");
@@ -96,8 +96,8 @@ export default function AuthScreen() {
         darkColor="#1E1E1E"
         lightColor="#1E1E1E"
       >
-        <ButtonGradient label="Log In" onPress={handleLogin} />
-        <Button label="Sign Up" onPress={handleSignUp}/>
+        <AuthButtonGradient label="Log In" onPress={handleLogin}/>
+        <AuthButton label="Sign Up" onPress={handleSignUp}/>
         <Pressable onPress={handleGuest}>
           <ThemedText type="link" style={{ color: "white" }}>
             Continue as guest

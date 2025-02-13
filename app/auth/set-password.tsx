@@ -1,5 +1,5 @@
-import ButtonGradient from "@/components/auth/button_gradient";
-import AuthHeader from "@/components/auth/header";
+import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
+import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
@@ -27,10 +27,10 @@ export default function SetPasswordScreen() {
   const newPassword = watch("newPassword");
 
   const onSubmit = (data: FormData) => {
-    router.push("/login");
+    router.push("/auth/login");
   };
   const handleBackToLogin = () => {
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   return (
@@ -181,7 +181,7 @@ export default function SetPasswordScreen() {
           </ThemedText>
         )}
 
-        <ButtonGradient
+        <AuthButtonGradient
           label="Set Password"
           onPress={handleSubmit(onSubmit)}
           style={[{ marginTop: 15, width: "100%", marginHorizontal: 0 }]}

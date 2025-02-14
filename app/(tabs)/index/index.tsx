@@ -8,7 +8,7 @@ import { Blog } from '@/interfaces/blogInterface';
 import { loremIpsum } from 'lorem-ipsum';
 
 const mockBlog: Blog = {
-  title: 'Blog Title',
+  title: 'How to fix clipboard if it isn’t working',
   image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS65YSxnV0O5BzHbIQh-SdECVMcA57w2oxt8Q&s',
   description: 'Blog Description',
   content: loremIpsum({ count: 50, units: 'paragraphs' }),
@@ -41,7 +41,8 @@ export default function DashboardScreen() {
       </ThemedView>
       {/* Blog Preview */}
       <BlogPreview blog={mockBlog} />
-      
+      <BlogPreview blog={mockBlog} />
+      <BlogPreview blog={mockBlog} /> 
     </ParallaxScrollView>
   );
 }

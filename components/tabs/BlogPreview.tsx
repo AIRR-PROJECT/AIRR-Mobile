@@ -2,6 +2,9 @@ import { Blog } from "@/interfaces/blogInterface";
 import { Pressable, ImageBackground, StyleSheet, View } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
+import BlogAuthor from "./BlogAuthor";
+import BlogInGroup from "./BlogInGroup";
+import { Avatar } from "@rneui/base";
 
 export default function BlogPreview({ blog }: { blog: Blog }) {
   return (
@@ -15,26 +18,29 @@ export default function BlogPreview({ blog }: { blog: Blog }) {
           {/* 1st Part: User, Group, Button */}
           <View style={styles.topSection}>
             <View style={styles.userSection}>
-              <ThemedText
+              {/* <ThemedText
                 style={styles.text}
                 type="default"
                 lightColor="#fff"
                 darkColor="#fff"
               >
                 User
-              </ThemedText>
+              </ThemedText> */}
+              <BlogAuthor author={{name: 'username', avatar: 'https://i.pravatar.cc/150'}}/>
             </View>
             <View style={styles.groupSection}>
-              <ThemedText
+              {/* <ThemedText
                 style={styles.text}
                 type="default"
                 lightColor="#fff"
                 darkColor="#fff"
               >
                 Group
-              </ThemedText>
+              </ThemedText> */}
+              <BlogInGroup style={{}} group={{name:`Group's name`, avatar: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', numberOfMembers: 123} }/>
             </View>
-            <View style={styles.buttonSection}>
+            {/* Ask later because it take to much space */}
+            {/* <View style={styles.buttonSection}>
               <ThemedText
                 style={styles.text}
                 type="default"
@@ -43,7 +49,7 @@ export default function BlogPreview({ blog }: { blog: Blog }) {
               >
                 Button
               </ThemedText>
-            </View>
+            </View> */}
           </View>
 
           {/* 2nd Part: Title */}
@@ -66,7 +72,7 @@ export default function BlogPreview({ blog }: { blog: Blog }) {
               lightColor="#fff"
               darkColor="#fff"
             >
-              {blog.content.slice(0, 120)}...
+              {blog.content.slice(0, 100)}...
             </ThemedText>
           </View>
 
@@ -112,13 +118,17 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
   },
   userSection: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
   },
   groupSection: {
-    flex: 1,
+    flex: 1.2,
+    width: 100,
     justifyContent: "center",
     alignItems: "center",
   },

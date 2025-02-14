@@ -29,7 +29,7 @@ const mockBlog: Blog = {
 export default function DashboardScreen() {
   return (
     // correct the darkColor and lightColor values later
-    <ParallaxScrollView style={{ flex: 1,  }}>
+    <ParallaxScrollView style={{ flex: 1,}}>
       {/* Title */}
       <ThemedView style={styles.titleContainer} darkColor='#1E1E1E' lightColor='#1E1E1E'>
         <ThemedText style={styles.titleText} type="title" darkColor='#fff' lightColor='#fff'>Let's Post A New Blog</ThemedText>

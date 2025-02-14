@@ -66,7 +66,7 @@ export default function BlogPreview({ blog }: { blog: Blog }) {
               lightColor="#fff"
               darkColor="#fff"
             >
-              {blog.content.slice(0, 50)}...
+              {blog.content.slice(0, 120)}...
             </ThemedText>
           </View>
 
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   imageBackground: {
     width: "100%",
-    height: 350,
+    height: 400,
   },
   imageStyle: {
     borderRadius: 16,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     
   },
   topSection: {
-    flex: 2,
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -128,11 +128,11 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   titleSection: {
-    flex: 2,
+    flex: 1,
     justifyContent: "center",
   },
   contentSection: {
-    flex: 2,
+    flex: 1,
     justifyContent: "center",
   },
   tagsSection: {
@@ -155,9 +155,10 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   tag: {
-    marginRight: 8,
-    padding: 4,
+    margin: 8,
+    padding: 2,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderRadius: 8,
+    
   },
 });

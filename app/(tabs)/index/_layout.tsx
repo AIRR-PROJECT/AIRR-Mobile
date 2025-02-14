@@ -4,7 +4,7 @@ export default function DashboardTabLayout() {
     <MaterialTopTabs
       style={{ flex: 1 }}
       screenOptions={{
-        tabBarStyle: { height: 'auto' }, // Adjust the height of the tab bar
+        tabBarStyle: { height: 'auto', backgroundColor: '#1E1E1E' }, // Adjust the height of the tab bar
         tabBarLabelStyle: { fontSize: 12 }, // Adjust the font size of tab labels
         tabBarIndicatorStyle: { height: 2 }, // Change the indicator thickness
         tabBarItemStyle: { width: 'auto' }, // Adjust the width of the tab bar items

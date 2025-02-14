@@ -5,7 +5,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import AuthButton from "@/components/auth/AuthButton";
 
-import ImageViewer from "@/components/auth/imageViewer";
+import ImageViewer from "@/components/ImageViewer";
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import { Pressable } from "react-native";
 import { Dimensions } from "react-native";

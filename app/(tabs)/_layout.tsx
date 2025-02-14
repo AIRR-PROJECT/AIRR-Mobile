@@ -6,7 +6,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { AntDesign, Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, Entypo, FontAwesome6, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 
 const MiddleButton = () => (
@@ -42,11 +42,11 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: "absolute",
+
+          default: {
+            // borderTopLeftRadius:10,
+            // overflow: '',
           },
-          default: {},
         }),
        
       }}
@@ -56,7 +56,7 @@ export default function TabLayout() {
         options={{
           title: "Dashboard",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <Entypo size={24} name="home" color={color} />
           ),
         }}
       />
@@ -65,7 +65,7 @@ export default function TabLayout() {
         options={{
           title: "My Feed",
           tabBarIcon: ({ color }) => (
-            <Ionicons size={28} name="newspaper" color={color} />
+            <Ionicons size={24} name="newspaper" color={color} />
           ),
         }}
       />
@@ -82,7 +82,7 @@ export default function TabLayout() {
         options={{
           title: "Career Path",
           tabBarIcon: ({ color }) => (
-            <Entypo size={28} name="line-graph" color={color} />
+            <Entypo size={24} name="line-graph" color={color} />
           ),
         }}
       />
@@ -91,7 +91,7 @@ export default function TabLayout() {
         options={{
           title: "Group",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons size={28} name="account-group" color={color} />
+            <FontAwesome6 size={24} name="user-group" color={color} />
           ),
         }}
       />

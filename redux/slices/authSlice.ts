@@ -1,10 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as SecureStore from 'expo-secure-store';
+import api from "../api/axiosInstance";
 
 const initialState = {
     userAccessToken: null,
     userRefreshToken: null,
     isLoading: true,
+    error: null
 };
 
 // Async thunks 
@@ -12,7 +14,18 @@ export const login = createAsyncThunk(
     'auth/login',
     async (data, thunkAPI) => {
         // Perform async operation here
-        return data;
+        try {
+            const response = await api.post(`${API_URL}/auth/login`, credentials);
+            const { accessToken, refreshToken } = response.data;
+
+            await SecureStore.setItemAsync('accessToken', accessToken);
+            await SecureStore.setItemAsync('refreshToken', refreshToken);
+
+            return { accessToken, refreshToken };
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data);
+        }
+       
     }
 )
 

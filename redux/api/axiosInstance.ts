@@ -15,7 +15,7 @@ api.interceptors.request.use(async (config) => {
     return config;
 }, (error) => Promise.reject(error));
 
-// Handle expired tokens automatically
+// Handle expired tokens automatically  x
 api.interceptors.response.use(
     (response) => response, 
     async (error) => {
@@ -23,7 +23,7 @@ api.interceptors.response.use(
 
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-
+            
             try{
                 const refreshToken = await SecureStore.getItemAsync('refreshToken');
                 
@@ -46,3 +46,5 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+export default api;

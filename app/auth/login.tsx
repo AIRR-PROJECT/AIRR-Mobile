@@ -4,7 +4,6 @@ import {
   TextInput,
   View,
   Text,
-  Pressable,
 } from "react-native";
 import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedView } from "@/components/ThemedView";
@@ -15,6 +14,7 @@ import { TouchableOpacity } from "react-native";
 import { useState } from "react";
 import Checkbox from "expo-checkbox";
 import AuthButton from "@/components/auth/AuthButton";
+import AnimatedPressable from "@/components/AnimatedPressable";
 import GradientText from "@/components/GradientText";
 import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -162,7 +162,7 @@ export default function LoginScreen() {
         <View style={[styles.section, { justifyContent: "space-between" }]}>
           {/* Remember Me */}
 
-          <Pressable style={styles.section} onPress={handleToggleCheckbox}>
+          <AnimatedPressable style={styles.section} onPress={handleToggleCheckbox}>
             <Checkbox
               style={styles.checkbox}
               value={isRememberChecked}
@@ -170,10 +170,10 @@ export default function LoginScreen() {
               color={isRememberChecked ? "#B9FF66" : undefined}
             />
             <Text style={styles.paragraph}>Remember me</Text>
-          </Pressable>
+          </AnimatedPressable>
 
           {/* Forgot Password */}
-          <Pressable onPress={handleForgotPassword}>
+          <AnimatedPressable onPress={handleForgotPassword}>
             <GradientText
               style={[
                 styles.text,
@@ -183,7 +183,7 @@ export default function LoginScreen() {
             >
               Forgot password?
             </GradientText>
-          </Pressable>
+          </AnimatedPressable>
         </View>
 
         {/* Submit Button */}
@@ -209,7 +209,7 @@ export default function LoginScreen() {
       </ThemedView>
 
       {/* Sign Up Link*/}
-      <Pressable style={{ alignSelf:'flex-start', marginHorizontal: 10 }} onPress={handleSignUp}>
+      <AnimatedPressable style={{ alignSelf:'flex-start', marginHorizontal: 10 }} onPress={handleSignUp}>
         <ThemedText
           type="link"
           style={[
@@ -234,7 +234,7 @@ export default function LoginScreen() {
             Sign Up
           </ThemedText>
         </ThemedText>
-      </Pressable>
+      </AnimatedPressable>
     </ThemedView>
   );
 }

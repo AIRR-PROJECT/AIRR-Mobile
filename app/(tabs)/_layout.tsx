@@ -7,10 +7,9 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { AntDesign, Entypo, FontAwesome6, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Pressable } from "react-native";
-
+import AnimatedPressable from "@/components/AnimatedPressable";
 const MiddleButton = () => (
-  <Pressable 
+  <AnimatedPressable 
     style={{
       flex: 1,
       alignSelf: 'center',
@@ -28,7 +27,7 @@ const MiddleButton = () => (
    
   >
     <AntDesign name="plussquare" size={40} color="#B9FF66" style={{alignSelf: "center"}}/>
-  </Pressable>
+  </AnimatedPressable>
 );
 export default function TabLayout() {
   const colorScheme = useColorScheme();

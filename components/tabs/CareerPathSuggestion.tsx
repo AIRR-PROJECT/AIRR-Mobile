@@ -1,9 +1,10 @@
-import { View, TextInput, StyleSheet, Pressable } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-
+import AnimatedPressable from "../AnimatedPressable";
+import { Pressable } from "react-native";
 export default function CareerPathSuggestion() {
   const router = useRouter();
 

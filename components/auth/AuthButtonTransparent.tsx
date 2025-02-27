@@ -1,11 +1,11 @@
-import { StyleSheet, Pressable, } from "react-native";
+import { StyleSheet, } from "react-native";
 import { ThemedView } from "../ThemedView";
 import { ThemedText } from "../ThemedText";
 import { Dimensions } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
-
+import AnimatedPressable from "@/components/AnimatedPressable";
 import { LinearGradient } from "expo-linear-gradient";
 import { View } from "react-native";
 import { Text } from "react-native";
@@ -41,11 +41,11 @@ export default function AuthButtonTransparent({
       end={{ x: 1, y: 0 }}
     >
       <View style={[styles.innerContainer,{backgroundColor: innerBgColor}]}>
-      <Pressable style={[styles.button, buttonStyle]} onPress={handlePress}>
+      <AnimatedPressable style={[styles.button, buttonStyle]} onPress={handlePress}>
           <ThemedText style={[styles.buttonLabel, labelStyle]}>
             {label}
           </ThemedText>
-        </Pressable>
+        </AnimatedPressable>
         
       </View>
     </LinearGradient>

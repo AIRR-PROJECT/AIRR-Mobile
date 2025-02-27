@@ -57,7 +57,7 @@ export default function DashboardScreen() {
       </ThemedView>
       {/*  */}
       <ThemedView style={styles.longTextContainer}>
-        <ThemedText type="default" lightColor="#fff" darkColor="#fff">
+        <ThemedText type="default" lightColor="#fff" darkColor="#fff" style={{textAlign: "justify"}}>
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quis non
           commodi ad, nostrum quod facere magni facilis esse atque dolor
           doloremque aut corporis optio at praesentium mollitia fuga, pariatur

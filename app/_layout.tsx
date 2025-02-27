@@ -9,11 +9,11 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, StyleSheet, Platform, Text } from "react-native";
+import { View, StyleSheet, Platform, Text, Modal } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Image } from "expo-image";
-import LeftHeader from "@/components/tabs/left_header";
-import RightHeader from "@/components/tabs/right_header";
+import LeftHeader from "@/components/tabs/LeftHeader";
+import RightHeader from "@/components/tabs/RightHeader";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -71,6 +71,7 @@ export default function RootLayout() {
         ) : (
           <Redirect href="/auth" />
         )}
+       
       </View>
       {/* </SafeAreaView> */}
     </ThemeProvider>

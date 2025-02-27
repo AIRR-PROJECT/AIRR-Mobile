@@ -10,9 +10,9 @@ import {
   Text,
   TextInput,
   View,
-  Pressable,
   Alert,
 } from "react-native";
+import AnimatedPressable from "@/components/AnimatedPressable";
 import GradientText from "@/components/GradientText";
 import { TouchableOpacity } from "react-native";
 import { useState } from "react";
@@ -332,7 +332,7 @@ export default function SignUpScreen() {
             {errors.confirmPassword.message}
           </ThemedText>
         )}
-        <Pressable style={styles.section} onPress={handleToggleCheckbox}>
+        <AnimatedPressable style={styles.section} onPress={handleToggleCheckbox}>
           <Checkbox
             style={styles.checkbox}
             value={isTermChecked}
@@ -342,7 +342,7 @@ export default function SignUpScreen() {
           <Text style={[styles.paragraph, { paddingHorizontal: 0 }]}>
             I accept the all terms and conditions
           </Text>
-        </Pressable>
+        </AnimatedPressable>
 
         {/* Sign Up Button */}
         <AuthButtonGradient
@@ -366,7 +366,7 @@ export default function SignUpScreen() {
         </View>
 
         {/* Sign In Link*/}
-        <Pressable onPress={handleBackToLogin}>
+        <AnimatedPressable onPress={handleBackToLogin}>
           <ThemedText
             type="link"
             style={[
@@ -392,7 +392,7 @@ export default function SignUpScreen() {
               Sign In
             </ThemedText>
           </ThemedText>
-        </Pressable>
+        </AnimatedPressable>
       </ThemedView>
     </ScrollView>
   );

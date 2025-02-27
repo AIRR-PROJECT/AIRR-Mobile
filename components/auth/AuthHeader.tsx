@@ -1,5 +1,5 @@
 import { ThemedView } from "../ThemedView";
-import { StyleSheet, Pressable } from "react-native";
+import { StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
 const icon_air_tech = require("@/assets/images/logo/logo_icon-air-tech.svg");

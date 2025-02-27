@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, View, type ViewStyle, type TextStyle } from "react-native";
+import { StyleSheet, View, type ViewStyle, type TextStyle } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import { Dimensions } from "react-native";
@@ -6,6 +6,8 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+
+import AnimatedPressable from "./AnimatedPressable";
 
 type ButtonGradientProps = {
   label: string;
@@ -39,11 +41,11 @@ export default function ButtonGradient({
         end={{ x: 1, y: 0 }}
         style={[styles.button, buttonStyle]}
       >
-        <Pressable style={[styles.button, buttonStyle]} onPress={handlePress}>
+        <AnimatedPressable style={[styles.button, buttonStyle]} onPress={handlePress} >
           <ThemedText style={[styles.buttonLabel, labelStyle]} type="defaultSemiBold" lightColor={lightColor} darkColor={darkColor}>
             {label}
           </ThemedText>
-        </Pressable>
+        </AnimatedPressable>
       </LinearGradient>
     </View>
   );

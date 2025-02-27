@@ -1,8 +1,8 @@
-import { StyleSheet, Pressable } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { ThemedView } from '../ThemedView';
 import { ThemedText } from '../ThemedText';
 import { Dimensions } from 'react-native';
-
+import AnimatedPressable from '@/components/AnimatedPressable';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -21,9 +21,9 @@ export default function AuthButton({ label, onPress, style, buttonStyle, labelSt
 
   return (
     <ThemedView style={[styles.buttonContainer, style]} darkColor='#1E1E1E' lightColor='#1E1E1E'>
-      <Pressable style={[styles.button, buttonStyle]} onPress={handlePress}>
+      <AnimatedPressable style={[styles.button, buttonStyle]} onPress={handlePress}>
         <ThemedText style={[styles.buttonLabel, labelStyle]}>{label}</ThemedText>
-      </Pressable>
+      </AnimatedPressable>
     </ThemedView>
   );
 }

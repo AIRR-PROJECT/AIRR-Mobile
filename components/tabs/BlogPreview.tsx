@@ -1,10 +1,11 @@
 import { Blog } from "@/interfaces/blogInterface";
-import { Pressable, ImageBackground, StyleSheet, View } from "react-native";
+import { ImageBackground, StyleSheet, View } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import BlogAuthor from "./BlogAuthor";
 import BlogInGroup from "./BlogInGroup";
-
+import AnimatedPressable from "../AnimatedPressable";
+import { Pressable, TouchableOpacity } from "react-native";
 export default function BlogPreview({ blog }: { blog: Blog }) {
   return (
     <View style={styles.outerContainer}>
@@ -13,7 +14,7 @@ export default function BlogPreview({ blog }: { blog: Blog }) {
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >
-        <Pressable style={styles.container} onPress={null}>
+        <Pressable style={styles.container}>
           {/* 1st Part: User, Group, Button */}
           <View style={styles.topSection}>
             <View style={styles.userSection}>
@@ -120,11 +121,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+
     gap: 10,
   },
   userSection: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-evenly",
     alignItems: "center",
   },
   groupSection: {

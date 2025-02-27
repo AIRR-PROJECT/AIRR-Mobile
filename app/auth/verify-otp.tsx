@@ -5,9 +5,9 @@ import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import GradientText from "@/components/GradientText";
-
+import AnimatedPressable from "@/components/AnimatedPressable";
 type FormData = {
   otp: number;
 };
@@ -33,14 +33,14 @@ export default function SignUpScreen() {
       lightColor="#1E1E1E"
     >
       <AuthHeader />
-      <Pressable
+      <AnimatedPressable
         onPress={handleBackToLogin}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>
           {" < "}Back to login
         </ThemedText>
-      </Pressable>
+      </AnimatedPressable>
 
       <View
         style={{

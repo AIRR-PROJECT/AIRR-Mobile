@@ -4,12 +4,13 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
+import { Controller, useForm } from "react-hook-form";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import GradientText from "@/components/GradientText";
 import { TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import AnimatedPressable from "@/components/AnimatedPressable";
 type FormData = {
   newPassword: string;
   confirmNewPassword: string;
@@ -40,14 +41,14 @@ export default function SetPasswordScreen() {
       lightColor="#1E1E1E"
     >
       <AuthHeader />
-      <Pressable
+      <AnimatedPressable
         onPress={handleBackToLogin}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>
           {" < "}Back to login
         </ThemedText>
-      </Pressable>
+      </AnimatedPressable>
       <View style={{ alignSelf: "flex-start", flexDirection: "row", paddingHorizontal: 10 }}>
         <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
           Set a password!

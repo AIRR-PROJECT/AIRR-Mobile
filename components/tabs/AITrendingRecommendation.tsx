@@ -25,7 +25,7 @@ export default function AITrendingRecommendation() {
       </ThemedText>
       {/* Text */}
       <ThemedText
-        style={styles.fourthRowText}
+        style={styles.secondRowText}
         type="default"
         darkColor="#fff"
         lightColor="#fff"
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: "center",
     justifyContent: "center",
+    fontSize: 20,
   },
 
   firstRowText: {
@@ -91,12 +92,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-
-  fourthRow: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  fourthRowText: {
+  secondRowText: {
     flexWrap: "wrap",
     fontSize: 16,
     color: "#fff",

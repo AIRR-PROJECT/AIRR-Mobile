@@ -1,7 +1,7 @@
-import { StyleSheet, Pressable, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { ThemedView } from "../ThemedView";
 import { ThemedText } from "../ThemedText";
-
+import AnimatedPressable from "@/components/AnimatedPressable";
 import { LinearGradient } from "expo-linear-gradient";
 import { Dimensions } from "react-native";
 const windowWidth = Dimensions.get('window').width;
@@ -34,11 +34,11 @@ export default function AuthButtonGradient({
         end={{ x: 1, y: 0 }}
         style={[styles.button, style]}
         >
-        <Pressable style={[styles.button, buttonStyle]} onPress={handlePress}>
+        <AnimatedPressable style={[styles.button, buttonStyle]} onPress={handlePress}>
           <ThemedText style={[styles.buttonLabel, labelStyle]}>
             {label}
           </ThemedText>
-        </Pressable>
+        </AnimatedPressable>
       </LinearGradient>
     </View>
   );

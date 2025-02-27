@@ -25,6 +25,7 @@ const MiddleButton = () => (
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
     }}
+   
   >
     <AntDesign name="plussquare" size={40} color="#B9FF66" style={{alignSelf: "center"}}/>
   </Pressable>
@@ -42,13 +43,12 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
-
           default: {
-            // borderTopLeftRadius:10,
+            borderTopLeftRadius:10,
             // overflow: '',
-          },
+          },  
         }),
-       
+        animation: "shift",
       }}
     >
       <Tabs.Screen
@@ -76,6 +76,7 @@ export default function TabLayout() {
           title: "",
           tabBarButton: (props) => <MiddleButton {...props} />,
         }}
+
       />
       <Tabs.Screen
         name="career-path"

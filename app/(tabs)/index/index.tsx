@@ -8,6 +8,7 @@ import { Blog } from '@/interfaces/blogInterface';
 import { loremIpsum } from 'lorem-ipsum';
 import GroupSearch from '@/components/tabs/GroupSearch';
 import GroupJoin from '@/components/tabs/GroupJoinComponent';
+import CareerPathSuggestion from '@/components/tabs/CareerPathSuggestion';
 
 const mockBlog: Blog = {
   title: 'How to fix clipboard if it isn’t working',
@@ -48,6 +49,7 @@ export default function DashboardScreen() {
       {/* Find group search bar */}
       <GroupSearch/>
       {/* Career Path props suggestion */}
+      <CareerPathSuggestion/>
       {/* Ai Trending tech recommdation */}
     </ParallaxScrollView>
   );

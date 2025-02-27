@@ -4,7 +4,6 @@ import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import BlogAuthor from "./BlogAuthor";
 import BlogInGroup from "./BlogInGroup";
-import { Avatar } from "@rneui/base";
 
 export default function BlogPreview({ blog }: { blog: Blog }) {
   return (
@@ -98,7 +97,7 @@ export default function BlogPreview({ blog }: { blog: Blog }) {
 
 const styles = StyleSheet.create({
   outerContainer: {
-    borderRadius: 30,
+    borderRadius: 40,
     overflow: "hidden",
   },
   imageBackground: {

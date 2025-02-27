@@ -99,6 +99,8 @@ const styles = StyleSheet.create({
   outerContainer: {
     borderRadius: 40,
     overflow: "hidden",
+    borderColor: "#48576E",
+    borderWidth: 2,
   },
   imageBackground: {
     width: "100%",

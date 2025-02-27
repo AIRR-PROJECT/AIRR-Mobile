@@ -8,10 +8,9 @@ export default function CareerPathSuggestion() {
   const router = useRouter();
 
   const handleClick = () => {
-    // handle
-    router.navigate('/(tabs)/career-path')
-
-  }
+    // handle click
+    router.navigate("/(tabs)/career-path");
+  };
   return (
     <Pressable onPress={handleClick}>
       {/* gradient background */}
@@ -24,16 +23,14 @@ export default function CareerPathSuggestion() {
       <View style={styles.container}>
         {/* Title and button */}
         <View style={styles.firstRow}>
-          <View style={styles.textBorder}>
-            <ThemedText
-              style={styles.firstRowText}
-              type="default"
-              darkColor="#fff"
-              lightColor="#fff"
-            >
-              Career Path
-            </ThemedText>
-          </View>
+          <ThemedText
+            style={styles.textBorder}
+            type="default"
+            darkColor="#fff"
+            lightColor="#fff"
+          >
+            Career Path
+          </ThemedText>
 
           <MaterialCommunityIcons
             name="arrow-top-right-thin-circle-outline"
@@ -43,11 +40,11 @@ export default function CareerPathSuggestion() {
         </View>
         {/* Image */}
         <View style={styles.secondRow}>
-          <View style={[styles.verticalCurvedBar, {height: 60}]}/>
-          <View style={[styles.verticalCurvedBar, {height: 90}]}/>
-          <View style={[styles.verticalCurvedBar, {height: 120}]}/>
-          <View style={[styles.verticalCurvedBar, {height: 150}]}/>
-          <View style={[styles.verticalCurvedBar, {height: 180}]}/>
+          <View style={[styles.verticalCurvedBar, { height: 60 }]} />
+          <View style={[styles.verticalCurvedBar, { height: 90 }]} />
+          <View style={[styles.verticalCurvedBar, { height: 120 }]} />
+          <View style={[styles.verticalCurvedBar, { height: 150 }]} />
+          <View style={[styles.verticalCurvedBar, { height: 180 }]} />
         </View>
         {/* Title */}
         <View style={styles.thirdRow}>
@@ -68,7 +65,9 @@ export default function CareerPathSuggestion() {
             darkColor="#fff"
             lightColor="#fff"
           >
-            We will discuss your business goals and objectives, target audience, and current marketing efforts. This will allow us to understand your needs
+            We will discuss your business goals and objectives, target audience,
+            and current marketing efforts. This will allow us to understand your
+            needs.
           </ThemedText>
         </View>
       </View>
@@ -89,7 +88,7 @@ const styles = StyleSheet.create({
   gradientBackground: {
     position: "absolute",
     width: "100%",
-    height: "100%", 
+    height: "100%",
     borderRadius: 40,
   },
   firstRow: {
@@ -113,40 +112,39 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: "center",
     justifyContent: "center",
+    color: "#1E1E1E",
   },
   verticalCurvedBar: {
     width: 30,
     backgroundColor: "#1E1E1E",
     borderRadius: 90,
   },
-  firstRowText:{
+  firstRowText: {
     flex: 1,
     fontSize: 16,
-    color: "black",
+    color: "#1E1E1E",
     fontWeight: "bold",
   },
   title: {
     flexWrap: "wrap",
     width: "auto",
     fontSize: 20,
-    color: "black",
+    color: "#1E1E1E",
     alignSelf: "auto",
   },
-  thirdRow:{
-   
+  thirdRow: {
     alignItems: "center",
     justifyContent: "flex-start",
     padding: 10,
   },
   fourthRow: {
-    
     alignItems: "center",
     justifyContent: "center",
   },
-  fourthRowText:{
+  fourthRowText: {
     flexWrap: "wrap",
     fontSize: 16,
-    color: "black",
+    color: "#1E1E1E",
     textAlign: "justify",
   },
 });

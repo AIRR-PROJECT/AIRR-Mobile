@@ -6,6 +6,7 @@ import ButtonGradient from '@/components/ButtonGradient';
 import BlogPreview from '@/components/tabs/BlogPreview';
 import { Blog } from '@/interfaces/blogInterface';
 import { loremIpsum } from 'lorem-ipsum';
+import GroupSearch from '@/components/tabs/GroupSearch';
 
 const mockBlog: Blog = {
   title: 'How to fix clipboard if it isn’t working',
@@ -41,8 +42,11 @@ export default function DashboardScreen() {
       </ThemedView>
       {/* Blog Preview */}
       <BlogPreview blog={mockBlog} />
-      <BlogPreview blog={mockBlog} />
-      <BlogPreview blog={mockBlog} /> 
+      {/* Join Group props */}
+      {/* Find group search bar */}
+      <GroupSearch/>
+      {/* Career Path props suggestion */}
+      {/* Ai Trending tech recommdation */}
     </ParallaxScrollView>
   );
 }

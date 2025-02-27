@@ -7,6 +7,7 @@ import BlogPreview from '@/components/tabs/BlogPreview';
 import { Blog } from '@/interfaces/blogInterface';
 import { loremIpsum } from 'lorem-ipsum';
 import GroupSearch from '@/components/tabs/GroupSearch';
+import GroupJoin from '@/components/tabs/GroupJoinComponent';
 
 const mockBlog: Blog = {
   title: 'How to fix clipboard if it isn’t working',
@@ -43,6 +44,7 @@ export default function DashboardScreen() {
       {/* Blog Preview */}
       <BlogPreview blog={mockBlog} />
       {/* Join Group props */}
+      <GroupJoin url1='' url2='' url3=''/>
       {/* Find group search bar */}
       <GroupSearch/>
       {/* Career Path props suggestion */}

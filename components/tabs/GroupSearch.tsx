@@ -1,7 +1,5 @@
-import React from "react";
 import { View, TextInput, StyleSheet } from "react-native";
 import { ThemedText } from "../ThemedText";
-import ButtonGradient from "../ButtonGradient";
 import { FontAwesome6 } from "@expo/vector-icons";
 
 export default function GroupSearch() {
@@ -31,6 +29,7 @@ const styles = StyleSheet.create({
     padding: 20,
     columnGap: 10,
     borderColor: "white",
+    height: 100,
   },
   title: {
     flex: 1,

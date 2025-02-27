@@ -3,10 +3,14 @@ import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 import GradientText from "@/components/GradientText";
+import { useAppSelector } from "@/redux/hook";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { sendAccountOTP, sendPasswordOTP, resetPasswordVerified, verifyPasswordOTP } from "@/redux/slices/authSlice";
 
 type FormData = {
   otp: number;
@@ -15,17 +19,38 @@ type FormData = {
 export default function SignUpScreen() {
   const {
     control,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
-
   const router = useRouter();
-  const onSubmit = (data: any) => {
-    router.push("/auth/set-password");
+  const dispatch = useDispatch()
+  const otpWatch = watch('otp')
+  const searchParams = useLocalSearchParams<{ resendEmail: string }>()
+  const { isPasswordVerified } = useAppSelector(state => state.auth)
+
+  // Init
+  useEffect(() => {
+    dispatch(sendPasswordOTP({ email: searchParams.resendEmail }))
+  }, [])
+
+  useEffect(() => {
+    if (isPasswordVerified) {
+      // Reset
+      dispatch(resetPasswordVerified(false))
+      router.push(`/auth/set-password?email=${searchParams.resendEmail}`);
+    }
+  }, [isPasswordVerified])
+
+  const onSubmit = (data: FormData) => {
+    dispatch(verifyPasswordOTP({ email: searchParams.resendEmail, otp: otpWatch.toString() }))
   };
   const handleBackToLogin = () => {
     router.push("/auth/login");
   };
+  const handleResend = () => {
+    dispatch(sendPasswordOTP({ email: searchParams.resendEmail }))
+  }
   return (
     <ThemedView
       style={styles.container}
@@ -56,7 +81,7 @@ export default function SignUpScreen() {
 
       <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
         <ThemedText style={styles.paragraph}>
-          An authentication code has been sent to your email.
+          A password change OTP has been sent to your email.
         </ThemedText>
       </View>
 
@@ -107,17 +132,19 @@ export default function SignUpScreen() {
           ]}
         >
           Didn't receive a code?{" "}
-          <ThemedText
-            type="default"
-            style={[
-              {
-                color: "#B9FF66",
-                fontWeight: "bold",
-              },
-            ]}
-          >
-            Resend
-          </ThemedText>
+          <Pressable onPress={handleResend}>
+            <ThemedText
+              type="default"
+              style={[
+                {
+                  color: "#B9FF66",
+                  fontWeight: "bold",
+                },
+              ]}
+            >
+              Resend
+            </ThemedText>
+          </Pressable>
         </ThemedText>
         <AuthButtonGradient
           style={{ width: "100%", marginTop: 10, marginHorizontal: 0 }}

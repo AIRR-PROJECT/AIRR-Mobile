@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactElement } from "react";
-import { StyleSheet } from "react-native";
+import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -18,7 +18,7 @@ type Props = PropsWithChildren<{
   headerImage?: ReactElement;
   headerBackgroundColor?: { dark: string; light: string };
   hasHeader?: boolean;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
   backgroundColor?: { dark: string; light: string };
 }>;
 
@@ -27,6 +27,7 @@ export default function ParallaxFlatView({
   headerImage,
   headerBackgroundColor = { light: "#A1CEDC", dark: "#1D3D47" },
   hasHeader,
+  style,
 }: Props) {
   const colorScheme = useColorScheme() ?? "light";
   const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
@@ -49,6 +50,7 @@ export default function ParallaxFlatView({
             scrollOffset.value,
             [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
             [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
+
           ),
         },
         {
@@ -65,6 +67,7 @@ export default function ParallaxFlatView({
     <ThemedView
       style={[
         styles.container,
+        style,
         { backgroundColor: colorScheme === "light" ? "#fff" : "#000" }, // Fixed background color
       ]}
     >

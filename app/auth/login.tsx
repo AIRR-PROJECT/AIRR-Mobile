@@ -162,7 +162,7 @@ export default function LoginScreen() {
         <View style={[styles.section, { justifyContent: "space-between" }]}>
           {/* Remember Me */}
 
-          <AnimatedPressable style={styles.section} onPress={handleToggleCheckbox}>
+          <TouchableOpacity style={styles.section} onPress={handleToggleCheckbox}>
             <Checkbox
               style={styles.checkbox}
               value={isRememberChecked}
@@ -170,10 +170,10 @@ export default function LoginScreen() {
               color={isRememberChecked ? "#B9FF66" : undefined}
             />
             <Text style={styles.paragraph}>Remember me</Text>
-          </AnimatedPressable>
+          </TouchableOpacity>
 
           {/* Forgot Password */}
-          <AnimatedPressable onPress={handleForgotPassword}>
+          <TouchableOpacity onPress={handleForgotPassword}>
             <GradientText
               style={[
                 styles.text,
@@ -183,7 +183,7 @@ export default function LoginScreen() {
             >
               Forgot password?
             </GradientText>
-          </AnimatedPressable>
+          </TouchableOpacity>
         </View>
 
         {/* Submit Button */}
@@ -209,7 +209,7 @@ export default function LoginScreen() {
       </ThemedView>
 
       {/* Sign Up Link*/}
-      <AnimatedPressable style={{ alignSelf:'flex-start', marginHorizontal: 10 }} onPress={handleSignUp}>
+      <TouchableOpacity style={{ alignSelf:'flex-start', marginHorizontal: 10 }} onPress={handleSignUp}>
         <ThemedText
           type="link"
           style={[
@@ -234,7 +234,7 @@ export default function LoginScreen() {
             Sign Up
           </ThemedText>
         </ThemedText>
-      </AnimatedPressable>
+      </TouchableOpacity>
     </ThemedView>
   );
 }

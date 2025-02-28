@@ -1,7 +1,7 @@
 import { StyleSheet, View, type ViewStyle, type TextStyle } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
-import { Dimensions } from "react-native";
+import { Dimensions,TouchableOpacity } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
 const windowWidth = Dimensions.get('window').width;
@@ -41,11 +41,11 @@ export default function ButtonGradient({
         end={{ x: 1, y: 0 }}
         style={[styles.button, buttonStyle]}
       >
-        <AnimatedPressable style={[styles.button, buttonStyle]} onPress={handlePress} >
+        <TouchableOpacity style={[styles.button, buttonStyle]} onPress={handlePress} >
           <ThemedText style={[styles.buttonLabel, labelStyle]} type="defaultSemiBold" lightColor={lightColor} darkColor={darkColor}>
             {label}
           </ThemedText>
-        </AnimatedPressable>
+        </TouchableOpacity>
       </LinearGradient>
     </View>
   );

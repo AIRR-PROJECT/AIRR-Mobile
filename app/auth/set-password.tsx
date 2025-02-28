@@ -41,14 +41,14 @@ export default function SetPasswordScreen() {
       lightColor="#1E1E1E"
     >
       <AuthHeader />
-      <AnimatedPressable
+      <TouchableOpacity
         onPress={handleBackToLogin}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>
           {" < "}Back to login
         </ThemedText>
-      </AnimatedPressable>
+      </TouchableOpacity>
       <View style={{ alignSelf: "flex-start", flexDirection: "row", paddingHorizontal: 10 }}>
         <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
           Set a password!

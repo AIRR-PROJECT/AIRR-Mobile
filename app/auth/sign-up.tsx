@@ -18,7 +18,7 @@ import { TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
-
+import { Pressable } from "react-native";
 import { ScrollView } from "react-native";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 type FormData = {
@@ -332,7 +332,7 @@ export default function SignUpScreen() {
             {errors.confirmPassword.message}
           </ThemedText>
         )}
-        <AnimatedPressable style={styles.section} onPress={handleToggleCheckbox}>
+        <TouchableOpacity style={styles.section} onPress={handleToggleCheckbox}>
           <Checkbox
             style={styles.checkbox}
             value={isTermChecked}
@@ -342,7 +342,7 @@ export default function SignUpScreen() {
           <Text style={[styles.paragraph, { paddingHorizontal: 0 }]}>
             I accept the all terms and conditions
           </Text>
-        </AnimatedPressable>
+        </TouchableOpacity>
 
         {/* Sign Up Button */}
         <AuthButtonGradient
@@ -366,7 +366,7 @@ export default function SignUpScreen() {
         </View>
 
         {/* Sign In Link*/}
-        <AnimatedPressable onPress={handleBackToLogin}>
+        <TouchableOpacity onPress={handleBackToLogin}>
           <ThemedText
             type="link"
             style={[
@@ -392,7 +392,7 @@ export default function SignUpScreen() {
               Sign In
             </ThemedText>
           </ThemedText>
-        </AnimatedPressable>
+        </TouchableOpacity>
       </ThemedView>
     </ScrollView>
   );

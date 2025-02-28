@@ -7,6 +7,7 @@ const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { LinearGradient } from "expo-linear-gradient";
+import { TouchableOpacity } from "react-native";
 import { View } from "react-native";
 import { Text } from "react-native";
 type Props = {
@@ -41,11 +42,11 @@ export default function AuthButtonTransparent({
       end={{ x: 1, y: 0 }}
     >
       <View style={[styles.innerContainer,{backgroundColor: innerBgColor}]}>
-      <AnimatedPressable style={[styles.button, buttonStyle]} onPress={handlePress}>
+      <TouchableOpacity style={[styles.button, buttonStyle]} onPress={handlePress}>
           <ThemedText style={[styles.buttonLabel, labelStyle]}>
             {label}
           </ThemedText>
-        </AnimatedPressable>
+        </TouchableOpacity>
         
       </View>
     </LinearGradient>

@@ -1,5 +1,5 @@
 import { Tabs,  } from "expo-router";
-import { Platform, View } from "react-native";
+import { Platform, View,TouchableOpacity } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -8,8 +8,9 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { AntDesign, Entypo, FontAwesome6, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AnimatedPressable from "@/components/AnimatedPressable";
+import { Pressable } from "react-native";
 const MiddleButton = () => (
-  <AnimatedPressable 
+  <TouchableOpacity 
     style={{
       flex: 1,
       alignSelf: 'center',
@@ -27,7 +28,7 @@ const MiddleButton = () => (
    
   >
     <AntDesign name="plussquare" size={40} color="#B9FF66" style={{alignSelf: "center"}}/>
-  </AnimatedPressable>
+  </TouchableOpacity>
 );
 export default function TabLayout() {
   const colorScheme = useColorScheme();

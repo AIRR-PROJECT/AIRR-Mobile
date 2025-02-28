@@ -29,12 +29,12 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   return (
     <View style={styles.container}>
       {/* Feed Settings Button */}
-      <AnimatedPressable
+      <TouchableOpacity
         style={styles.feed_settings_icon}
         onPress={() => setModalVisible(true)}
       >
         <Ionicons name="filter" size={18} color="#fff" />
-      </AnimatedPressable>
+      </TouchableOpacity>
 
       <Divider orientation="vertical" width={1} />
 
@@ -95,14 +95,14 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
               </View>
               {/* Close button and Save button */}
               <View style={styles.rowContainer}>
-                <AnimatedPressable
+                <TouchableOpacity
                   style={styles.closeButton}
                   onPress={() => setModalVisible(false)}
                 >
                   <ThemedText type="title" style={styles.closeButtonText}>
                     CANCEL
                   </ThemedText>
-                </AnimatedPressable>
+                </TouchableOpacity>
                 <ButtonGradient
                   label="SAVE"
                   style={{ width: 100, padding: 5 }}
@@ -137,12 +137,12 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
             <View style={styles.rowContainer}>
               {/* Suggested and My Tags */}
               <View style={styles.rowContainer}>
-                <AnimatedPressable>
+                <TouchableOpacity>
                   <ThemedText style={styles.modalText}>Suggested</ThemedText>
-                </AnimatedPressable>
-                <AnimatedPressable>
+                </TouchableOpacity>
+                <TouchableOpacity>
                   <ThemedText style={styles.modalText}>My Tags</ThemedText>
-                </AnimatedPressable>
+                </TouchableOpacity>
               </View>
             </View>
           </View>

@@ -1,4 +1,4 @@
-import { Link, Redirect, Stack, useRouter } from "expo-router";
+import { EffectCallback, Link, Redirect, Stack, useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -10,12 +10,27 @@ import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import { Dimensions, TouchableOpacity } from "react-native";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { LinearGradient } from "expo-linear-gradient";
+import { sendAccountOTP } from "@/redux/slices/authSlice";
+import { useEffect } from "react";
+import { useAppSelector } from "@/redux/hook";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
 const logo = require("@/assets/images/auth/Logo.svg");
+  
+const useMountEffect = (fun: EffectCallback) => useEffect(fun, [])
+
 export default function AuthScreen() {
   const router = useRouter();
+  // const { isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken } = useAppSelector(state => state.auth)
+
+  // // Init
+  // useMountEffect(() => {
+  //   if (isLoggedIn && isAccountVerified && userAccessToken.length > 0 && userRefreshToken.length > 0) {
+  //     router.replace("/(tabs)");
+  //   }
+  // })
+
   const handleLogin = () => {
     router.push("/auth/login");
   };

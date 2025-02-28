@@ -3,14 +3,17 @@ import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import GradientText from "@/components/GradientText";
 import { TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import AnimatedPressable from "@/components/AnimatedPressable";
+import { useDispatch } from "react-redux";
+import { resetChangedPassword, setPassword } from "@/redux/slices/authSlice";
+import { useAppSelector } from "@/redux/hook";
 type FormData = {
   newPassword: string;
   confirmNewPassword: string;
@@ -24,11 +27,28 @@ export default function SetPasswordScreen() {
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
-
+  const dispatch = useDispatch();
   const newPassword = watch("newPassword");
+  const searchParams = useLocalSearchParams<{ email: string }>()
+  const { changedPassword } = useAppSelector(state => state.auth)
+
+  useEffect(() => {
+    console.log(changedPassword)
+    if (changedPassword) {
+      // Reset
+      dispatch(resetChangedPassword(false))
+
+      router.push("/auth/login");
+    }
+  }, [changedPassword])
 
   const onSubmit = (data: FormData) => {
-    router.push("/auth/login");
+    const setPasswordData = {
+      email: searchParams.email,
+      password: newPassword
+    }
+    
+    dispatch(setPassword(setPasswordData))
   };
   const handleBackToLogin = () => {
     router.push("/auth/login");

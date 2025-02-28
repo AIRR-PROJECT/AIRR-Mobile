@@ -1,36 +1,59 @@
-
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import AnimatedPressable from "@/components/AnimatedPressable";
+import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 import GradientText from "@/components/GradientText";
-import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
-import { TouchableOpacity } from "react-native";
+import { EffectCallback, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { sendAccountOTP, verifyAccountOTP } from "@/redux/slices/authSlice";
+import { VerifyAccountCredentials } from "@/interfaces/authInterface";
+import { useAppSelector } from "@/redux/hook";
+
 type FormData = {
-  email: string;
+  otp: number;
 };
 
-export default function ForgotPasswordScreen() {
+const useMountEffect = (fun: EffectCallback) => useEffect(fun, [])
+
+export default function SignUpScreen() {
+  const dispatch = useDispatch();
+  const searchParams = useLocalSearchParams<{ resendEmail: string }>()
+  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
   const {
     control,
-    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
-  const emailWatch = watch('email')
+
+  // Init
+  useMountEffect(() => {
+    dispatch(sendAccountOTP({ email: searchParams.resendEmail }))
+  })
   
+  useEffect(() => {
+    if (isLoggedIn && isAccountVerified) {
+      router.back()
+    }
+  }, [isAccountVerified])
   const onSubmit = (data: any) => {
-    router.push(`/auth/verify-password-otp?resendEmail=${emailWatch}`);
+    const verifyData: VerifyAccountCredentials = {
+      email: searchParams.resendEmail,
+      otp: data.otp
+    }
+
+    dispatch(verifyAccountOTP(verifyData))
   };
   const handleBackToLogin = () => {
     router.push("/auth/login");
   };
+  const handleResend = () => {
+    dispatch(sendAccountOTP({ email: searchParams.resendEmail }))
+  }
 
   return (
     <ThemedView
@@ -39,37 +62,43 @@ export default function ForgotPasswordScreen() {
       lightColor="#1E1E1E"
     >
       <AuthHeader />
-      <TouchableOpacity
+      <Pressable
         onPress={handleBackToLogin}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>
           {" < "}Back to login
         </ThemedText>
-      </TouchableOpacity>
+      </Pressable>
 
-      <View style={{ alignSelf: "flex-start", flexDirection: "row", paddingHorizontal: 10 }}>
+      <View
+        style={{
+          alignSelf: "flex-start",
+          flexDirection: "row",
+          paddingHorizontal: 10,
+        }}
+      >
         <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
-          Forgot password?
+          Verify code
         </GradientText>
       </View>
-      
+
       <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
         <ThemedText style={styles.paragraph}>
-          Don't worry, happens to all of us. Enter your email below to recover
-          your password.
+          Your account has not been verified. Therefore, a verification OTP has been sent to your email.
         </ThemedText>
       </View>
+
       <ThemedView style={styles.formContainer}>
-        {/* Email Input */}
-        <Text style={[styles.paragraph]}>Username</Text>
+        {/* OTP Input */}
+        <Text style={[styles.paragraph]}>Enter OTP</Text>
         <Controller
           control={control}
           rules={{
-            required: "Email is required",
+            required: "OTP is required",
             pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Enter a valid email address",
+              value: /^[0-9]{6}$/,
+              message: "Invalid OTP",
             },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -80,41 +109,20 @@ export default function ForgotPasswordScreen() {
               style={{ borderRadius: 20 }}
             >
               <TextInput
-                style={[styles.input, errors.email && styles.errorInput]}
-                placeholder="Email"
-                placeholderTextColor="#999"
+                style={[styles.input, errors.otp ? styles.errorInput : {}]}
                 onBlur={onBlur}
                 onChangeText={onChange}
-                value={value}
+                value={value ? String(value) : ""}
+                placeholder="OTP"
+                keyboardType="numeric"
               />
             </LinearGradient>
           )}
-          name="email"
+          name="otp"
         />
-        {errors.email && (
-          <ThemedText style={styles.errorText}>
-            {errors.email.message}
-          </ThemedText>
+        {errors.otp && (
+          <Text style={styles.errorText}>{errors.otp.message}</Text>
         )}
-        <AuthButtonGradient
-          label="Reset Password"
-          onPress={handleSubmit(onSubmit)}
-          style={[{ marginTop: 15, width: "100%", marginHorizontal: 0 }]}
-        />
-
-        {/* Other Options */}
-        <ThemedText
-          type="default"
-          style={[{ color: "#fff", alignSelf: "center" }]}
-        >
-          Or
-        </ThemedText>
-        {/* Or Google or Facebook */}
-        <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <AuthButtonTransparent label="Google" style={styles.otherButton} />
-
-          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
-        </View>
 
         <ThemedText
           type="link"
@@ -122,26 +130,33 @@ export default function ForgotPasswordScreen() {
             {
               color: "#fff",
               alignSelf: "flex-start",
-              marginTop: 5,
-              textDecorationLine: "underline",
+              marginTop: 20,
               marginHorizontal: 10,
             },
           ]}
         >
-          Don't have a account,{" "}
-          <ThemedText
-            type="link"
-            style={[
-              {
-                color: "#fff",
-                textDecorationLine: "underline",
-                fontWeight: "bold",
-              },
-            ]}
+          Didn't receive a code?{" "}
+          <Pressable
+            onPress={handleResend}
           >
-            Sign Up
-          </ThemedText>
+            <ThemedText
+              type="default"
+              style={[
+                {
+                  color: "#B9FF66",
+                  fontWeight: "bold",
+                },
+              ]}
+            >
+              Resend
+            </ThemedText>
+          </Pressable>
         </ThemedText>
+        <AuthButtonGradient
+          style={{ width: "100%", marginTop: 10, marginHorizontal: 0 }}
+          label="Verify OTP"
+          onPress={handleSubmit(onSubmit)}
+        />
       </ThemedView>
     </ThemedView>
   );
@@ -180,7 +195,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
-    marginBottom: 10,
+    marginBottom: -20,
     padding: 10,
     fontSize: 12,
   },

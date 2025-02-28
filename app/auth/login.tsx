@@ -8,10 +8,10 @@ import {
 import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import { TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { EffectCallback, useEffect, useState } from "react";
 import Checkbox from "expo-checkbox";
 import AuthButton from "@/components/auth/AuthButton";
 import AnimatedPressable from "@/components/AnimatedPressable";
@@ -19,23 +19,62 @@ import GradientText from "@/components/GradientText";
 import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 type FormData = {
   email: string;
   password: string;
 };
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch } from "react-redux";
+import { login, sendAccountOTP, resetLoggedIn } from "@/redux/slices/authSlice";
+import { LoginCredentials } from "@/interfaces/authInterface";
+import { useAppSelector } from "@/redux/hook";
+
 export default function LoginScreen() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken } = useAppSelector(state => state.auth)
+
   const {
     control,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
-  const onSubmit = (data: any) => {
-    Alert.alert("Login Successful", `Welcome, ${data.email}`);
-    router.replace("/(tabs)");
+  
+  const emailWatch = watch('email')
+
+  const [init, setInit] = useState(false)
+
+  const onSubmit = (data: LoginCredentials) => {
+    dispatch(login(data))
+    // Alert.alert("Login Successful", `Welcome, ${data.email}`);
+    // router.replace("/(tabs)");
   };
+
+  // Init
+  useEffect(() => {
+    // Reset
+    dispatch(resetLoggedIn(false))
+
+    setInit(true)
+  }, [])
+
+  useEffect(() => {
+    if (!init) return
+
+    if (isLoggedIn && !isAccountVerified) {
+      router.push({
+        pathname: "/auth/verify-account-otp",
+        params: { resendEmail: emailWatch } 
+      });
+    }
+    
+    if (isLoggedIn && isAccountVerified && userAccessToken.length > 0 && userRefreshToken.length > 0) {
+      router.replace("/(tabs)");
+    }
+  }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])
+
 
   const [isRememberChecked, setRememberChecked] = useState(false);
   const handleToggleCheckbox = () => {

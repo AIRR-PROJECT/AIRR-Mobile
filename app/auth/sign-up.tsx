@@ -15,12 +15,16 @@ import {
 import AnimatedPressable from "@/components/AnimatedPressable";
 import GradientText from "@/components/GradientText";
 import { TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import { Pressable } from "react-native";
 import { ScrollView } from "react-native";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
+import { useDispatch } from "react-redux";
+import { resetAccountCreated, signup } from "@/redux/slices/authSlice";
+import { SignUpCredentials } from "@/interfaces/authInterface";
+import { useAppSelector } from "@/redux/hook";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -38,10 +42,23 @@ export default function SignUpScreen() {
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { isAccountCreated } = useAppSelector(state => state.auth)
 
   const password = watch("password");
 
   const [isTermChecked, setTermChecked] = useState(false);
+
+  useEffect(() => {
+    dispatch(resetAccountCreated(false))
+  }, [])
+
+  useEffect(() => {
+    if (isAccountCreated) {
+      router.back()
+    }
+  }, [isAccountCreated])
+
   const handleToggleCheckbox = () => {
     setTermChecked(!isTermChecked);
   };
@@ -49,7 +66,14 @@ export default function SignUpScreen() {
     if (!isTermChecked) {
       Alert.alert("Please accept the terms and conditions");
     } else {
-      router.push("/auth/login");
+      const signUpData: SignUpCredentials = {
+        email: data.email,
+        username: data.username,
+        password: data.password
+      }
+
+      console.log("test")
+      dispatch(signup(signUpData))
     }
   };
   const handleBackToLogin = () => {

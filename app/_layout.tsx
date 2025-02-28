@@ -14,6 +14,8 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Image } from "expo-image";
 import LeftHeader from "@/components/tabs/LeftHeader";
 import RightHeader from "@/components/tabs/RightHeader";
+import { Provider } from "react-redux";
+import store from "@/redux/store";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -36,45 +38,46 @@ export default function RootLayout() {
   }
 
   return (
-    // change to dark later
-    <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
-      {/* <StatusBar style="auto" /> */}
-      {/* <SafeAreaView style={styles.safeArea}> */}
-      <View style={styles.container}>
-        <Stack>
-          <Stack.Screen
-            name="index"
-            redirect={userLoggedIn}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name="auth" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: true,
-              headerStyle:{
-                backgroundColor: "#1E1E1E",
-              },
-              headerLeft: () => <LeftHeader/>,
-              headerTitle: "",
-              headerRight: () => <RightHeader streak={streak}/>,
-            }}
-          />
-          <Stack.Screen name="profile" 
-            options={{
-              headerTitle: "Profile",
-            }}
-          />
-        </Stack>
-        {userLoggedIn ? (
-          <Redirect href="/(tabs)" />
-        ) : (
-          <Redirect href="/auth" />
-        )}
-       
-      </View>
-      {/* </SafeAreaView> */}
-    </ThemeProvider>
+    <Provider store={store}>
+      {/* // change to dark later */}
+      <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
+        {/* <StatusBar style="auto" /> */}
+        {/* <SafeAreaView style={styles.safeArea}> */}
+        <View style={styles.container}>
+          <Stack>
+            <Stack.Screen
+              name="index"
+              redirect={userLoggedIn}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="auth" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: true,
+                headerStyle:{
+                  backgroundColor: "#1E1E1E",
+                },
+                headerLeft: () => <LeftHeader/>,
+                headerTitle: "",
+                headerRight: () => <RightHeader streak={streak}/>,
+              }}
+            />
+            <Stack.Screen name="profile" 
+              options={{
+                headerTitle: "Profile",
+              }}
+            />
+          </Stack>
+          {userLoggedIn ? (
+            <Redirect href="/(tabs)" />
+          ) : (
+            <Redirect href="/auth" />
+          )}
+        </View>
+        {/* </SafeAreaView> */}
+      </ThemeProvider>
+    </Provider>
   );
 }
 

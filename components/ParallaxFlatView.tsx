@@ -6,6 +6,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   useAnimatedScrollHandler,
+  Extrapolation,
 } from "react-native-reanimated";
 
 import { ThemedView } from "@/components/ThemedView";
@@ -49,12 +50,12 @@ export default function ParallaxFlatView({
           translateY: interpolate(
             scrollOffset.value,
             [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
-
+            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75],
+            Extrapolation.CLAMP,
           ),
         },
         {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
+          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1], Extrapolation.CLAMP,),
         },
       ],
     };
@@ -64,11 +65,12 @@ export default function ParallaxFlatView({
   const data = Array.isArray(children) ? children : [children];
 
   return (
+    // change light to #fff later
     <ThemedView
       style={[
         styles.container,
         style,
-        { backgroundColor: colorScheme === "light" ? "#fff" : "#000" }, // Fixed background color
+        { backgroundColor: colorScheme === "light" ? "#1E1E1E" : "#000" }, // Fixed background color
       ]}
     >
       <Animated.FlatList
@@ -79,7 +81,7 @@ export default function ParallaxFlatView({
         scrollEventThrottle={16}
         onScroll={onScroll} // Attach animated scroll handler
         scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}
+        contentContainerStyle={{ paddingBottom: bottom, }}
         ListHeaderComponent={
           hasHeader ? (
             <Animated.View

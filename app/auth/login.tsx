@@ -28,11 +28,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 import { login, sendAccountOTP, resetLoggedIn } from "@/redux/slices/authSlice";
 import { LoginCredentials } from "@/interfaces/authInterface";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken } = useAppSelector(state => state.auth)
 
   const {

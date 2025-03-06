@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, } from "react-native";
 import GradientText from "@/components/GradientText";
 import AnimatedPressable from "@/components/AnimatedPressable";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { sendAccountOTP, sendPasswordOTP, resetPasswordVerified, verifyPasswordOTP } from "@/redux/slices/authSlice";
@@ -25,7 +25,7 @@ export default function SignUpScreen() {
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const otpWatch = watch('otp')
   const searchParams = useLocalSearchParams<{ resendEmail: string }>()
   const { isPasswordVerified } = useAppSelector(state => state.auth)

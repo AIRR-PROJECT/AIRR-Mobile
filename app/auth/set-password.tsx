@@ -50,8 +50,8 @@ export default function SetPasswordScreen() {
     
     dispatch(setPassword(setPasswordData))
   };
-  const handleBackToLogin = () => {
-    router.push("/auth/login");
+  const handleBackToForgotPassword = () => {
+    router.push("/auth/forgot-password");
   };
 
   return (
@@ -62,7 +62,7 @@ export default function SetPasswordScreen() {
     >
       <AuthHeader />
       <TouchableOpacity
-        onPress={handleBackToLogin}
+        onPress={handleBackToForgotPassword}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>

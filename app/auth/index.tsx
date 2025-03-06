@@ -1,4 +1,4 @@
-import { EffectCallback, Link, Redirect, Stack, useRouter } from "expo-router";
+import { EffectCallback, useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -8,17 +8,12 @@ import AuthButton from "@/components/auth/AuthButton";
 import ImageViewer from "@/components/ImageViewer";
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import { Dimensions, TouchableOpacity } from "react-native";
-import AnimatedPressable from "@/components/AnimatedPressable";
 import { LinearGradient } from "expo-linear-gradient";
-import { sendAccountOTP } from "@/redux/slices/authSlice";
 import { useEffect } from "react";
-import { useAppSelector } from "@/redux/hook";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
 const logo = require("@/assets/images/auth/Logo.svg");
-  
-const useMountEffect = (fun: EffectCallback) => useEffect(fun, [])
 
 export default function AuthScreen() {
   const router = useRouter();

@@ -46,8 +46,8 @@ export default function SignUpScreen() {
   const onSubmit = (data: FormData) => {
     dispatch(verifyPasswordOTP({ email: searchParams.resendEmail, otp: otpWatch.toString() }))
   };
-  const handleBackToLogin = () => {
-    router.push("/auth/login");
+  const handleBackToForgotPassword = () => {
+    router.push("/auth/forgot-password");
   };
   const handleResend = () => {
     dispatch(sendPasswordOTP({ email: searchParams.resendEmail }))
@@ -60,7 +60,7 @@ export default function SignUpScreen() {
     >
       <AuthHeader />
       <TouchableOpacity
-        onPress={handleBackToLogin}
+        onPress={handleBackToForgotPassword}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>

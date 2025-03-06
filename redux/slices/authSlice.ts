@@ -3,9 +3,10 @@ import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { Alert } from "react-native";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { User, UserInfo } from "@/interfaces/userInterace";
 import { ResponseFailcode } from "@/enums/failcode.enum";
+import { getReasonPhrase } from 'http-status-codes'
 
 const initialState = {
     userAccessToken: "",
@@ -133,18 +134,20 @@ export const sendPasswordOTP = createAsyncThunk(
 export const verifyAccountOTP = createAsyncThunk<APIResponse, VerifyAccountCredentials>(
     'auth/verify-account-otp',
     async (data: VerifyAccountCredentials) => {
-        const verify = await api.post('auth/verify-account-otp', data) as APIResponse
+        const verify = await api.post('auth/verify-account-otp', data) as AxiosResponse
         
-        return verify
+        return verify.data
     }
 )
 
 export const verifyPasswordOTP = createAsyncThunk<APIResponse, VerifyPasswordCredentials>(
     'auth/verify-password-otp',
     async (data: VerifyPasswordCredentials) => {
-        const verify = await api.post('auth/verify-password-otp', data) as APIResponse
+        console.log("v1")
+        const verify = await api.post('auth/verify-password-otp', data) as AxiosResponse
+        console.log(verify.data)
         
-        return verify
+        return verify.data
     }
 )
 
@@ -152,15 +155,14 @@ export const setPassword = createAsyncThunk<APIResponse, SetPasswordCredentials>
     'auth/change-password',
     async (data: SetPasswordCredentials) => {
         // const token = await SecureStore.getItemAsync('passwordToken')
-        console.log(token)
 
         const set = await api.post('auth/change-password', data, {
             headers: {
                 Authorization: `Bearer ${token}`
               }
-        }) as APIResponse
+        }) as AxiosResponse
 
-        return set
+        return set.data
     }
 )
 
@@ -234,33 +236,56 @@ const authSlice = createSlice({
                 state.isAccountVerified = true
             })
             .addCase(login.rejected, (state, action) => {
-                if ((action.payload as APIResponse).message) {
-                    Alert.alert("Error", (action.payload as APIResponse).message)
-
-                    const payload = (action.payload as APIResponse)
-                    if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
-                        state.isLoggedIn = true
+                if (action.payload) {
+                    if ((action.payload as APIResponse).message) {
+                        Alert.alert("Error", (action.payload as APIResponse).message)
+    
+                        const payload = (action.payload as APIResponse)
+                        if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
+                            state.isLoggedIn = true
+                        }
+                    }
+                    else {
+                        Alert.alert("Error", action.payload as string)
                     }
                 }
-                else if (action.payload) {
-                    Alert.alert("Error", action.payload as string)
-                }
                 else {
-                    Alert.alert("Error", action.error.message)
+                    const check_prefix = "Request failed with status code "
+                    if (action.error.message?.startsWith("Request failed with status code ")) {
+                        const code = action.error.message.slice(check_prefix.length)
+                        Alert.alert("Error", getReasonPhrase(code))
+                    }
+                    else {
+                        Alert.alert("Error", action.error.message)
+                    }
                 }
             })
             .addCase(signup.fulfilled, (state, action) => {
                 state.isAccountCreated = true
             })
             .addCase(signup.rejected, (state, action) => {
-                if ((action.payload as APIResponse).message) {
-                    Alert.alert("Error", (action.payload as APIResponse).message)
-                }
-                else if (action.payload) {
-                    Alert.alert("Error", action.payload as string)
+                if (action.payload) {
+                    if ((action.payload as APIResponse).message) {
+                        Alert.alert("Error", (action.payload as APIResponse).message)
+    
+                        const payload = (action.payload as APIResponse)
+                        if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
+                            state.isLoggedIn = true
+                        }
+                    }
+                    else {
+                        Alert.alert("Error", action.payload as string)
+                    }
                 }
                 else {
-                    Alert.alert("Error", action.error.message)
+                    const check_prefix = "Request failed with status code "
+                    if (action.error.message?.startsWith("Request failed with status code ")) {
+                        const code = action.error.message.slice(check_prefix.length)
+                        Alert.alert("Error", getReasonPhrase(code))
+                    }
+                    else {
+                        Alert.alert("Error", action.error.message)
+                    }
                 }
             })
             .addCase(verifyAccountOTP.fulfilled, (state, action) => {
@@ -268,37 +293,60 @@ const authSlice = createSlice({
             })
             .addCase(verifyPasswordOTP.fulfilled, (state, action) => {
                 state.isPasswordVerified = true
-                token = action.payload.data.data.change_password_token
-                SecureStore.setItemAsync('passwordToken', action.payload.data.data.change_password_token)
+                token = action.payload.data.change_password_token
+                SecureStore.setItemAsync('passwordToken', token)
             })
             .addCase(verifyPasswordOTP.rejected, (state, action) => {
-                console.log(action.payload !== undefined)
-                if ((action.payload as APIResponse).message) {
-                    Alert.alert("Error", (action.payload as APIResponse).message)
+                if (action.payload) {
+                    if ((action.payload as APIResponse).message) {
+                        Alert.alert("Error", (action.payload as APIResponse).message)
+    
+                        const payload = (action.payload as APIResponse)
+                        if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
+                            state.isLoggedIn = true
+                        }
+                    }
+                    else {
+                        Alert.alert("Error", action.payload as string)
+                    }
                 }
-                else if (action.payload !== undefined) {
-                    Alert.alert("Error", action.payload as string)
-                }
-                
-                Alert.alert("Error", action.error.message)
-                if (action.error) {
-                    console.log("test")
-                    // Alert.alert("Error", action.error.message)
+                else {
+                    const check_prefix = "Request failed with status code "
+                    if (action.error.message?.startsWith("Request failed with status code ")) {
+                        const code = action.error.message.slice(check_prefix.length)
+                        Alert.alert("Error", getReasonPhrase(code))
+                    }
+                    else {
+                        Alert.alert("Error", action.error.message)
+                    }
                 }
             })
             .addCase(setPassword.fulfilled, (state, action) => {
                 state.changedPassword = true
             })
             .addCase(setPassword.rejected, (state, action) => {
-                if ((action.payload as APIResponse).message) {
-                    Alert.alert("Error", (action.payload as APIResponse).message)
-                }
-                else if (action.payload) {
-                    Alert.alert("Error", action.payload as string)
+                if (action.payload) {
+                    if ((action.payload as APIResponse).message) {
+                        Alert.alert("Error", (action.payload as APIResponse).message)
+    
+                        const payload = (action.payload as APIResponse)
+                        if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
+                            state.isLoggedIn = true
+                        }
+                    }
+                    else {
+                        Alert.alert("Error", action.payload as string)
+                    }
                 }
                 else {
-                    console.log("test")
-                    Alert.alert("Error", action.error.message)
+                    const check_prefix = "Request failed with status code "
+                    if (action.error.message?.startsWith("Request failed with status code ")) {
+                        const code = action.error.message.slice(check_prefix.length)
+                        Alert.alert("Error", getReasonPhrase(code))
+                    }
+                    else {
+                        Alert.alert("Error", action.error.message)
+                    }
                 }
             })
     },

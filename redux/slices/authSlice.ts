@@ -7,10 +7,13 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { User, UserInfo } from "@/interfaces/userInterace";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
+import jwt from 'expo-jwt'
+import { jwtDecode } from "jwt-decode";
 
 const initialState = {
     userAccessToken: "",
     userRefreshToken: "",
+    user: null,
     isAccountCreated: false,
     isLoggedIn: false,
     isAccountVerified: false,
@@ -143,9 +146,7 @@ export const verifyAccountOTP = createAsyncThunk<APIResponse, VerifyAccountCrede
 export const verifyPasswordOTP = createAsyncThunk<APIResponse, VerifyPasswordCredentials>(
     'auth/verify-password-otp',
     async (data: VerifyPasswordCredentials) => {
-        console.log("v1")
         const verify = await api.post('auth/verify-password-otp', data) as AxiosResponse
-        console.log(verify.data)
         
         return verify.data
     }
@@ -168,11 +169,36 @@ export const setPassword = createAsyncThunk<APIResponse, SetPasswordCredentials>
 
 export const loadToken = createAsyncThunk(
     'auth/loadToken',
-    async () => {
+    async (_, thunkAPI) => {
         // Perform async operation here
         const accessToken = await SecureStore.getItemAsync('accessToken');
-        const refreshToken = await SecureStore.getItemAsync('refreshToken');   
-        return { accessToken, refreshToken }; 
+        const refreshToken = await SecureStore.getItemAsync('refreshToken');
+        
+        if (accessToken && refreshToken) {
+            return { accessToken, refreshToken };
+        }
+        else {
+            return thunkAPI.rejectWithValue(null)
+        }
+    }
+)
+
+export const getUserInfo = createAsyncThunk(
+    'auth/userInfo',
+    async (_, thunkAPI) => {
+        const accessToken =  await SecureStore.getItemAsync('accessToken');
+        
+        if (accessToken) {
+            const payload = jwtDecode(accessToken) as any
+
+            const res = await api.get('/users/by-username?username=' + payload.username) as AxiosResponse
+
+            if (res.data.success)
+                return res.data.data
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
     }
 )
 
@@ -214,11 +240,15 @@ const authSlice = createSlice({
         logout(state) {
             state.userAccessToken = "";
             state.userRefreshToken = "";
+            state.passwordVerifyToken = ""
+            state.user = null
             SecureStore.deleteItemAsync('accessToken');
             SecureStore.deleteItemAsync('refreshToken');
             state.isLoggedIn = false
             state.isAccountVerified = false
             state.isPasswordVerified = false
+            state.isAccountCreated = false
+            state.changedPassword = false
         },
 
     },
@@ -236,57 +266,58 @@ const authSlice = createSlice({
                 state.isAccountVerified = true
             })
             .addCase(login.rejected, (state, action) => {
-                if (action.payload) {
-                    if ((action.payload as APIResponse).message) {
-                        Alert.alert("Error", (action.payload as APIResponse).message)
+                if (action.payload && (action.payload as APIResponse).message) {
+                    state.isLoggedIn = true
+                }
+
+                /* Handling this somewhere else */
+                // if (action.payload) {
+                //     if ((action.payload as APIResponse).message) {
+                //         Alert.alert("Error", (action.payload as APIResponse).message)
     
-                        const payload = (action.payload as APIResponse)
-                        if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
-                            state.isLoggedIn = true
-                        }
-                    }
-                    else {
-                        Alert.alert("Error", action.payload as string)
-                    }
-                }
-                else {
-                    const check_prefix = "Request failed with status code "
-                    if (action.error.message?.startsWith("Request failed with status code ")) {
-                        const code = action.error.message.slice(check_prefix.length)
-                        Alert.alert("Error", getReasonPhrase(code))
-                    }
-                    else {
-                        Alert.alert("Error", action.error.message)
-                    }
-                }
+                //         const payload = (action.payload as APIResponse)
+                //         if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
+                //             state.isLoggedIn = true
+                //         }
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.payload as string)
+                //     }
+                // }
+                // else {
+                //     const check_prefix = "Request failed with status code "
+                //     if (action.error.message?.startsWith("Request failed with status code ")) {
+                //         const code = action.error.message.slice(check_prefix.length)
+                //         Alert.alert("Error", getReasonPhrase(code))
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.error.message)
+                //     }
+                // }
             })
             .addCase(signup.fulfilled, (state, action) => {
                 state.isAccountCreated = true
             })
             .addCase(signup.rejected, (state, action) => {
-                if (action.payload) {
-                    if ((action.payload as APIResponse).message) {
-                        Alert.alert("Error", (action.payload as APIResponse).message)
-    
-                        const payload = (action.payload as APIResponse)
-                        if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
-                            state.isLoggedIn = true
-                        }
-                    }
-                    else {
-                        Alert.alert("Error", action.payload as string)
-                    }
-                }
-                else {
-                    const check_prefix = "Request failed with status code "
-                    if (action.error.message?.startsWith("Request failed with status code ")) {
-                        const code = action.error.message.slice(check_prefix.length)
-                        Alert.alert("Error", getReasonPhrase(code))
-                    }
-                    else {
-                        Alert.alert("Error", action.error.message)
-                    }
-                }
+                /* Handling this somewhere else */
+                // if (action.payload) {
+                //     if ((action.payload as APIResponse).message) {
+                //         Alert.alert("Error", (action.payload as APIResponse).message)
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.payload as string)
+                //     }
+                // }
+                // else {
+                //     const check_prefix = "Request failed with status code "
+                //     if (action.error.message?.startsWith("Request failed with status code ")) {
+                //         const code = action.error.message.slice(check_prefix.length)
+                //         Alert.alert("Error", getReasonPhrase(code))
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.error.message)
+                //     }
+                // }
             })
             .addCase(verifyAccountOTP.fulfilled, (state, action) => {
                 state.isAccountVerified = true
@@ -297,58 +328,70 @@ const authSlice = createSlice({
                 SecureStore.setItemAsync('passwordToken', token)
             })
             .addCase(verifyPasswordOTP.rejected, (state, action) => {
-                if (action.payload) {
-                    if ((action.payload as APIResponse).message) {
-                        Alert.alert("Error", (action.payload as APIResponse).message)
-    
-                        const payload = (action.payload as APIResponse)
-                        if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
-                            state.isLoggedIn = true
-                        }
-                    }
-                    else {
-                        Alert.alert("Error", action.payload as string)
-                    }
-                }
-                else {
-                    const check_prefix = "Request failed with status code "
-                    if (action.error.message?.startsWith("Request failed with status code ")) {
-                        const code = action.error.message.slice(check_prefix.length)
-                        Alert.alert("Error", getReasonPhrase(code))
-                    }
-                    else {
-                        Alert.alert("Error", action.error.message)
-                    }
-                }
+                /* Handling this somewhere else */
+                // if (action.payload) {
+                //     if ((action.payload as APIResponse).message) {
+                //         Alert.alert("Error", (action.payload as APIResponse).message)
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.payload as string)
+                //     }
+                // }
+                // else {
+                //     const check_prefix = "Request failed with status code "
+                //     if (action.error.message?.startsWith("Request failed with status code ")) {
+                //         const code = action.error.message.slice(check_prefix.length)
+                //         Alert.alert("Error", getReasonPhrase(code))
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.error.message)
+                //     }
+                // }
             })
             .addCase(setPassword.fulfilled, (state, action) => {
                 state.changedPassword = true
             })
             .addCase(setPassword.rejected, (state, action) => {
-                if (action.payload) {
-                    if ((action.payload as APIResponse).message) {
-                        Alert.alert("Error", (action.payload as APIResponse).message)
-    
-                        const payload = (action.payload as APIResponse)
-                        if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
-                            state.isLoggedIn = true
-                        }
-                    }
-                    else {
-                        Alert.alert("Error", action.payload as string)
-                    }
-                }
-                else {
-                    const check_prefix = "Request failed with status code "
-                    if (action.error.message?.startsWith("Request failed with status code ")) {
-                        const code = action.error.message.slice(check_prefix.length)
-                        Alert.alert("Error", getReasonPhrase(code))
-                    }
-                    else {
-                        Alert.alert("Error", action.error.message)
-                    }
-                }
+                /* Handling this somewhere else */
+                // if (action.payload) {
+                //     if ((action.payload as APIResponse).message) {
+                //         Alert.alert("Error", (action.payload as APIResponse).message)
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.payload as string)
+                //     }
+                // }
+                // else {
+                //     const check_prefix = "Request failed with status code "
+                //     if (action.error.message?.startsWith("Request failed with status code ")) {
+                //         const code = action.error.message.slice(check_prefix.length)
+                //         Alert.alert("Error", getReasonPhrase(code))
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.error.message)
+                //     }
+                // }
             })
+            .addCase(loadToken.fulfilled, (state, action) => {
+                state.userAccessToken = action.payload.accessToken
+                state.userRefreshToken = action.payload.refreshToken
+                state.isLoggedIn = true
+                state.isAccountVerified = true
+            })
+            .addCase(loadToken.rejected, (state, action) => {
+                console.log("Where tokens :<")
+            })
+            .addCase(getUserInfo.fulfilled, (state, action) => {
+                state.user = action.payload.user
+            })
+            .addCase(getUserInfo.rejected, (state, action) => {
+                // console.log(action)
+                state.userAccessToken = ""
+                state.userRefreshToken = ""
+                state.isLoggedIn = false
+                state.isAccountVerified = false
+            })
+
     },
 });
 

@@ -14,7 +14,7 @@ export default function AuthHeader({ signUp = true }: AuthHeaderProps) {
   const router = useRouter();
   const handlePress = () => {
     if (signUp) {
-      router.push("/auth/sign-up");
+      router.push("/auth/sign-up-first-page");
     } else {
       router.push("/auth/login");
     }

@@ -46,7 +46,8 @@ export default function AuthLayout() {
         <Stack.Screen name='verify-account-otp' options={{ headerShown: false }}/>
         <Stack.Screen name='verify-password-otp' options={{ headerShown: false }}/>
         <Stack.Screen name='set-password' options={{ headerShown: false }}/>
-        <Stack.Screen name='sign-up' options={{ headerShown: false }}/>
+        <Stack.Screen name='sign-up-first-page' options={{ headerShown: false }}/>
+        <Stack.Screen name='sign-up-second-page' options={{ headerShown: false }}/>
       </Stack>
 
   

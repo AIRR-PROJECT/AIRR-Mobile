@@ -1,23 +1,17 @@
-import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import AuthHeader from "@/components/auth/AuthHeader";
+import GradientText from "@/components/GradientText";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { Controller, useForm } from "react-hook-form";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View, Alert } from "react-native";
-import GradientText from "@/components/GradientText";
-import { TouchableOpacity } from "react-native";
-import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import Checkbox from "expo-checkbox";
-import { Pressable } from "react-native";
-import { ScrollView } from "react-native";
+import { TouchableOpacity } from "react-native";
+import { useState } from "react";
+import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
-import { useDispatch } from "react-redux";
-import { resetAccountCreated, signup } from "@/redux/slices/authSlice";
-import { SignUpCredentials } from "@/interfaces/authInterface";
-import { useAppSelector } from "@/redux/hook";
+import { router, useLocalSearchParams } from "expo-router";
+import Checkbox from "expo-checkbox";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -27,138 +21,65 @@ type FormData = {
   confirmPassword: string;
 };
 
-export default function SignUpScreen() {
+export default function SignUpSecondPage() {
+  // get the data from the previous page
+  const { data } = useLocalSearchParams();
+  const { firstName, lastName, username } = JSON.parse(data as string);
+
   const {
     control,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm<FormData>();
-  const router = useRouter();
-  const dispatch = useDispatch();
-  const { isAccountCreated } = useAppSelector((state) => state.auth);
-
+ 
   const password = watch("password");
 
   const [isTermChecked, setTermChecked] = useState(false);
-
-  useEffect(() => {
-    dispatch(resetAccountCreated(false));
-  }, []);
-
-  useEffect(() => {
-    if (isAccountCreated) {
-      router.back();
-    }
-  }, [isAccountCreated]);
-
-  const handleToggleCheckbox = () => {
-    setTermChecked(!isTermChecked);
-  };
-  const onSubmit = (data: FormData) => {
-    if (!isTermChecked) {
-      Alert.alert("Please accept the terms and conditions");
-    } else {
-      const signUpData: SignUpCredentials = {
-        email: data.email,
-        username: data.username,
-        password: data.password,
-      };
-
-      console.log("test");
-      dispatch(signup(signUpData));
-    }
-  };
+    const handleToggleCheckbox = () => {
+      setTermChecked(!isTermChecked);
+    };
+    const onSubmit = (data: FormData) => {
+      if (!isTermChecked) {
+        Alert.alert("Please accept the terms and conditions");
+      } else {
+        // const signUpData: SignUpCredentials = {
+        //   email: data.email,
+        //   username: data.username,
+        //   password: data.password,
+        // };
+  
+        console.log("test");
+        // dispatch(signup(signUpData));
+      }
+    };
   const handleBackToLogin = () => {
     router.push("/auth/login");
   };
-
   return (
-    <ScrollView
-      contentContainerStyle={[styles.container, { backgroundColor: "#1E1E1E" }]}
-      //   darkColor="#1E1E1E"
-      //   lightColor="#1E1E1E"
+    // change light color to #000 later because figma didn't have a color for light mode
+    <ThemedView
+      style={[styles.container]}
+      darkColor="#1E1E1E"
+      lightColor="#1E1E1E"
     >
       <AuthHeader signUp={false} />
-      <View
-        style={{ alignSelf: "flex-start", padding: 10, flexDirection: "row" }}
-      >
-        <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
-          Sign up
-        </GradientText>
-        <Text style={styles.text}> now.</Text>
-      </View>
-
-      <ThemedView style={styles.formContainer}>
-        {/* First name and last name */}
-        <View style={[styles.section, { justifyContent: "space-between" }]}>
-          {/* First Name */}
-          <View style={{ width: "48%" }}>
-            <Text style={[styles.paragraph]}>First Name</Text>
-            <Controller
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <LinearGradient
-                  colors={["#B9FF66", "#9DE8EE"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{ borderRadius: 20 }}
-                >
-                  <TextInput
-                    style={[
-                      styles.input,
-                      errors.firstName && styles.errorInput,
-                      { width: "100%" },
-                    ]}
-                    placeholder="First Name"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                </LinearGradient>
-              )}
-              name="firstName"
-              rules={{ required: "First Name is required" }}
-              defaultValue=""
-            />
-            {errors.firstName && (
-              <Text style={styles.errorText}>{errors.firstName.message}</Text>
-            )}
-          </View>
-          {/* First Name */}
-          <View style={{ width: "48%" }}>
-            <Text style={[styles.paragraph]}>Last Name</Text>
-            <Controller
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <LinearGradient
-                  colors={["#B9FF66", "#9DE8EE"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{ borderRadius: 20 }}
-                >
-                  <TextInput
-                    style={[
-                      styles.input,
-                      errors.lastName && styles.errorInput,
-                      { width: "100%" },
-                    ]}
-                    placeholder="Last Name"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                </LinearGradient>
-              )}
-              name="lastName"
-              rules={{ required: "Last Name is required" }}
-              defaultValue=""
-            />
-            {errors.lastName && (
-              <Text style={styles.errorText}>{errors.lastName.message}</Text>
-            )}
-          </View>
+      <View style={{ alignSelf: "flex-start", padding: 10 }}>
+        <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
+          <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
+            Sign up
+          </GradientText>
+          <Text style={styles.text}> now.</Text>
         </View>
+        <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
+          <Text style={styles.smalltext}>Let's set up your account, </Text>
+          <Text style={[styles.smalltext, { color: "#B9FF66" }]}>
+            {username}
+          </Text>
+          <Text style={styles.smalltext}>!</Text>
+        </View>
+      </View>
+      <ThemedView style={styles.formContainer}>
         {/* Email Input */}
         <Text style={[styles.paragraph]}>Email</Text>
         <Controller
@@ -193,42 +114,6 @@ export default function SignUpScreen() {
         {errors.email && (
           <ThemedText style={styles.errorText}>
             {errors.email.message}
-          </ThemedText>
-        )}
-
-        {/* Username Input */}
-        <Text style={[styles.paragraph]}>Username</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "Username is required",
-            minLength: {
-              value: 6,
-              message: "Username must be at least 6 characters",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <LinearGradient
-              colors={["#B9FF66", "#9DE8EE"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ borderRadius: 20 }}
-            >
-              <TextInput
-                style={[styles.input, errors.username && styles.errorInput]}
-                placeholder="Username"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </LinearGradient>
-          )}
-          name="username"
-          defaultValue=""
-        />
-        {errors.username && (
-          <ThemedText style={styles.errorText}>
-            {errors.username.message}
           </ThemedText>
         )}
 
@@ -361,57 +246,57 @@ export default function SignUpScreen() {
           </Text>
         </TouchableOpacity>
 
-        {/* Sign Up Button */}
-        <AuthButtonGradient
-          label="Sign Up"
-          onPress={handleSubmit(onSubmit)}
-          style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
-        />
-
-        {/* Other Options */}
-        <ThemedText
-          type="default"
-          style={[{ color: "#fff", alignSelf: "center" }]}
-        >
-          Or
-        </ThemedText>
-        {/* Or Google or Facebook */}
-        <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <AuthButtonTransparent label="Google" style={styles.otherButton} />
-
-          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
-        </View>
-
-        {/* Sign In Link*/}
-        <TouchableOpacity onPress={handleBackToLogin}>
-          <ThemedText
-            type="link"
-            style={[
-              {
-                color: "#fff",
-                alignSelf: "flex-start",
-                marginTop: 5,
-                textDecorationLine: "underline",
-              },
-            ]}
-          >
-            Have an account yet,{" "}
-            <ThemedText
-              type="link"
-              style={[
-                {
-                  color: "#fff",
-
-                  fontWeight: "bold",
-                },
-              ]}
-            >
-              Sign In
-            </ThemedText>
-          </ThemedText>
-        </TouchableOpacity>
+                {/* Sign Up Button */}
+                <AuthButtonGradient
+                  label="Sign Up"
+                  onPress={handleSubmit(onSubmit)}
+                  style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
+                />
+        
+                {/* Other Options */}
+                <ThemedText
+                  type="default"
+                  style={[{ color: "#fff", alignSelf: "center" }]}
+                >
+                  Or
+                </ThemedText>
+                {/* Or Google or Facebook */}
+                <View style={[styles.section, { justifyContent: "space-between" }]}>
+                  <AuthButtonTransparent label="Google" style={styles.otherButton} />
+        
+                  <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
+                </View>
+        
+                {/* Sign In Link*/}
+                <TouchableOpacity onPress={handleBackToLogin}>
+                  <ThemedText
+                    type="link"
+                    style={[
+                      {
+                        color: "#fff",
+                        alignSelf: "flex-start",
+                        marginTop: 5,
+                        textDecorationLine: "underline",
+                      },
+                    ]}
+                  >
+                    Have an account yet,{" "}
+                    <ThemedText
+                      type="link"
+                      style={[
+                        {
+                          color: "#fff",
+        
+                          fontWeight: "bold",
+                        },
+                      ]}
+                    >
+                      Sign In
+                    </ThemedText>
+                  </ThemedText>
+                </TouchableOpacity>
       </ThemedView>
-    </ScrollView>
+    </ThemedView>
   );
 }
 
@@ -421,6 +306,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  smalltext: {
+    fontSize: 16,
+    color: "#fff",
+    alignSelf: "flex-start",
+  },
+
   text: {
     fontSize: 40,
     fontWeight: "bold",

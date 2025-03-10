@@ -209,6 +209,8 @@ const authSlice = createSlice({
         setAuthData(state, action) {
             state.userAccessToken = action.payload.userAccessToken;
             state.userRefreshToken = action.payload.userRefreshToken;
+            SecureStore.setItemAsync('accessToken', action.payload.userAccessToken);
+            SecureStore.setItemAsync('refreshToken', action.payload.userRefreshToken);
             state.isLoggedIn = true
             state.isAccountVerified = true
         },

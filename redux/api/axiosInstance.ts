@@ -3,6 +3,9 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { getReasonPhrase } from 'http-status-codes';
 import { Alert } from 'react-native';
+import { useAppDispatch } from '../hook';
+import { setAuthData } from '../slices/authSlice';
+import store from '../store';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 const api = axios.create({
@@ -52,12 +55,20 @@ api.interceptors.response.use(
                         
                         console.log(response)
                         if (response.status === 200) {
-                            await SecureStore.setItemAsync('accessToken', response.data.accessToken);
+                            store.dispatch(setAuthData({
+                                userAccessToken: response.data.access_token,
+                                userRefreshToken: response.data.refresh_token
+                            }))
                             return api(originalRequest);
                         }
                         else {
                             exception_status = response.status
-                            exception_message = response.data.message
+                            if (response.status === 401) {
+                                exception_message = "Session expired. Please re-login"
+                            }
+                            else {
+                                exception_message = response.data.message
+                            }
                         }
                     }
                     else {

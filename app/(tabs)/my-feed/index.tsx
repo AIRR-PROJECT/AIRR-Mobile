@@ -6,6 +6,11 @@ import { Blog } from "@/interfaces/blogInterface";
 import { loremIpsum } from "lorem-ipsum";
 import AIBlogPreview from "@/components/tabs/feed/AIBlogPreview";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
+import { useWatch } from "react-hook-form";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useAppDispatch } from "@/redux/hook";
+import { fetchFeed } from "@/redux/slices/feedSlice";
+import { useState } from "react";
 const mockBlog: Blog = {
   title: "How to fix clipboard if it isn’t working",
   image:
@@ -29,6 +34,18 @@ const mockBlog: Blog = {
 };
 const Data = [mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog];
 export default function MyFeed() {
+  const dispatch = useAppDispatch()
+  const [page, setPage] = useState(1)
+
+  const { data, isSuccess, isError, isPending } = useQuery({
+    queryKey: ['feed-recommended', page],
+    queryFn: async () => {
+      const a = await dispatch(fetchFeed(page))
+      console.log(a)
+    },
+    placeholderData: keepPreviousData
+  })
+
   return (
     <ParallaxFlatView>
       {/* Header */}

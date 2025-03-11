@@ -17,9 +17,11 @@ import RightHeader from "@/components/tabs/RightHeader";
 import { Provider } from "react-redux";
 import store from "@/redux/store";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { getUserInfo, loadToken } from "@/redux/slices/authSlice";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/redux/api/queryClient";
+import { getCurrentUser, getTokens } from "@/stores/authStore";
+import { loadTokensFromStore, setTokens } from "@/redux/slices/userSlice";
+import { getUserInfo, loadToken } from "@/redux/slices/authSlice";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -27,21 +29,30 @@ SplashScreen.preventAutoHideAsync();
 export function RootBackgroundTask() {
   const dispatch = useAppDispatch()
 
-  const { isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken, user } = useAppSelector(state => state.auth)
+  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
+  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
 
   // Init
   useEffect(() => {
-    dispatch(loadToken())
+    dispatch(loadToken()).then(() => {
+      dispatch(getUserInfo())
+    })
   }, [])
 
-  useEffect(() => {
-    if (isLoggedIn && isAccountVerified && userAccessToken) {
-      dispatch(getUserInfo())
-    }
-  }, [isLoggedIn, isAccountVerified, userAccessToken])
+  // useEffect(() => {
+  //   if (isLoggedIn && isAccountVerified && userAccessToken != "") {
+  //     console.log(user)
+  //     if (!user) {
+  //       dispatch(getUserInfo()).then(() => {
+  //         dispatch(loadToken())
+  //       })
+  //     }
+  //   }
+  // }, [isLoggedIn, isAccountVerified, userAccessToken])
 
   useEffect(() => {
-    if (user) {
+    console.log(user)
+    if (user != undefined) {
       router.push("/(tabs)")
     }
   }, [user])

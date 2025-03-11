@@ -30,7 +30,7 @@ export default function AuthScreen() {
     router.push("/auth/login");
   };
   const handleSignUp = () => {
-    router.push("/auth/sign-up");
+    router.push("/auth/sign-up-first-page");
   };
   const handleGuest = () => {
     router.push("/(tabs)");
@@ -46,58 +46,7 @@ export default function AuthScreen() {
         darkColor="#1E1E1E"
         lightColor="#1E1E1E"
       >
-        <LinearGradient
-          colors={["rgba(196, 255, 127, 0.1)", "rgba(196, 255, 127, 0)"]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            borderRadius: 80,
-          }}
-        />
-        <LinearGradient
-          colors={["rgba(196, 255, 127, 0.1)", "rgba(196, 255, 127, 0)"]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 0.8 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            borderRadius: 80,
-          }}
-        />
-        <LinearGradient
-          colors={["rgba(196, 255, 127, 0.1)", "rgba(196, 255, 127, 0)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0.8, y: 0.8 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            borderRadius: 80,
-          }}
-        />
-        <LinearGradient
-          colors={["rgba(196, 255, 127, 0.1)", "rgba(196, 255, 127, 0)"]}
-          start={{ x: 0.8, y: 0 }}
-          end={{ x: 0, y: 0.8 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            borderRadius: 80,
-          }}
-        />
+        
         <ImageViewer imgSource={logo} />
       </ThemedView>
       <ThemedView

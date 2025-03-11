@@ -9,11 +9,9 @@ import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
 import jwt from 'expo-jwt'
 import { jwtDecode } from "jwt-decode";
+import { setTokens, setCurrentUser, reset } from "./userSlice";
 
 const initialState = {
-    userAccessToken: "",
-    userRefreshToken: "",
-    user: null,
     isAccountCreated: false,
     isLoggedIn: false,
     isAccountVerified: false,
@@ -41,9 +39,6 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
             // )
             const response = await api.post('auth/sign-in', loginData);
             const { access_token, refresh_token } = response.data.data;
-            
-            // await SecureStore.setItemAsync('accessToken', accessToken);
-            // await SecureStore.setItemAsync('refreshToken', refreshToken);
 
             if (access_token === undefined) {
                 return thunkAPI.rejectWithValue("Access token must not be undefined")
@@ -51,6 +46,9 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
             if (refresh_token === undefined) {
                 return thunkAPI.rejectWithValue("Refresh token must not be undefined")
             }
+
+            await SecureStore.setItemAsync('accessToken', access_token)
+            await SecureStore.setItemAsync('refreshToken', refresh_token)
     
             return { 
                 accessToken: access_token,
@@ -175,6 +173,8 @@ export const loadToken = createAsyncThunk(
         const refreshToken = await SecureStore.getItemAsync('refreshToken');
         
         if (accessToken && refreshToken) {
+            thunkAPI.dispatch(setTokens({ accessToken, refreshToken }))
+
             return { accessToken, refreshToken };
         }
         else {
@@ -193,8 +193,10 @@ export const getUserInfo = createAsyncThunk(
 
             const res = await api.get('/users/by-username?username=' + payload.username) as AxiosResponse
 
-            if (res.data.success)
+            if (res.data.success) {
+                thunkAPI.dispatch(setCurrentUser(res.data.data))
                 return res.data.data
+            }
             else {
                 return thunkAPI.rejectWithValue(res.data)
             }
@@ -206,15 +208,6 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setAuthData(state, action) {
-            state.userAccessToken = action.payload.userAccessToken;
-            state.userRefreshToken = action.payload.userRefreshToken;
-            SecureStore.setItemAsync('accessToken', action.payload.userAccessToken);
-            SecureStore.setItemAsync('refreshToken', action.payload.userRefreshToken);
-            state.isLoggedIn = true
-            state.isAccountVerified = true
-        },
-
         setLoading(state, action) {
             state.isLoading = action.payload
         },
@@ -240,10 +233,7 @@ const authSlice = createSlice({
         },
 
         logout(state) {
-            state.userAccessToken = "";
-            state.userRefreshToken = "";
             state.passwordVerifyToken = ""
-            state.user = null
             SecureStore.deleteItemAsync('accessToken');
             SecureStore.deleteItemAsync('refreshToken');
             state.isLoggedIn = false
@@ -257,13 +247,6 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(login.fulfilled, (state, action) => {
-                const accessToken = action.payload.accessToken
-                const refreshToken = action.payload.refreshToken
-
-                state.userAccessToken = accessToken
-                state.userRefreshToken = refreshToken
-                SecureStore.setItemAsync('accessToken', accessToken)
-                SecureStore.setItemAsync('refreshToken', refreshToken)
                 state.isLoggedIn = true
                 state.isAccountVerified = true
             })
@@ -375,8 +358,6 @@ const authSlice = createSlice({
                 // }
             })
             .addCase(loadToken.fulfilled, (state, action) => {
-                state.userAccessToken = action.payload.accessToken
-                state.userRefreshToken = action.payload.refreshToken
                 state.isLoggedIn = true
                 state.isAccountVerified = true
             })
@@ -384,12 +365,16 @@ const authSlice = createSlice({
                 console.log("Where tokens :<")
             })
             .addCase(getUserInfo.fulfilled, (state, action) => {
-                state.user = action.payload.user
+                console.log("Success")
+                // setCurrentUser(action.payload.user)
+                // state.user = action.payload.user
             })
             .addCase(getUserInfo.rejected, (state, action) => {
                 // console.log(action)
-                state.userAccessToken = ""
-                state.userRefreshToken = ""
+                // setTokens(undefined)
+                // state.userAccessToken = ""
+                // state.userRefreshToken = ""
+                console.log(action.error)
                 state.isLoggedIn = false
                 state.isAccountVerified = false
             })
@@ -397,5 +382,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { setAuthData, setLoading, resetLoggedIn, resetAccountCreated, resetPasswordVerified, resetChangedPassword, logout } = authSlice.actions;
+export const { setLoading, resetLoggedIn, resetAccountCreated, resetPasswordVerified, resetChangedPassword, logout } = authSlice.actions;
 export default authSlice.reducer;

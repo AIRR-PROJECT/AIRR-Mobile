@@ -33,7 +33,8 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 export default function LoginScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken } = useAppSelector(state => state.auth)
+  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
+  const { userAccessToken, userRefreshToken } = useAppSelector(state => state.user)
 
   const {
     control,
@@ -69,8 +70,8 @@ export default function LoginScreen() {
         params: { resendEmail: emailWatch } 
       });
     }
-    
-    if (isLoggedIn && isAccountVerified && userAccessToken.length > 0 && userRefreshToken.length > 0) {
+
+    if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken) {
       router.replace("/(tabs)");
     }
   }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])

@@ -1,6 +1,7 @@
 import { configureStore, createSerializableStateInvariantMiddleware, Tuple } from "@reduxjs/toolkit";
 
 import authReducer from "./slices/authSlice";
+import userReducer from './slices/userSlice'
 
 // Ignore action path "payload.headers" to avoid "non-serializable" error
 const serializableMiddleware = createSerializableStateInvariantMiddleware({
@@ -11,6 +12,7 @@ const store = configureStore({
     reducer: {
         // Add the reducer here
         auth: authReducer,
+        user: userReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()

@@ -34,17 +34,17 @@ const mockBlog: Blog = {
 };
 const Data = [mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog];
 export default function MyFeed() {
-  const dispatch = useAppDispatch()
-  const [page, setPage] = useState(1)
+  // const dispatch = useAppDispatch()
+  // const [page, setPage] = useState(1)
 
-  const { data, isSuccess, isError, isPending } = useQuery({
-    queryKey: ['feed-recommended', page],
-    queryFn: async () => {
-      const a = await dispatch(fetchFeed(page))
-      console.log(a)
-    },
-    placeholderData: keepPreviousData
-  })
+  // const { data, isSuccess, isError, isPending } = useQuery({
+  //   queryKey: ['feed-recommended', page],
+  //   queryFn: async () => {
+  //     const a = await dispatch(fetchFeed(page))
+  //     console.log(a)
+  //   },
+  //   placeholderData: keepPreviousData
+  // })
 
   return (
     <ParallaxFlatView>

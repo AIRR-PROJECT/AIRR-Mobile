@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Redirect, Stack } from "expo-router";
+import { Redirect, router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -16,9 +16,49 @@ import LeftHeader from "@/components/tabs/LeftHeader";
 import RightHeader from "@/components/tabs/RightHeader";
 import { Provider } from "react-redux";
 import store from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { QueryClientProvider } from "@tanstack/react-query";
+import queryClient from "@/redux/api/queryClient";
+import { getCurrentUser, getTokens } from "@/stores/authStore";
+import { loadTokensFromStore, setTokens } from "@/redux/slices/userSlice";
+import { getUserInfo, loadToken } from "@/redux/slices/authSlice";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
+
+export function RootBackgroundTask() {
+  const dispatch = useAppDispatch()
+
+  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
+  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
+
+  // Init
+  useEffect(() => {
+    dispatch(loadToken()).then(() => {
+      dispatch(getUserInfo())
+    })
+  }, [])
+
+  // useEffect(() => {
+  //   if (isLoggedIn && isAccountVerified && userAccessToken != "") {
+  //     console.log(user)
+  //     if (!user) {
+  //       dispatch(getUserInfo()).then(() => {
+  //         dispatch(loadToken())
+  //       })
+  //     }
+  //   }
+  // }, [isLoggedIn, isAccountVerified, userAccessToken])
+
+  useEffect(() => {
+    console.log(user)
+    if (user != undefined) {
+      router.push("/(tabs)")
+    }
+  }, [user])
+
+  return <></>
+}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -27,6 +67,7 @@ export default function RootLayout() {
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
   const streak = 1; // Replace with actual streak count
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -38,46 +79,49 @@ export default function RootLayout() {
   }
 
   return (
-    <Provider store={store}>
-      {/* // change to dark later */}
-      <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
-        {/* <StatusBar style="auto" /> */}
-        {/* <SafeAreaView style={styles.safeArea}> */}
-        <View style={styles.container}>
-          <Stack>
-            <Stack.Screen
-              name="index"
-              redirect={userLoggedIn}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                headerShown: true,
-                headerStyle:{
-                  backgroundColor: "#1E1E1E",
-                },
-                headerLeft: () => <LeftHeader/>,
-                headerTitle: "",
-                headerRight: () => <RightHeader streak={streak}/>,
-              }}
-            />
-            <Stack.Screen name="profile" 
-              options={{
-                headerTitle: "Profile",
-              }}
-            />
-          </Stack>
-          {userLoggedIn ? (
-            <Redirect href="/(tabs)" />
-          ) : (
-            <Redirect href="/auth" />
-          )}
-        </View>
-        {/* </SafeAreaView> */}
-      </ThemeProvider>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <RootBackgroundTask></RootBackgroundTask>
+        {/* // change to dark later */}
+        <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
+          {/* <StatusBar style="auto" /> */}
+          {/* <SafeAreaView style={styles.safeArea}> */}
+          <View style={styles.container}>
+            <Stack>
+              <Stack.Screen
+                name="index"
+                redirect={userLoggedIn}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(tabs)"
+                options={{
+                  headerShown: true,
+                  headerStyle:{
+                    backgroundColor: "#1E1E1E",
+                  },
+                  headerLeft: () => <LeftHeader/>,
+                  headerTitle: "",
+                  headerRight: () => <RightHeader streak={streak}/>,
+                }}
+              />
+              <Stack.Screen name="profile" 
+                options={{
+                  headerTitle: "Profile",
+                }}
+              />
+            </Stack>
+            {userLoggedIn ? (
+              <Redirect href="/(tabs)" />
+            ) : (
+              <Redirect href="/auth" />
+            )}
+          </View>
+          {/* </SafeAreaView> */}
+        </ThemeProvider>
+      </Provider>
+    </QueryClientProvider>
   );
 }
 

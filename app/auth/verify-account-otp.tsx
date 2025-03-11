@@ -11,7 +11,7 @@ import { EffectCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { sendAccountOTP, verifyAccountOTP } from "@/redux/slices/authSlice";
 import { VerifyAccountCredentials } from "@/interfaces/authInterface";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 
 type FormData = {
   otp: number;
@@ -20,7 +20,7 @@ type FormData = {
 const useMountEffect = (fun: EffectCallback) => useEffect(fun, [])
 
 export default function SignUpScreen() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const searchParams = useLocalSearchParams<{ resendEmail: string }>()
   const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
   const {

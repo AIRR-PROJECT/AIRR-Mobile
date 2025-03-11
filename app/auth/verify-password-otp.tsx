@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, } from "react-native";
 import GradientText from "@/components/GradientText";
 import AnimatedPressable from "@/components/AnimatedPressable";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { sendAccountOTP, sendPasswordOTP, resetPasswordVerified, verifyPasswordOTP } from "@/redux/slices/authSlice";
@@ -25,7 +25,7 @@ export default function SignUpScreen() {
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const otpWatch = watch('otp')
   const searchParams = useLocalSearchParams<{ resendEmail: string }>()
   const { isPasswordVerified } = useAppSelector(state => state.auth)
@@ -46,8 +46,8 @@ export default function SignUpScreen() {
   const onSubmit = (data: FormData) => {
     dispatch(verifyPasswordOTP({ email: searchParams.resendEmail, otp: otpWatch.toString() }))
   };
-  const handleBackToLogin = () => {
-    router.push("/auth/login");
+  const handleBackToForgotPassword = () => {
+    router.push("/auth/forgot-password");
   };
   const handleResend = () => {
     dispatch(sendPasswordOTP({ email: searchParams.resendEmail }))
@@ -60,7 +60,7 @@ export default function SignUpScreen() {
     >
       <AuthHeader />
       <TouchableOpacity
-        onPress={handleBackToLogin}
+        onPress={handleBackToForgotPassword}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>

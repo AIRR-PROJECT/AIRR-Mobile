@@ -17,7 +17,7 @@ import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 import { useDispatch } from "react-redux";
 import { resetAccountCreated, signup } from "@/redux/slices/authSlice";
 import { SignUpCredentials } from "@/interfaces/authInterface";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -35,8 +35,8 @@ export default function SignUpScreen() {
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
-  const dispatch = useDispatch();
-  const { isAccountCreated } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const { isAccountCreated } = useAppSelector(state => state.auth)
 
   const password = watch("password");
 

@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { useDispatch } from "react-redux";
 import { resetChangedPassword, setPassword } from "@/redux/slices/authSlice";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 type FormData = {
   newPassword: string;
   confirmNewPassword: string;
@@ -27,7 +27,7 @@ export default function SetPasswordScreen() {
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const newPassword = watch("newPassword");
   const searchParams = useLocalSearchParams<{ email: string }>()
   const { changedPassword } = useAppSelector(state => state.auth)
@@ -50,8 +50,8 @@ export default function SetPasswordScreen() {
     
     dispatch(setPassword(setPasswordData))
   };
-  const handleBackToLogin = () => {
-    router.push("/auth/login");
+  const handleBackToForgotPassword = () => {
+    router.push("/auth/forgot-password");
   };
 
   return (
@@ -62,7 +62,7 @@ export default function SetPasswordScreen() {
     >
       <AuthHeader />
       <TouchableOpacity
-        onPress={handleBackToLogin}
+        onPress={handleBackToForgotPassword}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>

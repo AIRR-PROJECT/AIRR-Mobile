@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingBlock: 5,
     borderRadius: 10,
-
   },
   tabButtonText: {
     fontSize: 12,

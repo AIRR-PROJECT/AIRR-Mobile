@@ -32,27 +32,27 @@ export default function SignUpSecondPage() {
     watch,
     formState: { errors },
   } = useForm<FormData>();
- 
+
   const password = watch("password");
 
   const [isTermChecked, setTermChecked] = useState(false);
-    const handleToggleCheckbox = () => {
-      setTermChecked(!isTermChecked);
-    };
-    const onSubmit = (data: FormData) => {
-      if (!isTermChecked) {
-        Alert.alert("Please accept the terms and conditions");
-      } else {
-        // const signUpData: SignUpCredentials = {
-        //   email: data.email,
-        //   username: data.username,
-        //   password: data.password,
-        // };
-  
-        console.log("test");
-        // dispatch(signup(signUpData));
-      }
-    };
+  const handleToggleCheckbox = () => {
+    setTermChecked(!isTermChecked);
+  };
+  const onSubmit = (data: FormData) => {
+    if (!isTermChecked) {
+      Alert.alert("Please accept the terms and conditions");
+    } else {
+      // const signUpData: SignUpCredentials = {
+      //   email: data.email,
+      //   username: data.username,
+      //   password: data.password,
+      // };
+
+      console.log("test");
+      // dispatch(signup(signUpData));
+    }
+  };
   const handleBackToLogin = () => {
     router.push("/auth/login");
   };
@@ -246,55 +246,55 @@ export default function SignUpSecondPage() {
           </Text>
         </TouchableOpacity>
 
-                {/* Sign Up Button */}
-                <AuthButtonGradient
-                  label="Sign Up"
-                  onPress={handleSubmit(onSubmit)}
-                  style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
-                />
-        
-                {/* Other Options */}
-                <ThemedText
-                  type="default"
-                  style={[{ color: "#fff", alignSelf: "center" }]}
-                >
-                  Or
-                </ThemedText>
-                {/* Or Google or Facebook */}
-                <View style={[styles.section, { justifyContent: "space-between" }]}>
-                  <AuthButtonTransparent label="Google" style={styles.otherButton} />
-        
-                  <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
-                </View>
-        
-                {/* Sign In Link*/}
-                <TouchableOpacity onPress={handleBackToLogin}>
-                  <ThemedText
-                    type="link"
-                    style={[
-                      {
-                        color: "#fff",
-                        alignSelf: "flex-start",
-                        marginTop: 5,
-                        textDecorationLine: "underline",
-                      },
-                    ]}
-                  >
-                    Have an account yet,{" "}
-                    <ThemedText
-                      type="link"
-                      style={[
-                        {
-                          color: "#fff",
-        
-                          fontWeight: "bold",
-                        },
-                      ]}
-                    >
-                      Sign In
-                    </ThemedText>
-                  </ThemedText>
-                </TouchableOpacity>
+        {/* Sign Up Button */}
+        <AuthButtonGradient
+          label="Sign Up"
+          onPress={handleSubmit(onSubmit)}
+          style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
+        />
+
+        {/* Other Options */}
+        <ThemedText
+          type="default"
+          style={[{ color: "#fff", alignSelf: "center" }]}
+        >
+          Or
+        </ThemedText>
+        {/* Or Google or Facebook */}
+        <View style={[styles.section, { justifyContent: "space-between" }]}>
+          <AuthButtonTransparent label="Google" style={styles.otherButton} />
+
+          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
+        </View>
+
+        {/* Sign In Link*/}
+        <TouchableOpacity onPress={handleBackToLogin}>
+          <ThemedText
+            type="link"
+            style={[
+              {
+                color: "#fff",
+                alignSelf: "flex-start",
+                marginTop: 5,
+                textDecorationLine: "underline",
+              },
+            ]}
+          >
+            Have an account yet,{" "}
+            <ThemedText
+              type="link"
+              style={[
+                {
+                  color: "#fff",
+
+                  fontWeight: "bold",
+                },
+              ]}
+            >
+              Sign In
+            </ThemedText>
+          </ThemedText>
+        </TouchableOpacity>
       </ThemedView>
     </ThemedView>
   );

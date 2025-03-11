@@ -22,6 +22,7 @@ import queryClient from "@/redux/api/queryClient";
 import { getCurrentUser, getTokens } from "@/stores/authStore";
 import { loadTokensFromStore, setTokens } from "@/redux/slices/userSlice";
 import { getUserInfo, loadToken } from "@/redux/slices/authSlice";
+import { injectStoreToAxiosInterceptor } from "@/redux/api/axiosInstance";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -29,8 +30,7 @@ SplashScreen.preventAutoHideAsync();
 export function RootBackgroundTask() {
   const dispatch = useAppDispatch()
 
-  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
-  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
+  const { user } = useAppSelector(state => state.user)
 
   // Init
   useEffect(() => {
@@ -39,19 +39,7 @@ export function RootBackgroundTask() {
     })
   }, [])
 
-  // useEffect(() => {
-  //   if (isLoggedIn && isAccountVerified && userAccessToken != "") {
-  //     console.log(user)
-  //     if (!user) {
-  //       dispatch(getUserInfo()).then(() => {
-  //         dispatch(loadToken())
-  //       })
-  //     }
-  //   }
-  // }, [isLoggedIn, isAccountVerified, userAccessToken])
-
   useEffect(() => {
-    console.log(user)
     if (user != undefined) {
       router.push("/(tabs)")
     }
@@ -67,6 +55,8 @@ export default function RootLayout() {
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
   const streak = 1; // Replace with actual streak count
+  
+  injectStoreToAxiosInterceptor(store)
 
   useEffect(() => {
     if (loaded) {

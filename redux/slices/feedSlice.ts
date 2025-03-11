@@ -3,7 +3,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 
 const initialState = {
-    blogs: null,
+    newestBlogs: null,
+    scrollBlogs: null,
     page: -1
 }
 
@@ -11,8 +12,8 @@ export const fetchFeed = createAsyncThunk(
     'feed/fetch',
     async (page: number, thunkAPI) => {
         try {
-            const res = await api.get(`blogs/preview-recommend-blogs?page=${page}`)
-            return res.data
+            // const res = await api.get(`blogs/preview-recommend-blogs?page=${page}`)
+            // return res.data
         }
         catch (error: any) {
             return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
@@ -25,7 +26,8 @@ const feedSlice = createSlice({
     initialState,
     reducers: {
         reset(state, action) {
-            state.blogs = null
+            state.newestBlogs = null
+            state.scrollBlogs = null
             state.page = -1
         }
     },

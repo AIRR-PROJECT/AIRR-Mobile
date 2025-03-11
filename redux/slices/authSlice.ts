@@ -1,15 +1,11 @@
-import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
-import { Alert } from "react-native";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { User, UserInfo } from "@/interfaces/userInterace";
-import { ResponseFailcode } from "@/enums/failcode.enum";
-import { getReasonPhrase } from 'http-status-codes'
-import jwt from 'expo-jwt'
+import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { UserInfo } from "@/interfaces/userInterace";
 import { jwtDecode } from "jwt-decode";
-import { setTokens, setCurrentUser, reset } from "./userSlice";
+import { setTokens, setCurrentUser } from "./userSlice";
 
 const initialState = {
     isAccountCreated: false,

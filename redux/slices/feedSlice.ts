@@ -3,17 +3,43 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 
 const initialState = {
-    newestBlogs: null,
-    scrollBlogs: null,
-    page: -1
+    recommendedBlogs: null,
+    userBlogs: null,
+    recommendedPage: -1,
+    userPage: -1
 }
 
-export const fetchFeed = createAsyncThunk(
-    'feed/fetch',
+export const fetchRecommendedBlogs = createAsyncThunk(
+    'feed/fetchRecommended',
     async (page: number, thunkAPI) => {
         try {
-            // const res = await api.get(`blogs/preview-recommend-blogs?page=${page}`)
-            // return res.data
+            const res = await api.get(`blogs/preview-recommend-blogs?page=${page}`)
+
+            if (res.data.success) {
+                return res.data.data
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data.message)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const fetchUserBlogs = createAsyncThunk(
+    'feed/fetchUser',
+    async (page: number, thunkAPI) => {
+        try {
+            const res = await api.get(`blogs/preview-user-blogs?page=${page}`)
+
+            if (res.data.success) {
+                return res.data.data
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data.message)
+            }
         }
         catch (error: any) {
             return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
@@ -26,18 +52,25 @@ const feedSlice = createSlice({
     initialState,
     reducers: {
         reset(state, action) {
-            state.newestBlogs = null
-            state.scrollBlogs = null
-            state.page = -1
+            state.recommendedBlogs = null
+            state.userBlogs = null
+            state.recommendedPage = -1
+            state.userPage = -1
         }
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchFeed.fulfilled, (state, action) => {
-                console.log(action.payload)
+            .addCase(fetchRecommendedBlogs.fulfilled, (state, action) => {
+                state.recommendedBlogs = action.payload.blogs.blogList
             })
-            .addCase(fetchFeed.rejected, (state, action) => {
-                console.log(action.error)
+            .addCase(fetchRecommendedBlogs.rejected, (state, action) => {
+                // console.log(action.error)
+            })
+            .addCase(fetchUserBlogs.fulfilled, (state, action) => {
+                state.userBlogs = action.payload.blogs.blogList
+            })
+            .addCase(fetchUserBlogs.rejected, (state, action) => {
+                // console.log(action.error)
             })
     }
 })

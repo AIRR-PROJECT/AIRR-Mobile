@@ -49,7 +49,7 @@ export default function AIBlogPreview({ blog }: { blog: Blog }) {
               lightColor="#fff"
               darkColor="#fff"
             >
-              {blog.title}
+              {blog.Title}
             </ThemedText>
           </View>
         </Pressable>

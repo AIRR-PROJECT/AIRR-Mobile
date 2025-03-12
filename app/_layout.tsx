@@ -21,7 +21,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/redux/api/queryClient";
 import { getCurrentUser, getTokens } from "@/stores/authStore";
 import { loadTokensFromStore, setTokens } from "@/redux/slices/userSlice";
-import { getUserInfo, loadToken } from "@/redux/slices/authSlice";
+import { getUserInfo, loadToken, logout } from "@/redux/slices/authSlice";
 import { injectStoreToAxiosInterceptor } from "@/redux/api/axiosInstance";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
@@ -30,12 +30,18 @@ SplashScreen.preventAutoHideAsync();
 export function RootBackgroundTask() {
   const dispatch = useAppDispatch()
 
-  const { user } = useAppSelector(state => state.user)
+  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
 
   // Init
   useEffect(() => {
     dispatch(loadToken()).then(() => {
-      dispatch(getUserInfo())
+      if (userAccessToken && userRefreshToken) {
+        dispatch(getUserInfo())
+      }
+      else {
+        dispatch(logout())
+        router.dismissAll()
+      }
     })
   }, [])
 

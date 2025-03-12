@@ -41,7 +41,7 @@ export default function FeedBlogPreview({ blog }: { blog: Blog }) {
             lightColor="#fff"
             darkColor="#fff"
           >
-            {blog.title}
+            {blog.Title}
           </ThemedText>
         </View>
 

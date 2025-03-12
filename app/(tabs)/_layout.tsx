@@ -9,6 +9,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { AntDesign, Entypo, FontAwesome6, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable } from "react-native";
+import { useEffect } from "react";
 const MiddleButton = () => (
   <TouchableOpacity 
     style={{

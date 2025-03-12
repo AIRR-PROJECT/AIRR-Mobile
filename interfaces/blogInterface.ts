@@ -1,8 +1,8 @@
 import { User } from "./userInterace";
 
 export interface Blog {
-    title: string;
-    description: string;
+    Title: string;
+    Description: string;
     image: string;
     content: string;
     timestamp: string;

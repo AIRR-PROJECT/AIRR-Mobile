@@ -9,13 +9,13 @@ import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
 import { useWatch } from "react-hook-form";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useAppDispatch } from "@/redux/hook";
-import { fetchFeed } from "@/redux/slices/feedSlice";
-import { useState } from "react";
+import { fetchRecommendedBlogs } from "@/redux/slices/feedSlice";
+import { useEffect, useState } from "react";
 const mockBlog: Blog = {
-  title: "How to fix clipboard if it isn’t working",
+  Title: "How to fix clipboard if it isn’t working",
   image:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
-  description: "Blog Description",
+  Description: "Blog Description",
   content: loremIpsum({ count: 50, units: "paragraphs" }),
   timestamp: new Date().toISOString(),
   blogAuthor: {
@@ -37,11 +37,13 @@ export default function MyFeed() {
   const dispatch = useAppDispatch()
   const [page, setPage] = useState(1)
 
-  const { data, isSuccess, isError, isPending } = useQuery({
+  const { data, error, isSuccess, isError, isPending } = useQuery({
     queryKey: ['feed-recommended', page],
     queryFn: async () => {
-      const a = await dispatch(fetchFeed(page))
-      console.log(a)
+      const fetchedBlogs = await dispatch(fetchRecommendedBlogs(page))
+
+      console.log(fetchedBlogs.payload.blogList.blogs)
+      return fetchedBlogs.payload.blogList.blogs
     },
     placeholderData: keepPreviousData
   })
@@ -60,7 +62,7 @@ export default function MyFeed() {
       </View>
       {/* Flat list for lazy load */}
       <FlatList
-        data={Data}
+        data={data}
         horizontal={true}
         style={styles.aiBlogContainer}
         keyExtractor={(item, index) => index.toString()}

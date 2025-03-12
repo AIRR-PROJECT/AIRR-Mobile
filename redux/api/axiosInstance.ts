@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { getReasonPhrase } from 'http-status-codes';
 import { Alert } from 'react-native';
 import { useAppDispatch } from '../hook';
-import { setTokens } from '../slices/userSlice';
+import { reset, setTokens } from '../slices/userSlice';
 import { Store } from '@reduxjs/toolkit';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -72,6 +72,10 @@ api.interceptors.response.use(
                             exception_status = response.status
                             if (response.status === 401 && response.data.failcode === ResponseFailcode.TOKEN_INVALID) {
                                 exception_message = "Session expired. Please re-login"
+                                
+                                store.dispatch(reset())
+                                await SecureStore.deleteItemAsync("accessToken")
+                                await SecureStore.deleteItemAsync("refreshToken")
                             }
                             else {
                                 exception_message = response.data.message
@@ -87,6 +91,10 @@ api.interceptors.response.use(
                     exception_status = error.status
                     if (error.status === 401 && error.response.data.failcode === ResponseFailcode.TOKEN_INVALID) {
                         exception_message = "Session expired. Please re-login"
+
+                        store.dispatch(reset())
+                        await SecureStore.deleteItemAsync("accessToken")
+                        await SecureStore.deleteItemAsync("refreshToken")
                     }
                     else {
                         exception_message = error.response.data.message

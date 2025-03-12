@@ -6,6 +6,7 @@ import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { UserInfo } from "@/interfaces/userInterace";
 import { jwtDecode } from "jwt-decode";
 import { setTokens, setCurrentUser } from "./userSlice";
+import { ResponseFailcode } from "@/enums/failcode.enum";
 
 const initialState = {
     isAccountCreated: false,
@@ -45,6 +46,10 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
 
             await SecureStore.setItemAsync('accessToken', access_token)
             await SecureStore.setItemAsync('refreshToken', refresh_token)
+            thunkAPI.dispatch(setTokens({
+                accessToken: access_token,
+                refreshToken: refresh_token
+            }))
     
             return { 
                 accessToken: access_token,
@@ -182,8 +187,8 @@ export const loadToken = createAsyncThunk(
 export const getUserInfo = createAsyncThunk(
     'auth/userInfo',
     async (_, thunkAPI) => {
-        const accessToken =  await SecureStore.getItemAsync('accessToken');
-        
+        let accessToken =  await SecureStore.getItemAsync('accessToken');
+
         if (accessToken) {
             const payload = jwtDecode(accessToken) as any
 
@@ -197,6 +202,8 @@ export const getUserInfo = createAsyncThunk(
                 return thunkAPI.rejectWithValue(res.data)
             }
         }
+
+        return thunkAPI.rejectWithValue("No access token found")
     }
 )
 
@@ -247,7 +254,7 @@ const authSlice = createSlice({
                 state.isAccountVerified = true
             })
             .addCase(login.rejected, (state, action) => {
-                if (action.payload && (action.payload as APIResponse).message) {
+                if (action.payload && (action.payload as APIResponse).message && (action.payload as APIResponse).failcode !== ResponseFailcode.USER_NOT_FOUND) {
                     state.isLoggedIn = true
                 }
 

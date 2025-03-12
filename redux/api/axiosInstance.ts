@@ -6,6 +6,7 @@ import { Alert } from 'react-native';
 import { useAppDispatch } from '../hook';
 import { reset, setTokens } from '../slices/userSlice';
 import { Store } from '@reduxjs/toolkit';
+import { router } from 'expo-router';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 let store: Store
@@ -24,6 +25,7 @@ const api = axios.create({
 // Attach access token to every request
 api.interceptors.request.use(async (config) => {
     const accessToken = await SecureStore.getItemAsync('accessToken');
+    // const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im90dGVyLm9saXZlLjQ1OCIsInN1YiI6IjY3OGQwNmRlNjcyMjBlZTFjOWRlZDdkYiIsInJvbGUiOiJNZW1iZXIiLCJpYXQiOjE3NDE2OTg5NzQsImV4cCI6MTc0MTY5OTg3NH0.gfuXsPa2XR97yqYNNRZmn0R85MBSKPIK_L3L-yudDas"
     // If already has a token in auth header, that is the refresh token => skip this
     if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
@@ -60,6 +62,7 @@ api.interceptors.response.use(
                         });
                         
                         if (response.status === 200) {
+                            console.log("Tokens refreshed")
                             await SecureStore.setItemAsync('accessToken', response.data.data.tokens.access_token);
                             await SecureStore.setItemAsync('refreshToken', response.data.data.tokens.refresh_token);
                             store.dispatch(setTokens({
@@ -72,10 +75,14 @@ api.interceptors.response.use(
                             exception_status = response.status
                             if (response.status === 401 && response.data.failcode === ResponseFailcode.TOKEN_INVALID) {
                                 exception_message = "Session expired. Please re-login"
-                                
+
                                 store.dispatch(reset())
                                 await SecureStore.deleteItemAsync("accessToken")
                                 await SecureStore.deleteItemAsync("refreshToken")
+                                console.log("dismissed to first screen")
+                                if (router.canDismiss()) {
+                                    router.dismissAll()
+                                }
                             }
                             else {
                                 exception_message = response.data.message
@@ -95,6 +102,10 @@ api.interceptors.response.use(
                         store.dispatch(reset())
                         await SecureStore.deleteItemAsync("accessToken")
                         await SecureStore.deleteItemAsync("refreshToken")
+                        console.log("dismissed to first screen")
+                        if (router.canDismiss()) {
+                            router.dismissAll()
+                        }
                     }
                     else {
                         exception_message = error.response.data.message

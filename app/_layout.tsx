@@ -30,22 +30,33 @@ SplashScreen.preventAutoHideAsync();
 export function RootBackgroundTask() {
   const dispatch = useAppDispatch()
 
+  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
   const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
 
   // Init
   useEffect(() => {
+    if (isLoggedIn && isAccountVerified && !userAccessToken && !userAccessToken && !user) {
+      dispatch(logout())
+    }
+
     dispatch(loadToken()).then(() => {
-      if (userAccessToken && userRefreshToken) {
+      // console.log(userAccessToken)
+      // console.log(userRefreshToken)
+      // if (userAccessToken != "" && userRefreshToken != "") {
+      //   dispatch(getUserInfo())
+      // }
+      // else {
+      //   dispatch(logout())
+      // }
         dispatch(getUserInfo())
-      }
-      else {
-        dispatch(logout())
-        router.dismissAll()
-      }
     })
   }, [])
 
   useEffect(() => {
+  }, [isLoggedIn, isAccountVerified])
+
+  useEffect(() => {
+    console.log(user)
     if (user != undefined) {
       router.push("/(tabs)")
     }

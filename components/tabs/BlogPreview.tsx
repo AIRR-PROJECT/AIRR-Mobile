@@ -3,7 +3,7 @@ import { ImageBackground, StyleSheet, View } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import BlogAuthor from "./BlogAuthor";
-import BlogInGroup from "./BlogInGroup";
+import GroupPreviewInfo from "./GroupPreviewInfo";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 export default function BlogPreview({ blog }: { blog: Blog }) {
@@ -37,7 +37,7 @@ export default function BlogPreview({ blog }: { blog: Blog }) {
               >
                 Group
               </ThemedText> */}
-              <BlogInGroup style={{}} group={{name:`Group's name`, avatar: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', numberOfMembers: 123} }/>
+              <GroupPreviewInfo style={{}} group={{name:`Group's name`, avatar: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', numberOfMembers: 123} }/>
             </View>
             {/* Ask later because it take to much space */}
             {/* <View style={styles.buttonSection}>

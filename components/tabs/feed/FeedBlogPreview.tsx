@@ -3,7 +3,7 @@ import { ImageBackground, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import BlogAuthor from "@/components/tabs/BlogAuthor";
-import BlogInGroup from "@/components/tabs/BlogInGroup";
+import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
@@ -21,7 +21,7 @@ export default function FeedBlogPreview({ blog }: { blog: Blog }) {
             />
           </View>
           <View style={styles.groupSection}>
-            <BlogInGroup
+            <GroupPreviewInfo
               style={{}}
               group={{
                 name: `Group's name`,

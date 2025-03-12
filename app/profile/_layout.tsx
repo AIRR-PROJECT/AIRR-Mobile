@@ -15,6 +15,9 @@ export default function ProfileLayout() {
             />
           </TouchableOpacity>
         ),
+        headerStyle: {
+          backgroundColor: "#1E1E1E",
+        }
       }}
     >
       <Stack.Screen name="index" options={{ headerTitle: "Profile" }} />

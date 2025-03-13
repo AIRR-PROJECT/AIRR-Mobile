@@ -6,16 +6,18 @@ import { LinearGradient } from "expo-linear-gradient";
 export default function ReadmeComponent() {
   return (
     // Readme
-    <View style={styles.container}>
-      {/* User Readme */}
-        <LinearGradient
-            colors={['#9DE8EE', '#B9FF66']}
-            style={styles.background}
-        />
-        <ThemedText style={styles.title}>“YOUR README WILL BE DISPLAYED HERE! ”</ThemedText>
-        <TouchableOpacity style={styles.buttonContainer}>
-            <ThemedText style={styles.buttonText}>Add Readme</ThemedText>
-        </TouchableOpacity>
+
+    <View style={styles.readMeContainer}>
+      <LinearGradient
+        colors={["#9DE8EE", "#B9FF66"]}
+        style={styles.background}
+      />
+      <ThemedText style={styles.title}>
+        “YOUR README WILL BE DISPLAYED HERE!”
+      </ThemedText>
+      <TouchableOpacity style={styles.buttonContainer}>
+        <ThemedText style={styles.buttonText}>Add Readme</ThemedText>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -23,18 +25,22 @@ const styles = StyleSheet.create({
   // Styles
   container: {
     backgroundColor: "transparent",
-    gap: 20,    
-    height: 150,
     justifyContent: "center",
-    padding: 20,
-    borderRadius: 30,
   },
-  background : {
+  readMeContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 30,
+    padding: 20,
+    justifyContent: "center",
+    height: 150,
+    gap: 20,
+  },
+  background: {
     position: "absolute",
-    left : 0,
-    right : 0,
-    top : 0,
-    bottom : 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     borderRadius: 30,
   },
   title: {
@@ -55,5 +61,5 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 16,
     fontWeight: "bold",
-  }
+  },
 });

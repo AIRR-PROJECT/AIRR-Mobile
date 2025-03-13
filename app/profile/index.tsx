@@ -17,7 +17,8 @@ import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import { useState } from "react";
 import TabButton from "@/components/tabs/feed/TabButton";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import ReadmeComponent from "@/components/profile/ReadmeComponent";
+import ReadmeTab from "@/components/profile/ReadmeTab";
+import ParallaxFlatView from "@/components/ParallaxFlatView";
 type MockUserInfo = {
   username: string;
   avatar: string;
@@ -65,6 +66,7 @@ export default function ProfileScreen() {
 
   return (
     // change light color to #fff later because figma of the app is not ready
+
     <ParallaxScrollView style={styles.container}>
       {/* User Info */}
       <UserInfoComponent {...mockUserInfo} />
@@ -73,25 +75,26 @@ export default function ProfileScreen() {
 
       {/* Active groups */}
       <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
-      <View style={[styles.rowContainer]}>
-        <FontAwesome
-          name="plus-circle"
-          size={50}
-          color="white"
-          style={styles.plusIcon}
-        />
-        <FlatList
-          data={Data}
-          horizontal={true}
-          style={styles.groupContainer}
-          keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={{ columnGap: 25 }}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => {
-            return <GroupPreviewInfo group={item} />;
-          }}
-        />
-      </View>
+      <FlatList
+        data={Data}
+        horizontal={true}
+        style={styles.groupContainer}
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={{ columnGap: 25 }}
+        showsHorizontalScrollIndicator={false}
+        ListHeaderComponent={
+          <FontAwesome
+            name="plus-circle"
+            size={50}
+            color="white"
+            style={styles.plusIcon}
+          />
+        }
+        renderItem={({ item }) => {
+          return <GroupPreviewInfo group={item} />;
+        }}
+      />
+
       {/* Readme , Blog, Activity */}
       <View style={styles.rowContainer}>
         {selectedTabs.map((tab) => {
@@ -124,7 +127,7 @@ export default function ProfileScreen() {
         })}
       </View>
       {/* Readme if tab == readme */}
-      {selectedTab === "Readme" && <ReadmeComponent />}
+      {selectedTab === "Readme" && <ReadmeTab />}
     </ParallaxScrollView>
   );
 }
@@ -133,7 +136,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1E1E1E",
-    padding: 20,
     gap: 20,
   },
   rowContainer: {
@@ -149,11 +151,11 @@ const styles = StyleSheet.create({
   plusIcon: {
     alignSelf: "center",
     backgroundColor: "#1E1E1E",
-    marginRight: 20,
+    padding: 10,
   },
   tabButton: {
-    padding: 8,
     paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   tabText: {
     color: "#8A94AC",

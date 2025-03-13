@@ -1,6 +1,11 @@
 import { User } from "./userInterace";
 
-export interface Blog {
+export interface AIBlog {
+    Title: string;
+    Description: string;
+}
+
+export interface UserBlog {
     Title: string;
     Description: string;
     image: string;

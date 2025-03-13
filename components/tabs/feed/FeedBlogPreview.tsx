@@ -1,4 +1,4 @@
-import { Blog } from "@/interfaces/blogInterface";
+import { UserBlog } from "@/interfaces/blogInterface";
 import { ImageBackground, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -7,7 +7,7 @@ import BlogInGroup from "@/components/tabs/BlogInGroup";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-export default function FeedBlogPreview({ blog }: { blog: Blog }) {
+export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   return (
     <View style={styles.outerContainer}>
       <Pressable style={styles.container}>

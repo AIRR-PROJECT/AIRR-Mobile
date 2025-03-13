@@ -1,4 +1,4 @@
-import { Blog } from "@/interfaces/blogInterface"
+import { UserBlog } from "@/interfaces/blogInterface"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 
@@ -12,6 +12,7 @@ const initialState = {
 export const fetchRecommendedBlogs = createAsyncThunk(
     'feed/fetchRecommended',
     async (page: number, thunkAPI) => {
+        console.log("test")
         try {
             const res = await api.get(`blogs/preview-recommend-blogs?page=${page}`)
 
@@ -61,16 +62,16 @@ const feedSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchRecommendedBlogs.fulfilled, (state, action) => {
-                state.recommendedBlogs = action.payload.blogs.blogList
+                state.recommendedBlogs = action.payload.blogList.blogs
             })
             .addCase(fetchRecommendedBlogs.rejected, (state, action) => {
-                // console.log(action.error)
+                console.log(action.error)
             })
             .addCase(fetchUserBlogs.fulfilled, (state, action) => {
-                state.userBlogs = action.payload.blogs.blogList
+                state.userBlogs = action.payload.blogList.blogs
             })
             .addCase(fetchUserBlogs.rejected, (state, action) => {
-                // console.log(action.error)
+                console.log(action.error)
             })
     }
 })

@@ -2,16 +2,17 @@ import { View, Text, StyleSheet, FlatList } from "react-native";
 import ParallaxFlatView from "@/components/ParallaxFlatView";
 import GradientText from "@/components/GradientText";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
-import { Blog } from "@/interfaces/blogInterface";
+import { UserBlog } from "@/interfaces/blogInterface";
 import { loremIpsum } from "lorem-ipsum";
 import AIBlogPreview from "@/components/tabs/feed/AIBlogPreview";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
 import { useWatch } from "react-hook-form";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { useAppDispatch } from "@/redux/hook";
-import { fetchRecommendedBlogs } from "@/redux/slices/feedSlice";
+import { fetchRecommendedBlogs, fetchUserBlogs } from "@/redux/slices/feedSlice";
 import { useEffect, useState } from "react";
-const mockBlog: Blog = {
+import queryClient from "@/redux/api/queryClient";
+const mockBlog: UserBlog = {
   Title: "How to fix clipboard if it isn’t working",
   image:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
@@ -37,16 +38,67 @@ export default function MyFeed() {
   const dispatch = useAppDispatch()
   const [page, setPage] = useState(1)
 
-  const { data, error, isSuccess, isError, isPending } = useQuery({
-    queryKey: ['feed-recommended', page],
+  const recommendedBlogsQuery = useQuery({
+    queryKey: ['feed-recommended'],
     queryFn: async () => {
       const fetchedBlogs = await dispatch(fetchRecommendedBlogs(page))
+
+      // console.log(fetchedBlogs.payload.blogList.blogs)
+      return fetchedBlogs.payload.blogList.blogs
+    },
+    placeholderData: keepPreviousData
+  })
+  const recommendedBlogsMutation = useMutation({
+    mutationFn: async (page: number) => {
+      const moreFetchedBlogs = await dispatch(fetchRecommendedBlogs(page))
+
+      // console.log(moreFetchedBlogs.payload.blogList.blogs)
+      return moreFetchedBlogs.payload.blogList.blogs
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(
+        ['feed-recommended'],
+        (oldData: any) => {
+          return [...oldData, ...data]
+        }
+      )
+    }
+  })
+  const handleOnRecommendedBlogListEndReached = () => {
+    setPage(page + 1)
+    recommendedBlogsMutation.mutate(page + 1)
+  }
+
+  const userBlogsQuery = useQuery({
+    queryKey: ['feed-user', page],
+    queryFn: async () => {
+      const fetchedBlogs = await dispatch(fetchUserBlogs(page))
 
       console.log(fetchedBlogs.payload.blogList.blogs)
       return fetchedBlogs.payload.blogList.blogs
     },
     placeholderData: keepPreviousData
   })
+  const userBlogsMutation = useMutation({
+    mutationFn: async (page: number) => {
+      const moreFetchedBlogs = await dispatch(fetchUserBlogs(page))
+
+      // console.log(moreFetchedBlogs.payload.blogList.blogs)
+      return moreFetchedBlogs.payload.blogList.blogs
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(
+        ['feed-user'],
+        (oldData: any) => {
+          return [...oldData, ...data]
+        }
+      )
+    }
+  })
+  const handleOnUserBlogListEndReached = () => {
+    setPage(page + 1)
+    userBlogsMutation.mutate(page + 1)
+  }
 
   return (
     <ParallaxFlatView>
@@ -62,12 +114,13 @@ export default function MyFeed() {
       </View>
       {/* Flat list for lazy load */}
       <FlatList
-        data={data}
+        data={recommendedBlogsQuery.data}
         horizontal={true}
         style={styles.aiBlogContainer}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={{ columnGap: 25 }}
         showsHorizontalScrollIndicator={false}
+        onEndReached={handleOnRecommendedBlogListEndReached}
         renderItem={({ item }) => {
           return <AIBlogPreview blog={item} />;
         }}

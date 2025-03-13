@@ -4,14 +4,14 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import ButtonGradient from "@/components/ButtonGradient";
 import BlogPreview from "@/components/tabs/BlogPreview";
-import { Blog } from "@/interfaces/blogInterface";
+import { UserBlog } from "@/interfaces/blogInterface";
 import { loremIpsum } from "lorem-ipsum";
 import GroupSearch from "@/components/tabs/GroupSearch";
 import GroupJoin from "@/components/tabs/GroupJoinComponent";
 import CareerPathSuggestion from "@/components/tabs/CareerPathSuggestion";
 import AITrendingRecommendation from "@/components/tabs/AITrendingRecommendation";
 
-const mockBlog: Blog = {
+const mockBlog: UserBlog = {
   Title: "How to fix clipboard if it isn’t working",
   image:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",

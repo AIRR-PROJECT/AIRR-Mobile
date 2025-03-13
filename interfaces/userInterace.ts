@@ -1,4 +1,4 @@
-import { Blog } from "./blogInterface";
+import { UserBlog } from "./blogInterface";
 import { Group } from "./groupInterface";
 
 export interface User {
@@ -10,7 +10,7 @@ export interface User {
     bio: string;
     socials: User[];
     groups: Group[];
-    blogs: Blog[];
+    blogs: UserBlog[];
 }
 
 /** Represents survey tags linked to a user */

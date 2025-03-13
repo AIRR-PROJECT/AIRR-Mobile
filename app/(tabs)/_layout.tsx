@@ -15,6 +15,7 @@ import {
 } from "@expo/vector-icons";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable } from "react-native";
+import { useEffect } from "react";
 const MiddleButton = () => (
   <TouchableOpacity
     style={{

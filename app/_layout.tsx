@@ -21,7 +21,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/redux/api/queryClient";
 import { getCurrentUser, getTokens } from "@/stores/authStore";
 import { loadTokensFromStore, setTokens } from "@/redux/slices/userSlice";
-import { getUserInfo, loadToken } from "@/redux/slices/authSlice";
+import { getUserInfo, loadToken, logout } from "@/redux/slices/authSlice";
+import { injectStoreToAxiosInterceptor } from "@/redux/api/axiosInstance";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -34,21 +35,25 @@ export function RootBackgroundTask() {
 
   // Init
   useEffect(() => {
+    if (isLoggedIn && isAccountVerified && !userAccessToken && !userAccessToken && !user) {
+      dispatch(logout())
+    }
+
     dispatch(loadToken()).then(() => {
-      dispatch(getUserInfo())
+      // console.log(userAccessToken)
+      // console.log(userRefreshToken)
+      // if (userAccessToken != "" && userRefreshToken != "") {
+      //   dispatch(getUserInfo())
+      // }
+      // else {
+      //   dispatch(logout())
+      // }
+        dispatch(getUserInfo())
     })
   }, [])
 
-  // useEffect(() => {
-  //   if (isLoggedIn && isAccountVerified && userAccessToken != "") {
-  //     console.log(user)
-  //     if (!user) {
-  //       dispatch(getUserInfo()).then(() => {
-  //         dispatch(loadToken())
-  //       })
-  //     }
-  //   }
-  // }, [isLoggedIn, isAccountVerified, userAccessToken])
+  useEffect(() => {
+  }, [isLoggedIn, isAccountVerified])
 
   useEffect(() => {
     console.log(user)
@@ -67,6 +72,8 @@ export default function RootLayout() {
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
   const streak = 1; // Replace with actual streak count
+  
+  injectStoreToAxiosInterceptor(store)
 
   useEffect(() => {
     if (loaded) {

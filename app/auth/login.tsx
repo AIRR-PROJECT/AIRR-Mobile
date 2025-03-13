@@ -72,6 +72,10 @@ export default function LoginScreen() {
     }
 
     if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken) {
+      console.log(isLoggedIn)
+      console.log(isAccountVerified)
+      console.log(userAccessToken)
+      console.log(userRefreshToken)
       router.replace("/(tabs)");
     }
   }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])

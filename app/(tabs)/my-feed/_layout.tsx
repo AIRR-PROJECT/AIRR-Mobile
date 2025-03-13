@@ -1,7 +1,7 @@
 import { MaterialTopTabs } from "@/components/MaterialTopTabs";
 import { Image } from "expo-image";
-import { useState } from "react";
 import { Text, View } from "react-native";
+import { useEffect, useState } from "react";
 export default function MyFeedTabLayout() {
   const [swipeEnabled, setSwipeEnabled] = useState(true);
   return (

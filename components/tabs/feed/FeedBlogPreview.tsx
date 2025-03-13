@@ -1,4 +1,4 @@
-import { Blog } from "@/interfaces/blogInterface";
+import { UserBlog } from "@/interfaces/blogInterface";
 import { ImageBackground, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -7,7 +7,7 @@ import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-export default function FeedBlogPreview({ blog }: { blog: Blog }) {
+export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   return (
     <View style={styles.outerContainer}>
       <Pressable style={styles.container}>
@@ -41,14 +41,14 @@ export default function FeedBlogPreview({ blog }: { blog: Blog }) {
             lightColor="#fff"
             darkColor="#fff"
           >
-            {blog.title}
+            {blog.Title}
           </ThemedText>
         </View>
 
         {/* 3rd Part: Preview of Content */}
-        <View style={styles.contentSection}>
+        {/* <View style={styles.contentSection}>
           <ImageBackground
-            source={{ uri: blog.image }}
+            source={{ uri: blog.BackgroundURL }}
             style={styles.imageBackground}
             imageStyle={styles.imageStyle}
           >
@@ -74,7 +74,7 @@ export default function FeedBlogPreview({ blog }: { blog: Blog }) {
               ))}
             </View>
           </ImageBackground>
-        </View>
+        </View> */}
 
         {/* 4th Part: Interactions */}
         <View style={styles.interactSection}>

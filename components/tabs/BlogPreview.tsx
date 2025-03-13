@@ -1,4 +1,4 @@
-import { Blog } from "@/interfaces/blogInterface";
+import { UserBlog } from "@/interfaces/blogInterface";
 import { ImageBackground, StyleSheet, View } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
@@ -6,11 +6,11 @@ import BlogAuthor from "./BlogAuthor";
 import GroupPreviewInfo from "./GroupPreviewInfo";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
-export default function BlogPreview({ blog }: { blog: Blog }) {
+export default function BlogPreview({ blog }: { blog: UserBlog }) {
   return (
     <View style={styles.outerContainer}>
       <ImageBackground
-        source={{ uri: blog.image }}
+        source={{ uri: blog.BackgroundURL }}
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >
@@ -60,7 +60,7 @@ export default function BlogPreview({ blog }: { blog: Blog }) {
               lightColor="#fff"
               darkColor="#fff"
             >
-              {blog.title}
+              {blog.Title}
             </ThemedText>
           </View>
 

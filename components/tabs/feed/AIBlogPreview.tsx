@@ -1,22 +1,22 @@
-import { Blog } from "@/interfaces/blogInterface";
+import { AIBlog, UserBlog } from "@/interfaces/blogInterface";
 import { ImageBackground, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 import { formatISODate, formatUnixDate } from "@/utils/dateConvert";
-export default function AIBlogPreview({ blog }: { blog: Blog }) {
+export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
   return (
     <View style={styles.outerContainer}>
       <ImageBackground
-        source={{ uri: blog.image }}
+        source=/* {{ uri: blog.image }} */ {{ uri: ""}}
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >
         <Pressable style={styles.container}>
           {/* 1st Part: Date  */}
 
-          <View style={styles.timeSection}>
+          {/* <View style={styles.timeSection}>
             <ThemedText
               style={styles.timeText}
               type="default"
@@ -25,23 +25,9 @@ export default function AIBlogPreview({ blog }: { blog: Blog }) {
             >
               {formatISODate(blog.timestamp)}
             </ThemedText>
-          </View>
+          </View> */}
 
-          {/* 2nd Part: List of Tags */}
-          <View style={styles.tagsSection}>
-            {blog.tags.map((tag, index) => (
-              <ThemedText
-                key={index}
-                style={styles.tag}
-                type="default"
-                lightColor="#fff"
-                darkColor="#fff"
-              >
-                #{tag}
-              </ThemedText>
-            ))}
-          </View>
-          {/* 3rd Part: Title */}
+          {/* 2nd Part: Title */}
           <View style={styles.titleSection}>
             <ThemedText
               style={styles.title}
@@ -49,7 +35,7 @@ export default function AIBlogPreview({ blog }: { blog: Blog }) {
               lightColor="#fff"
               darkColor="#fff"
             >
-              {blog.title}
+              {blog.Title}
             </ThemedText>
           </View>
         </Pressable>

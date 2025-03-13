@@ -7,10 +7,12 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 import { router } from "expo-router";
+import { resetAccountCreated } from "@/redux/slices/authSlice";
+import { useAppDispatch } from "@/redux/hook";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -23,6 +25,12 @@ export default function SignUpFirstPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
+  const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    dispatch(resetAccountCreated(false));
+  }, []);
+
   const onSubmit = (data: FormData) => {
     router.push(
       {

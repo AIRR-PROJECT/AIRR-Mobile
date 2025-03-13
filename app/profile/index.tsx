@@ -18,7 +18,7 @@ import { useState } from "react";
 import TabButton from "@/components/tabs/feed/TabButton";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import ReadmeTab from "@/components/profile/ReadmeTab";
-import ParallaxFlatView from "@/components/ParallaxFlatView";
+import ParallaxFlatList from "@/components/ParallaxFlatList";
 type MockUserInfo = {
   username: string;
   avatar: string;

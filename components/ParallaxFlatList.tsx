@@ -8,7 +8,7 @@ import Animated, {
   useAnimatedScrollHandler,
   Extrapolation,
 } from "react-native-reanimated";
-
+import { FlashList } from "@shopify/flash-list";
 import { ThemedView } from "@/components/ThemedView";
 import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -23,7 +23,7 @@ type Props = PropsWithChildren<{
   backgroundColor?: { dark: string; light: string };
 }>;
 
-export default function ParallaxFlatView({
+export default function ParallaxFlatList({
   children,
   headerImage,
   headerBackgroundColor = { light: "#A1CEDC", dark: "#1D3D47" },
@@ -81,6 +81,7 @@ export default function ParallaxFlatView({
         scrollEventThrottle={16}
         onScroll={onScroll} // Attach animated scroll handler
         scrollIndicatorInsets={{ bottom }}
+        scrollEnabled={true}
         contentContainerStyle={{ paddingBottom: bottom, }}
         ListHeaderComponent={
           hasHeader ? (

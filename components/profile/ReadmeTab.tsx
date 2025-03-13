@@ -1,20 +1,19 @@
-import { StyleSheet, TouchableOpacity, View,Text, FlatList } from "react-native";
+import { StyleSheet, TouchableOpacity, View,Text, FlatList, ScrollView } from "react-native";
 import { ThemedText } from "../ThemedText";
 import GradientText from "../GradientText";
 import { LinearGradient } from "expo-linear-gradient";
 import ReadmeComponent from "./ReadmeComponent";
 import { FontAwesome6 } from "@expo/vector-icons";
 import TotalBlogComponent from "./TotalBlogComponent";
+import { FlashList } from "@shopify/flash-list";
 
-
-const tags = [
-  'React', 'Vue', 'Angular', 'Node', 'Express', 'MongoDB', 'Firebase', 'AWS', 'GCP', 'Azure',
-];
+// Get list of tags [max 20]
+const tags = Array(20).fill('Frontend');
 
 export default function ReadmeTab() {
   return (
     // Readme
-    <View style={styles.container}>
+    <View style={styles.container} >
       {/* User Readme */}
       <ReadmeComponent />
       {/* Reading Journey */}
@@ -31,9 +30,10 @@ export default function ReadmeTab() {
       {/* Top tags */}
       <View style={styles.topTagsContainer}> 
         <ThemedText style={styles.topTagsTitle}>Top tags by reading days</ThemedText>
-        <FlatList
+        <FlashList
           data={tags}
           keyExtractor={(item, index) => index.toString()}
+          scrollEnabled={false}
           renderItem={({ item }) => (
             <TouchableOpacity>
               <LinearGradient
@@ -48,8 +48,9 @@ export default function ReadmeTab() {
               </LinearGradient>
             </TouchableOpacity>
           )}
+          estimatedItemSize={300}
         >
-        </FlatList>
+        </FlashList>
       </View>
     </View>
   );

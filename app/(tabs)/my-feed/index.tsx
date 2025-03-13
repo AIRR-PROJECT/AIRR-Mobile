@@ -142,7 +142,7 @@ export default function MyFeed() {
       </View>
       {/* Flat list for lazy load */}
 
-      <FlahList
+      <FlashList
         data={userBlogsQuery.data}
         style={styles.userBlogContainer}
         scrollEnabled={false}

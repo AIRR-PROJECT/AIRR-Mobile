@@ -7,14 +7,15 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import TotalBlogComponent from "./TotalBlogComponent";
 import { FlashList } from "@shopify/flash-list";
 import ProfileTabButton from "./ProfileTabButton";
-
+import * as Clipboard from 'expo-clipboard';
 // Get list of tags [max 10]
 const tags = Array(10).fill('Frontend');
 const chunkedTags = chunkArray(tags, 5);
-
+const mockLink = "https://dly.to/dfdsc";
 export default function ReadmeTab() {
-  const handleCopyLink = () => {
-    console.log("Link copied");
+  const handleCopyLink = async () => {
+    await Clipboard.setStringAsync(mockLink);
+
     ToastAndroid.show("Link copied to clipboard", ToastAndroid.SHORT);
   }
   return (
@@ -53,7 +54,7 @@ export default function ReadmeTab() {
       <ThemedText style={styles.inviteFriendText}>Invite other developers to discover how easy it is to stay updated with daily.dev</ThemedText>
       {/* Link */}
       <View style={[styles.linkContainer,]}>
-          <ThemedText style={styles.linkText}>https://dly.to/dfdsc</ThemedText>
+          <ThemedText style={styles.linkText}>{mockLink}</ThemedText>
           <TouchableOpacity style={styles.copyLinkButton} onPress={handleCopyLink}>
             <ThemedText style={styles.copyLinkText}>Copy Link</ThemedText>
           </TouchableOpacity>

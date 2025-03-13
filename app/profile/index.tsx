@@ -19,6 +19,8 @@ import TabButton from "@/components/tabs/feed/TabButton";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import ReadmeTab from "@/components/profile/ReadmeTab";
 import ParallaxFlatList from "@/components/ParallaxFlatList";
+import BlogTab from "@/components/profile/BlogTab";
+import { Divider } from "@rneui/themed";
 type MockUserInfo = {
   username: string;
   avatar: string;
@@ -126,8 +128,10 @@ export default function ProfileScreen() {
           );
         })}
       </View>
+      <Divider orientation="horizontal" style={{ width: "100%", borderColor: "#fff", borderWidth: 1 }}/>
       {/* Readme if tab == readme */}
       {selectedTab === "Readme" && <ReadmeTab />}
+      {selectedTab === "Blog" && <BlogTab />}
     </ParallaxScrollView>
   );
 }

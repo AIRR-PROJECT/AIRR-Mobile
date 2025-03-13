@@ -9,7 +9,7 @@ interface BlogInGroupProps {
   style?: ViewStyle;
 }
 
-export default function BlogInGroup({ group, style }: BlogInGroupProps) {
+export default function GroupPreviewInfo({ group, style }: BlogInGroupProps) {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.textContainer}>

@@ -1,34 +1,44 @@
-import { Tabs,  } from "expo-router";
-import { Platform, View,TouchableOpacity } from "react-native";
+import { Tabs } from "expo-router";
+import { Platform, View, TouchableOpacity } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { AntDesign, Entypo, FontAwesome6, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Entypo,
+  FontAwesome6,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable } from "react-native";
 import { useEffect } from "react";
 const MiddleButton = () => (
-  <TouchableOpacity 
+  <TouchableOpacity
     style={{
       flex: 1,
-      alignSelf: 'center',
-      backgroundColor: 'transparent',
+      alignSelf: "center",
+      backgroundColor: "transparent",
       width: 60,
       height: 60,
-      justifyContent: 'center',
+      justifyContent: "center",
       // alignItems: 'center',
       // elevation: 4,
-      shadowColor: '#1E1E1E',
+      shadowColor: "#1E1E1E",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
     }}
-   
   >
-    <AntDesign name="plussquare" size={40} color="#B9FF66" style={{alignSelf: "center"}}/>
+    <AntDesign
+      name="plussquare"
+      size={40}
+      color="#B9FF66"
+      style={{ alignSelf: "center" }}
+    />
   </TouchableOpacity>
 );
 export default function TabLayout() {
@@ -45,12 +55,14 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           default: {
-            borderTopLeftRadius:10,
+           
+            backgroundColor: "#17191E",
             // overflow: '',
-          },  
+          },
         }),
         animation: "shift",
       }}
+      
     >
       <Tabs.Screen
         name="index"
@@ -70,14 +82,13 @@ export default function TabLayout() {
           ),
         }}
       />
-       {/* Middle Button with Function */}
-       <Tabs.Screen
+      {/* Middle Button with Function */}
+      <Tabs.Screen
         name="create"
         options={{
           title: "",
           tabBarButton: (props) => <MiddleButton {...props} />,
         }}
-
       />
       <Tabs.Screen
         name="career-path"

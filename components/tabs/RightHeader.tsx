@@ -1,7 +1,7 @@
 import { Keyboard, StyleSheet, Text, TextInput } from "react-native";
 import { View, Modal, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Divider } from "@rneui/themed";
 import { ThemedText } from "../ThemedText";
@@ -10,12 +10,17 @@ import { useState } from "react";
 import ButtonGradient from "../ButtonGradient";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable } from "react-native";
+import { Collapsible } from "../Collapsible";
+import TabButton from "./feed/TabButton";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type RightHeaderProps = {
   streak: number;
   avatar?: string;
 };
+
+const userSelectedTabs = ["Python", "JavaScript", "React", "Vue", "Angular"];
+const suggestedTabs = ["Java", "C++", "C#", "Ruby", "Rust", "Go", "Swift"];
 
 export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   const route = useRouter();
@@ -25,7 +30,9 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   };
   const [isModalVisible, setModalVisible] = useState(false);
   const [isSearchFocused, setSearchFocused] = useState(false);
-  const [activeTab, setActiveTab] = useState<"suggested" | "myTags">("suggested"); // Default to suggested tags
+
+  const [selectedTab, setSelectedTab] = useState("Suggested");
+  const modalButtons = ["Suggested", "My Tags"];
   return (
     <View style={styles.container}>
       {/* Feed Settings Button */}
@@ -105,14 +112,14 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
                 </TouchableOpacity>
                 <ButtonGradient
                   label="SAVE"
-                  style={{ width: 100, padding: 5 }}
+                  style={{ width: 100, padding: 10 }}
                 />
               </View>
             </View>
 
             <Divider
               orientation="horizontal"
-              style={{ width: "100%", borderColor: "#3D434A", borderWidth: 2 }}
+              style={{ width: "100%", borderColor: "#3D434A", borderWidth: 1 }}
             />
 
             {/* Modal Content */}
@@ -134,20 +141,82 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
               />
             </View>
             {/* Tags Row and sort button */}
-            <View style={styles.rowContainer}>
+            <View style={[styles.searchOptionsContainer]}>
               {/* Suggested and My Tags */}
-              <View style={styles.rowContainer}>
-                <TouchableOpacity>
-                  <ThemedText style={styles.modalText}>Suggested</ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <ThemedText style={styles.modalText}>My Tags</ThemedText>
-                </TouchableOpacity>
+              <View style={[styles.rowContainer]}>
+                {modalButtons.map((button) => (
+                  <TouchableOpacity
+                    key={button}
+                    onPress={() => setSelectedTab(button)}
+                    style={[
+                      styles.modalTextContainer,
+                      selectedTab === button && {
+                        backgroundColor: "#363B47",
+                      },
+                    ]}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.modalText,
+                        selectedTab === button && styles.modalTextSelected,
+                      ]}
+                    >
+                      {button}
+                    </ThemedText>
+                  </TouchableOpacity>
+                ))}
               </View>
+              <TouchableOpacity style={styles.modalSortButtonContainer}>
+                <ThemedText style={styles.modalSortButton}>Sort</ThemedText>
+                <Entypo name="select-arrows" size={24} color="black" />
+              </TouchableOpacity>
             </View>
+            <Divider
+              orientation="horizontal"
+              style={{ width: "100%", borderColor: "#242630", borderWidth: 1 }}
+            />
+            {/* Content */}
+            
+              {selectedTab === "Suggested" ? (
+                <SuggestedTags />
+              ) : (
+                <MyTags />
+              )}
+       
           </View>
         </Pressable>
       </Modal>
+    </View>
+  );
+}
+
+function SuggestedTags() {
+  return (
+    <View style={styles.tagsSection}>
+      {suggestedTabs.map((tag, index) => (
+        <TabButton
+          key={index}
+          title={tag}
+          onPress={() => console.log(tag)}
+          userSelected={false}
+        >
+        </TabButton>
+      ))}
+    </View>
+  );
+}
+function MyTags() {
+  return (
+    <View style={styles.tagsSection}>
+      {userSelectedTabs.map((tag, index) => (
+        <TabButton
+          key={index}
+          title={tag}
+          onPress={() => console.log(tag)}
+          userSelected={true}
+        >
+        </TabButton>
+      ))}
     </View>
   );
 }
@@ -202,8 +271,35 @@ const styles = StyleSheet.create({
   },
   modalText: {
     fontSize: 14,
+    color: "#8A94AC",
+    textAlign: "center",
+  },
+  modalTextSelected: {
+    fontSize: 14,
     color: "#fff",
     textAlign: "center",
+    fontWeight: "bold",
+  },
+  modalTextContainer: {
+    borderRadius: 10,
+    width: 100,
+    padding: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalSortButtonContainer: {
+    flexDirection: "row",
+    backgroundColor: "#2E3B40",
+    borderRadius: 1000,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+  },
+  modalSortButton: {
+    paddingBlock: 5,
+    fontSize: 14,
+    color: "#fff",
+    padding: 10,
   },
   closeButton: {
     padding: 10,
@@ -236,6 +332,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  searchOptionsContainer: {
+    width: "100%", // Make sure the row takes up the full width of the modal
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+  },
   searchBar: {
     padding: 10,
     flex: 0.9,
@@ -252,5 +355,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#3D434A",
     marginTop: 20,
+  },
+  tagsSection: {
+    paddingVertical: 8,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 10,
   },
 });

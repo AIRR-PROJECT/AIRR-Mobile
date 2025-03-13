@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View,Text, FlatList, ScrollView } from "react-native";
+import { StyleSheet, TouchableOpacity, View,Text, FlatList, ScrollView, ToastAndroid } from "react-native";
 import { ThemedText } from "../ThemedText";
 import GradientText from "../GradientText";
 import { LinearGradient } from "expo-linear-gradient";
@@ -6,11 +6,17 @@ import ReadmeComponent from "./ReadmeComponent";
 import { FontAwesome6 } from "@expo/vector-icons";
 import TotalBlogComponent from "./TotalBlogComponent";
 import { FlashList } from "@shopify/flash-list";
+import ProfileTabButton from "./ProfileTabButton";
 
-// Get list of tags [max 20]
-const tags = Array(20).fill('Frontend');
+// Get list of tags [max 10]
+const tags = Array(10).fill('Frontend');
+const chunkedTags = chunkArray(tags, 5);
 
 export default function ReadmeTab() {
+  const handleCopyLink = () => {
+    console.log("Link copied");
+    ToastAndroid.show("Link copied to clipboard", ToastAndroid.SHORT);
+  }
   return (
     // Readme
     <View style={styles.container} >
@@ -34,27 +40,34 @@ export default function ReadmeTab() {
           data={tags}
           keyExtractor={(item, index) => index.toString()}
           scrollEnabled={false}
+          numColumns={5}
           renderItem={({ item }) => (
-            <TouchableOpacity>
-              <LinearGradient
-                colors={["#FF6E6E", "#FF6E6E"]}
-                style={{
-                  padding: 10,
-                  borderRadius: 20,
-                  margin: 5,
-                }}
-              >
-                <Text>{item}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            <ProfileTabButton title={item} onPress={() => {}} />
           )}
-          estimatedItemSize={300}
+          estimatedItemSize={50}
         >
         </FlashList>
+      </View>
+      {/* Invite friends */}
+      <ThemedText style={styles.inviteFriendTitle}>Invite Friends</ThemedText>
+      <ThemedText style={styles.inviteFriendText}>Invite other developers to discover how easy it is to stay updated with daily.dev</ThemedText>
+      {/* Link */}
+      <View style={[styles.linkContainer,]}>
+          <ThemedText style={styles.linkText}>https://dly.to/dfdsc</ThemedText>
+          <TouchableOpacity style={styles.copyLinkButton} onPress={handleCopyLink}>
+            <ThemedText style={styles.copyLinkText}>Copy Link</ThemedText>
+          </TouchableOpacity>
       </View>
     </View>
   );
 }
+
+function chunkArray(array: any[], size: number): any[][] {
+  return Array.from({ length: Math.ceil(array.length / size) }, (_, index) =>
+    array.slice(index * size, index * size + size)
+  );
+}
+
 const styles = StyleSheet.create({
   // Styles
   container: {
@@ -78,11 +91,54 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   topTagsContainer: {
-  
+    borderWidth: 1,
+    borderColor: "#393F4C",
+    padding: 10,
+    borderRadius: 20,
+  },
+  tagContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+   
   },
   topTagsTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
-  }
+    paddingVertical: 10,
+  },
+  inviteFriendTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  
+  },
+  inviteFriendText: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  linkContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#1F1F63",
+    padding: 20,
+    borderRadius: 20,
+  },
+  linkText: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  copyLinkButton: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius : 20,
+  
+  },
+  copyLinkText: {
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "bold",
+  },
 });

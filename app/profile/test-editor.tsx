@@ -1,7 +1,7 @@
 import QuillEditor from "@/components/quill/QuillEditor";
 import { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-export default function EditProfileScreen() {
+export default function EditorScreen() {
   const [editorContent, setEditorContent] = useState<string>('');
   return (
     <View style={styles.container}>

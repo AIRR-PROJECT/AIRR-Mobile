@@ -7,11 +7,14 @@ import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 import { router, useLocalSearchParams } from "expo-router";
 import Checkbox from "expo-checkbox";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { SignUpCredentials } from "@/interfaces/authInterface";
+import { signup } from "@/redux/slices/authSlice";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -32,25 +35,36 @@ export default function SignUpSecondPage() {
     watch,
     formState: { errors },
   } = useForm<FormData>();
+  const dispatch = useAppDispatch();
 
   const password = watch("password");
+  const { isAccountCreated } = useAppSelector(state => state.auth)
 
   const [isTermChecked, setTermChecked] = useState(false);
   const handleToggleCheckbox = () => {
     setTermChecked(!isTermChecked);
   };
+
+  useEffect(() => {
+    if (isAccountCreated) {
+      if (router.canDismiss()) {
+        router.dismissTo("/auth/login")
+      }
+    }
+  }, [isAccountCreated]);
+  
   const onSubmit = (data: FormData) => {
     if (!isTermChecked) {
       Alert.alert("Please accept the terms and conditions");
     } else {
-      // const signUpData: SignUpCredentials = {
-      //   email: data.email,
-      //   username: data.username,
-      //   password: data.password,
-      // };
+      const signUpData: SignUpCredentials = {
+        email: data.email,
+        username: username,
+        password: data.password,
+      };
 
       console.log("test");
-      // dispatch(signup(signUpData));
+      dispatch(signup(signUpData));
     }
   };
   const handleBackToLogin = () => {

@@ -21,6 +21,7 @@ type Props = PropsWithChildren<{
   hasHeader?: boolean;
   style?: StyleProp<ViewStyle>;
   backgroundColor?: { dark: string; light: string };
+  refreshControl?: ReactElement;
 }>;
 
 export default function ParallaxFlatList({
@@ -29,6 +30,7 @@ export default function ParallaxFlatList({
   headerBackgroundColor = { light: "#A1CEDC", dark: "#1D3D47" },
   hasHeader,
   style,
+  refreshControl,
 }: Props) {
   const colorScheme = useColorScheme() ?? "light";
   const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
@@ -64,6 +66,8 @@ export default function ParallaxFlatList({
   // Convert children to FlatList-compatible items
   const data = Array.isArray(children) ? children : [children];
 
+  // Refresh handler
+
   return (
     // change light to #fff later
     <ThemedView
@@ -83,6 +87,8 @@ export default function ParallaxFlatList({
         scrollIndicatorInsets={{ bottom }}
         scrollEnabled={true}
         contentContainerStyle={{ paddingBottom: bottom, }}
+        refreshControl={refreshControl}
+        overScrollMode={"always"}
         ListHeaderComponent={
           hasHeader ? (
             <Animated.View

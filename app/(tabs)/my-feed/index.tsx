@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, RefreshControl } from "react-native";
 import ParallaxFlatList from "@/components/ParallaxFlatList";
 import ParallaxFlashList from "@/components/ParallaxFlashList";
 import GradientText from "@/components/GradientText";
@@ -11,7 +11,7 @@ import { useWatch } from "react-hook-form";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { useAppDispatch } from "@/redux/hook";
 import { fetchRecommendedBlogs, fetchUserBlogs } from "@/redux/slices/feedSlice";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import queryClient from "@/redux/api/queryClient";
 // const mockBlog: UserBlog = {
 //   Title: "How to fix clipboard if it isn’t working",
@@ -103,9 +103,19 @@ export default function MyFeed() {
     setUserPage(userPage + 1)
     userBlogsMutation.mutate(userPage + 1)
   }
+  // Simulate refresh
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate fetching data
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+  }, []);
 
   return (
-    <ParallaxFlatList>
+    <ParallaxFlatList refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {/* Header */}
       <View style={styles.headerContainer}>
         <GradientText

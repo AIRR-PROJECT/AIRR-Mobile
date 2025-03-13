@@ -1,28 +1,57 @@
-import { Blog } from "@/interfaces/blogInterface";
+import { UserBlog } from "@/interfaces/blogInterface";
 import { FlashList } from "@shopify/flash-list";
 import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "../tabs/feed/FeedBlogPreview";
 import { View } from "react-native";
-const mockBlog: Blog = {
-  title: "How to fix clipboard if it isn’t working",
-  image:
+const mockBlog: UserBlog = {
+  _id: "123",
+  Title: "How to fix clipboard if it isn’t working",
+  BackgroundURL:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
-  description: "Blog Description",
-  content: loremIpsum({ count: 50, units: "paragraphs" }),
-  timestamp: new Date().toISOString(),
-  blogAuthor: {
-    name: "Name of the Author",
-    avatar:
+  Description: "Blog Description",
+  //content: loremIpsum({ count: 50, units: "paragraphs" }),
+  //timestamp: new Date().toISOString(),
+  Author: {
+    Username: "Name of the Author",
+    AvatarURL:
       "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg",
-    email: "sample_email@gmail.com",
-    phoneNumber: "1234567890",
-    location: "Location",
-    bio: "Bio",
-    socials: [],
-    groups: [],
-    blogs: [],
+    _id: "123",
+    CreateDate: "2021-09-01",
   },
-  tags: ["Frontend", "Backend", "React", "NodeJS", "Express"],
+  Tags: [
+    {
+      _id: "123",
+      TagName: "Frontend",
+    },
+    {
+      _id: "123",
+      TagName: "Backend",
+    },
+    {
+      _id: "123",
+      TagName: "React",
+    },
+    {
+      _id: "123",
+      TagName: "NodeJS",
+    },
+    {
+      _id: "123",
+      TagName: "Express",
+    },
+  ],
+  Group: {
+    CoverURL:
+      "https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png",
+    Name: "Group's name",
+    NumberOfMembers: 123,
+  },
+  UserInteraction: "like",
+  Reaction: {
+    Likes: 123,
+    Dislikes: 123,
+    Comments: 123,
+  },
 };
 const Data = [
   mockBlog,

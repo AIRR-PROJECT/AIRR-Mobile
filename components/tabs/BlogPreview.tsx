@@ -10,7 +10,7 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
   return (
     <View style={styles.outerContainer}>
       <ImageBackground
-        source={{ uri: blog.image }}
+        source={{ uri: blog.BackgroundURL }}
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >

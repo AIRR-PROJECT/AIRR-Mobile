@@ -13,12 +13,12 @@ import AITrendingRecommendation from "@/components/tabs/AITrendingRecommendation
 
 const mockBlog: UserBlog = {
   Title: "How to fix clipboard if it isn’t working",
-  image:
+  BackgroundURL:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
   Description: "Blog Description",
   content: loremIpsum({ count: 50, units: "paragraphs" }),
   timestamp: new Date().toISOString(),
-  blogAuthor: {
+  Author: {
     name: "Name of the Author",
     avatar:
       "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg",

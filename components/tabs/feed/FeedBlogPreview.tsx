@@ -46,9 +46,9 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         </View>
 
         {/* 3rd Part: Preview of Content */}
-        <View style={styles.contentSection}>
+        {/* <View style={styles.contentSection}>
           <ImageBackground
-            source={{ uri: blog.image }}
+            source={{ uri: blog.BackgroundURL }}
             style={styles.imageBackground}
             imageStyle={styles.imageStyle}
           >
@@ -74,7 +74,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
               ))}
             </View>
           </ImageBackground>
-        </View>
+        </View> */}
 
         {/* 4th Part: Interactions */}
         <View style={styles.interactSection}>

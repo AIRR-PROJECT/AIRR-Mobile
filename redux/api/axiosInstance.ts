@@ -125,7 +125,7 @@ api.interceptors.response.use(
         // else {
         //     Alert.alert("Error" + error.status, getReasonPhrase(error.status))
         // }
-        Alert.alert((exception_status != -1 ? "Error: " + exception_status : "Error"), exception_message)
+        // Alert.alert((exception_status != -1 ? "Error: " + exception_status : "Error"), exception_message)
         return Promise.reject(error);
     }
 );

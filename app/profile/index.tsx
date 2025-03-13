@@ -11,7 +11,6 @@ import { ThemedText } from "@/components/ThemedText";
 import UserInfoComponent from "@/components/profile/UserInfoComponent";
 import UserStudentInfoComponent from "@/components/profile/UserStudentInfoComponent";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
-import { Blog } from "@/interfaces/blogInterface";
 import { loremIpsum } from "lorem-ipsum";
 import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import { useState } from "react";
@@ -21,6 +20,7 @@ import ReadmeTab from "@/components/profile/ReadmeTab";
 import ParallaxFlatList from "@/components/ParallaxFlatList";
 import BlogTab from "@/components/profile/BlogTab";
 import { Divider } from "@rneui/themed";
+import ActivityTab from "@/components/profile/ActivityTab";
 type MockUserInfo = {
   username: string;
   avatar: string;
@@ -132,6 +132,7 @@ export default function ProfileScreen() {
       {/* Readme if tab == readme */}
       {selectedTab === "Readme" && <ReadmeTab />}
       {selectedTab === "Blog" && <BlogTab />}
+      {selectedTab === "Activity" && <ActivityTab/>}
     </ParallaxScrollView>
   );
 }

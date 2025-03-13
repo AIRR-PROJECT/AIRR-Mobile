@@ -40,3 +40,12 @@ export interface UserBlog {
     Tags: UserBlogTag[];
     Group: UserBlogGroup;
 }
+
+
+export interface BlogActionHistory{
+    _id: string;
+    Title: string;
+    BackgroundURL: string;
+    Action: string;
+    Timestamp: string;
+}

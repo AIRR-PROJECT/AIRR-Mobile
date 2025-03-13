@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import ParallaxFlatView from "@/components/ParallaxFlatView";
+import ParallaxFlatList from "@/components/ParallaxFlatList";
+import ParallaxFlashList from "@/components/ParallaxFlashList";
 import GradientText from "@/components/GradientText";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { AIBlog, UserBlog } from "@/interfaces/blogInterface";
@@ -34,6 +35,8 @@ import queryClient from "@/redux/api/queryClient";
 //   tags: ["Frontend", "Backend", "React", "NodeJS", "Express"],
 // };
 // const Data = [mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog];
+
+import { FlashList } from "@shopify/flash-list";
 export default function MyFeed() {
   const dispatch = useAppDispatch()
   const [recommendedPage, setRecommendedPage] = useState(1)
@@ -102,7 +105,7 @@ export default function MyFeed() {
   }
 
   return (
-    <ParallaxFlatView>
+    <ParallaxFlatList>
       {/* Header */}
       <View style={styles.headerContainer}>
         <GradientText
@@ -114,17 +117,18 @@ export default function MyFeed() {
         <Ionicons name="play-forward-circle-outline" size={30} color="#fff" />
       </View>
       {/* Flat list for lazy load */}
-      <FlatList
+
+      <FlashList
         data={recommendedBlogsQuery.data}
         horizontal={true}
-        style={styles.aiBlogContainer}
         keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ columnGap: 25 }}
         showsHorizontalScrollIndicator={false}
         onEndReached={handleOnRecommendedBlogListEndReached}
         renderItem={({ item }) => {
           return <AIBlogPreview blog={item} />;
         }}
+        ItemSeparatorComponent={() => <View style={{ width: 25 }} />}
+        estimatedItemSize={350}
       />
       {/* User Blogs and Button*/}
       <View style={styles.headerContainer}>
@@ -137,19 +141,22 @@ export default function MyFeed() {
         <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
       </View>
       {/* Flat list for lazy load */}
-      <FlatList
+
+      <FlahList
         data={userBlogsQuery.data}
         style={styles.userBlogContainer}
+        scrollEnabled={false}
         keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ rowGap: 25 }}
+        ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         showsHorizontalScrollIndicator={false}
         onEndReached={handleOnUserBlogListEndReached}
         renderItem={({ item }) => {
           return <FeedBlogPreview blog={item} />;
         }}
+        estimatedItemSize={400}
       />
       
-    </ParallaxFlatView>
+    </ParallaxFlatList>
   );
 }
 const styles = StyleSheet.create({
@@ -166,12 +173,11 @@ const styles = StyleSheet.create({
   aiBlogContainer: {
     flexDirection: "row",
     height: "auto",
-    marginHorizontal: -25,
-    marginTop: -25,
     flex: 1,
+  
   },
   userBlogContainer: {
     flex: 1,
-    rowGap: 25,
+
   }
 });

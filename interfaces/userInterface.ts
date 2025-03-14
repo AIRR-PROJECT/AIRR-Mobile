@@ -1,14 +1,14 @@
 import { UserBlog } from "./blogInterface";
 import { Group } from "./groupInterface";
 
-export interface User {
+export interface User1 {
     name: string;
     avatar: string;
     email: string;
     phoneNumber: string;
     location: string;
     bio: string;
-    socials: User[];
+    socials: User1[];
     groups: Group[];
     blogs: UserBlog[];
 }
@@ -19,7 +19,20 @@ export interface SurveyTags {
     TagName: string;
 }
 
-export interface UserInfo {
+export interface UserProfile {
+    studentID: string;
+    department: string
+    program: string
+    year: number;
+    gpa: number;
+    link: {
+        Facebook: string,
+        LinkedIn: string,
+        Github: string
+    };
+}
+
+export interface User {
     username: string;
     id: string;
     email?: string;
@@ -31,5 +44,6 @@ export interface UserInfo {
     joinDate?: Date;
     survey?: SurveyTags[];
     role?: string;
-    profile?: any;
+    profile: UserProfile;
+    avatar_url: string;
   }

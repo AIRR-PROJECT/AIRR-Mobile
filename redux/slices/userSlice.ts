@@ -4,7 +4,7 @@ import api from "../api/axiosInstance";
 import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { Alert } from "react-native";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { User, UserInfo } from "@/interfaces/userInterace";
+import { User } from "@/interfaces/userInterface";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
 import jwt from 'expo-jwt'

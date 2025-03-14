@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { UserInfo } from "@/interfaces/userInterace";
+import { User1 } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
 import { setTokens, setCurrentUser } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
@@ -61,7 +61,7 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
     }
 )
 
-export const signup = createAsyncThunk<UserInfo, SignUpCredentials>(
+export const signup = createAsyncThunk<User1, SignUpCredentials>(
     'auth/sign-up',
     async (data: SignUpCredentials, thunkAPI) => {
         try {

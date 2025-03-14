@@ -1,5 +1,5 @@
 import BlogAuthor from "@/components/tabs/BlogAuthor";
-import { User } from "./userInterace";
+import { User1 } from "./userInterface";
 
 export interface AIBlog {
     _id: string;

@@ -78,7 +78,7 @@ export default function MyFeed() {
   const userBlogsQuery = useQuery({
     queryKey: ["feed-user"],
     queryFn: async () => {
-      const fetchedBlogs = await dispatch(fetchUserBlogs(recommendedPage));
+      const fetchedBlogs = await dispatch(fetchUserBlogs(userPage));
 
       console.log(fetchedBlogs.payload.blogList.blogs);
       return fetchedBlogs.payload.blogList.blogs as UserBlog[];

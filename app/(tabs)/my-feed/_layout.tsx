@@ -12,6 +12,7 @@ export default function MyFeedTabLayout() {
         tabBarLabelStyle: { fontSize: 12 }, // Adjust the font size of tab labels
         tabBarIndicatorStyle: { height: 2 }, // Change the indicator thickness
         tabBarItemStyle: { width: "auto" }, // Adjust the width of the tab bar items
+        swipeEnabled: false, // Disable swipe
       }}
     >
       <MaterialTopTabs.Screen name="index" options={{ title: "Popular" }} />

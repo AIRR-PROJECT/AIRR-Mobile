@@ -1,4 +1,4 @@
-import { Keyboard, StyleSheet, Text, TextInput } from "react-native";
+import { Keyboard, StyleSheet, Text, TextInput, ToastAndroid } from "react-native";
 import { View, Modal, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { Entypo, Ionicons } from "@expo/vector-icons";
@@ -6,12 +6,13 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Divider } from "@rneui/themed";
 import { ThemedText } from "../ThemedText";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonGradient from "../ButtonGradient";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable } from "react-native";
 import { Collapsible } from "../Collapsible";
 import TabButton from "./feed/TabButton";
+import { useAppSelector } from "@/redux/hook";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type RightHeaderProps = {
@@ -19,11 +20,21 @@ type RightHeaderProps = {
   avatar?: string;
 };
 
-const userSelectedTabs = ["Python", "JavaScript", "React", "Vue", "Angular"];
-const suggestedTabs = ["Java", "C++", "C#", "Ruby", "Rust", "Go", "Swift"];
+type Tag = {
+  _id: string;
+  TagName: string;
+}
+
+// const userSelectedTabs = ["Python", "JavaScript", "React", "Vue", "Angular"];
+// const defaultSuggestedTabs = ["Java", "C++", "C#", "Ruby", "Rust", "Go", "Swift"];
+let suggestedTags: Tag[] = []
+let selectedTags: Tag[] = []
+let selectedTagsShow: boolean[] = []
 
 export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   const route = useRouter();
+  const { user } = useAppSelector(state => state.user)
+
   const handleAvatarPress = () => {
     console.log("Avatar Pressed");
     route.push("/profile");
@@ -33,6 +44,22 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
 
   const [selectedTab, setSelectedTab] = useState("Suggested");
   const modalButtons = ["Suggested", "My Tags"];
+
+  useEffect(() => {
+    suggestedTags = user ? 
+      ((user as any).survey.RelatedTags as Tag[]).map((tag, index) => tag)
+      : []
+    selectedTags = user ? 
+      ((user as any).survey.SelectedTags as Tag[]).map((tag, index) => tag)
+      : []
+    
+    selectedTagsShow = Array(selectedTags.length).fill(true) as boolean[]
+  }, [])
+
+  const handleSaveTags = () => {
+    console.log(selectedTags)
+  }
+
   return (
     <View style={styles.container}>
       {/* Feed Settings Button */}
@@ -113,6 +140,7 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
                 <ButtonGradient
                   label="SAVE"
                   style={{ width: 100, padding: 10 }}
+                  onPress={handleSaveTags}
                 />
               </View>
             </View>
@@ -193,11 +221,21 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
 function SuggestedTags() {
   return (
     <View style={styles.tagsSection}>
-      {suggestedTabs.map((tag, index) => (
+      {suggestedTags.map((tag, index) => (
         <TabButton
           key={index}
-          title={tag}
-          onPress={() => console.log(tag)}
+          title={tag.TagName}
+          onPress={() => {
+            const tag = suggestedTags[index]
+            suggestedTags = suggestedTags.splice(index)
+
+            if (!selectedTags.includes(tag)) {
+              selectedTags.push(tag)
+              selectedTagsShow.push(true)
+            }
+
+            ToastAndroid.showWithGravity("Added tag to My Tags", ToastAndroid.LONG, ToastAndroid.BOTTOM)
+          }}
           userSelected={false}
         >
         </TabButton>
@@ -208,15 +246,19 @@ function SuggestedTags() {
 function MyTags() {
   return (
     <View style={styles.tagsSection}>
-      {userSelectedTabs.map((tag, index) => (
-        <TabButton
-          key={index}
-          title={tag}
-          onPress={() => console.log(tag)}
-          userSelected={true}
-        >
-        </TabButton>
-      ))}
+      {selectedTags ? selectedTags.map((tag, index) => (
+          selectedTagsShow[index] ? 
+          <TabButton
+            key={index}
+            title={tag.TagName}
+            onPress={() => {
+              selectedTagsShow[index] = false
+            }}
+            userSelected={true}
+          >
+          </TabButton> : null
+        )) :
+        <Ionicons name="sad" size={25} color="#fff" />}
     </View>
   );
 }

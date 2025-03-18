@@ -68,7 +68,8 @@
     "react-native-webview": "13.12.5",
     "react-redux": "^9.2.0",
     "@shopify/flash-list": "1.7.3",
-    "expo-clipboard": "~7.0.1"
+    "expo-clipboard": "~7.0.1",
+    "expo-image-picker": "~16.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

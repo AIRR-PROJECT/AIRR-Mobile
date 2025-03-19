@@ -2,7 +2,7 @@ import { ResponseFailcode } from '@/enums/failcode.enum';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { getReasonPhrase } from 'http-status-codes';
-import { Alert } from 'react-native';
+import { Alert, ToastAndroid } from 'react-native';
 import { useAppDispatch } from '../hook';
 import { reset, setTokens } from '../slices/userSlice';
 import { Store } from '@reduxjs/toolkit';
@@ -125,6 +125,7 @@ api.interceptors.response.use(
         // else {
         //     Alert.alert("Error" + error.status, getReasonPhrase(error.status))
         // }
+        ToastAndroid.showWithGravity(`(${exception_status}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
         // Alert.alert((exception_status != -1 ? "Error: " + exception_status : "Error"), exception_message)
         return Promise.reject(error);
     }

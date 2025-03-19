@@ -1,4 +1,4 @@
-import { Keyboard, StyleSheet, Text, TextInput } from "react-native";
+import { Keyboard, StyleSheet, Text, TextInput, ToastAndroid } from "react-native";
 import { View, Modal, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { Entypo, Ionicons } from "@expo/vector-icons";
@@ -6,12 +6,14 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Divider } from "@rneui/themed";
 import { ThemedText } from "../ThemedText";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonGradient from "../ButtonGradient";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable } from "react-native";
 import { Collapsible } from "../Collapsible";
 import TabButton from "./feed/TabButton";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { saveTags } from "@/redux/slices/feedSlice";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type RightHeaderProps = {
@@ -19,11 +21,26 @@ type RightHeaderProps = {
   avatar?: string;
 };
 
-const userSelectedTabs = ["Python", "JavaScript", "React", "Vue", "Angular"];
-const suggestedTabs = ["Java", "C++", "C#", "Ruby", "Rust", "Go", "Swift"];
+type Tag = {
+  _id: string;
+  TagName: string;
+}
+
+// const userSelectedTabs = ["Python", "JavaScript", "React", "Vue", "Angular"];
+// const defaultSuggestedTabs = ["Java", "C++", "C#", "Ruby", "Rust", "Go", "Swift"];
+let suggestedTags: Tag[] = []
+let selectedTags: Tag[] = []
+let originalSuggestedTags: Tag[]
+let originalSelectedTags: Tag[]
 
 export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   const route = useRouter();
+  const dispatch = useAppDispatch()
+  const { user } = useAppSelector(state => state.user)
+
+  const [suggestedTagsShow, setSuggestedTagsShow] = useState<boolean[]>([]);
+  const [selectedTagsShow, setSelectedTagsShow] = useState<boolean[]>([]);
+
   const handleAvatarPress = () => {
     console.log("Avatar Pressed");
     route.push("/profile");
@@ -33,6 +50,114 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
 
   const [selectedTab, setSelectedTab] = useState("Suggested");
   const modalButtons = ["Suggested", "My Tags"];
+
+  useEffect(() => {
+    suggestedTags = user ? 
+      ((user as any).survey.RelatedTags as Tag[]).map((tag, index) => tag)
+      : []
+    selectedTags = user ? 
+      ((user as any).survey.SelectedTags as Tag[]).map((tag, index) => tag)
+      : []
+    originalSuggestedTags = JSON.parse(JSON.stringify(suggestedTags))
+    originalSelectedTags = JSON.parse(JSON.stringify(selectedTags))
+
+    const initSuggestedTagsShow = suggestedTags.map(() => true)
+    setSuggestedTagsShow(initSuggestedTagsShow)
+    const initSelectedTagsShow = selectedTags.map(() => true)
+    setSelectedTagsShow(initSelectedTagsShow)
+  }, [])
+
+  const handleCancel = () => {
+    // Reset
+    selectedTags = JSON.parse(JSON.stringify(originalSuggestedTags))
+    selectedTags = JSON.parse(JSON.stringify(originalSelectedTags))
+    const initSuggestedTagsShow = suggestedTags.map(() => true)
+    setSuggestedTagsShow(initSuggestedTagsShow)
+    const initSelectedTagsShow = selectedTags.map(() => true)
+    setSelectedTagsShow(initSelectedTagsShow)
+
+    // Make modal invisible
+    setModalVisible(false)
+  }
+
+  const handleSaveTags = () => {
+    console.log(selectedTags)
+    dispatch(saveTags(selectedTags)).then(() => {
+      ToastAndroid.showWithGravity(`Selected tags saved`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+      setModalVisible(false)
+    })
+  }
+
+  function SuggestedTags() {
+    return (
+      <View style={styles.tagsSection}>
+        {suggestedTags ? suggestedTags.map((tag, index) => 
+          (
+            suggestedTagsShow[index] &&
+            <TabButton
+              key={index}
+              title={tag.TagName}
+              onPress={() => {
+                const tag = suggestedTags[index]
+
+                const newSuggestedTagsShow = [...suggestedTagsShow]
+                newSuggestedTagsShow[index] = false
+                setSuggestedTagsShow(newSuggestedTagsShow)
+    
+                if (!selectedTags.includes(tag)) {
+                  selectedTags.push(tag)
+    
+                  const newSelectedTagsShow = [...selectedTagsShow]
+                  newSelectedTagsShow.push(true)
+                  setSelectedTagsShow(newSelectedTagsShow)
+                }
+                else {
+                  const tagIndex = selectedTags.indexOf(suggestedTags[index])
+                  const newSelectedTagsShow = [...selectedTagsShow]
+                  newSelectedTagsShow[tagIndex] = true
+                  setSelectedTagsShow(newSelectedTagsShow)
+                }
+    
+                ToastAndroid.showWithGravity("Added tag to My Tags", ToastAndroid.LONG, ToastAndroid.BOTTOM)
+              }}
+              userSelected={false}
+            />
+          )) :
+          <Ionicons name="sad" size={25} color="#fff" />}
+      </View>
+    );
+  }
+  function MyTags() {
+    return (
+      <View style={styles.tagsSection}>
+        {selectedTags ? selectedTags.map((tag, index) => 
+          (
+            selectedTagsShow[index] &&
+            <TabButton
+              key={index}
+              title={tag.TagName}
+              onPress={() => {
+                // New suggested tags show list
+                const tagIndex = suggestedTags.indexOf(selectedTags[index])
+                if (tagIndex != -1) {
+                  const newSuggestedTagsShow = [...suggestedTagsShow]
+                  newSuggestedTagsShow[tagIndex] = true
+                  setSuggestedTagsShow(newSuggestedTagsShow)
+                }
+
+                // New selected tags show list
+                const newSelectedTagsShow = [...selectedTagsShow]
+                newSelectedTagsShow[index] = false
+                setSelectedTagsShow(newSelectedTagsShow)
+              }}
+              userSelected={true}
+            />
+          )) :
+          <Ionicons name="sad" size={25} color="#fff" />}
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Feed Settings Button */}
@@ -72,7 +197,7 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
       <Modal
         transparent={true}
         visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={handleCancel}
         animationType="fade"
       >
         <Pressable
@@ -81,7 +206,7 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
           onPress={(event) => {
             if (event.target === event.currentTarget) {
               if (!isSearchFocused) {
-                setModalVisible(false);
+                handleCancel()
               } else {
                 Keyboard.dismiss();
               }
@@ -104,7 +229,7 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
               <View style={styles.rowContainer}>
                 <TouchableOpacity
                   style={styles.closeButton}
-                  onPress={() => setModalVisible(false)}
+                  onPress={handleCancel}
                 >
                   <ThemedText type="title" style={styles.closeButtonText}>
                     CANCEL
@@ -113,6 +238,7 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
                 <ButtonGradient
                   label="SAVE"
                   style={{ width: 100, padding: 10 }}
+                  onPress={handleSaveTags}
                 />
               </View>
             </View>
@@ -186,37 +312,6 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
           </View>
         </Pressable>
       </Modal>
-    </View>
-  );
-}
-
-function SuggestedTags() {
-  return (
-    <View style={styles.tagsSection}>
-      {suggestedTabs.map((tag, index) => (
-        <TabButton
-          key={index}
-          title={tag}
-          onPress={() => console.log(tag)}
-          userSelected={false}
-        >
-        </TabButton>
-      ))}
-    </View>
-  );
-}
-function MyTags() {
-  return (
-    <View style={styles.tagsSection}>
-      {userSelectedTabs.map((tag, index) => (
-        <TabButton
-          key={index}
-          title={tag}
-          onPress={() => console.log(tag)}
-          userSelected={true}
-        >
-        </TabButton>
-      ))}
     </View>
   );
 }

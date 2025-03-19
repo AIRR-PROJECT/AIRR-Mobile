@@ -73,14 +73,19 @@ export default function LoginScreen() {
       });
     }
 
-    if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken && user) {
-      console.log(isLoggedIn)
-      console.log(isAccountVerified)
-      console.log(userAccessToken)
-      console.log(userRefreshToken)
-      router.replace("/(tabs)");
+    if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken) {
+      // console.log(isLoggedIn)
+      // console.log(isAccountVerified)
+      // console.log(userAccessToken)
+      // console.log(userRefreshToken)
+      // router.replace("/(tabs)");
+      dispatch(getUserInfo())
     }
   }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken, user])
+
+  useEffect(() => {
+    router.replace("/(tabs)")
+  }, [user])
 
 
   const [isRememberChecked, setRememberChecked] = useState(false);

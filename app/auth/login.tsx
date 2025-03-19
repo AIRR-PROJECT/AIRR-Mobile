@@ -26,7 +26,7 @@ type FormData = {
 };
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
-import { login, sendAccountOTP, resetLoggedIn } from "@/redux/slices/authSlice";
+import { login, sendAccountOTP, resetLoggedIn, getUserInfo } from "@/redux/slices/authSlice";
 import { LoginCredentials } from "@/interfaces/authInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 
@@ -34,7 +34,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
-  const { userAccessToken, userRefreshToken } = useAppSelector(state => state.user)
+  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
 
   const {
     control,
@@ -72,13 +72,18 @@ export default function LoginScreen() {
     }
 
     if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken) {
-      console.log(isLoggedIn)
-      console.log(isAccountVerified)
-      console.log(userAccessToken)
-      console.log(userRefreshToken)
-      router.replace("/(tabs)");
+      // console.log(isLoggedIn)
+      // console.log(isAccountVerified)
+      // console.log(userAccessToken)
+      // console.log(userRefreshToken)
+      // router.replace("/(tabs)");
+      dispatch(getUserInfo())
     }
   }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])
+
+  useEffect(() => {
+    router.replace("/(tabs)")
+  }, [user])
 
 
   const [isRememberChecked, setRememberChecked] = useState(false);

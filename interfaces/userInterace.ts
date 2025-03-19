@@ -15,7 +15,7 @@ export interface User {
 
 /** Represents survey tags linked to a user */
 export interface SurveyTags {
-    id: string;
+    _id: string;
     TagName: string;
 }
 
@@ -32,4 +32,4 @@ export interface UserInfo {
     survey?: SurveyTags[];
     role?: string;
     profile?: any;
-  }
+}

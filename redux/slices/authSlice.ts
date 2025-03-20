@@ -61,7 +61,7 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
     }
 )
 
-export const signup = createAsyncThunk<User1, SignUpCredentials>(
+export const signup = createAsyncThunk(
     'auth/sign-up',
     async (data: SignUpCredentials, thunkAPI) => {
         try {

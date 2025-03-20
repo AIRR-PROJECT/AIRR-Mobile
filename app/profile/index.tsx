@@ -21,8 +21,9 @@ import ParallaxFlatList from "@/components/ParallaxFlatList";
 import BlogTab from "@/components/profile/BlogTab";
 import { Divider } from "@rneui/themed";
 import ActivityTab from "@/components/profile/ActivityTab";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { User } from "@/interfaces/userInterface";
+import { getPreviewGroups } from "@/redux/slices/userSlice";
 // type UserInfo = {
 //   username: string;
 //   avatar_url: string;
@@ -71,13 +72,19 @@ export default function ProfileScreen() {
   const selectedTabs = ["Readme", "Blog", "Activity"];
   const [selectedTab, setSelectedTab] = useState(selectedTabs[0]);
 
-  const { user } = useAppSelector(state => state.user);
+  const { user, userGroups } = useAppSelector(state => state.user);
   const [userInfo, setUserInfo] = useState<UserInfo>(user!)
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!)
 
+  const dispatch = useAppDispatch()
+
   useEffect(() => {
-    console.log(userInfo)
+    dispatch(getPreviewGroups(user!["_id"]))
   }, [])
+
+  useEffect(() => {
+    console.log(userGroups)
+  }, [userGroups])
 
   return (
     // change light color to #fff later because figma of the app is not ready
@@ -91,7 +98,7 @@ export default function ProfileScreen() {
       {/* Active groups */}
       <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
       <FlatList
-        data={Data}
+        data={userGroups}
         horizontal={true}
         style={styles.groupContainer}
         keyExtractor={(item, index) => index.toString()}

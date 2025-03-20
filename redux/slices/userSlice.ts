@@ -13,8 +13,23 @@ import { jwtDecode } from "jwt-decode";
 const initialState = {
     userAccessToken: "",
     userRefreshToken: "",
-    user: null
+    user: null,
+    userGroups: null
 };
+
+export const getPreviewGroups = createAsyncThunk(
+    'user/previewGroups',
+    async (user_id: string, thunkAPI) => {
+        const res = await api.get(`user-group/get-preview-group-by-user-id?userID=${user_id}`)
+
+        if (res.data.success) {
+            return res.data.data
+        }
+        else {
+            return thunkAPI.rejectWithValue(res.data.message)
+        }
+    }
+)
 
 const userSlice = createSlice({
     name: "user",
@@ -35,6 +50,15 @@ const userSlice = createSlice({
             state.user = null
         },
 
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(getPreviewGroups.fulfilled, (state, action) => {
+                state.userGroups = action.payload
+            })
+            .addCase(getPreviewGroups.rejected, (state, action) => {
+
+            })
     }
 });
 

@@ -1,8 +1,8 @@
 import { UserBlog } from "@/interfaces/blogInterface"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
-import { SurveyTags } from "@/interfaces/userInterace"
 import { AxiosResponse } from "axios"
+import { SurveyTags } from "@/interfaces/userInterface"
 
 const initialState = {
     recommendedBlogs: null,

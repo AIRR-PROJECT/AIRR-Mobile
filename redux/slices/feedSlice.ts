@@ -52,7 +52,7 @@ export const fetchUserBlogs = createAsyncThunk(
 
 export const saveTags = createAsyncThunk(
     'feed/saveTags',
-    async (tags: SurveyTags[], thunkAPI) => {
+    async (tags: {tags: SurveyTags[]}, thunkAPI) => {
         try {
             const res = await api.post(`users/update-survey`, tags) as AxiosResponse
 

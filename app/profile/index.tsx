@@ -23,7 +23,7 @@ import { Divider } from "@rneui/themed";
 import ActivityTab from "@/components/profile/ActivityTab";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { User } from "@/interfaces/userInterface";
-import { getPreviewGroups } from "@/redux/slices/userSlice";
+import { getUserPreviewGroups } from "@/redux/slices/authSlice";
 // type UserInfo = {
 //   username: string;
 //   avatar_url: string;
@@ -79,7 +79,7 @@ export default function ProfileScreen() {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(getPreviewGroups(user!["_id"]))
+    dispatch(getUserPreviewGroups(user!["_id"]))
   }, [])
 
   useEffect(() => {

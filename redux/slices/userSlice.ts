@@ -17,20 +17,6 @@ const initialState = {
     userGroups: null
 };
 
-export const getPreviewGroups = createAsyncThunk(
-    'user/previewGroups',
-    async (user_id: string, thunkAPI) => {
-        const res = await api.get(`user-group/get-preview-group-by-user-id?userID=${user_id}`)
-
-        if (res.data.success) {
-            return res.data.data
-        }
-        else {
-            return thunkAPI.rejectWithValue(res.data.message)
-        }
-    }
-)
-
 const userSlice = createSlice({
     name: "user",
     initialState,
@@ -44,23 +30,19 @@ const userSlice = createSlice({
             state.user = action.payload.user
         },
 
+        setUserPreviewGroup(state, action) {
+            state.userGroups = action.payload.groups
+        },
+
         reset(state) {
             state.userAccessToken = "";
             state.userRefreshToken = "";
             state.user = null
+            state.userGroups = null
         },
 
     },
-    extraReducers: (builder) => {
-        builder
-            .addCase(getPreviewGroups.fulfilled, (state, action) => {
-                state.userGroups = action.payload
-            })
-            .addCase(getPreviewGroups.rejected, (state, action) => {
-
-            })
-    }
 });
 
-export const { reset, setCurrentUser, setTokens } = userSlice.actions;
+export const { reset, setCurrentUser, setTokens, setUserPreviewGroup } = userSlice.actions;
 export default userSlice.reducer;

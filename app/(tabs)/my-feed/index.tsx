@@ -99,6 +99,7 @@ export default function MyFeed() {
     },
   });
   const handleOnUserBlogListEndReached = () => {
+    console.log("Triggered")
     setUserPage(userPage + 1);
     userBlogsMutation.mutate(userPage + 1);
   };
@@ -156,7 +157,7 @@ export default function MyFeed() {
       {/* Flat list for lazy load */}
 
       <View style={{ flex: 1, width: "100%" }}>
-        <FlashList
+        <FlatList
           data={userBlogsQuery.data}
           style={styles.userBlogContainer}
           scrollEnabled={false}
@@ -167,7 +168,6 @@ export default function MyFeed() {
           renderItem={({ item }) => {
             return <FeedBlogPreview blog={item} />;
           }}
-          estimatedItemSize={400}
         />
       </View>
     </ParallaxFlatList>

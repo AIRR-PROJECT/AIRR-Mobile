@@ -14,6 +14,7 @@ import { Collapsible } from "../Collapsible";
 import TabButton from "./feed/TabButton";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { saveTags } from "@/redux/slices/feedSlice";
+import { getUserInfo } from "@/redux/slices/authSlice";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type RightHeaderProps = {
@@ -52,6 +53,20 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   const modalButtons = ["Suggested", "My Tags"];
 
   useEffect(() => {
+    refreshTags()
+  }, [])
+
+  // Handle on tags saved
+  useEffect(() => {
+    refreshTags()
+    ToastAndroid.showWithGravity(`Selected tags saved`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+    if (isModalVisible) {
+      setModalVisible(false)
+    }
+  }, [user])
+
+  const refreshTags = () => {
+    console.log(user)
     suggestedTags = user ? 
       ((user as any).survey.RelatedTags as Tag[]).map((tag, index) => tag)
       : []
@@ -65,7 +80,7 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
     setSuggestedTagsShow(initSuggestedTagsShow)
     const initSelectedTagsShow = selectedTags.map(() => true)
     setSelectedTagsShow(initSelectedTagsShow)
-  }, [])
+  }
 
   const handleCancel = () => {
     // Reset
@@ -81,12 +96,15 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   }
 
   const handleSaveTags = () => {
-    console.log(selectedTags)
-    dispatch(saveTags(selectedTags)).then(() => {
-      ToastAndroid.showWithGravity(`Selected tags saved`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
-      setModalVisible(false)
+    const saveTagsPayload = {
+      tags: selectedTags
+    }
+    dispatch(saveTags(saveTagsPayload)).then(() => {
+      dispatch(getUserInfo())
     })
   }
+
+  
 
   function SuggestedTags() {
     return (

@@ -5,7 +5,7 @@ import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, Ve
 import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { User1 } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
-import { setTokens, setCurrentUser } from "./userSlice";
+import { setTokens, setCurrentUser, setUserPreviewGroup } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 
 const initialState = {
@@ -207,6 +207,21 @@ export const getUserInfo = createAsyncThunk(
     }
 )
 
+
+export const getUserPreviewGroups = createAsyncThunk(
+    'user/previewGroups',
+    async (user_id: string, thunkAPI) => {
+        const res = await api.get(`user-group/get-preview-group-by-user-id?userID=${user_id}`)
+
+        if (res.data.success) {
+            thunkAPI.dispatch(setUserPreviewGroup(res.data.data))
+        }
+        else {
+            return thunkAPI.rejectWithValue(res.data.message)
+        }
+    }
+)
+
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -380,6 +395,12 @@ const authSlice = createSlice({
                 console.log(action.error)
                 state.isLoggedIn = false
                 state.isAccountVerified = false
+            })
+            .addCase(getUserPreviewGroups.fulfilled, (state, action) => {
+                
+            })
+            .addCase(getUserPreviewGroups.rejected, (state, action) => {
+
             })
 
     },

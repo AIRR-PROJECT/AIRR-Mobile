@@ -36,6 +36,7 @@ export interface User {
     username: string;
     id: string;
     email?: string;
+    avatar_url: string;
     firstName?: string;
     lastName?: string;
     dateOfBirth?: string;

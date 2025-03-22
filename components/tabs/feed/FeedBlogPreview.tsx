@@ -46,7 +46,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         </View>
 
         {/* 3rd Part: Preview of Content */}
-        {/* <View style={styles.contentSection}>
+        <View style={styles.contentSection}>
           <ImageBackground
             source={{ uri: blog.BackgroundURL }}
             style={styles.imageBackground}
@@ -58,10 +58,10 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
               lightColor="#fff"
               darkColor="#fff"
             >
-              {blog.content.slice(0, 100)}...
+              {blog.Description.slice(0, 100)}...
             </ThemedText>
             <View style={styles.tagsSection}>
-              {blog.tags.map((tag, index) => (
+              {blog.Tags.map((tag, index) => (
                 <ThemedText
                   key={index}
                   style={styles.tag}
@@ -69,12 +69,12 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
                   lightColor="#fff"
                   darkColor="#fff"
                 >
-                  #{tag}
+                  #{tag.TagName}
                 </ThemedText>
               ))}
             </View>
           </ImageBackground>
-        </View> */}
+        </View>
 
         {/* 4th Part: Interactions */}
         <View style={styles.interactSection}>

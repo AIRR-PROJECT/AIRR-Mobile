@@ -3,6 +3,11 @@ import { FlashList } from "@shopify/flash-list";
 import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "../tabs/feed/FeedBlogPreview";
 import { View } from "react-native";
+import queryClient from "@/redux/api/queryClient";
+import { fetchUserBlogs } from "@/redux/slices/feedSlice";
+import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
+import { useAppDispatch } from "@/redux/hook";
+import { useState } from "react";
 const mockBlog: UserBlog = {
   _id: "123",
   Title: "How to fix clipboard if it isn’t working",
@@ -66,13 +71,44 @@ const Data = [
 ];
 
 export default function BlogTab() {
+  const dispatch = useAppDispatch();
+  const [userPage, setUserPage] = useState(1);
+  const userBlogsQuery = useQuery({
+    queryKey: ["feed-user"],
+    queryFn: async () => {
+      const fetchedBlogs = await dispatch(fetchUserBlogs(userPage));
+
+      console.log(fetchedBlogs.payload.blogList.blogs);
+      return fetchedBlogs.payload.blogList.blogs as UserBlog[];
+    },
+    placeholderData: keepPreviousData,
+  });
+  const userBlogsMutation = useMutation({
+    mutationFn: async (page: number) => {
+      const moreFetchedBlogs = await dispatch(fetchUserBlogs(page));
+
+      // console.log(moreFetchedBlogs.payload.blogList.blogs)
+      return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-user"], (oldData: any) => {
+        return [...oldData, ...data] as UserBlog[];
+      });
+    },
+  });
+  const handleOnUserBlogListEndReached = () => {
+    setUserPage(userPage + 1);
+    userBlogsMutation.mutate(userPage + 1);
+  };
+
   return (
     <FlashList
-      data={Data}
+      data={userBlogsQuery.data}
       scrollEnabled={false}
       keyExtractor={(item, index) => index.toString()}
       ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
       showsHorizontalScrollIndicator={false}
+      onEndReached={handleOnUserBlogListEndReached}
       renderItem={({ item }) => {
         return <FeedBlogPreview blog={item} />;
       }}

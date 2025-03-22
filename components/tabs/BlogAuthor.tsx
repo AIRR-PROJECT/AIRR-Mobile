@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Image, StyleSheet, ViewStyle } from "react-native";
 import { ThemedText } from "../ThemedText";
-import { User } from "@/interfaces/userInterace";
+import { User1 } from "@/interfaces/userInterface";
 
-type Author = Pick<User, "name" | "avatar">;
+type Author = Pick<User1, "name" | "avatar">;
 
 interface BlogAuthorProps {
     author: Author;

@@ -4,6 +4,8 @@ import { ThemedView } from "../ThemedView";
 import { Image } from "expo-image";
 import ButtonGradient from "../ButtonGradient";
 import { useRouter } from "expo-router";
+import { User } from "@/interfaces/userInterface";
+import { useEffect } from "react";
 
 type UserInfoProps = {
   username: string;
@@ -13,24 +15,28 @@ type UserInfoProps = {
   followers: number;
   following: number;
 };
+type UserInfo = Pick<User, "username" | "avatar_url" | "firstName" | "lastName" | "joinDate">
 
 export default function UserInfoComponent({
   username,
-  avatar,
-  fullName,
-  dateJoined,
-  followers,
-  following,
-}: UserInfoProps) {
+  avatar_url,
+  firstName,
+  lastName,
+  joinDate
+  // followers,
+  // following,
+}: UserInfo) {
   const router = useRouter();
   const handleEditProfile = () => {
     console.log("Edit profile");
     router.push("/profile/edit-profile");
   };
+  useEffect(() => {
+  }, [])
   return (
     <View style={styles.container}>
       {/* User avatar */}
-      <Image source={avatar} style={styles.avatar} contentFit="contain" />
+      <Image source={avatar_url} style={styles.avatar} contentFit="contain" />
       {/* user info */}
       <View style={styles.userInfoSection}>
         {/* user full name */}
@@ -43,7 +49,7 @@ export default function UserInfoComponent({
           }}
         >
           <ThemedText type="title" style={styles.userFullName}>
-            {fullName.slice(0, 15)}
+            {(firstName + " " + lastName).slice(0, 10)}
           </ThemedText>
           {/* Edit profile button */}
           <ButtonGradient
@@ -58,10 +64,10 @@ export default function UserInfoComponent({
           <ThemedText style={styles.userUsername}>
             @{username.slice(0, 8)}
           </ThemedText>
-          <ThemedText style={styles.userDateJoined}> . {dateJoined}</ThemedText>
+          <ThemedText style={styles.userDateJoined}> . {new Date(joinDate!).toDateString()}</ThemedText>
         </View>
         {/* user followers and following */}
-        <View style={{ flexDirection: "row", gap: 10 }}>
+        {/* <View style={{ flexDirection: "row", gap: 10 }}>
           <ThemedText style={styles.userFollowers}>
             {followers}{" "}
             <ThemedText style={styles.followText}>Followers</ThemedText>
@@ -70,7 +76,7 @@ export default function UserInfoComponent({
             {following}{" "}
             <ThemedText style={styles.followText}>Following</ThemedText>
           </ThemedText>
-        </View>
+        </View> */}
       </View>
     </View>
   );

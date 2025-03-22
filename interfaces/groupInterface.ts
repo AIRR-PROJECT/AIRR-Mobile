@@ -1,4 +1,4 @@
-import { User } from "./userInterace";
+import { User1 } from "./userInterface";
 
 export interface Group {
     name: string;
@@ -8,7 +8,7 @@ export interface Group {
     members: string[];
     numberOfMembers: number;
     timestamp: string;
-    groupAdmin: User;
+    groupAdmin: User1;
     tags: string[];
 }
 

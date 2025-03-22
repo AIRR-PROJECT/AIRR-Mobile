@@ -1,15 +1,16 @@
 import { View, StyleSheet } from "react-native";
 import { ThemedText } from "../ThemedText";
+import { User } from "@/interfaces/userInterface";
 
 type UserStudentInfoProps = {
   studentId: string;
   departure: string;
 };
+type StudentInfo = Pick<User, "profile">
 
 export default function UserStudentInfoComponent({
-  studentId,
-  departure,
-}: UserStudentInfoProps) {
+  profile
+}: StudentInfo) {
   return (
     <View style={styles.container}>
       <ThemedText type="default" style={styles.title}>
@@ -18,11 +19,11 @@ export default function UserStudentInfoComponent({
       <View style={[{ gap: 5 }]}>
         <View style={styles.rowContainer}>
           <ThemedText style={styles.attribute}>Student ID:</ThemedText>
-          <ThemedText style={styles.info}>{studentId}</ThemedText>
+          <ThemedText style={styles.info}>{profile.studentID}</ThemedText>
         </View>
         <View style={styles.rowContainer}>
-          <ThemedText style={styles.attribute}>Departure:</ThemedText>
-          <ThemedText style={styles.info}>{departure}</ThemedText>
+          <ThemedText style={styles.attribute}>Department:</ThemedText>
+          <ThemedText style={styles.info}>{profile.department}</ThemedText>
         </View>
       </View>
     </View>

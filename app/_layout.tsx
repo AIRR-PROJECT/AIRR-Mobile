@@ -19,8 +19,6 @@ import store from "@/redux/store";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/redux/api/queryClient";
-import { getCurrentUser, getTokens } from "@/stores/authStore";
-import { loadTokensFromStore, setTokens } from "@/redux/slices/userSlice";
 import { getUserInfo, loadToken, logout } from "@/redux/slices/authSlice";
 import { injectStoreToAxiosInterceptor } from "@/redux/api/axiosInstance";
 

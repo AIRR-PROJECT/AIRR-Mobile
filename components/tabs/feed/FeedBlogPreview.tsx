@@ -52,14 +52,14 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
             style={styles.imageBackground}
             imageStyle={styles.imageStyle}
           >
-            {/* <ThemedText
+            <ThemedText
               style={styles.description}
               type="default"
               lightColor="#fff"
               darkColor="#fff"
             >
-              {blog.content.slice(0, 100)}...
-            </ThemedText> */}
+              {blog.Description.slice(0, 100)}...
+            </ThemedText>
             <View style={styles.tagsSection}>
               {blog.Tags.map((tag, index) => (
                 <ThemedText

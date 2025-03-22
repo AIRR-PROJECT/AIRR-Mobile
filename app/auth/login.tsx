@@ -81,10 +81,12 @@ export default function LoginScreen() {
       // router.replace("/(tabs)");
       dispatch(getUserInfo())
     }
-  }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken, user])
+  }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])
 
   useEffect(() => {
-    router.replace("/(tabs)")
+    if (user) {
+      router.replace("/(tabs)")
+    }
   }, [user])
 
 

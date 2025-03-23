@@ -1,6 +1,8 @@
 import { UserBlog } from "@/interfaces/blogInterface"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
+import { AxiosResponse } from "axios"
+import { SurveyTags } from "@/interfaces/userInterface"
 
 const initialState = {
     recommendedBlogs: null,
@@ -48,6 +50,25 @@ export const fetchUserBlogs = createAsyncThunk(
     }
 )
 
+export const saveTags = createAsyncThunk(
+    'feed/saveTags',
+    async (tags: {tags: SurveyTags[]}, thunkAPI) => {
+        try {
+            const res = await api.post(`users/update-survey`, tags) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 const feedSlice = createSlice({
     name: 'feed',
     initialState,
@@ -72,6 +93,12 @@ const feedSlice = createSlice({
             })
             .addCase(fetchUserBlogs.rejected, (state, action) => {
                 console.log(action.error)
+            })
+            .addCase(saveTags.fulfilled, (state, action) => {
+
+            })
+            .addCase(saveTags.rejected, (state, action) => {
+                
             })
     }
 })

@@ -46,6 +46,7 @@ export default function EditProfileScreen() {
     watch,
     formState: { errors },
   } = useForm<UnifiedForm>({
+    mode: "onChange",
     defaultValues: mockData,
   });
 
@@ -74,17 +75,19 @@ export default function EditProfileScreen() {
             <Controller
               control={control}
               render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[
-                    styles.input,
-                    errors.firstName && styles.errorInput,
-                    { width: "100%" },
-                  ]}
-                  placeholder="First Name" // set the user's first name to the value
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
+                <View style={styles.viewBoxShadow}>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      errors.firstName && styles.errorInput,
+                      { width: "100%" },
+                    ]}
+                    placeholder="First Name" // set the user's first name to the value
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                </View>
               )}
               name="firstName"
               rules={{ required: "First Name is required" }}
@@ -99,17 +102,19 @@ export default function EditProfileScreen() {
             <Controller
               control={control}
               render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[
-                    styles.input,
-                    errors.lastName && styles.errorInput,
-                    { width: "100%" },
-                  ]}
-                  placeholder="Last Name"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                />
+                <View style={styles.viewBoxShadow}>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      errors.lastName && styles.errorInput,
+                      { width: "100%" },
+                    ]}
+                    placeholder="Last Name"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                </View>
               )}
               name="lastName"
               rules={{ required: "Last Name is required" }}
@@ -124,15 +129,17 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, { color: "#888" }]}
-              placeholder="Username"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              editable={false}
-              selectTextOnFocus={false}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[styles.input, { color: "#888" }]}
+                placeholder="Username"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                editable={false}
+                selectTextOnFocus={false}
+              />
+            </View>
           )}
           name="username"
         />
@@ -144,20 +151,28 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[
-                styles.input,
-                errors.email && styles.errorInput,
-                { width: "100%" },
-              ]}
-              placeholder="Email"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.email && styles.errorInput,
+                  { width: "100%" },
+                ]}
+                placeholder="Email"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="email"
-          rules={{ required: "Email is required" }}
+          rules={{
+            required: "Email is required",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Enter a valid email address",
+            },
+          }}
         />
         {errors.email && (
           <Text style={styles.errorText}>{errors.email.message}</Text>
@@ -167,17 +182,19 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[
-                styles.input,
-                errors.phone && styles.errorInput,
-                { width: "100%" },
-              ]}
-              placeholder="Phone"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.phone && styles.errorInput,
+                  { width: "100%" },
+                ]}
+                placeholder="Phone"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="phone"
           rules={{ required: "Phone is required" }}
@@ -197,17 +214,19 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[
-                styles.input,
-                errors.studentId && styles.errorInput,
-                { width: "100%" },
-              ]}
-              placeholder="Student ID"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.studentId && styles.errorInput,
+                  { width: "100%" },
+                ]}
+                placeholder="Student ID"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="studentId"
           rules={{ required: "Student ID is required" }}
@@ -220,17 +239,19 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[
-                styles.input,
-                errors.department && styles.errorInput,
-                { width: "100%" },
-              ]}
-              placeholder="Department"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.department && styles.errorInput,
+                  { width: "100%" },
+                ]}
+                placeholder="Department"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="department"
           rules={{ required: "Department is required" }}
@@ -243,17 +264,19 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[
-                styles.input,
-                errors.program && styles.errorInput,
-                { width: "100%" },
-              ]}
-              placeholder="Program"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.program && styles.errorInput,
+                  { width: "100%" },
+                ]}
+                placeholder="Program"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="program"
           rules={{ required: "Program is required" }}
@@ -270,17 +293,19 @@ export default function EditProfileScreen() {
             <Controller
               control={control}
               render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[
-                    styles.input,
-                    errors.gpa && styles.errorInput,
-                    { width: "100%" },
-                  ]}
-                  placeholder="GPA"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value ? value.toString() : ""}
-                />
+                <View style={styles.viewBoxShadow}>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      errors.gpa && styles.errorInput,
+                      { width: "100%" },
+                    ]}
+                    placeholder="GPA"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value ? value.toString() : ""}
+                  />
+                </View>
               )}
               name="gpa"
               rules={{ required: "GPA is required" }}
@@ -295,17 +320,19 @@ export default function EditProfileScreen() {
             <Controller
               control={control}
               render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[
-                    styles.input,
-                    errors.startYear && styles.errorInput,
-                    { width: "100%" },
-                  ]}
-                  placeholder="Start Year"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value ? value.toString() : ""}
-                />
+                <View style={styles.viewBoxShadow}>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      errors.startYear && styles.errorInput,
+                      { width: "100%" },
+                    ]}
+                    placeholder="Start Year"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value ? value.toString() : ""}
+                  />
+                </View>
               )}
               name="startYear"
               rules={{ required: "Start Year is required" }}
@@ -327,17 +354,19 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[
-                styles.input,
-                errors.linkedin && styles.errorInput,
-                { width: "100%" },
-              ]}
-              placeholder="LinkedIn"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.linkedin && styles.errorInput,
+                  { width: "100%" },
+                ]}
+                placeholder="LinkedIn"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="linkedin"
           rules={{ required: "LinkedIn is required" }}
@@ -350,17 +379,19 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[
-                styles.input,
-                errors.github && styles.errorInput,
-                { width: "100%" },
-              ]}
-              placeholder="Github"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.github && styles.errorInput,
+                  { width: "100%" },
+                ]}
+                placeholder="Github"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="github"
         />
@@ -372,17 +403,19 @@ export default function EditProfileScreen() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[
-                styles.input,
-                errors.facebook && styles.errorInput,
-                { width: "100%" },
-              ]}
-              placeholder="Facebook"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
+            <View style={styles.viewBoxShadow}>
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.facebook && styles.errorInput,
+                  { width: "100%" },
+                ]}
+                placeholder="Facebook"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
           )}
           name="facebook"
         />
@@ -429,15 +462,12 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    width: "100%",
-    padding: 10,
+    paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 13,
-    marginBottom: 5,
     color: "#000",
     backgroundColor: "#fff",
-    boxShadow: "0px 4px 0px 0px #B9FF66",
   },
   errorInput: {
     borderColor: "red",
@@ -453,5 +483,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "white",
     paddingVertical: 5,
+  },
+  viewBoxShadow: {
+    boxShadow: "0px 4px 0px 0px #B9FF66",
+    borderRadius: 13,
+    marginBottom: 5,
   },
 });

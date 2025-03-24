@@ -355,6 +355,7 @@ export default function SignUpScreen() {
             value={isTermChecked}
             onValueChange={setTermChecked}
             color={isTermChecked ? "#B9FF66" : undefined}
+            pointerEvents="none"
           />
           <Text style={[styles.paragraph, { paddingHorizontal: 0 }]}>
             I accept the all terms and conditions

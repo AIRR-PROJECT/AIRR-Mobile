@@ -17,6 +17,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@react-native-masked-view/masked-view": "0.3.2",
+    "@react-native-picker/picker": "2.9.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/material-top-tabs": "^7.1.0",
     "@react-navigation/native": "^7.0.14",
@@ -52,6 +53,7 @@
     "i18next": "^24.2.1",
     "jwt-decode": "^4.0.0",
     "lorem-ipsum": "^2.0.8",
+    "moment-timezone": "^0.5.48",
     "quill": "^2.0.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",

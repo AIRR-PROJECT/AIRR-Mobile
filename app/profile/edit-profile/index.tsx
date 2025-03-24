@@ -321,7 +321,7 @@ export default function EditProfileScreen() {
         Social Media Accounts
       </ThemedText>
       {/* Social Media Form */}
-      <View style={styles.formSection}>
+      <View style={[styles.formSection, { marginBottom: 20 }]}>
         {/*LinkedIn  */}
         <Text style={[styles.paragraph]}>LinkedIn</Text>
         <Controller
@@ -409,6 +409,7 @@ const styles = StyleSheet.create({
     color: "#A2B5A5",
     marginTop: 8,
     marginBottom: 16,
+    textAlign: "justify",
   },
   rowContainer: {
     flexDirection: "row",
@@ -426,11 +427,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     alignSelf: "flex-start",
   },
-  formContainer: {
-    width: "100%",
-    marginTop: 10,
-    backgroundColor: "transparent",
-  },
+
   input: {
     width: "100%",
     padding: 10,
@@ -452,24 +449,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  section: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  checkbox: {
-    margin: 8,
-    borderRadius: 10,
-  },
   paragraph: {
     fontSize: 15,
     color: "white",
     paddingVertical: 5,
-  },
-
-  otherButton: {
-    width: "45%",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });

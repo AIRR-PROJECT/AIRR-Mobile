@@ -66,7 +66,6 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   }, [user])
 
   const refreshTags = () => {
-    console.log(user)
     suggestedTags = user ? 
       ((user as any).survey.RelatedTags as Tag[]).map((tag, index) => tag)
       : []

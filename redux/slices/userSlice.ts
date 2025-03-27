@@ -14,6 +14,7 @@ const initialState = {
     userAccessToken: "",
     userRefreshToken: "",
     user: null,
+    userChange: null,
     userGroups: null
 };
 
@@ -28,6 +29,11 @@ const userSlice = createSlice({
 
         setCurrentUser(state, action) {
             state.user = action.payload.user
+            state.userChange = action.payload.user
+        },
+
+        setUserChange(state, action) {
+            state.userChange = action.payload
         },
 
         setUserPreviewGroup(state, action) {
@@ -38,11 +44,12 @@ const userSlice = createSlice({
             state.userAccessToken = "";
             state.userRefreshToken = "";
             state.user = null
+            state.userChange = null
             state.userGroups = null
         },
 
     },
 });
 
-export const { reset, setCurrentUser, setTokens, setUserPreviewGroup } = userSlice.actions;
+export const { reset, setCurrentUser, setUserChange, setTokens, setUserPreviewGroup } = userSlice.actions;
 export default userSlice.reducer;

@@ -116,6 +116,17 @@ export default function RootLayout() {
                   headerShown: false,
                 }}
               />
+              <Stack.Screen name="blog" 
+                options={{
+                  headerShown: true,
+                  headerStyle:{
+                    backgroundColor: "#1E1E1E",
+                  },
+                  headerLeft: () => <LeftHeader/>,
+                  headerTitle: "",
+                  headerRight: () => <RightHeader streak={streak}/>,
+                }}
+              />
             </Stack>
             {userLoggedIn ? (
               <Redirect href="/(tabs)" />

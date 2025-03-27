@@ -40,11 +40,12 @@ import queryClient from "@/redux/api/queryClient";
 // const Data = [mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog];
 
 import { FlashList } from "@shopify/flash-list";
+import { useSegments } from "expo-router";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const [recommendedPage, setRecommendedPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
-
+ 
   const recommendedBlogsQuery = useQuery({
     queryKey: ["feed-recommended"],
     queryFn: async () => {

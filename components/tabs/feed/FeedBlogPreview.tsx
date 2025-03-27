@@ -14,8 +14,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   const handlePress = () => {
     console.log("Blog Pressed");
     route.push({
-      pathname: "/(tabs)/blog",
-      params: { fromTabs: "feed" },
+      pathname: "/blog",
     });
     
   };

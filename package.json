@@ -72,6 +72,7 @@
     "react-native-tab-view": "^4.0.5",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
+    "react-quill": "^2.0.0",
     "react-redux": "^9.2.0"
   },
   "devDependencies": {

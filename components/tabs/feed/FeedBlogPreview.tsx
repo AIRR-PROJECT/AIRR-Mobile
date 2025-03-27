@@ -7,10 +7,21 @@ import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
+  // default to mock blog for this, but later will be passed as props
+  const route = useRouter();
+  const handlePress = () => {
+    console.log("Blog Pressed");
+    route.push({
+      pathname: "/(tabs)/blog",
+      params: { fromTabs: "feed" },
+    });
+    
+  };
   return (
     <View style={styles.outerContainer}>
-      <Pressable style={styles.container}>
+      <Pressable style={styles.container} onPress={handlePress}>
         <View style={styles.topSection}>
           <View style={styles.userSection}>
             <BlogAuthor
@@ -116,7 +127,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           {/* Bookmart Button */}
           <View style={styles.bookmarkContainer}>
             <FontAwesome name="bookmark" size={24} color="#fff" />
-
           </View>
         </View>
       </Pressable>

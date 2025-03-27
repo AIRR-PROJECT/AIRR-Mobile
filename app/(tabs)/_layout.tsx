@@ -108,6 +108,12 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="blog"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

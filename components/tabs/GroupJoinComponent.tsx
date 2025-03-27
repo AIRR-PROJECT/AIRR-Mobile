@@ -8,8 +8,8 @@ type GroupJoinProps = {
   url2?: string;
   url3?: string;
 };
-
-export default function GroupJoin({ url1, url2, url3 }: GroupJoinProps) {
+const defaultUri = "https://picsum.photos/seed/picsum/200";
+export default function GroupJoin({ url1 = defaultUri, url2 = defaultUri, url3 = defaultUri}: GroupJoinProps) {
   const defaultUri = "https://picsum.photos/seed/picsum/200";
   return (
     <View style={styles.container}>
@@ -48,11 +48,7 @@ export default function GroupJoin({ url1, url2, url3 }: GroupJoinProps) {
     </View>
   );
 }
-GroupJoin.defaultprops = {
-  url1: "https://picsum.photos/200",
-  url2: "https://picsum.photos/200",
-  url3: "https://picsum.photos/200",
-};
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",

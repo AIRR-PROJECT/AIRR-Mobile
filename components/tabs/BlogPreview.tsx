@@ -6,9 +6,17 @@ import BlogAuthor from "./BlogAuthor";
 import GroupPreviewInfo from "./GroupPreviewInfo";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+
 export default function BlogPreview({ blog }: { blog: UserBlog }) {
+  // default to mock blog for this, but later will be passed as props
+  const route = useRouter();
+  const handlePress = () => {
+    console.log("Blog Pressed");
+    route.push("/blog");
+  };
   return (
-    <View style={styles.outerContainer}>
+    <TouchableOpacity style={styles.outerContainer} onPress={handlePress}>
       <ImageBackground
         source={{ uri: blog.BackgroundURL }}
         style={styles.imageBackground}
@@ -92,7 +100,7 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
           </View>
         </Pressable>
       </ImageBackground>
-    </View>
+    </TouchableOpacity>
   );
 }
 

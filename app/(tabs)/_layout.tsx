@@ -55,14 +55,13 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           default: {
-           
             backgroundColor: "#17191E",
             // overflow: '',
           },
         }),
         animation: "shift",
       }}
-      
+      backBehavior="history"
     >
       <Tabs.Screen
         name="index"
@@ -108,6 +107,7 @@ export default function TabLayout() {
           ),
         }}
       />
+      
     </Tabs>
   );
 }

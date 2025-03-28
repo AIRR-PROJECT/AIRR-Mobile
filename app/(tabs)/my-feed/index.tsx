@@ -42,6 +42,7 @@ import queryClient from "@/redux/api/queryClient";
 import { FlashList } from "@shopify/flash-list";
 import AIBlogPreviewSkeleton from "@/components/tabs/feed/AIBlogPreviewSkeleton";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
+import { useSegments } from "expo-router";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const [recommendedPage, setRecommendedPage] = useState(1);

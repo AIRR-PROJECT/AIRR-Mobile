@@ -37,7 +37,7 @@ let originalSelectedTags: Tag[]
 export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   const route = useRouter();
   const dispatch = useAppDispatch()
-  const { user } = useAppSelector(state => state.user)
+  const { user, userAvatar } = useAppSelector(state => state.user)
 
   const [suggestedTagsShow, setSuggestedTagsShow] = useState<boolean[]>([]);
   const [selectedTagsShow, setSelectedTagsShow] = useState<boolean[]>([]);
@@ -205,7 +205,7 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
       {/* Avatar (Circle Container) */}
       <Pressable style={styles.avatar_container} onPress={handleAvatarPress}>
         <Image
-          source={avatar ? { uri: avatar } : sample_avatar}
+          source={userAvatar ? { uri: userAvatar } : sample_avatar}
           style={styles.avatar}
         />
       </Pressable>

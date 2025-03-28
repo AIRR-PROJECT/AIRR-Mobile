@@ -6,7 +6,7 @@ import feedReducer from './slices/feedSlice';
 
 // Ignore action path "payload.headers" to avoid "non-serializable" error
 const serializableMiddleware = createSerializableStateInvariantMiddleware({
-    ignoredActionPaths: ["payload.headers"]
+    ignoredActionPaths: ["payload.headers", "meta.arg"]
   })
 
 const store = configureStore({

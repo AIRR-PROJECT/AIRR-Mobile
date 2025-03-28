@@ -3,9 +3,9 @@ import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { UpdateUser, User, User1 } from "@/interfaces/userInterface";
+import { UpdateAvatar, UpdateUser, User, User1 } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
-import { setTokens, setCurrentUser, setUserPreviewGroup } from "./userSlice";
+import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 import { useAppSelector } from "../hook";
 
@@ -252,6 +252,27 @@ export const updateUser = createAsyncThunk(
         
         if (res.data.success) {
             // thunkAPI.dispatch(setCurrentUser(res.data.data))
+        }
+        else {
+            return thunkAPI.rejectWithValue(res.data.message)
+        }
+    }
+)
+
+export const updateAvatar = createAsyncThunk(
+    'user/updateAvatar',
+    async (file: FormData, thunkAPI) => {
+        const res = await api.post('users/update-avatar', file, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
+
+        console.log(res)
+
+        if (res.data.success) {
+            console.log("Result: " + res.data)
+            // thunkAPI.dispatch(setUserAvatar(res.data.data))
         }
         else {
             return thunkAPI.rejectWithValue(res.data.message)

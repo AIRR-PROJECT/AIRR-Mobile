@@ -14,6 +14,8 @@ const initialState = {
     userAccessToken: "",
     userRefreshToken: "",
     user: null,
+    userAvatar: "",
+    userChange: null,
     userGroups: null
 };
 
@@ -28,6 +30,16 @@ const userSlice = createSlice({
 
         setCurrentUser(state, action) {
             state.user = action.payload.user
+            state.userChange = action.payload.user
+            state.userAvatar = action.payload.user.avatarURL
+        },
+
+        setUserChange(state, action) {
+            state.userChange = action.payload
+        },
+
+        setUserAvatar(state, action) {
+            state.userAvatar = action.payload
         },
 
         setUserPreviewGroup(state, action) {
@@ -38,11 +50,12 @@ const userSlice = createSlice({
             state.userAccessToken = "";
             state.userRefreshToken = "";
             state.user = null
+            state.userChange = null
             state.userGroups = null
         },
 
     },
 });
 
-export const { reset, setCurrentUser, setTokens, setUserPreviewGroup } = userSlice.actions;
+export const { reset, setCurrentUser, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup } = userSlice.actions;
 export default userSlice.reducer;

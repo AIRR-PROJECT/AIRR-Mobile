@@ -34,7 +34,7 @@ export interface UserProfile {
 
 export interface User {
     username: string;
-    id: string;
+    _id: string;
     email?: string;
     avatar_url: string;
     firstName?: string;
@@ -46,4 +46,31 @@ export interface User {
     survey?: SurveyTags[];
     role?: string;
     profile?: any;
+}
+
+export interface UpdateUser {
+    "userID": string,
+    "firstname": string,
+    "lastname": string,
+    "dob": string,
+    "phone"?: string,
+    "studentID": string,
+    "department": string,
+    "program": string,
+    "entry_year": number
+    "gpa": number,
+    "facebook"?: string,
+    "github"?: string,
+    "linkedIn"?: string,
+    "skills"?: [
+        {
+            "skill_name": string,
+            "years": number,
+            "proficiency": string
+        }
+    ] 
+}
+
+export interface UpdateAvatar {
+    avatar: any
 }

@@ -64,7 +64,7 @@ export default function TabLayout() {
       backBehavior="history"
     >
       <Tabs.Screen
-        name="index"
+        name="dashboard"
         options={{
           title: "Dashboard",
           tabBarIcon: ({ color }) => (

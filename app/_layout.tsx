@@ -56,7 +56,7 @@ export function RootBackgroundTask() {
   useEffect(() => {
     console.log(user)
     if (user != undefined) {
-      router.push("/(tabs)")
+      router.push("/(tabs)/dashboard")
     }
   }, [user])
 
@@ -129,7 +129,7 @@ export default function RootLayout() {
               />
             </Stack>
             {userLoggedIn ? (
-              <Redirect href="/(tabs)" />
+              <Redirect href="/(tabs)/dashboard" />
             ) : (
               <Redirect href="/auth" />
             )}

@@ -7,18 +7,25 @@ import { Entypo } from "@expo/vector-icons";
 import { ThemedText } from "../ThemedText";
 import { useNavigation } from "expo-router";
 import ButtonGradient from "../ButtonGradient";
+import { useForm } from "react-hook-form";
+import { UpdateAvatar } from "@/interfaces/userInterface";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { updateAvatar } from "@/redux/slices/authSlice";
 
 type imageProps = {
   imgSource: ImageSource;
 };
 
-
-
 export default function UploadProfileComponent({ imgSource }: imageProps) {
+  const dispatch = useAppDispatch()
+  const { userAvatar } = useAppSelector(state => state.user)
 
-  // Image picker
+  if (userAvatar) {
+    imgSource.uri = userAvatar
+  }
+  
   const [image, setImage] = useState<ImageSource>(imgSource);
-  console.log(image);
+  
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -32,6 +39,11 @@ export default function UploadProfileComponent({ imgSource }: imageProps) {
 
     if (!result.canceled) {
       setImage({ uri: result.assets[0].uri });
+      const asset = result.assets[0]
+      const blob = new Blob([asset.uri], {type: asset.mimeType})
+      const avatarFormData = new FormData()
+      avatarFormData.append("avatar", blob)
+      dispatch(updateAvatar(avatarFormData))
     }
   };
 

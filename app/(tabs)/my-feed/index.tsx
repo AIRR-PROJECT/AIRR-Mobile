@@ -9,7 +9,7 @@ import AIBlogPreview from "@/components/tabs/feed/AIBlogPreview";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
 import { useWatch } from "react-hook-form";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
-import { useAppDispatch } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   fetchRecommendedBlogs,
   fetchUserBlogs,
@@ -40,12 +40,16 @@ import queryClient from "@/redux/api/queryClient";
 // const Data = [mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog];
 
 import { FlashList } from "@shopify/flash-list";
+import AIBlogPreviewSkeleton from "@/components/tabs/feed/AIBlogPreviewSkeleton";
+import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 import { useSegments } from "expo-router";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const [recommendedPage, setRecommendedPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
- 
+  const [currentTags, setCurrentTags] = useState()
+  const { user } = useAppSelector(state => state.user)
+
   const recommendedBlogsQuery = useQuery({
     queryKey: ["feed-recommended"],
     queryFn: async () => {
@@ -81,7 +85,6 @@ export default function MyFeed() {
     queryFn: async () => {
       const fetchedBlogs = await dispatch(fetchUserBlogs(userPage));
 
-      console.log(fetchedBlogs.payload.blogList.blogs);
       return fetchedBlogs.payload.blogList.blogs as UserBlog[];
     },
     placeholderData: keepPreviousData,
@@ -99,8 +102,19 @@ export default function MyFeed() {
       });
     },
   });
+  const userBlogsReset = useMutation({
+    mutationFn: async () => {
+      const refetchedBlog = await dispatch(fetchUserBlogs(1))
+
+      return refetchedBlog.payload.blogList.blogs as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-user"], (oldData: any) => {
+        return [...data] as UserBlog[];
+      });
+    }
+  })
   const handleOnUserBlogListEndReached = () => {
-    console.log("Triggered")
     setUserPage(userPage + 1);
     userBlogsMutation.mutate(userPage + 1);
   };
@@ -114,6 +128,21 @@ export default function MyFeed() {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
   }, []);
+  
+  // Update current tags upon successful query
+  useEffect(() => {
+    console.log(userBlogsQuery.isSuccess)
+    if (userBlogsQuery.isSuccess) {
+      setCurrentTags((user as any).Survey)
+    }
+  }, [userBlogsQuery.isSuccess])
+  // If user's tags are updated, update the feed 
+  useEffect(() => {
+    if (user) {
+      setUserPage(1)
+      userBlogsReset.mutate()
+    }
+  }, [user])
 
   return (
     <ParallaxFlatList
@@ -132,19 +161,22 @@ export default function MyFeed() {
         <Ionicons name="play-forward-circle-outline" size={30} color="#fff" />
       </View>
       {/* Flat list for lazy load */}
-      <View style={{ flex: 1, width: "100%" }}>
-        <FlatList
-          data={recommendedBlogsQuery.data}
-          horizontal={true}
-          keyExtractor={(item, index) => index.toString()}
-          showsHorizontalScrollIndicator={false}
-          onEndReached={handleOnRecommendedBlogListEndReached}
-          renderItem={({ item }) => {
-            return <AIBlogPreview blog={item} />;
-          }}
-          ItemSeparatorComponent={() => <View style={{ width: 25 }} />}
-        />
-      </View>
+      {recommendedBlogsQuery.isPending ?
+        <AIBlogPreviewSkeleton/> :
+        <View style={{ flex: 1, width: "100%" }}>
+          <FlatList
+            data={recommendedBlogsQuery.data}
+            horizontal={true}
+            keyExtractor={(item, index) => index.toString()}
+            showsHorizontalScrollIndicator={false}
+            onEndReached={handleOnRecommendedBlogListEndReached}
+            renderItem={({ item }) => {
+              return <AIBlogPreview blog={item} />;
+            }}
+            ItemSeparatorComponent={() => <View style={{ width: 25 }} />}
+          />
+        </View>
+      }
       {/* User Blogs and Button*/}
       <View style={styles.headerContainer}>
         <GradientText
@@ -156,21 +188,23 @@ export default function MyFeed() {
         <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
       </View>
       {/* Flat list for lazy load */}
-
-      <View style={{ flex: 1, width: "100%" }}>
-        <FlatList
-          data={userBlogsQuery.data}
-          style={styles.userBlogContainer}
-          scrollEnabled={false}
-          keyExtractor={(item, index) => index.toString()}
-          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-          showsHorizontalScrollIndicator={false}
-          onEndReached={handleOnUserBlogListEndReached}
-          renderItem={({ item }) => {
-            return <FeedBlogPreview blog={item} />;
-          }}
-        />
-      </View>
+      {userBlogsQuery.isPending ?
+        <FeedBlogPreviewSkeleton/> :
+        <View style={{ flex: 1, width: "100%" }}>
+          <FlatList
+            data={userBlogsQuery.data}
+            style={styles.userBlogContainer}
+            scrollEnabled={false}
+            keyExtractor={(item, index) => index.toString()}
+            ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+            showsHorizontalScrollIndicator={false}
+            onEndReached={handleOnUserBlogListEndReached}
+            renderItem={({ item }) => {
+              return <FeedBlogPreview blog={item} />;
+            }}
+          />
+        </View>
+      }
     </ParallaxFlatList>
   );
 }

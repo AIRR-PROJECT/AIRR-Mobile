@@ -54,7 +54,7 @@ export function RootBackgroundTask() {
   }, [isLoggedIn, isAccountVerified])
 
   useEffect(() => {
-    console.log(user)
+    // console.log(user)
     if (user != undefined) {
       router.push("/(tabs)/dashboard")
     }

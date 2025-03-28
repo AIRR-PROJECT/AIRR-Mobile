@@ -3,10 +3,11 @@ import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { User1 } from "@/interfaces/userInterface";
+import { UpdateAvatar, UpdateUser, User, User1 } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
-import { setTokens, setCurrentUser, setUserPreviewGroup } from "./userSlice";
+import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
+import { useAppSelector } from "../hook";
 
 const initialState = {
     isAccountCreated: false,
@@ -211,10 +212,67 @@ export const getUserInfo = createAsyncThunk(
 export const getUserPreviewGroups = createAsyncThunk(
     'user/previewGroups',
     async (user_id: string, thunkAPI) => {
-        const res = await api.get(`user-group/get-preview-group-by-user-id?userID=${user_id}`)
+        const res = await api.get(`groups/get-preview-group-by-user-id?userID=${user_id}`)
 
         if (res.data.success) {
-            thunkAPI.dispatch(setUserPreviewGroup(res.data.data))
+            thunkAPI.dispatch(setUserPreviewGroup(res.data.data.groupList))
+        }
+        else {
+            return thunkAPI.rejectWithValue(res.data.message)
+        }
+    }
+)
+
+export const updateUser = createAsyncThunk(
+    'user/update',
+    async (userData: User, thunkAPI) => {
+        const inputData: UpdateUser = {
+            userID: userData._id,
+            firstname: userData.firstName ?? "",
+            lastname: userData.lastName ?? "",
+            phone: userData.phoneNumber?.toString() ?? "",
+            dob: userData.dateOfBirth ?? "",
+            studentID: userData.profile.studentID ?? "",
+            department: userData.profile.department ?? "",
+            program: userData.profile.program,
+            entry_year: new Date().getFullYear() - userData.profile.year,
+            gpa: userData.profile.gpa ?? 0
+        }
+        if (userData.profile.link.LinkedIn) {
+            inputData.linkedIn = userData.profile.link.LinkedIn
+        }
+        if (userData.profile.link.Github) {
+            inputData.github = userData.profile.link.Github
+        }
+        if (userData.profile.link.Facebook) {
+            inputData.facebook = userData.profile.link.Facebook
+        }
+
+        const res = await api.post("users/update", inputData)
+        
+        if (res.data.success) {
+            // thunkAPI.dispatch(setCurrentUser(res.data.data))
+        }
+        else {
+            return thunkAPI.rejectWithValue(res.data.message)
+        }
+    }
+)
+
+export const updateAvatar = createAsyncThunk(
+    'user/updateAvatar',
+    async (file: FormData, thunkAPI) => {
+        const res = await api.post('users/update-avatar', file, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
+
+        console.log(res)
+
+        if (res.data.success) {
+            console.log("Result: " + res.data)
+            // thunkAPI.dispatch(setUserAvatar(res.data.data))
         }
         else {
             return thunkAPI.rejectWithValue(res.data.message)
@@ -401,6 +459,12 @@ const authSlice = createSlice({
             })
             .addCase(getUserPreviewGroups.rejected, (state, action) => {
 
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                
+            })
+            .addCase(updateUser.rejected, (state, action) => {
+                console.log(action.error)
             })
 
     },

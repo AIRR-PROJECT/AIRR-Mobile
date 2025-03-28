@@ -3,6 +3,10 @@ import { ThemedText } from "@/components/ThemedText";
 import { Controller, useForm } from "react-hook-form";
 import { View, Text, StyleSheet, ScrollView, TextInput } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { User } from "@/interfaces/userInterface";
+import { useEffect } from "react";
+import { setUserChange } from "@/redux/slices/userSlice";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type PersonalInfoForm = {
@@ -41,14 +45,99 @@ const mockData: UnifiedForm = {
   facebook: "",
 };
 export default function EditProfileScreen() {
+  const dispatch = useAppDispatch()
+  const { user } = useAppSelector(state => state.user)
+  const userData = user as any as User
+  const defaultFormData: UnifiedForm = {
+    firstName: userData.firstName ?? "",
+    lastName: userData.lastName ?? "",
+    username: userData.username,
+    email: userData.email ?? "",
+    phone: userData.phoneNumber?.toString() ?? "",
+    studentId: userData.profile.studentID ?? "",
+    department: userData.profile.department ?? "",
+    program: userData.profile.program ?? "",
+    gpa: userData.profile.gpa ?? 0,
+    startYear: userData.profile.year ? new Date().getFullYear() - userData.profile.year : 0,
+    linkedin: userData.profile.link.LinkedIn ?? "",
+    github: userData.profile.link.Github ?? "",
+    facebook: userData.profile.link.Facebook ?? "",
+  }
+
   const {
     control,
     watch,
     formState: { errors },
+    getValues
   } = useForm<UnifiedForm>({
     mode: "onChange",
-    defaultValues: mockData,
+    defaultValues: defaultFormData,
   });
+
+  const userChange: User = JSON.parse(JSON.stringify(userData)) as User
+
+
+  const firstNameWatch = watch('firstName')
+  const lastNameWatch = watch('lastName')
+  const emailWatch = watch('email')
+  const phoneWatch = watch('phone')
+  const studentIdWatch = watch('studentId')
+  const departmentWatch = watch('department')
+  const programWatch = watch('program')
+  const gpaWatch = watch('gpa')
+  const startYearWatch = watch('startYear')
+  const linkedinWatch = watch('linkedin')
+  const githubWatch = watch('github')
+  const facebookWatch = watch('facebook')
+
+  useEffect(() => {
+    userChange.firstName = firstNameWatch
+    dispatch(setUserChange(userChange))
+  }, [firstNameWatch])
+  useEffect(() => {
+    userChange.lastName = lastNameWatch
+    dispatch(setUserChange(userChange))
+  }, [lastNameWatch])
+  useEffect(() => {
+    userChange.email = emailWatch
+    dispatch(setUserChange(userChange))
+  }, [emailWatch])
+  useEffect(() => {
+    userChange.phoneNumber = /^-?\d+$/.test(phoneWatch) ? Number(phoneWatch) : undefined
+    dispatch(setUserChange(userChange))
+  }, [phoneWatch])
+  useEffect(() => {
+    userChange.profile.studentID = studentIdWatch
+    dispatch(setUserChange(userChange))
+  }, [studentIdWatch])
+  useEffect(() => {
+    userChange.profile.department = departmentWatch
+    dispatch(setUserChange(userChange))
+  }, [departmentWatch])
+  useEffect(() => {
+    userChange.profile.program = programWatch
+    dispatch(setUserChange(userChange))
+  }, [programWatch])
+  useEffect(() => {
+    userChange.profile.gpa = gpaWatch
+    dispatch(setUserChange(userChange))
+  }, [gpaWatch])
+  useEffect(() => {
+    userChange.profile.year = new Date().getFullYear() - startYearWatch
+    dispatch(setUserChange(userChange))
+  }, [startYearWatch])
+  useEffect(() => {
+    userChange.profile.link.LinkedIn = linkedinWatch
+    dispatch(setUserChange(userChange))
+  }, [linkedinWatch])
+  useEffect(() => {
+    userChange.profile.link.Github = githubWatch
+    dispatch(setUserChange(userChange))
+  }, [githubWatch])
+  useEffect(() => {
+    userChange.profile.link.Facebook = facebookWatch
+    dispatch(setUserChange(userChange))
+  }, [facebookWatch])
 
   return (
     <ScrollView style={styles.container}>

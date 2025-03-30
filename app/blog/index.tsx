@@ -88,6 +88,7 @@ const mockComments = [
   mockCommenter,
   mockCommenter,
 ];
+const mockThumbnail = "https://picsum.photos/200";
 export default function BlogScreen() {
   const { width } = useWindowDimensions();
   const route = useRouter();
@@ -171,6 +172,13 @@ export default function BlogScreen() {
                 <BlogTagButton title={tag} key={tag} />
               ))}
             </View>
+            {/* Thumbnail */}
+            <Image
+              source={mockThumbnail}
+              style={{ width: "100%", height: 200, borderRadius: 20 }}
+              contentFit="cover"
+              transition={1000}
+            />
             {/* Blog content (render from html) */}
             <RenderHTML
                 source={{

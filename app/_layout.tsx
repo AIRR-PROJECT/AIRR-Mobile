@@ -25,43 +25,6 @@ import { injectStoreToAxiosInterceptor } from "@/redux/api/axiosInstance";
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
 
-export function RootBackgroundTask() {
-  const dispatch = useAppDispatch()
-
-  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
-  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
-
-  // Init
-  useEffect(() => {
-    if (isLoggedIn && isAccountVerified && !userAccessToken && !userAccessToken && !user) {
-      dispatch(logout())
-    }
-
-    dispatch(loadToken()).then(() => {
-      // console.log(userAccessToken)
-      // console.log(userRefreshToken)
-      // if (userAccessToken != "" && userRefreshToken != "") {
-      //   dispatch(getUserInfo())
-      // }
-      // else {
-      //   dispatch(logout())
-      // }
-        dispatch(getUserInfo())
-    })
-  }, [])
-
-  useEffect(() => {
-  }, [isLoggedIn, isAccountVerified])
-
-  useEffect(() => {
-    // console.log(user)
-    if (user != undefined) {
-      router.push("/(tabs)/dashboard")
-    }
-  }, [user])
-
-  return <></>
-}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -86,7 +49,6 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <RootBackgroundTask></RootBackgroundTask>
         {/* // change to dark later */}
         <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
           {/* <StatusBar style="auto" /> */}

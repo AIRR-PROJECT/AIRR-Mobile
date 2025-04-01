@@ -5,8 +5,10 @@ import { View, Text, StyleSheet, ScrollView, TextInput } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { User } from "@/interfaces/userInterface";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { setUserChange } from "@/redux/slices/userSlice";
+import { router } from "expo-router";
+import { setUserChangeSaved } from "@/redux/slices/authSlice";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type PersonalInfoForm = {
@@ -46,8 +48,10 @@ const mockData: UnifiedForm = {
 };
 export default function EditProfileScreen() {
   const dispatch = useAppDispatch()
+  const { isUserChangeSaved } = useAppSelector(state => state.auth)
   const { user } = useAppSelector(state => state.user)
   const userData = user as any as User
+  const [checkCounter, setCheckCounter] = useState(0)
   const defaultFormData: UnifiedForm = {
     firstName: userData.firstName ?? "",
     lastName: userData.lastName ?? "",
@@ -76,6 +80,13 @@ export default function EditProfileScreen() {
 
   const userChange: User = JSON.parse(JSON.stringify(userData)) as User
 
+  useEffect(() => {
+    if (isUserChangeSaved) {
+      dispatch(setUserChangeSaved(false))
+
+      router.back()
+    }
+  }, [isUserChangeSaved])
 
   const firstNameWatch = watch('firstName')
   const lastNameWatch = watch('lastName')

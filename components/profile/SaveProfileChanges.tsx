@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import ButtonGradient from "../ButtonGradient";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { getUserInfo, updateUser } from "@/redux/slices/authSlice";
+import { getUserInfo, setUserChangeSaved, updateUser } from "@/redux/slices/authSlice";
 import { User } from "@/interfaces/userInterface";
 
 export default function SaveProfileChanges() {
@@ -11,11 +11,15 @@ export default function SaveProfileChanges() {
   // handle on press to save change here
   const handleSaveChanges = () => {
     if (JSON.stringify(user) == JSON.stringify(userChange)) {
-      dispatch(getUserInfo())
+      dispatch(getUserInfo()).then(() => {
+        dispatch(setUserChangeSaved(true))
+      })
     }
     else {
       dispatch(updateUser(userChange as unknown as User)).then(() => {
-        dispatch(getUserInfo())
+        dispatch(getUserInfo()).then(() => {
+          dispatch(setUserChangeSaved(true))
+        })
       })
     }
   };

@@ -32,7 +32,8 @@ import BlogTagButton from "@/components/blog/BlogTagButton";
 import { ThemedText } from "@/components/ThemedText";
 import { color } from "@rneui/base";
 import BlogCommenter from "@/components/blog/BlogCommenter";
-
+import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
+import * as SplashScreen from "expo-splash-screen";
 const mockHtml = `
 <p class="ql-align-center">
 <strong class="ql-size-large">
@@ -88,7 +89,8 @@ const mockComments = [
   mockCommenter,
   mockCommenter,
 ];
-const mockThumbnail = "https://picsum.photos/200";
+const mockThumbnail = "https://picsum.photos/400";
+
 export default function BlogScreen() {
   const { width } = useWindowDimensions();
   const route = useRouter();
@@ -180,13 +182,7 @@ export default function BlogScreen() {
               transition={1000}
             />
             {/* Blog content (render from html) */}
-            <RenderHTML
-                source={{
-                  html: mockHtml,
-                }}
-                baseStyle={{ color: "white" }}
-                contentWidth={width}
-              />
+            <QuillRenderer dom={{matchContents: true}}/>
             <Divider
               orientation="vertical"
               width={1}

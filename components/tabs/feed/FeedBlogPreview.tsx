@@ -71,7 +71,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
               {blog.Description.slice(0, 100)}...
             </ThemedText>
             <View style={styles.tagsSection}>
-              {blog.Tags.map((tag, index) => (
+              {blog.Tags.slice(0,2).map((tag, index) => (
                 <ThemedText
                   key={index}
                   style={styles.tag}

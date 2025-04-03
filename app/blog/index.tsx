@@ -35,11 +35,10 @@ import BlogCommenter from "@/components/blog/BlogCommenter";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import * as SplashScreen from "expo-splash-screen";
 const mockHtml = `
-<p class="ql-align-center">
-<strong class="ql-size-large">
-<u>Editor test with new text editor</u>
-</strong>
-</p>`;
+<p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
+sada
+</pre><p>ádasdadab</p>
+`;
 const mockGroup = {
   name: "Group Name",
   image: "https://picsum.photos/200",
@@ -107,7 +106,9 @@ export default function BlogScreen() {
       ListHeaderComponent={
         <View style={styles.container}>
           {/* Back button */}
-          <View style={[styles.rowContainer, { width: "100%", paddingBottom: 20,  }]}>
+          <View
+            style={[styles.rowContainer, { width: "100%", paddingBottom: 20 }]}
+          >
             <TouchableOpacity onPress={handleBack}>
               <Entypo name="chevron-small-left" size={30} color="white" />
             </TouchableOpacity>
@@ -182,7 +183,8 @@ export default function BlogScreen() {
               transition={1000}
             />
             {/* Blog content (render from html) */}
-            <QuillRenderer dom={{matchContents: true}}/>
+            <QuillRenderer dom={{ matchContents: true }} content={mockHtml}/>
+
             <Divider
               orientation="vertical"
               width={1}

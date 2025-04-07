@@ -293,11 +293,10 @@ export const updateAvatar = createAsyncThunk(
             }
         })
 
-        console.log(res)
-
         if (res.data.success) {
-            console.log("Result: " + res.data)
-            // thunkAPI.dispatch(setUserAvatar(res.data.data))
+            thunkAPI.dispatch(setUserAvatar(file.get("avatar")["uri"]))
+
+            ToastAndroid.showWithGravity("Avatar updated successfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
         }
         else {
             return thunkAPI.rejectWithValue(res.data.message)
@@ -503,6 +502,12 @@ const authSlice = createSlice({
             })
             .addCase(updateUser.rejected, (state, action) => {
 
+            })
+            .addCase(updateAvatar.fulfilled, (state, action) => {
+                console.log("Avatar updated")
+            })
+            .addCase(updateAvatar.rejected, (state, action) => {
+                console.log(action.error)
             })
 
     },

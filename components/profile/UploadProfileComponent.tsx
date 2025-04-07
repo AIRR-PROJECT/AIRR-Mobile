@@ -19,10 +19,6 @@ type imageProps = {
 export default function UploadProfileComponent({ imgSource }: imageProps) {
   const dispatch = useAppDispatch()
   const { userAvatar } = useAppSelector(state => state.user)
-
-  if (userAvatar) {
-    imgSource.uri = userAvatar
-  }
   
   const [image, setImage] = useState<ImageSource>(imgSource);
   
@@ -35,21 +31,22 @@ export default function UploadProfileComponent({ imgSource }: imageProps) {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage({ uri: result.assets[0].uri });
       const asset = result.assets[0]
-      const blob = new Blob([asset.uri], {type: asset.mimeType})
       const avatarFormData = new FormData()
-      avatarFormData.append("avatar", blob)
+      avatarFormData.append("avatar", {
+        uri: asset.uri,
+        name: asset.fileName,
+        type: asset.mimeType
+      })
       dispatch(updateAvatar(avatarFormData))
     }
   };
 
   return (
     <TouchableOpacity style={styles.container} onPress={pickImage}>
-      {image && <ImageViewer imgSource={image} style={styles.image} />}
+      {(userAvatar || image) && <ImageViewer imgSource={userAvatar ?? image} style={styles.image} />}
       <Entypo name="camera" size={40} color="#fff" />
       <ThemedText style={styles.description}>Upload Your Photo</ThemedText>
     </TouchableOpacity>

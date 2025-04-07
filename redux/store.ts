@@ -4,7 +4,7 @@ import authReducer from "./slices/authSlice";
 import userReducer from './slices/userSlice';
 import feedReducer from './slices/feedSlice';
 
-// Ignore action path "payload.headers" to avoid "non-serializable" error
+// Ignore action paths to avoid "non-serializable" error
 const serializableMiddleware = createSerializableStateInvariantMiddleware({
     ignoredActionPaths: ["payload.headers", "meta.arg"]
   })

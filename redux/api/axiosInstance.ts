@@ -43,9 +43,9 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         const exception_data = error.response?.data
-        let exception_status: number = error.status
+        let exception_status: number = error.status ?? ""
         let exception_failcode: number
-        let exception_message: string = exception_data.message
+        let exception_message: string = exception_data ? exception_data.message : error.message
 
         if (error.response?.status === 401) {
             // Don't refresh token if the error is not related to access token's expiration

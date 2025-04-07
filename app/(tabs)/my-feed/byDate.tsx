@@ -6,6 +6,8 @@ import { View, Text } from "react-native";
 export default function ByDate() {
   const [value, setValue] = useState("");
   return (
-    <QuillEditor onContentChange={setValue}/>
+    <View style={{ flex: 1 }}>
+      <Text>By Date</Text>
+    </View>
   );
 }

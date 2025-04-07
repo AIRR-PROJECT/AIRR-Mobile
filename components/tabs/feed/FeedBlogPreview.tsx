@@ -14,9 +14,8 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   const handlePress = () => {
     console.log("Blog Pressed");
     route.push({
-      pathname: "/blog",
+      pathname: `/blog?userBlogId=${blog._id}`,
     });
-    
   };
   return (
     <View style={styles.outerContainer}>

@@ -1,5 +1,4 @@
-import React, { useRef, useMemo, useCallback } from "react";
-import { Divider } from "@rneui/base";
+import { useRef, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,14 +7,17 @@ import {
   Button,
   TouchableOpacity,
 } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+  GestureHandlerRootView,
+  TextInput,
+} from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Feather, FontAwesome } from "@expo/vector-icons";
-import UploadProfileComponent from "@/components/profile/UploadProfileComponent";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
-const sample_image = require("@/assets/images/blog/upload-image.png");
+import QuillEditor from "@/components/dom-components/QuillEditor.tsx/QuillEditor";
+import ButtonGradient from "@/components/ButtonGradient";
 const mockGroup = {
   name: "Group's name",
   avatar: "https://picsum.photos/300",
@@ -139,14 +141,85 @@ export default function NewBlog() {
         {/* Thumbnail Selection */}
         <View style={[styles.rowContainer]}>
           <View style={styles.divider} />
-          <View style={{gap: 20}}>
-            <Text style={styles.smallText}>Show off your vibe! Upload a profile pic to make your account totally you. let the world see your style!</Text>
-            <View >
-              <UploadThumbnailComponent imgSource={sample_image} />
+          <View style={{ gap: 20, flex: 1 }}>
+            <Text style={styles.smallText}>
+              Show off your vibe! Upload a profile pic to make your account
+              totally you. Let the world see your style!
+            </Text>
+            <View>
+              <UploadThumbnailComponent />
             </View>
-
           </View>
         </View>
+
+        {/* Title Section */}
+        <View style={[styles.rowContainer]}>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.section}>4</Text>
+          </View>
+          <Text style={styles.title}>Title</Text>
+        </View>
+
+        {/* Title Input */}
+        <View style={[styles.rowContainer]}>
+          <View style={styles.divider} />
+          <View style={{ flex: 1 }}>
+            <TextInput
+              placeholder="Enter Blog Title *"
+              placeholderTextColor="#A2B5A5"
+              style={styles.titleInput}
+              multiline={true}
+              numberOfLines={3}
+            />
+          </View>
+        </View>
+
+        {/* Description Section */}
+        <View style={[styles.rowContainer]}>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.section}>5</Text>
+          </View>
+          <Text style={styles.title}>Description</Text>
+        </View>
+
+        {/* Description Input */}
+        <View style={[styles.rowContainer]}>
+          <View style={styles.divider} />
+          <View style={{ flex: 1 }}>
+            <TextInput
+              placeholder="Enter Blog Description *"
+              placeholderTextColor="#A2B5A5"
+              style={styles.titleInput}
+              multiline={true}
+              numberOfLines={3}
+            />
+          </View>
+        </View>
+
+        {/* Content Section */}
+        <View style={[styles.rowContainer]}>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.section}>6</Text>
+          </View>
+          <Text style={styles.title}>Content</Text>
+        </View>
+
+        {/* Content Input */}
+        <View style={[styles.rowContainer]}>
+          <View style={styles.divider} />
+          <View style={{ flex: 1 }}>
+            {/* QuillJS Here */}
+            <QuillEditor dom={{matchContents: true}} />
+          </View>
+        </View>
+        {/* Post button */}
+        <ButtonGradient
+          label="POST BLOG"
+          onPress={() => {}}
+          style={styles.postButtonStyle}
+          labelStyle={styles.postButtonLabel}
+        />
+        {/* Preview (ask later) */}
       </ScrollView>
 
       {/* Group Selection Bottom Sheet */}
@@ -166,9 +239,9 @@ export default function NewBlog() {
           contentContainerStyle={styles.groupListContent}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           showsVerticalScrollIndicator={false}
-          
         />
       </BottomSheet>
+      
     </GestureHandlerRootView>
   );
 }
@@ -233,5 +306,34 @@ const styles = StyleSheet.create({
   smallText: {
     fontSize: 14,
     color: "#A2B5A5",
+    textAlign: "justify",
   },
+  titleInput: {
+    backgroundColor: "#212531",
+    color: "#fff",
+    borderRadius: 20,
+    padding: 10,
+    fontSize: 16,
+    minHeight: 100,
+    textAlignVertical: "top",
+  },
+  descriptionInput: {
+    backgroundColor: "#212531",
+    color: "#fff",
+    borderRadius: 20,
+    padding: 10,
+    fontSize: 14,
+    minHeight: 100,
+    textAlignVertical: "top",
+  },
+  postButtonStyle: {
+    width: 200,
+    alignSelf: "flex-end",
+    height: 50,
+  },
+  postButtonLabel: {
+    fontSize: 20,
+    color: "#000",
+    fontWeight: "bold",
+  }
 });

@@ -1,0 +1,96 @@
+/* ===================== */
+/* QUIL EDITOR CONTAINER */
+/* ===================== */
+.quill-editor-container {
+    margin-top: 0.5rem;            /* Spacing above the editor */
+    width: 95%;                    /* Width with small margins */
+    background-color: #212531;      /* Dark blue-gray background */
+    border-radius: 20px;            /* Rounded corners */
+    color: white;                   /* Default text color */
+    padding: 1rem;                 /* Internal spacing */
+}
+
+/* ===================== */
+/* EDITOR CONTENT STYLES */
+/* ===================== */
+.ql-editor {
+    color: white;                  /* Main text color */
+    font-family: inherit;          /* Inherit font from parent */
+    line-height: 1.5;              /* Comfortable line spacing */
+    padding: 12px 15px;            /* Internal padding */
+    height: 350px;                
+}
+
+/* Heading styles for the editor content */
+.ql-editor h1 { font-size: 2em; margin: 0.67em 0; }
+.ql-editor h2 { font-size: 1.5em; margin: 0.75em 0; }
+.ql-editor h3 { font-size: 1.17em; margin: 0.83em 0; }
+.ql-editor h4 { font-size: 1em; margin: 1em 0; }
+.ql-editor h5 { font-size: 0.83em; margin: 1.17em 0; }
+.ql-editor h6 { font-size: 0.67em; margin: 1.33em 0; }
+
+/* ===================== */
+/* PLACEHOLDER STYLING */
+/* ===================== */
+.ql-editor.ql-blank::before {
+    color: #9ca3af;                /* Light gray placeholder text */
+    font-style: normal;            /* Non-italic style */
+    left: 15px;                   /* Align with editor padding */
+    right: 15px;
+    content: attr(data-placeholder); /* Use data attribute for text */
+    pointer-events: none;          /* Allow clicks through placeholder */
+}
+
+/* ===================== */
+/* TOOLBAR STYLING */
+/* ===================== */
+.ql-snow .ql-toolbar {
+    border-color: #4b5563 !important;  /* Dark gray border */
+    background-color: #374151;     /* Dark gray background */
+    border-radius: 8px 8px 0 0;    /* Rounded top corners */
+}
+
+/* Toolbar icon colors */
+.ql-snow .ql-stroke { stroke: white; }      /* White icon outlines */
+.ql-snow .ql-fill { fill: white; }          /* White filled icons */
+.ql-snow .ql-picker { color: white; }       /* White picker text */
+
+/* ===================== */
+/* EDITOR CONTAINER */
+/* ===================== */
+.ql-snow .ql-container {
+    border-color: #4b5563 !important;  /* Matching dark gray border */
+    border-radius: 0 0 8px 8px;    /* Rounded bottom corners */
+    background-color: #1f2937;     /* Slightly darker background */
+    min-height: 200px;             /* Minimum editor height */
+    font-size: 16px;               /* Base font size */
+}
+
+/* ===================== */
+/* DROPDOWN MENUS */
+/* ===================== */
+.ql-snow .ql-picker-options {
+    background-color: #1f2937;     /* Dark background */
+    border-color: #4b5563 !important;  /* Matching border */
+    border-radius: 4px;            /* Slightly rounded corners */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25); /* Subtle shadow */
+}
+
+.ql-snow .ql-picker-label {
+    color: white;                  /* White text for labels */
+}
+
+/* ===================== */
+/* INTERACTIVE STATES */
+/* ===================== */
+.ql-snow .ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:focus,
+.ql-snow .ql-toolbar button.ql-active {
+    color: #3b82f6;                /* Blue highlight for active buttons */
+}
+
+.ql-snow .ql-toolbar button:hover .ql-stroke,
+.ql-snow .ql-toolbar button:focus .ql-stroke,
+.ql-snow .ql-toolbar button.ql-active .ql-stroke {
+    stroke: #3b82f6;               /* Blue highlight for icons */
+}

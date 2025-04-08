@@ -1,6 +1,6 @@
 
 import { View, Text } from "react-native";
-import TestEditor from "@/components/dom-components/Quill";
+import QuillEditor from "@/components/dom-components/QuillEditor.tsx/QuillEditor";
 export default function ByLike() {
   return (
       // <TestEditor />

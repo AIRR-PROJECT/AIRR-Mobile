@@ -10,6 +10,8 @@ import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import { Dimensions, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { logout, loadToken, getUserInfo } from "@/redux/slices/authSlice";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
@@ -25,6 +27,29 @@ export default function AuthScreen() {
   //     router.replace("/(tabs)");
   //   }
   // })
+  const dispatch = useAppDispatch()
+
+  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
+  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
+
+  // Init
+  useEffect(() => {
+    if (isLoggedIn && isAccountVerified && !userAccessToken && !userAccessToken && !user) {
+      dispatch(logout())
+    }
+
+    dispatch(loadToken()).then(() => {
+        dispatch(getUserInfo())
+    })
+  }, [])
+
+  useEffect(() => {
+    // console.log(user)
+    if (user != undefined) {
+      router.replace("/(tabs)/dashboard")
+    }
+    console.log("Tag changed test")
+  }, [user])
 
   const handleLogin = () => {
     router.push("/auth/login");

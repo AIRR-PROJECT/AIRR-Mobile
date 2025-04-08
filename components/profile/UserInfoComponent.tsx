@@ -6,6 +6,8 @@ import ButtonGradient from "../ButtonGradient";
 import { useRouter } from "expo-router";
 import { User } from "@/interfaces/userInterface";
 import { useEffect } from "react";
+import { useAppSelector } from "@/redux/hook";
+const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type UserInfoProps = {
   username: string;
@@ -15,11 +17,11 @@ type UserInfoProps = {
   followers: number;
   following: number;
 };
-type UserInfo = Pick<User, "username" | "avatar_url" | "firstName" | "lastName" | "joinDate">
+type UserInfo = Pick<User, "username" | "avatarURL" | "firstName" | "lastName" | "joinDate">
 
 export default function UserInfoComponent({
   username,
-  avatar_url,
+  avatarURL,
   firstName,
   lastName,
   joinDate
@@ -27,6 +29,9 @@ export default function UserInfoComponent({
   // following,
 }: UserInfo) {
   const router = useRouter();
+
+  const { userAvatar } = useAppSelector(state => state.user)
+
   const handleEditProfile = () => {
     console.log("Edit profile");
     router.push("/profile/edit-profile");
@@ -36,7 +41,7 @@ export default function UserInfoComponent({
   return (
     <View style={styles.container}>
       {/* User avatar */}
-      <Image source={avatar_url} style={styles.avatar} contentFit="contain" />
+      <Image source={userAvatar ?? sample_avatar} style={styles.avatar} contentFit="contain" />
       {/* user info */}
       <View style={styles.userInfoSection}>
         {/* user full name */}

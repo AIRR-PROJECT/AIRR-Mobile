@@ -3,8 +3,9 @@ import { configureStore, createSerializableStateInvariantMiddleware, Tuple } fro
 import authReducer from "./slices/authSlice";
 import userReducer from './slices/userSlice';
 import feedReducer from './slices/feedSlice';
+import blogReducer from './slices/blogSlice';
 
-// Ignore action path "payload.headers" to avoid "non-serializable" error
+// Ignore action paths to avoid "non-serializable" error
 const serializableMiddleware = createSerializableStateInvariantMiddleware({
     ignoredActionPaths: ["payload.headers", "meta.arg"]
   })
@@ -14,7 +15,8 @@ const store = configureStore({
         // Add the reducer here
         auth: authReducer,
         user: userReducer,
-        feed: feedReducer
+        feed: feedReducer,
+        blog: blogReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()

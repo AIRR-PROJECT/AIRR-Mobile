@@ -125,7 +125,7 @@ export default function SignUpScreen() {
         )}
 
         <ThemedText
-          type="link"
+          type="default"
           style={[
             {
               color: "#fff",
@@ -145,6 +145,7 @@ export default function SignUpScreen() {
                 {
                   color: "#B9FF66",
                   fontWeight: "bold",
+                  marginTop: 5,
                 },
               ]}
             >

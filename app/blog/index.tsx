@@ -229,6 +229,7 @@ export default function BlogScreen() {
   return (
     <FlatList
       data={currentBlogComments}
+      keyExtractor={(item, index) => item._id + index}
       renderItem={({ item }) => <BlogCommenter {...item} />}
       style={styles.flatListContainer}
       contentContainerStyle={styles.contentContainer}

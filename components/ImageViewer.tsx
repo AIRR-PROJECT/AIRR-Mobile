@@ -2,7 +2,7 @@ import { StyleSheet, type StyleProp, type ImageStyle } from "react-native";
 import { Image, type ImageSource } from "expo-image";
 
 type Props = {
-  imgSource: ImageSource;
+  imgSource: ImageSource | string;
   style?: StyleProp<ImageStyle>;
   contentFit?: "cover" | "contain";
 };

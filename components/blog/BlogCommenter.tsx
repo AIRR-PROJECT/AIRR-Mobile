@@ -2,27 +2,21 @@ import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { Feather, FontAwesome, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
-
-type Commenter = {
-  name: string;
-  image: string;
-  date: string;
-  comment: string;
-};
+import { UserBlogComment } from "@/interfaces/blogInterface";
 
 // later change this component to take a user prop
-export default function BlogCommenter({ name, image, date, comment }: Commenter) {
+export default function BlogCommenter({ User, Content, createdAt }: UserBlogComment) {
   return (
     <View style={styles.container}>
       <View style={[styles.rowContainer, { justifyContent: "space-between" }]}>
         {/* User avatar */}
         <View style={styles.rowContainer}>
-          <Image style={styles.avatar} source={{ uri: image }} />
+          <Image style={styles.avatar} source={{ uri: User.AvatarURL }} />
           {/* name and date */}
           <View>
             <View>
-              <Text style={styles.name}>{name}</Text>
-              <Text style={styles.date}>{date}</Text>
+              <Text style={styles.name}>{User.UserName}</Text>
+              <Text style={styles.date}>{new Date(createdAt).toDateString()}</Text>
             </View>
           </View>
         </View>
@@ -31,7 +25,7 @@ export default function BlogCommenter({ name, image, date, comment }: Commenter)
       </View>
       {/* Actual Comment */}
       <Text style={styles.comment}> 
-        {comment}
+        {Content}
       </Text>
       <Divider />
       {/* Interaction */}

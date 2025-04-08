@@ -17,7 +17,7 @@ import {
   useSegments,
 } from "expo-router";
 import RenderHTML from "react-native-render-html";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Entypo,
   FontAwesome,
@@ -34,6 +34,9 @@ import { color } from "@rneui/base";
 import BlogCommenter from "@/components/blog/BlogCommenter";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import * as SplashScreen from "expo-splash-screen";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { getAIBlogDetail, getBlogComment, getUserBlogDetail } from "@/redux/slices/blogSlice";
+import { AIBlogSection, UserBlogComment, UserBlogTag } from "@/interfaces/blogInterface";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -45,28 +48,28 @@ const mockGroup = {
 };
 
 type Author = {
-  name: string;
-  image: string;
-  userName: string;
-  streak: number;
+  // name: string;
+  AvatarURL: string;
+  Username: string;
+  // streak: number;
 };
 const mockAuthor: Author = {
-  name: "FullName",
-  image: "https://picsum.photos/200",
-  userName: "user_name",
-  streak: 120,
+  // name: "FullName",
+  AvatarURL: "https://picsum.photos/200",
+  Username: "user_name",
+  // streak: 120,
 };
-const mockTags = [
-  "Frontend",
-  "Backend",
-  "React",
-  "Vue",
-  "Angular",
-  "Node",
-  "Express",
-  "MongoDB",
-  "SQL",
-  "GraphQL",
+const mockTags: UserBlogTag[] = [
+  { TagName: "Frontend", _id: "1" },
+  { TagName: "Backend", _id: "2" },
+  { TagName: "React", _id: "3" },
+  { TagName: "Vue", _id: "4" },
+  { TagName: "Angular", _id: "5" },
+  { TagName: "Node", _id: "6" },
+  { TagName: "Express", _id: "7" },
+  { TagName: "MongoDB", _id: "8" },
+  { TagName: "SQL", _id: "9" },
+  { TagName: "GraphQL", _id: "10" },
 ];
 type Commenter = {
   name: string;
@@ -74,12 +77,16 @@ type Commenter = {
   date: string;
   comment: string;
 };
-const mockCommenter: Commenter = {
-  name: "FullName",
-  image: "https://picsum.photos/200",
-  date: "18 Nov 2023",
-  comment:
-    "I just tried this recipe and it was amazing! The instructions were clear and easy to follow, and the end result was delicious. I will definitely be making this again. Thanks for sharing!",
+const mockCommenter: UserBlogComment = {
+  User: {
+    _id: "abc",
+    UserName: "FullName",
+    AvatarURL: "https://picsum.photos/200"
+  },
+  createdAt: new Date("18 Nov 2023"),
+  updatedAt: new Date("18 Nov 2023"),
+  Content: "I just tried this recipe and it was amazing! The instructions were clear and easy to follow, and the end result was delicious. I will definitely be making this again. Thanks for sharing!",
+  _id: "123"
 };
 const mockComments = [
   mockCommenter,
@@ -89,17 +96,139 @@ const mockComments = [
   mockCommenter,
 ];
 const mockThumbnail = "https://picsum.photos/400";
+const mockSections: AIBlogSection[] = [
+  {
+      "Heading": "BetterStack Monitoring and Incident Management",
+      "Content": [
+          {
+              "SubHeading": "Uptime Monitoring",
+              "Details": "BetterStack offers free usage of their uptime monitoring tools, allowing users to have up to 10 monitors and a status page, aiding in user trust during downtimes.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": ""
+          },
+          {
+              "SubHeading": "Incident Management",
+              "Details": "The platform provides incident management tools, including incident silencing to reduce alert noise and Slack integration for direct incident resolution.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": ""
+          },
+          {
+              "SubHeading": "Infrastructure Monitoring and Insights",
+              "Details": "BetterStack utilizes OpenTelemetry for native infrastructure monitoring, providing observability dashboards to analyze metrics and gather insights.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": ""
+          }
+      ]
+  },
+  {
+      "Heading": "Key Features of Express 5",
+      "Content": [
+          {
+              "SubHeading": "Async/Await Enhancements",
+              "Details": "Express 5 simplifies promise rejection handling by forwarding rejected promises to error-handling middleware.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": "app.get('/data', async (req, res, next) => { try { const result = await fetchData(); res.send(result); } catch (err) { next(err); } });"
+          },
+          {
+              "SubHeading": "Route Matching Improvements",
+              "Details": "Improvements enhance security and clarity in route matching, including the removal of inline regex.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": "app.get('/user(.*)', (req, res) => res.send('User'));"
+          },
+          {
+              "SubHeading": "Error Handling",
+              "Details": "Stricter enforcement of HTTP status codes improves error visibility and prevents silent failures.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": "res.status(978).send('Invalid status');"
+          },
+          {
+              "SubHeading": "Body Parsing Enhancements",
+              "Details": "The updated configuration enhances security against deep nested objects while simplifying body parsing.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": "app.use(express.urlencoded({ depth: 10 }));"
+          },
+          {
+              "SubHeading": "Removed Deprecated Features",
+              "Details": "Express 5 eliminates outdated methods, ensuring modern JavaScript compatibility.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": ""
+          },
+          {
+              "SubHeading": "Long-Term Support",
+              "Details": "Express 5 requires Node.js 18 or higher, improving performance and longevity.",
+              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+              "Code": ""
+          }
+      ]
+  }
+]
 
 export default function BlogScreen() {
+  const searchParams = useLocalSearchParams<{ aiBlogId: string, userBlogId: string }>()
   const { width } = useWindowDimensions();
   const route = useRouter();
+  const dispatch = useAppDispatch()
+  const { currentAIBlog, currentUserBlog, currentBlogComments } = useAppSelector(state => state.blog)
+
+  // Shared properties
+  const [title, setTitle] = useState("Mock description")
+  const [description, setDescription] = useState("Mock description")
+  const [thumbnail, setThumbnail] = useState(mockThumbnail)
+  // AI blog properties
+  const [sections, setSections] = useState(mockSections)
+  const [conclusion, setConclusion] = useState("This is concluded.")
+  // User blog properties
+  const [author, setAuthor] = useState(mockAuthor)
+  const [tags, setTags] = useState(mockTags)
+  const [likes, setLikes] = useState(123)
+  const [dislikes, setDislikes] = useState(123)
+  const [comments, setComments] = useState(123)
+  const [html, setHtml] = useState(mockHtml)
+  const [commentsDetail, setCommentsDetail] = useState(mockComments)
+
+  useEffect(() => {
+    if (searchParams.aiBlogId) {
+      dispatch(getAIBlogDetail(searchParams.aiBlogId))
+    }
+    else {
+      dispatch(getUserBlogDetail(searchParams.userBlogId))
+    }
+    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId))
+  }, [])
+
+  useEffect(() => {
+    if (currentAIBlog) {
+      setTitle(currentAIBlog.Title)
+      setDescription(currentAIBlog.Description)
+      setSections(currentAIBlog.Sections)
+      setConclusion(currentAIBlog.Conclusion)
+    }
+  }, [currentAIBlog])
+
+  useEffect(() => {
+    if (currentUserBlog) {
+      setTitle(currentUserBlog.Title)
+      setDescription(currentUserBlog.Description)
+      setThumbnail(currentUserBlog.BackgroundURL)
+      setTags(currentUserBlog.Tags)
+      setAuthor(currentUserBlog.Author)
+      setLikes(currentUserBlog.Reaction.Likes)
+      setDislikes(currentUserBlog.Reaction.Dislikes)
+      setComments(currentUserBlog.Reaction.Comments)
+      setHtml(currentUserBlog.Content)
+    }
+  }, [currentUserBlog])
+
+  useEffect(() => {
+    setCommentsDetail(currentBlogComments)
+  }, [currentBlogComments])
 
   const handleBack = () => {
     route.back();
   };
   return (
     <FlatList
-      data={mockComments}
+      data={currentBlogComments}
       renderItem={({ item }) => <BlogCommenter {...item} />}
       style={styles.flatListContainer}
       contentContainerStyle={styles.contentContainer}
@@ -126,22 +255,26 @@ export default function BlogScreen() {
               <Text style={styles.groupName}>{mockGroup.name}</Text>
             </View>
             {/* User Component */}
-            <BlogAuthorComponent {...mockAuthor} />
+            {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
             {/* Title */}
             <Text style={styles.title}>
-              How to fix clipboard if it isn't working
+              {title}
             </Text>
             {/* Date and number of comment */}
             <View style={styles.additionalInfo}>
               {/* Date */}
               <View style={styles.dateAndComment}>
                 <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
-                <Text style={styles.smallText}>18 Nov 2023</Text>
+                <Text style={styles.smallText}>
+                  {commentsDetail && commentsDetail.length > 0 ? 
+                    new Date(commentsDetail[0].createdAt).toDateString() 
+                    : "No records"}
+                </Text>
               </View>
               {/* Number of comment */}
               <View style={styles.dateAndComment}>
                 <MaterialIcons name="comment" size={24} color="#C2C2C2" />
-                <Text style={styles.smallText}>123 Comments</Text>
+                <Text style={styles.smallText}>{comments} Comments</Text>
               </View>
             </View>
             {/* Description */}
@@ -162,78 +295,84 @@ export default function BlogScreen() {
                   >
                     Description:{" "}
                   </Text>
-                  This is a description of the blog post. It is a brief summary
-                  of the blog post. It is a description of the blog post. It is
-                  a brief summary of the blog post.
+                  {description}
                 </Text>
               </View>
             </View>
-
             {/* List of tags */}
-            <View style={styles.tagsContainer}>
-              {mockTags.map((tag) => (
-                <BlogTagButton title={tag} key={tag} />
-              ))}
-            </View>
-            {/* Thumbnail */}
-            <Image
-              source={mockThumbnail}
-              style={{ width: "100%", height: 200, borderRadius: 20 }}
-              contentFit="cover"
-              transition={1000}
-            />
-            {/* Blog content (render from html) */}
-            <QuillRenderer dom={{ matchContents: true }} content={mockHtml}/>
+            {searchParams.userBlogId &&
+              <View style={styles.tagsContainer}>
+                {tags.map((tag) => (
+                  <BlogTagButton title={tag.TagName} key={tag._id} />
+                ))}
+              </View>
+            }
 
-            <Divider
-              orientation="vertical"
-              width={1}
-              style={{ borderColor: "white" }}
-            />
+            {/* Thumbnail */}
+            {searchParams.userBlogId &&
+              <Image
+                source={thumbnail}
+                style={{ width: "100%", height: 200, borderRadius: 20 }}
+                contentFit="cover"
+                transition={1000}
+              />
+            }
+            {/* Blog content (render from html) */}
+            <QuillRenderer dom={{ matchContents: true }} content={html}/>
+
+            {searchParams.userBlogId &&
+              <Divider
+                orientation="vertical"
+                width={1}
+                style={{ borderColor: "white" }}
+              />
+            }
             {/* Like, Dislike, Comment, Markbook */}
-            <View style={styles.interactSection}>
-              {/* Likes */}
-              <View style={[styles.rowContainer, { gap: 20 }]}>
-                <View style={styles.likeContainer}>
-                  <FontAwesome name="thumbs-up" size={24} color="#fff" />
+            {searchParams.userBlogId &&
+              <View style={styles.interactSection}>
+                {/* Likes */}
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <View style={styles.likeContainer}>
+                    <FontAwesome name="thumbs-up" size={24} color="#fff" />
+                    <ThemedText
+                      style={{ color: "#fff" }}
+                      type="default"
+                      lightColor="#fff"
+                      darkColor="#fff"
+                    >
+                      {likes}
+                    </ThemedText>
+                  </View>
+                  {/* Dislikes */}
+                  <View style={styles.dislikeContainer}>
+                    <FontAwesome name="thumbs-down" size={24} color="#fff" />
+                    {/* <ThemedText
+                      style={styles.text}
+                      type="default"
+                      lightColor="#fff"
+                      darkColor="#fff">
+                      123
+                    </ThemedText> */}
+                  </View>
+                </View>
+                {/* Comment */}
+                <View style={styles.commentContainer}>
+                  <MaterialIcons name="comment" size={28} color="#fff" />
                   <ThemedText
                     style={{ color: "#fff" }}
                     type="default"
                     lightColor="#fff"
                     darkColor="#fff"
                   >
-                    123
+                    {comments}
                   </ThemedText>
                 </View>
-                {/* Dislikes */}
-                <View style={styles.dislikeContainer}>
-                  <FontAwesome name="thumbs-down" size={24} color="#fff" />
-                  {/* <ThemedText
-                    style={styles.text}
-                    type="default"
-                    lightColor="#fff"
-                    darkColor="#fff">
-                    123
-                  </ThemedText> */}
+                {/* Bookmart Button */}
+                <View style={styles.bookmarkContainer}>
+                  <FontAwesome name="bookmark" size={24} color="#fff" />
                 </View>
               </View>
-              {/* Comment */}
-              <View style={styles.commentContainer}>
-                <MaterialIcons name="comment" size={28} color="#fff" />
-                <ThemedText
-                  style={{ color: "#fff" }}
-                  type="default"
-                  lightColor="#fff"
-                  darkColor="#fff"
-                >
-                  123
-                </ThemedText>
-              </View>
-              {/* Bookmart Button */}
-              <View style={styles.bookmarkContainer}>
-                <FontAwesome name="bookmark" size={24} color="#fff" />
-              </View>
-            </View>
+            }
             <Divider
               orientation="vertical"
               width={1}

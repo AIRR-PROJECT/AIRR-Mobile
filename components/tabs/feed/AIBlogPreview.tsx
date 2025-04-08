@@ -5,7 +5,15 @@ import { ThemedView } from "@/components/ThemedView";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 import { formatISODate, formatUnixDate } from "@/utils/dateConvert";
+import { useRouter } from "expo-router";
 export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
+  const route = useRouter();
+  const handlePress = () => {
+    console.log("Blog Pressed");
+    route.push({
+      pathname: `/blog?aiBlogId=${blog._id}`,
+    });
+  };
   return (
     <View style={styles.outerContainer}>
       <ImageBackground
@@ -13,7 +21,7 @@ export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >
-        <Pressable style={styles.container}>
+        <Pressable style={styles.container} onPress={handlePress}>
           {/* 1st Part: Date  */}
 
           {/* <View style={styles.timeSection}>

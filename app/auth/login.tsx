@@ -26,14 +26,14 @@ type FormData = {
 };
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
-import { login, sendAccountOTP, resetLoggedIn, getUserInfo } from "@/redux/slices/authSlice";
+import { login, sendAccountOTP, resetLoggedIn, getUserInfo, setRememberedSignUpUser, getRememberedSignUpUser } from "@/redux/slices/authSlice";
 import { LoginCredentials } from "@/interfaces/authInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 
 export default function LoginScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
+  const { isLoggedIn, isAccountVerified, rememberedSignUpUser } = useAppSelector(state => state.auth)
   const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
 
   const {
@@ -48,6 +48,10 @@ export default function LoginScreen() {
   const [init, setInit] = useState(false)
 
   const onSubmit = (data: LoginCredentials) => {
+    if (isRememberChecked) {
+      dispatch(setRememberedSignUpUser(data.email))
+    }
+
     dispatch(login(data)).then(() => {
       dispatch(getUserInfo())
     })
@@ -59,6 +63,9 @@ export default function LoginScreen() {
   useEffect(() => {
     // Reset
     dispatch(resetLoggedIn(false))
+
+    // Get remembered sign in username
+    dispatch(getRememberedSignUpUser())
 
     setInit(true)
   }, [])
@@ -74,11 +81,6 @@ export default function LoginScreen() {
     }
 
     if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken) {
-      // console.log(isLoggedIn)
-      // console.log(isAccountVerified)
-      // console.log(userAccessToken)
-      // console.log(userRefreshToken)
-      // router.replace("/(tabs)");
       dispatch(getUserInfo())
     }
   }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])
@@ -143,6 +145,7 @@ export default function LoginScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                defaultValue={rememberedSignUpUser}
               />
             </LinearGradient>
           )}

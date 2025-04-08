@@ -8,12 +8,15 @@ import { jwtDecode } from "jwt-decode";
 import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 import { useAppSelector } from "../hook";
+import { ToastAndroid } from "react-native";
 
 const initialState = {
+    rememberedSignUpUser: "",
     isAccountCreated: false,
     isLoggedIn: false,
     isAccountVerified: false,
     isPasswordVerified: false,
+    isUserChangeSaved: false,
     passwordVerifyToken: "",
     changedPassword: false,
     isLoading: true,
@@ -58,6 +61,28 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
             };
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const setRememberedSignUpUser = createAsyncThunk(
+    'auth/setRememberedSignUpUser',
+    async (data: string, thunkAPI) => {
+        try {
+            await SecureStore.setItemAsync("rememberedSignUpUser", data)
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response.data);
+        }
+    }
+)
+
+export const getRememberedSignUpUser = createAsyncThunk(
+    'auth/getRememberedSignUpUser',
+    async (_, thunkAPI) => {
+        try {
+            return await SecureStore.getItemAsync("rememberedSignUpUser")
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response.data);
         }
     }
 )
@@ -268,11 +293,10 @@ export const updateAvatar = createAsyncThunk(
             }
         })
 
-        console.log(res)
-
         if (res.data.success) {
-            console.log("Result: " + res.data)
-            // thunkAPI.dispatch(setUserAvatar(res.data.data))
+            thunkAPI.dispatch(setUserAvatar(file.get("avatar")["uri"]))
+
+            ToastAndroid.showWithGravity("Avatar updated successfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
         }
         else {
             return thunkAPI.rejectWithValue(res.data.message)
@@ -302,6 +326,10 @@ const authSlice = createSlice({
 
         resetChangedPassword(state, _) {
             state.changedPassword = false
+        },
+
+        setUserChangeSaved(state, action) {
+            state.isUserChangeSaved = action.payload
         },
 
         resetPasswordToken(state, _) {
@@ -355,6 +383,15 @@ const authSlice = createSlice({
                 //         Alert.alert("Error", action.error.message)
                 //     }
                 // }
+            })
+            .addCase(setRememberedSignUpUser.rejected, (state, action) => {
+                ToastAndroid.showWithGravity("Failed to save sign in username", ToastAndroid.LONG, ToastAndroid.BOTTOM)
+            })
+            .addCase(getRememberedSignUpUser.fulfilled, (state, action) => {
+                state.rememberedSignUpUser = action.payload ?? ""
+            })
+            .addCase(getRememberedSignUpUser.rejected, (state, action) => {
+                ToastAndroid.showWithGravity("Failed to get sign in username", ToastAndroid.LONG, ToastAndroid.BOTTOM)
             })
             .addCase(signup.fulfilled, (state, action) => {
                 state.isAccountCreated = true
@@ -464,11 +501,17 @@ const authSlice = createSlice({
                 
             })
             .addCase(updateUser.rejected, (state, action) => {
+
+            })
+            .addCase(updateAvatar.fulfilled, (state, action) => {
+                console.log("Avatar updated")
+            })
+            .addCase(updateAvatar.rejected, (state, action) => {
                 console.log(action.error)
             })
 
     },
 });
 
-export const { setLoading, resetLoggedIn, resetAccountCreated, resetPasswordVerified, resetChangedPassword, logout } = authSlice.actions;
+export const { setLoading, resetLoggedIn, resetAccountCreated, resetPasswordVerified, setUserChangeSaved, resetChangedPassword, logout } = authSlice.actions;
 export default authSlice.reducer;

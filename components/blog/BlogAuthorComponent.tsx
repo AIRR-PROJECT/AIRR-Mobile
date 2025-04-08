@@ -3,30 +3,30 @@ import { Image } from "expo-image";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 type Author = {
-  name: string;
-  image: string;
-  userName: string;
-  streak: number;
+  // name: string;
+  AvatarURL: string;
+  Username: string;
+  // streak: number;
 };
 
 // later change this component to take a user prop
 export default function BlogAuthorComponent({
-  name,
-  image,
-  userName,
-  streak,
+  // name,
+  AvatarURL,
+  Username,
+  // streak,
 }: Author) {
   return (
     <View style={styles.rowContainer}>
       {/* User avatar */}
-      <Image style={styles.authorImage} source={{ uri: image }} />
+      <Image style={styles.authorImage} source={{ uri: AvatarURL }} />
       <View>
         <View style={[styles.rowContainer, {gap: 5}]}>
-          <Text style={styles.authorName}>{name}</Text>
+          {/* <Text style={styles.authorName}>{name}</Text> */}
           <FontAwesome5 name="fire-alt" size={20} color="#B9FF66" />
-          <Text style={styles.authorName}>{streak}</Text>
+          {/* <Text style={styles.authorName}>{streak}</Text> */}
         </View>
-        <Text style={styles.authorUsername}>@{userName}</Text>
+        <Text style={styles.authorUsername}>@{Username}</Text>
       </View>
     </View>
   );

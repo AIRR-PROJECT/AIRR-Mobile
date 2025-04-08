@@ -6,6 +6,22 @@ export interface AIBlog {
     Title: string;
     Description: string;
 }
+export interface AIBlogDetail {
+    _id: string;
+    Title: string;
+    Description: string;
+    Sections: AIBlogSection[];
+    Conclusion: string;
+}
+export interface AIBlogSection {
+    Heading: string;
+    Content: {
+        SubHeading: string;
+        Details: string;
+        Source: string;
+        Code: string;
+    }[]
+}
 
 export interface UserBlogReaction {
     Likes: number;
@@ -40,7 +56,30 @@ export interface UserBlog {
     Tags: UserBlogTag[];
     Group: UserBlogGroup;
 }
+export interface UserBlogDetail {
+    _id: string;
+    Title: string;
+    Description: string;
+    BackgroundURL: string;
+    UserInteraction: string;
+    Reaction: UserBlogReaction;
+    Content: string;
+    Author: UserBlogAuthor;
+    Tags: UserBlogTag[];
+    Group: UserBlogGroup;
+}
 
+export interface UserBlogComment {
+    _id: string;
+    User: {
+        _id: string;
+        UserName: string
+        AvatarURL: string
+    }
+    Content: string
+    createdAt: Date
+    updatedAt: Date
+}
 
 export interface BlogActionHistory{
     _id: string;

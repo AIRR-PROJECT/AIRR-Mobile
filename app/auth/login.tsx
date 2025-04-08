@@ -40,6 +40,8 @@ export default function LoginScreen() {
     control,
     watch,
     handleSubmit,
+    trigger,
+    setValue,
     formState: { errors },
   } = useForm<FormData>();
   
@@ -69,6 +71,14 @@ export default function LoginScreen() {
 
     setInit(true)
   }, [])
+
+  // Trigger the Email validation if rememberedSignUpUser is not null/undefined
+  useEffect(() => {
+    if (rememberedSignUpUser) {
+      setValue("email", rememberedSignUpUser)
+      trigger("email")
+    }
+  }, [rememberedSignUpUser])
 
   useEffect(() => {
     if (!init) return
@@ -145,7 +155,6 @@ export default function LoginScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                defaultValue={rememberedSignUpUser}
               />
             </LinearGradient>
           )}

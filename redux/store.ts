@@ -7,7 +7,7 @@ import blogReducer from './slices/blogSlice';
 
 // Ignore action paths to avoid "non-serializable" error
 const serializableMiddleware = createSerializableStateInvariantMiddleware({
-    ignoredActionPaths: ["payload.headers", "meta.arg"]
+    ignoredActionPaths: ["payload.headers", "meta.arg", "payload.config.transformRequest.0"]
   })
 
 const store = configureStore({

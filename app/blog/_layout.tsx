@@ -45,6 +45,7 @@ export default function BlogLayout() {
       >
         {/* Define the screens for the navigation stack */}
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="new-blog" options={{ headerShown: true, title: "New Blog" }} />
       </Stack>
     </ThemeProvider>
   );

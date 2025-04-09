@@ -22,8 +22,16 @@ export default function GroupCardComponent({
   id,
   members,
 }: GroupCardComponentProps) {
+  const handleJoinPress = () => {
+    // Handle join button press
+    console.log(`Join group ${name}`);
+  }
+  const handleGroupPress = () => {
+    // Handle group card press
+    console.log(`Group card pressed: ${name}`);
+  }
   return (
-    <Pressable style={styles.container}>
+    <Pressable style={styles.container} onPress={handleGroupPress}>
       {/* Group image */}
       <View style={styles.rowContainer}>
         <Image style={styles.image} source={image} />
@@ -40,7 +48,7 @@ export default function GroupCardComponent({
         </View>
       </View>
       {/* Join button */}
-      <TouchableOpacity style={styles.joinButton}>
+      <TouchableOpacity style={styles.joinButton} onPress={handleJoinPress}>
         <Text style={styles.joinButtonText}>Join</Text>
       </TouchableOpacity>
     </Pressable>

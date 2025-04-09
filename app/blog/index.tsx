@@ -303,8 +303,8 @@ export default function BlogScreen() {
             {/* List of tags */}
             {searchParams.userBlogId &&
               <View style={styles.tagsContainer}>
-                {tags.map((tag) => (
-                  <BlogTagButton title={tag.TagName} key={tag._id} />
+                {tags.map((tag, index) => (
+                  <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
                 ))}
               </View>
             }

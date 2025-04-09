@@ -35,7 +35,7 @@ export default function GroupPopularTab() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
         ItemSeparatorComponent={() => <View style={{ height: 20 }} />} // Add space between items
-      ></FlatList>
+      />
     </View>
   );
 }

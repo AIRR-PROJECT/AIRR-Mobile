@@ -159,7 +159,7 @@ const DATA = [
     ],
   },
 ];
-export default function PopularGroupScreen() {
+export default function PopularGroupTab() {
   return (
     // Container for the Popular Group Screen
     <View style={styles.container}>
@@ -212,10 +212,7 @@ export default function PopularGroupScreen() {
           />
         )}
         stickySectionHeadersEnabled={false}
-        contentContainerStyle={{
-          paddingBottom: 50,
-          backgroundColor: "#1E1E1E",
-        }}
+ 
         ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
       />
     </View>

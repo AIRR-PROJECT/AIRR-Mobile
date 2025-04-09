@@ -1,5 +1,6 @@
-import PopularGroupScreen from "@/components/group/PopularGroupScreen";
-import { Entypo, FontAwesome } from "@expo/vector-icons";
+import GroupTab from "@/components/group/GroupTab";
+import PopularGroupTab from "@/components/group/PopularGroupTab";
+import {  FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   Text,
@@ -26,6 +27,7 @@ const mockTags = [
 ];
 export default function GroupPopularTab() {
   const [selectedId, setSelectedId] = useState("1");
+  console.log("selectedId", selectedId);
   return (
     <View style={styles.container}>
       {/* list tags */}
@@ -60,7 +62,7 @@ export default function GroupPopularTab() {
         <FontAwesome name="caret-right" size={30} color="white" />
       </View>
       {/* Content based on selected tabs */}
-      {selectedId === "1" ? <PopularGroupScreen /> : null}
+      {selectedId === "1" ? <PopularGroupTab /> : <GroupTab/>}
     </View>
   );
 }
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#1E1E1E",
     paddingVertical: 20,
-    
+    flex: 1,
   },
   rowWrapper: {
     flexDirection: "row",

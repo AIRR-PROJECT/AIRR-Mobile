@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1F26",
     borderRadius: 30,
-    marginBottom: 20,
     marginHorizontal: 20,
     width: Dimensions.get("window").width - 40,
     padding: 20,
@@ -78,6 +77,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "#B9FF66",
     overflow: "hidden",
+    
   },
 
   bgTop: {

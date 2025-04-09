@@ -2,7 +2,8 @@ import { View, Text, StyleSheet, FlatList, SectionList } from "react-native";
 import PopularGroupCardComponent from "./PopularGroupCardComponent";
 import GroupCardComponent from "./GroupCardComponent";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-
+import { useEffect, useRef, useState } from "react";
+import { Dimensions } from "react-native";
 const mockPopularGroup = {
   name: "Group nameadadadadadasdads",
   avatar: "https://picsum.photos/300",
@@ -160,6 +161,26 @@ const DATA = [
   },
 ];
 export default function PopularGroupTab() {
+  // const popularGroupListRef = useRef<FlatList>(null);
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  // console.log("currentIndex", currentIndex);
+  // // Auto scroll logic
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     const nextIndex = (currentIndex + 1) % mockGroupList.length;
+     
+  //     setCurrentIndex(nextIndex);
+      
+  //     popularGroupListRef.current?.scrollToIndex({
+  //       index: nextIndex,
+  //       animated: true,
+        
+  //     });
+
+  //   }, 3000); // scroll every 3 seconds
+
+  //   return () => clearInterval(interval);
+  // }, [currentIndex]);
   return (
     // Container for the Popular Group Screen
     <View style={styles.container}>
@@ -168,6 +189,7 @@ export default function PopularGroupTab() {
         ListHeaderComponent={() => (
           // Header for the Popular Group Screen
           <FlatList
+            // ref={popularGroupListRef}
             data={mockGroupList}
             horizontal={true}
             keyExtractor={(item, index) => index.toString()}
@@ -182,7 +204,13 @@ export default function PopularGroupTab() {
                 description={item.description}
               />
             )}
+            getItemLayout={(_, index) => ({
+              length: Dimensions.get("window").width,
+              offset: Dimensions.get("window").width * index,
+              index,
+            })}
             pagingEnabled={true}
+            
           />
         )}
         sections={DATA}
@@ -212,7 +240,6 @@ export default function PopularGroupTab() {
           />
         )}
         stickySectionHeadersEnabled={false}
- 
         ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
       />
     </View>

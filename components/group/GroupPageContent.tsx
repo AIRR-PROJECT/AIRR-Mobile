@@ -263,6 +263,6 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   textInputContainer: {
-    paddingVertical: 20,
+    paddingTop: 20,
   }
 });

@@ -10,6 +10,7 @@ import GroupPageContent from "@/components/group/GroupPageContent";
 import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
 import { SectionGrid } from "react-native-super-grid";
+import ParallaxFlatList from "@/components/ParallaxFlatList";
 const mockBlog = {
   Title: "How to fix clipboard if it isn’t working",
   BackgroundURL:
@@ -69,28 +70,24 @@ const mockTags = [
   { id: "y", data: ["YAML", "Yarn", "YouTube API", "YAGNI"] },
   { id: "z", data: ["Zig", "Zustand", "Zod", "Zookeeper", "Zigbee"] },
 ];
-// memoize the header component to prevent unnecessary re-renders
-const MemoizedHeader = memo(({ selectedId, setSelectedId }: {selectedId: number, setSelectedId: (id: number) => void}) => (
-  <GroupPageContent selectedId={selectedId} setSelectedId={setSelectedId} />
-));
 
 export default function GroupPage() {
   const [selectedId, setSelectedId] = useState(1);
   return (
-    <View style={styles.container}>
+    <ParallaxFlatList contentStyle={styles.contentStyle}>
+      <GroupPageContent selectedId={selectedId} setSelectedId={setSelectedId} />
       {selectedId === 1 ? (
         <FlatList
-          ListHeaderComponent={<MemoizedHeader selectedId={selectedId} setSelectedId={setSelectedId} />}
           data={Data}
           renderItem={({ item }) => <FeedBlogPreview blog={item} />}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, {}]}
+          style={{paddingBottom: 80}}
           ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         />
       ) : (
         <SectionGrid
-        ListHeaderComponent={<MemoizedHeader selectedId={selectedId} setSelectedId={setSelectedId} />}
           sections={mockTags}
           itemDimension={150} // Controls column width
           spacing={10} // Spacing between items
@@ -107,7 +104,7 @@ export default function GroupPage() {
           contentContainerStyle={styles.list}
         />
       )}
-    </View>
+    </ParallaxFlatList>
   );
 }
 
@@ -118,7 +115,6 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 20,
-    paddingBottom: 100,
   },
   title: {
     fontSize: 24,
@@ -140,5 +136,10 @@ const styles = StyleSheet.create({
   },
   gridView: {
     flex: 1,
+    paddingBottom: 40
   },
+  contentStyle: {
+    padding: 20,
+    flex: 1,
+  }
 });

@@ -233,6 +233,7 @@ export default function BlogScreen() {
       renderItem={({ item }) => <BlogCommenter {...item} />}
       style={styles.flatListContainer}
       contentContainerStyle={styles.contentContainer}
+      ListFooterComponent={<View style={{height: 20}}></View>}
       ListHeaderComponent={
         <View style={styles.container}>
           {/* Back button */}
@@ -402,6 +403,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E1E1E",
   },
   contentContainer: {
+    flexGrow: 1,
     padding: 20,
     gap: 20,
   },

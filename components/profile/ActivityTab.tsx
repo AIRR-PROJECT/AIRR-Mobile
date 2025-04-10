@@ -74,7 +74,7 @@ export default function ActivityTab() {
           focusBarOnPress={true}
           data={barData}
           frontColor={"#fff"}
-          barWidth={16}
+          barWidth={14}
           height={250}
           maxValue={360}
           barBorderTopRightRadius={6}

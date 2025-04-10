@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import { memo, useCallback, useState } from "react";
+import { memo, useState } from "react";
 import GroupPageContent from "@/components/group/GroupPageContent";
 import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
@@ -69,89 +69,47 @@ const mockTags = [
   { id: "y", data: ["YAML", "Yarn", "YouTube API", "YAGNI"] },
   { id: "z", data: ["Zig", "Zustand", "Zod", "Zookeeper", "Zigbee"] },
 ];
+// memoize the header component to prevent unnecessary re-renders
+const MemoizedHeader = memo(({ selectedId, setSelectedId }: {selectedId: number, setSelectedId: (id: number) => void}) => (
+  <GroupPageContent selectedId={selectedId} setSelectedId={setSelectedId} />
+));
 
-// this pattern of memoization is used to prevent unnecessary re-renders
-// can be apply for other components if needed
-// Memoize the header component
-const MemoizedHeader = memo(
-  ({
-    selectedId,
-    setSelectedId,
-  }: {
-    selectedId: number;
-    setSelectedId: (id: number) => void;
-  }) => (
-    <GroupPageContent selectedId={selectedId} setSelectedId={setSelectedId} />
-  )
-);
-
-// Memoize the main component
-function GroupPage() {
+export default function GroupPage() {
   const [selectedId, setSelectedId] = useState(1);
-
-  // Cache the setter function
-  const stableSetSelectedId = useCallback(
-    (id: number) => setSelectedId(id),
-    []
-  );
-
-  // Memoize the list renderers
-  const renderBlogList = useCallback(
-    () => (
-      <FlatList
-        ListHeaderComponent={
-          <MemoizedHeader
-            selectedId={selectedId}
-            setSelectedId={stableSetSelectedId}
-          />
-        }
-        data={Data}
-        renderItem={({ item }) => <FeedBlogPreview blog={item} />}
-        keyExtractor={(item, index) => index.toString()}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.list}
-        ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-      />
-    ),
-    [selectedId]
-  );
-
-  const renderTagGrid = useCallback(
-    () => (
-      <SectionGrid
-        ListHeaderComponent={
-          <MemoizedHeader
-            selectedId={selectedId}
-            setSelectedId={stableSetSelectedId}
-          />
-        }
-        sections={mockTags}
-        itemDimension={150}
-        spacing={10}
-        style={styles.gridView}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.tagContainer}>
-            <Text style={styles.tag}>#{item}</Text>
-          </TouchableOpacity>
-        )}
-        renderSectionHeader={({ section }) => (
-          <Text style={styles.title}>{section.id}</Text>
-        )}
-        keyExtractor={(item, index) => item + index}
-        contentContainerStyle={styles.list}
-      />
-    ),
-    [selectedId]
-  );
-
   return (
     <View style={styles.container}>
-      {selectedId === 1 ? renderBlogList() : renderTagGrid()}
+      {selectedId === 1 ? (
+        <FlatList
+          ListHeaderComponent={<MemoizedHeader selectedId={selectedId} setSelectedId={setSelectedId} />}
+          data={Data}
+          renderItem={({ item }) => <FeedBlogPreview blog={item} />}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.list}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+        />
+      ) : (
+        <SectionGrid
+        ListHeaderComponent={<MemoizedHeader selectedId={selectedId} setSelectedId={setSelectedId} />}
+          sections={mockTags}
+          itemDimension={150} // Controls column width
+          spacing={10} // Spacing between items
+          style={styles.gridView}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.tagContainer}>
+              <Text style={styles.tag}>#{item}</Text>
+            </TouchableOpacity>
+          )}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.title}>{section.id}</Text>
+          )}
+          keyExtractor={(item, index) => item + index}
+          contentContainerStyle={styles.list}
+        />
+      )}
     </View>
   );
 }
-// Memoize the main component
-export default memo(GroupPage);
 
 const styles = StyleSheet.create({
   container: {

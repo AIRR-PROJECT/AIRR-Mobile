@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
     gap: 10,
     width: "100%",
     borderRadius: 20,
+    
   },
   rowContainer: {
     flexDirection: "row",

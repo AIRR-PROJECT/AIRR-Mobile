@@ -1,223 +1,148 @@
-import DetailGroupCardComponent from "@/components/group/DetailGroupCardComponent";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Image } from "expo-image";
-import ButtonGradient from "@/components/ButtonGradient";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { useState } from "react";
-import { Divider } from "@rneui/base";
-type GroupDetailProps = {
-  name: string;
-  id: string;
-  avatar: string;
-  tag: string;
-  posts: number;
-  views: number;
-  likes: number;
-  description: string;
-  threeUserAvatar: string[];
-  numberOfMembers: number;
-  isUserInGroup?: boolean;
+import GroupPageContent from "@/components/group/GroupPageContent";
+import { loremIpsum } from "lorem-ipsum";
+import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
+import { SectionGrid } from "react-native-super-grid";
+const mockBlog = {
+  Title: "How to fix clipboard if it isn’t working",
+  BackgroundURL:
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
+  Description: "Blog Description",
+  content: loremIpsum({ count: 50, units: "paragraphs" }),
+  timestamp: new Date().toISOString(),
+  Author: {
+    name: "Name of the Author",
+    avatar:
+      "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg",
+    email: "sample_email@gmail.com",
+    phoneNumber: "1234567890",
+    location: "Location",
+    bio: "Bio",
+    socials: [],
+    groups: [],
+    blogs: [],
+  },
+  Tags: ["Frontend", "Backend", "React", "NodeJS", "Express"],
 };
-const mockGroupDetail: GroupDetailProps = {
-  name: "The Data-Driven Minds Collective",
-  id: "data_minds",
-  avatar: "https://picsum.photos/325",
-  tag: "Web Development",
-  posts: 100,
-  views: 2000,
-  likes: 500,
-  description:
-    "This group is for React developers of all levels to share knowledge, ask questions, and discuss best practices. Stay updated on the latest features, libraries, and trends in the React ecosystem. Happy coding...",
-  threeUserAvatar: [
-    "https://picsum.photos/350",
-    "https://picsum.photos/350",
-    "https://picsum.photos/350",
-  ],
-  numberOfMembers: 100,
-  isUserInGroup: true,
-};
+const Data = Array(10).fill(mockBlog);
+const mockTags = [
+  { id: "A", data: ["Artificial Intelligence", "Agile", "Android", "AWS"] },
+  { id: "B", data: ["Blockchain", "Bootstrap", "Babel", "Bitbucket"] },
+  { id: "C", data: ["C++", "CSS", "C#", "CI/CD", "Cloud Computing"] },
+  { id: "D", data: ["Docker", "Django", "Dart", "DNS", "Data Science"] },
+  {
+    id: "E",
+    data: ["Ethereum", "Elixir", "Express.js", "Electron", "ECMAScript"],
+  },
+  { id: "F", data: ["Firebase", "Flutter", "Figma", "FastAPI", "F#"] },
+  { id: "G", data: ["Git", "Go", "GraphQL", "Gatsby", "GCP"] },
+  { id: "H", data: ["HTML", "Heroku", "Hibernate", "Hadoop", "HTTP"] },
+  { id: "I", data: ["IoT", "iOS", "InVision", "Infrastructure", "Ionic"] },
+  { id: "J", data: ["JavaScript", "Java", "Jenkins", "Jest", "JQuery"] },
+  { id: "K", data: ["Kubernetes", "Kafka", "Kotlin", "Knex.js", "Kivy"] },
+  { id: "L", data: ["Linux", "Laravel", "Lua", "Load Balancer", "Logstash"] },
+  {
+    id: "M",
+    data: ["MongoDB", "MySQL", "Machine Learning", "Markdown", "MUI"],
+  },
+  { id: "N", data: ["Node.js", "Next.js", "NestJS", "Nginx", "NoSQL"] },
+  { id: "O", data: ["OpenAI", "OAuth", "OpenCV", "OpenGL", "Objective-C"] },
+  { id: "P", data: ["Python", "PostgreSQL", "PHP", "Perl", "Pandas"] },
+  { id: "Q", data: ["Quantum Computing", "QML", "QUnit", "Qlik", "Quasar"] },
+  { id: "R", data: ["React", "Redis", "Rust", "Ruby", "Redux"] },
+  { id: "S", data: ["SQL", "Sass", "Spring Boot", "Scala", "Swift"] },
+  {
+    id: "T",
+    data: ["TypeScript", "Tailwind CSS", "TensorFlow", "Terraform", "Tauri"],
+  },
+  { id: "U", data: ["Unity", "Ubuntu", "UI/UX", "Unreal Engine", "UML"] },
+  { id: "V", data: ["Vue.js", "Vite", "Vercel", "VS Code", "Vagrant"] },
+  { id: "W", data: ["WebAssembly", "Webpack", "WebRTC", "WordPress", "Web3"] },
+  { id: "X", data: ["Xamarin", "XML", "Xcode", "XSS", "XAMPP"] },
+  { id: "Y", data: ["YAML", "Yarn", "YouTube API", "YAGNI"] },
+  { id: "Z", data: ["Zig", "Zustand", "Zod", "Zookeeper", "Zigbee"] },
+];
 
 export default function GroupPage() {
   const [selectedId, setSelectedId] = useState(1);
   return (
     <View style={styles.container}>
-      <View style={{ padding: 20 }}>
-        <DetailGroupCardComponent {...mockGroupDetail} />
-      </View>
-      {/* Description */}
-      <Text style={styles.description}>{mockGroupDetail.description}</Text>
-      <View style={styles.rowContainer}>
-        <View style={styles.infoContainer}>
-          <View style={styles.imageContainer}>
-            <Image
-              source={mockGroupDetail.threeUserAvatar[0]}
-              style={[styles.memberImage, { marginLeft: 0 }]}
+      {selectedId === 1 ? (
+        <FlatList
+          ListHeaderComponent={
+            <GroupPageContent
+              selectedId={selectedId}
+              setSelectedId={setSelectedId}
             />
-            <Image
-              source={mockGroupDetail.threeUserAvatar[1]}
-              style={[styles.memberImage, { marginLeft: -5 }]}
-            />
-            <Image
-              source={mockGroupDetail.threeUserAvatar[2]}
-              style={[styles.memberImage, { marginLeft: -5 }]}
-            />
-          </View>
-          <Text style={styles.member}>+{mockGroupDetail.numberOfMembers}</Text>
-        </View>
-        {!mockGroupDetail.isUserInGroup ? (
-          <ButtonGradient
-            label="Join Group"
-            labelStyle={styles.tabButtonText}
-            style={styles.tabButton}
-          />
-        ) : null}
-        <MaterialCommunityIcons
-          name="dots-horizontal-circle-outline"
-          size={55}
-          color="white"
+          }
+          data={Data}
+          renderItem={({ item }) => <FeedBlogPreview blog={item} />}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.list}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         />
-      </View>
-      <Divider color="#242630" width={1} style={{ paddingTop: 20 }} />
-      <View style={styles.rowWrapper}>
-        {/* Tabs */}
-        <View style={styles.tabList}>
-          <TouchableOpacity
-            style={[styles.tabItem, selectedId === 1 && styles.tabItemActive]}
-            onPress={() => {
-              setSelectedId(1);
-            }}
-          >
-            <Text
-              style={{
-                color: selectedId === 1 ? "#fff" : "#8A94AC",
-                fontWeight: "bold",
-              }}
-            >
-              Blogs
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
-            onPress={() => {
-              setSelectedId(2);
-            }}
-          >
-            <Text
-              style={{
-                color: selectedId === 2 ? "#fff" : "#8A94AC",
-                fontWeight: "bold",
-              }}
-            >
-              Tags
-            </Text>
-          </TouchableOpacity>
-        </View>
+      ) : (
+        <SectionGrid
+          ListHeaderComponent={
+            <GroupPageContent
+              selectedId={selectedId}
+              setSelectedId={setSelectedId}
+            />
+          }
+          sections={mockTags}
+          itemDimension={150} // Controls column width
+          spacing={10} // Spacing between items
+          style={styles.gridView}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.tagContainer}>
+              <Text style={styles.tag}>{item}</Text>
+            </TouchableOpacity>
+          )}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.title}>{section.id}</Text>
+          )}
+          keyExtractor={(item, index) => item + index}
+          contentContainerStyle={styles.list}
+        />
+      )}
+    </View>
+  );
+}
 
-        {/* Create Post */}
-        {mockGroupDetail.isUserInGroup ? (
-          selectedId === 1 ? (
-            <CreatePost />
-          ) : (
-            <CreateTags />
-          )
-        ) : null}
-      </View>
-      <Divider color="#242630" width={1} style={{ paddingTop: 0 }} />
-    </View>
-  );
-}
-function CreatePost() {
-  return (
-    <View style={styles.rowContainer}>
-      <TouchableOpacity style={styles.tabButton}>
-        <Text style={styles.tabButtonText}>+ Create Post</Text>
-      </TouchableOpacity>
-      <Entypo name="select-arrows" size={24} color="#B9FF66" />
-    </View>
-  );
-}
-function CreateTags() {
-  return (
-    <View>
-      <TouchableOpacity style={styles.tabButton}>
-        <Text style={styles.tabButtonText}>+ Request Tag</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1E1E1E",
   },
-  description: {
-    color: "#fff",
-    marginTop: 8,
-    textAlign: "justify",
-    fontSize: 14,
-    lineHeight: 25,
-    paddingHorizontal: 20,
-    marginHorizontal: 20,
+  list: {
+    padding: 20,
+    paddingBottom: 100,
   },
-  imageContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  infoContainer: {
-    borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 90,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    borderColor: "#373B43",
-  },
-  memberImage: {
-    width: 30,
-    height: 30,
-    borderRadius: 90,
-  },
-  member: {
-    fontSize: 16,
-    color: "#fff",
-  },
-  rowContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-  },
-  tabButton: {
-    width: 140,
-    height: 40,
-    borderRadius: 80,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#B9FF66",
-  },
-  tabButtonText: {
-    fontSize: 16,
+  title: {
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
+    color: "#fff",
   },
-  rowWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
+  tagContainer: {
+    padding: 10,
+    backgroundColor: "#2A2A2A",
+    borderRadius: 10,
+    marginVertical: 5,
+    width: 160,
   },
-  tabList: {
-    flexDirection: "row",
-    paddingVertical: 20,
+  tag: {
+    fontSize: 16,
+    color: "#fff",
   },
-  tabItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  tabItemActive: {
-    backgroundColor: "#363B47",
+  gridView: {
+    flex: 1,
   },
 });

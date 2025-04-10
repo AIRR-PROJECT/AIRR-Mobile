@@ -6,7 +6,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Pressable,
   StyleProp,
   ViewStyle,
 } from "react-native";
@@ -38,7 +37,7 @@ export default function GroupCardComponent({
     console.log(`Group card pressed: ${name}`);
   }
   return (
-    <Pressable style={[styles.container, style]} onPress={handleGroupPress}>
+    <TouchableOpacity style={[styles.container, style]} onPress={handleGroupPress} activeOpacity={0.6}>
       {/* Group image */}
       <View style={styles.rowContainer}>
         <Image style={styles.image} source={image} />
@@ -58,7 +57,7 @@ export default function GroupCardComponent({
       <TouchableOpacity style={styles.joinButton} onPress={handleJoinPress}>
         <Text style={styles.joinButtonText}>Join</Text>
       </TouchableOpacity>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 

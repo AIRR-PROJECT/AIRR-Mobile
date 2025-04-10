@@ -9,6 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+
 const mockTags = [
   { id: "1", name: "Popular" }, // Popular is the default selected tab with id "1"
   { id: "2", name: "Web" },

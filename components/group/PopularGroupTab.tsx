@@ -313,6 +313,7 @@ export default function PopularGroupTab() {
             }}
           />
         )}
+        style={{marginBottom: 20}}
         stickySectionHeadersEnabled={false}
         ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
       />

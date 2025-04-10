@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Entypo } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Dimensions } from "react-native";
+import { useRouter } from "expo-router";
+// Can use more attributes to go into the group (passing props)
 type PopularGroupCardProps = {
   name: string;
   id: string;
@@ -19,8 +20,14 @@ export default function PopularGroupCardComponent({
   threeUserAvatar,
   description,
 }: PopularGroupCardProps) {
+  const route = useRouter();
+  const handleGroupPress = () => {
+    // Handle group press
+    console.log(`Group pressed: ${name}`);
+    route.push('/group');
+  }
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} activeOpacity={0.6} onPress={handleGroupPress}>
       {/* Group image */}
       <View style={styles.bgTop} />
       <Image style={styles.image} source={avatar} />
@@ -62,7 +69,7 @@ export default function PopularGroupCardComponent({
           ? `${description.slice(0, 247)}...`
           : description}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 const styles = StyleSheet.create({

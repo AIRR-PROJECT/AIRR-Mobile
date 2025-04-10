@@ -1,5 +1,6 @@
 import { Entypo } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import {
   StyleSheet,
   View,
@@ -26,12 +27,14 @@ export default function GroupCardComponent({
   members,
   style,
 }: GroupCardComponentProps) {
+  const route = useRouter();
   const handleJoinPress = () => {
     // Handle join button press
     console.log(`Join group ${name}`);
   }
   const handleGroupPress = () => {
     // Handle group card press
+    route.push("/group");
     console.log(`Group card pressed: ${name}`);
   }
   return (

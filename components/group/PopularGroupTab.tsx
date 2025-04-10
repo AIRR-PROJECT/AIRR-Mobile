@@ -26,7 +26,8 @@ const mockPopularGroup = {
   description:
     "This group is for React developers of all levels to share knowledge, ask questions, and discuss best practices. Stay updated on the latest features, libraries, and trends in the React ecosystem. Happy coding... Happy coding...Happy coding...Happy coding...Happy coding...",
 };
-const mockGroupList = Array(6).fill(mockPopularGroup);
+const mockGroupList = Array(10).fill(mockPopularGroup);
+const mockPaginationList = Array(10).fill(""); 
 const DATA = [
   {
     title: "Web",
@@ -169,14 +170,14 @@ const DATA = [
     ],
   },
 ];
-const defaultDataWith6Colors = [
-  "#B0604D",
-  "#899F9C",
-  "#B3C680",
-  "#5C6265",
-  "#F5D399",
-  "#F1F1F1",
-];
+// const defaultDataWith6Colors = [
+//   "#B0604D",
+//   "#899F9C",
+//   "#B3C680",
+//   "#5C6265",
+//   "#F5D399",
+//   "#F1F1F1",
+// ];
 export default function PopularGroupTab() {
   const progress = useSharedValue(0);
 
@@ -201,7 +202,7 @@ export default function PopularGroupTab() {
           // Header for the Popular Group Screen
           <View
             id="carousel-component"
-            dataSet={{ kind: "utils", name: "pagination" }}
+            // dataSet={{ kind: "utils", name: "pagination" }}
             style={{ gap: 10 }}
           >
             <Carousel
@@ -236,7 +237,7 @@ export default function PopularGroupTab() {
             />
             <Pagination.Custom<{ color: string }>
               progress={progress}
-              data={defaultDataWith6Colors.map((color) => ({ color }))}
+              data={mockPaginationList}
               size={20}
               dotStyle={{
                 borderRadius: 16,

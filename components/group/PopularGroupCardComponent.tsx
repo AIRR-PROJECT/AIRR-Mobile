@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "#B9FF66",
     overflow: "hidden",
-    
   },
 
   bgTop: {

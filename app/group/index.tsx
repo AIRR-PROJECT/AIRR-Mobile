@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import GroupPageContent from "@/components/group/GroupPageContent";
 import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
@@ -33,89 +33,125 @@ const mockBlog = {
 };
 const Data = Array(10).fill(mockBlog);
 const mockTags = [
-  { id: "A", data: ["Artificial Intelligence", "Agile", "Android", "AWS"] },
-  { id: "B", data: ["Blockchain", "Bootstrap", "Babel", "Bitbucket"] },
-  { id: "C", data: ["C++", "CSS", "C#", "CI/CD", "Cloud Computing"] },
-  { id: "D", data: ["Docker", "Django", "Dart", "DNS", "Data Science"] },
+  { id: "a", data: ["Artificial Intelligence", "Agile", "Android", "AWS"] },
+  { id: "b", data: ["Blockchain", "Bootstrap", "Babel", "Bitbucket"] },
+  { id: "c", data: ["C++", "CSS", "C#", "CI/CD", "Cloud Computing"] },
+  { id: "d", data: ["Docker", "Django", "Dart", "DNS", "Data Science"] },
   {
-    id: "E",
+    id: "e",
     data: ["Ethereum", "Elixir", "Express.js", "Electron", "ECMAScript"],
   },
-  { id: "F", data: ["Firebase", "Flutter", "Figma", "FastAPI", "F#"] },
-  { id: "G", data: ["Git", "Go", "GraphQL", "Gatsby", "GCP"] },
-  { id: "H", data: ["HTML", "Heroku", "Hibernate", "Hadoop", "HTTP"] },
-  { id: "I", data: ["IoT", "iOS", "InVision", "Infrastructure", "Ionic"] },
-  { id: "J", data: ["JavaScript", "Java", "Jenkins", "Jest", "JQuery"] },
-  { id: "K", data: ["Kubernetes", "Kafka", "Kotlin", "Knex.js", "Kivy"] },
-  { id: "L", data: ["Linux", "Laravel", "Lua", "Load Balancer", "Logstash"] },
+  { id: "f", data: ["Firebase", "Flutter", "Figma", "FastAPI", "F#"] },
+  { id: "g", data: ["Git", "Go", "GraphQL", "Gatsby", "GCP"] },
+  { id: "h", data: ["HTML", "Heroku", "Hibernate", "Hadoop", "HTTP"] },
+  { id: "i", data: ["IoT", "iOS", "InVision", "Infrastructure", "Ionic"] },
+  { id: "j", data: ["JavaScript", "Java", "Jenkins", "Jest", "JQuery"] },
+  { id: "k", data: ["Kubernetes", "Kafka", "Kotlin", "Knex.js", "Kivy"] },
+  { id: "l", data: ["Linux", "Laravel", "Lua", "Load Balancer", "Logstash"] },
   {
-    id: "M",
+    id: "m",
     data: ["MongoDB", "MySQL", "Machine Learning", "Markdown", "MUI"],
   },
-  { id: "N", data: ["Node.js", "Next.js", "NestJS", "Nginx", "NoSQL"] },
-  { id: "O", data: ["OpenAI", "OAuth", "OpenCV", "OpenGL", "Objective-C"] },
-  { id: "P", data: ["Python", "PostgreSQL", "PHP", "Perl", "Pandas"] },
-  { id: "Q", data: ["Quantum Computing", "QML", "QUnit", "Qlik", "Quasar"] },
-  { id: "R", data: ["React", "Redis", "Rust", "Ruby", "Redux"] },
-  { id: "S", data: ["SQL", "Sass", "Spring Boot", "Scala", "Swift"] },
+  { id: "n", data: ["Node.js", "Next.js", "NestJS", "Nginx", "NoSQL"] },
+  { id: "o", data: ["OpenAI", "OAuth", "OpenCV", "OpenGL", "Objective-C"] },
+  { id: "p", data: ["Python", "PostgreSQL", "PHP", "Perl", "Pandas"] },
+  { id: "q", data: ["Quantum Computing", "QML", "QUnit", "Qlik", "Quasar"] },
+  { id: "r", data: ["React", "Redis", "Rust", "Ruby", "Redux"] },
+  { id: "s", data: ["SQL", "Sass", "Spring Boot", "Scala", "Swift"] },
   {
-    id: "T",
+    id: "t",
     data: ["TypeScript", "Tailwind CSS", "TensorFlow", "Terraform", "Tauri"],
   },
-  { id: "U", data: ["Unity", "Ubuntu", "UI/UX", "Unreal Engine", "UML"] },
-  { id: "V", data: ["Vue.js", "Vite", "Vercel", "VS Code", "Vagrant"] },
-  { id: "W", data: ["WebAssembly", "Webpack", "WebRTC", "WordPress", "Web3"] },
-  { id: "X", data: ["Xamarin", "XML", "Xcode", "XSS", "XAMPP"] },
-  { id: "Y", data: ["YAML", "Yarn", "YouTube API", "YAGNI"] },
-  { id: "Z", data: ["Zig", "Zustand", "Zod", "Zookeeper", "Zigbee"] },
+  { id: "u", data: ["Unity", "Ubuntu", "UI/UX", "Unreal Engine", "UML"] },
+  { id: "v", data: ["Vue.js", "Vite", "Vercel", "VS Code", "Vagrant"] },
+  { id: "w", data: ["WebAssembly", "Webpack", "WebRTC", "WordPress", "Web3"] },
+  { id: "x", data: ["Xamarin", "XML", "Xcode", "XSS", "XAMPP"] },
+  { id: "y", data: ["YAML", "Yarn", "YouTube API", "YAGNI"] },
+  { id: "z", data: ["Zig", "Zustand", "Zod", "Zookeeper", "Zigbee"] },
 ];
 
-export default function GroupPage() {
+// this pattern of memoization is used to prevent unnecessary re-renders
+// can be apply for other components if needed
+// Memoize the header component
+const MemoizedHeader = memo(
+  ({
+    selectedId,
+    setSelectedId,
+  }: {
+    selectedId: number;
+    setSelectedId: (id: number) => void;
+  }) => (
+    <GroupPageContent selectedId={selectedId} setSelectedId={setSelectedId} />
+  )
+);
+
+// Memoize the main component
+function GroupPage() {
   const [selectedId, setSelectedId] = useState(1);
+
+  // Cache the setter function
+  const stableSetSelectedId = useCallback(
+    (id: number) => setSelectedId(id),
+    []
+  );
+
+  // Memoize the list renderers
+  const renderBlogList = useCallback(
+    () => (
+      <FlatList
+        ListHeaderComponent={
+          <MemoizedHeader
+            selectedId={selectedId}
+            setSelectedId={stableSetSelectedId}
+          />
+        }
+        data={Data}
+        renderItem={({ item }) => <FeedBlogPreview blog={item} />}
+        keyExtractor={(item, index) => index.toString()}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.list}
+        ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+      />
+    ),
+    [selectedId]
+  );
+
+  const renderTagGrid = useCallback(
+    () => (
+      <SectionGrid
+        ListHeaderComponent={
+          <MemoizedHeader
+            selectedId={selectedId}
+            setSelectedId={stableSetSelectedId}
+          />
+        }
+        sections={mockTags}
+        itemDimension={150}
+        spacing={10}
+        style={styles.gridView}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.tagContainer}>
+            <Text style={styles.tag}>#{item}</Text>
+          </TouchableOpacity>
+        )}
+        renderSectionHeader={({ section }) => (
+          <Text style={styles.title}>{section.id}</Text>
+        )}
+        keyExtractor={(item, index) => item + index}
+        contentContainerStyle={styles.list}
+      />
+    ),
+    [selectedId]
+  );
+
   return (
     <View style={styles.container}>
-      {selectedId === 1 ? (
-        <FlatList
-          ListHeaderComponent={
-            <GroupPageContent
-              selectedId={selectedId}
-              setSelectedId={setSelectedId}
-            />
-          }
-          data={Data}
-          renderItem={({ item }) => <FeedBlogPreview blog={item} />}
-          keyExtractor={(item, index) => index.toString()}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
-          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-        />
-      ) : (
-        <SectionGrid
-          ListHeaderComponent={
-            <GroupPageContent
-              selectedId={selectedId}
-              setSelectedId={setSelectedId}
-            />
-          }
-          sections={mockTags}
-          itemDimension={150} // Controls column width
-          spacing={10} // Spacing between items
-          style={styles.gridView}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.tagContainer}>
-              <Text style={styles.tag}>{item}</Text>
-            </TouchableOpacity>
-          )}
-          renderSectionHeader={({ section }) => (
-            <Text style={styles.title}>{section.id}</Text>
-          )}
-          keyExtractor={(item, index) => item + index}
-          contentContainerStyle={styles.list}
-        />
-      )}
+      {selectedId === 1 ? renderBlogList() : renderTagGrid()}
     </View>
   );
 }
+// Memoize the main component
+export default memo(GroupPage);
 
 const styles = StyleSheet.create({
   container: {
@@ -130,10 +166,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#fff",
+    textDecorationLine: "underline",
+    fontFamily: "Poppins-Regular",
   },
   tagContainer: {
     padding: 10,
-    backgroundColor: "#2A2A2A",
+    backgroundColor: "#2E3B40",
     borderRadius: 10,
     marginVertical: 5,
     width: 160,

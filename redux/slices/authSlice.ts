@@ -9,6 +9,7 @@ import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from ".
 import { ResponseFailcode } from "@/enums/failcode.enum";
 import { useAppSelector } from "../hook";
 import { ToastAndroid } from "react-native";
+import { setCurrentBlogDisliked, setCurrentBlogLiked, setCurrentBlogSaved } from "./blogSlice";
 
 const initialState = {
     rememberedSignUpUser: "",
@@ -318,7 +319,79 @@ export const changeCurrentPassword = createAsyncThunk<void, ChangeCurrentPasswor
                 return thunkAPI.rejectWithValue(res.data)
             }
         }
-        catch (err) {
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
+export const getUserBlogLikeActivities = createAsyncThunk(
+    'auth/getUserLikeActivity', 
+    async (blogId: string, thunkAPI) => {
+        try {
+            const res = await api.get(`users/get-activity-by-type-blog?type=Like&blogId=${blogId}`)
+
+            if (res.data.success) {
+                if (res.data.data.activities.length > 0) {
+                    thunkAPI.dispatch(setCurrentBlogLiked(true))
+                }
+                else {
+                    thunkAPI.dispatch(setCurrentBlogLiked(false))
+                }
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
+export const getUserBlogDislikeActivities = createAsyncThunk(
+    'auth/getUserDislikeActivity', 
+    async (blogId: string, thunkAPI) => {
+        try {
+            const res = await api.get(`users/get-activity-by-type-blog?type=Dislike&blogId=${blogId}`)
+
+            if (res.data.success) {
+                if (res.data.data.activities.length > 0) {
+                    thunkAPI.dispatch(setCurrentBlogDisliked(true))
+                }
+                else {
+                    thunkAPI.dispatch(setCurrentBlogDisliked(false))
+                }
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
+export const getUserBlogSaveActivities = createAsyncThunk(
+    'auth/getUserSaveActivity', 
+    async (blogId: string, thunkAPI) => {
+        try {
+            const res = await api.get(`users/get-activity-by-type-blog?type=Save&blogId=${blogId}`)
+
+            if (res.data.success) {
+                if (res.data.data.activities.length > 0) {
+                    thunkAPI.dispatch(setCurrentBlogSaved(true))
+                }
+                else {
+                    thunkAPI.dispatch(setCurrentBlogSaved(false))
+                }
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
             return thunkAPI.rejectWithValue(err.response)
         }
     }   

@@ -17,6 +17,7 @@ const initialState = {
     userAvatar: "",
     userCurrentPassword: "",
     userNewPassword: "",
+    userActivity: null,
     userChange: null as unknown as User,
     userGroups: null
 };

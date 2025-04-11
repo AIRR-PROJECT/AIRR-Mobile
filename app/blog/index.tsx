@@ -8,6 +8,7 @@ import {
   Pressable,
   TouchableOpacity,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import {
@@ -186,6 +187,8 @@ export default function BlogScreen() {
   const [comments, setComments] = useState(123)
   const [html, setHtml] = useState(mockHtml)
   const [commentsDetail, setCommentsDetail] = useState(mockComments)
+  // Simulate refresh
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (searchParams.aiBlogId) {
@@ -226,6 +229,25 @@ export default function BlogScreen() {
   useEffect(() => {
     setCommentsDetail(currentBlogComments)
   }, [currentBlogComments])
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    // Simulate fetching data
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+
+    if (searchParams.aiBlogId) {
+      dispatch(getAIBlogDetail(searchParams.aiBlogId))
+    }
+    else {
+      dispatch(getUserBlogDetail(searchParams.userBlogId))
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId))
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId))
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId))
+    }
+    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId))
+  }
 
   const handleBack = () => {
     route.back();
@@ -291,6 +313,9 @@ export default function BlogScreen() {
 
   return (
     <FlatList
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
       data={currentBlogComments}
       keyExtractor={(item, index) => item._id + index}
       renderItem={({ item }) => <BlogCommenter {...item} />}

@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactElement } from "react";
-import { StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -20,6 +20,7 @@ type Props = PropsWithChildren<{
   headerBackgroundColor?: { dark: string; light: string };
   hasHeader?: boolean;
   style?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
   backgroundColor?: { dark: string; light: string };
   refreshControl?: ReactElement;
 }>;
@@ -30,6 +31,7 @@ export default function ParallaxFlatList({
   headerBackgroundColor = { light: "#A1CEDC", dark: "#1D3D47" },
   hasHeader,
   style,
+  contentStyle,
   refreshControl,
 }: Props) {
   const colorScheme = useColorScheme() ?? "light";
@@ -81,7 +83,7 @@ export default function ParallaxFlatList({
         ref={scrollRef}
         data={data} // Use the converted array
         keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => <ThemedView style={styles.content}>{item}</ThemedView>}
+        renderItem={({ item }) => <View style={[styles.content, contentStyle]}>{item}</View>}
         scrollEventThrottle={16}
         onScroll={onScroll} // Attach animated scroll handler
         scrollIndicatorInsets={{ bottom }}
@@ -89,6 +91,10 @@ export default function ParallaxFlatList({
         contentContainerStyle={{ paddingBottom: bottom, }}
         refreshControl={refreshControl}
         overScrollMode={"always"}
+        initialNumToRender={10}
+        maxToRenderPerBatch={5}
+        //removeClippedSubviews={true} optimise for large list  
+        updateCellsBatchingPeriod={100}
         ListHeaderComponent={
           hasHeader ? (
             <Animated.View

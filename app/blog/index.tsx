@@ -292,9 +292,11 @@ export default function BlogScreen() {
   return (
     <FlatList
       data={currentBlogComments}
+      keyExtractor={(item, index) => item._id + index}
       renderItem={({ item }) => <BlogCommenter {...item} />}
       style={styles.flatListContainer}
       contentContainerStyle={styles.contentContainer}
+      ListFooterComponent={<View style={{height: 20}}></View>}
       ListHeaderComponent={
         <View style={styles.container}>
           {/* Back button */}
@@ -365,8 +367,8 @@ export default function BlogScreen() {
             {/* List of tags */}
             {searchParams.userBlogId &&
               <View style={styles.tagsContainer}>
-                {tags.map((tag) => (
-                  <BlogTagButton title={tag.TagName} key={tag._id} />
+                {tags.map((tag, index) => (
+                  <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
                 ))}
               </View>
             }
@@ -470,6 +472,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E1E1E",
   },
   contentContainer: {
+    flexGrow: 1,
     padding: 20,
     gap: 20,
   },

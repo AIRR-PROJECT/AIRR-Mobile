@@ -89,6 +89,17 @@ export default function RootLayout() {
                   headerRight: () => <RightHeader streak={streak}/>,
                 }}
               />
+              <Stack.Screen name="group" 
+                options={{
+                  headerShown: true,
+                  headerStyle:{
+                    backgroundColor: "#1E1E1E",
+                  },
+                  headerLeft: () => <LeftHeader/>,
+                  headerTitle: "",
+                  headerRight: () => <RightHeader streak={streak}/>,
+                }}
+              />
             </Stack>
             {userLoggedIn ? (
               <Redirect href="/(tabs)/dashboard" />

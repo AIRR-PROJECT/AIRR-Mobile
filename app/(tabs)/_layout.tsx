@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { Platform, View, TouchableOpacity } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
@@ -16,8 +16,17 @@ import {
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable } from "react-native";
 import { useEffect } from "react";
-const MiddleButton = () => (
+
+import { GestureResponderEvent } from "react-native";
+
+interface MiddleButtonProps {
+  onPress: (event: GestureResponderEvent) => void;
+  // [key: string]: any; // To allow other props to pass through
+}
+
+const MiddleButton = ({ onPress }: MiddleButtonProps) => (
   <TouchableOpacity
+    // {...props} // Spread other props to maintain tab bar button functionality
     style={{
       flex: 1,
       alignSelf: "center",
@@ -25,13 +34,12 @@ const MiddleButton = () => (
       width: 60,
       height: 60,
       justifyContent: "center",
-      // alignItems: 'center',
-      // elevation: 4,
       shadowColor: "#1E1E1E",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
     }}
+    onPress={onPress}
   >
     <AntDesign
       name="plussquare"
@@ -41,11 +49,16 @@ const MiddleButton = () => (
     />
   </TouchableOpacity>
 );
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const route = useRouter();
   const handleMiddleButtonPress = () => {
     console.log("Middle Button Press");
+    route.push("/blog/new-blog");
+    // Add your custom logic here
   };
+
   return (
     <Tabs
       screenOptions={{
@@ -56,7 +69,6 @@ export default function TabLayout() {
         tabBarStyle: Platform.select({
           default: {
             backgroundColor: "#17191E",
-            // overflow: '',
           },
         }),
         animation: "shift",
@@ -86,7 +98,9 @@ export default function TabLayout() {
         name="create"
         options={{
           title: "",
-          tabBarButton: (props) => <MiddleButton {...props} />,
+          tabBarButton: () => (
+            <MiddleButton onPress={handleMiddleButtonPress} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -99,7 +113,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="group"
+        name="group-list"
         options={{
           title: "Group",
           tabBarIcon: ({ color }) => (
@@ -107,7 +121,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      
     </Tabs>
   );
 }

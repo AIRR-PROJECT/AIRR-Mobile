@@ -1,11 +1,13 @@
 import { Entypo } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
-  Pressable,
+  StyleProp,
+  ViewStyle,
 } from "react-native";
 
 type GroupCardComponentProps = {
@@ -13,6 +15,7 @@ type GroupCardComponentProps = {
   name: string;
   id: string;
   members: number;
+  style? : StyleProp<ViewStyle>;
   // later add onPress function
   // onPress: () => void;
 };
@@ -21,9 +24,20 @@ export default function GroupCardComponent({
   name,
   id,
   members,
+  style,
 }: GroupCardComponentProps) {
+  const route = useRouter();
+  const handleJoinPress = () => {
+    // Handle join button press
+    console.log(`Join group ${name}`);
+  }
+  const handleGroupPress = () => {
+    // Handle group card press
+    route.push("/group");
+    console.log(`Group card pressed: ${name}`);
+  }
   return (
-    <Pressable style={styles.container}>
+    <TouchableOpacity style={[styles.container, style]} onPress={handleGroupPress} activeOpacity={0.6}>
       {/* Group image */}
       <View style={styles.rowContainer}>
         <Image style={styles.image} source={image} />
@@ -40,10 +54,10 @@ export default function GroupCardComponent({
         </View>
       </View>
       {/* Join button */}
-      <TouchableOpacity style={styles.joinButton}>
+      <TouchableOpacity style={styles.joinButton} onPress={handleJoinPress}>
         <Text style={styles.joinButtonText}>Join</Text>
       </TouchableOpacity>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
@@ -53,6 +67,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    
   },
   image: {
     width: 50,

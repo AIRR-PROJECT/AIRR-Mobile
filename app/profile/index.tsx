@@ -49,7 +49,7 @@ import { getUserPreviewGroups } from "@/redux/slices/authSlice";
 //   department: "Software Engineering",
 // };
 
-type UserInfo = Pick<User, "username" | "avatar_url" | "firstName" | "lastName" | "joinDate">
+type UserInfo = Pick<User, "username" | "avatarURL" | "firstName" | "lastName" | "joinDate">
 type StudentInfo = Pick<User, "profile">
 
 const mockGroup = {

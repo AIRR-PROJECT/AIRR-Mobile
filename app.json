@@ -34,11 +34,16 @@
         }
       ],
       "expo-localization",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-font",
+        {
+          "fonts": ["./assets/fonts/Poppins-Regular.ttf", "./assets/fonts/SpaceMono-Regular.ttf"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     }
-    
   }
 }

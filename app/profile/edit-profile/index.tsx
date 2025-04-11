@@ -84,7 +84,7 @@ export default function EditProfileScreen() {
     if (isUserChangeSaved) {
       dispatch(setUserChangeSaved(false))
 
-      router.back()
+      // router.back()
     }
   }, [isUserChangeSaved])
 

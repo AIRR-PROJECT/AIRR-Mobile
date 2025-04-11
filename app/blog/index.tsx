@@ -8,6 +8,7 @@ import {
   Pressable,
   TouchableOpacity,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import {
@@ -35,8 +36,9 @@ import BlogCommenter from "@/components/blog/BlogCommenter";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import * as SplashScreen from "expo-splash-screen";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { getAIBlogDetail, getBlogComment, getUserBlogDetail } from "@/redux/slices/blogSlice";
+import { dislikeBlog, dislikeToLikeBlog, getAIBlogDetail, getBlogComment, getUserBlogDetail, likeBlog, likeToDislikeBlog, removeDislikeBlog, removeLikeBlog, saveBlog, unsaveBlog } from "@/redux/slices/blogSlice";
 import { AIBlogSection, UserBlogComment, UserBlogTag } from "@/interfaces/blogInterface";
+import { getUserBlogDislikeActivities, getUserBlogLikeActivities, getUserBlogSaveActivities } from "@/redux/slices/authSlice";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -168,7 +170,7 @@ export default function BlogScreen() {
   const { width } = useWindowDimensions();
   const route = useRouter();
   const dispatch = useAppDispatch()
-  const { currentAIBlog, currentUserBlog, currentBlogComments } = useAppSelector(state => state.blog)
+  const { currentAIBlog, currentUserBlog, currentBlogComments, isCurrentBlogLiked, isCurrentBlogDisliked, isCurrentBlogSaved } = useAppSelector(state => state.blog)
 
   // Shared properties
   const [title, setTitle] = useState("Mock description")
@@ -185,6 +187,8 @@ export default function BlogScreen() {
   const [comments, setComments] = useState(123)
   const [html, setHtml] = useState(mockHtml)
   const [commentsDetail, setCommentsDetail] = useState(mockComments)
+  // Simulate refresh
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (searchParams.aiBlogId) {
@@ -192,6 +196,9 @@ export default function BlogScreen() {
     }
     else {
       dispatch(getUserBlogDetail(searchParams.userBlogId))
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId))
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId))
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId))
     }
     dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId))
   }, [])
@@ -223,11 +230,92 @@ export default function BlogScreen() {
     setCommentsDetail(currentBlogComments)
   }, [currentBlogComments])
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    // Simulate fetching data
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+
+    if (searchParams.aiBlogId) {
+      dispatch(getAIBlogDetail(searchParams.aiBlogId))
+    }
+    else {
+      dispatch(getUserBlogDetail(searchParams.userBlogId))
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId))
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId))
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId))
+    }
+    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId))
+  }
+
   const handleBack = () => {
     route.back();
   };
+  const handleLike = () => {
+    console.log("Pressed Like button")
+
+    if (isCurrentBlogLiked) {
+      dispatch(removeLikeBlog(searchParams.userBlogId)).then(() => {
+        setLikes(likes - 1)
+      })
+    }
+    else {
+      if (isCurrentBlogDisliked) {
+        dispatch(dislikeToLikeBlog(searchParams.userBlogId)).then(() => {
+          setLikes(likes + 1)
+          setDislikes(dislikes - 1)
+        })
+      }
+      else {
+        dispatch(likeBlog(searchParams.userBlogId)).then(() => {
+          setLikes(likes + 1)
+        })
+      }
+    }
+  }
+  const handleDislike = () => {
+    console.log("Pressed Dislike button")
+
+    if (isCurrentBlogDisliked) {
+      dispatch(removeDislikeBlog(searchParams.userBlogId)).then(() => {
+        setDislikes(dislikes - 1)
+      })
+    }
+    else {
+      if (isCurrentBlogLiked) {
+        dispatch(likeToDislikeBlog(searchParams.userBlogId)).then(() => {
+          setDislikes(dislikes + 1)
+          setLikes(likes - 1)
+        })
+      }
+      else {
+        dispatch(dislikeBlog(searchParams.userBlogId)).then(() => {
+          setDislikes(dislikes + 1)
+        })
+      }
+    }
+  }
+  const handleBookmark = () => {
+    console.log("Pressed Bookmark")
+
+    if (isCurrentBlogSaved) {
+      dispatch(unsaveBlog(searchParams.userBlogId))
+    }
+    else {
+      dispatch(saveBlog(searchParams.userBlogId))
+    }
+  }
+
+  useEffect(() => {
+    console.log(`Current blog saved: ${isCurrentBlogSaved}`)
+  }, [isCurrentBlogSaved])
+
   return (
     <FlatList
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
       data={currentBlogComments}
       keyExtractor={(item, index) => item._id + index}
       renderItem={({ item }) => <BlogCommenter {...item} />}
@@ -334,20 +422,24 @@ export default function BlogScreen() {
               <View style={styles.interactSection}>
                 {/* Likes */}
                 <View style={[styles.rowContainer, { gap: 20 }]}>
-                  <View style={styles.likeContainer}>
-                    <FontAwesome name="thumbs-up" size={24} color="#fff" />
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={isCurrentBlogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={handleLike}>
+                    <FontAwesome name="thumbs-up" size={24} color={isCurrentBlogLiked ? "#000" : "#fff"} />
                     <ThemedText
-                      style={{ color: "#fff" }}
+                      style={{ color: isCurrentBlogLiked ? "#000" : "#fff" }}
                       type="default"
                       lightColor="#fff"
                       darkColor="#fff"
                     >
                       {likes}
                     </ThemedText>
-                  </View>
+                  </TouchableOpacity>
                   {/* Dislikes */}
-                  <View style={styles.dislikeContainer}>
-                    <FontAwesome name="thumbs-down" size={24} color="#fff" />
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={isCurrentBlogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={handleDislike}>
+                    <FontAwesome name="thumbs-down" size={24} color={isCurrentBlogDisliked ? "#000" : "#fff"} />
                     {/* <ThemedText
                       style={styles.text}
                       type="default"
@@ -355,7 +447,7 @@ export default function BlogScreen() {
                       darkColor="#fff">
                       123
                     </ThemedText> */}
-                  </View>
+                  </TouchableOpacity>
                 </View>
                 {/* Comment */}
                 <View style={styles.commentContainer}>
@@ -370,9 +462,11 @@ export default function BlogScreen() {
                   </ThemedText>
                 </View>
                 {/* Bookmart Button */}
-                <View style={styles.bookmarkContainer}>
-                  <FontAwesome name="bookmark" size={24} color="#fff" />
-                </View>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={isCurrentBlogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={handleBookmark}>
+                  <FontAwesome name="bookmark" size={24} color={isCurrentBlogSaved ? "#000" : "#fff"} />
+                </TouchableOpacity>
               </View>
             }
             <Divider
@@ -479,7 +573,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 20,
   },
-  likeContainer: {
+  likeContainerNo: {
     flexDirection: "row",
     gap: 10,
     alignItems: "center",
@@ -487,12 +581,28 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 13,
   },
-  dislikeContainer: {
+  likeContainerYes: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 13,
+  },
+  dislikeContainerNo: {
     flexDirection: "row",
     gap: 10,
     alignItems: "center",
     padding: 10,
     backgroundColor: "#3C574960",
+    borderRadius: 13,
+  },
+  dislikeContainerYes: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#fff",
     borderRadius: 13,
   },
   commentContainer: {
@@ -503,7 +613,15 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     backgroundColor: "#3C574960",
   },
-  bookmarkContainer: {
+  bookmarkContainerYes: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 13,
+    backgroundColor: "#fff",
+  },
+  bookmarkContainerNo: {
     flexDirection: "row",
     gap: 10,
     alignItems: "center",

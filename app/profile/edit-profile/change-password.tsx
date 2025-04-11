@@ -2,7 +2,10 @@ import { View, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { Controller, useForm } from "react-hook-form";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { setCurrentPassword, setNewPassword } from "@/redux/slices/userSlice";
+import { setCurrentPasswordIncorrect } from "@/redux/slices/authSlice";
 
 type FormData = {
   currentPassword: string;
@@ -14,15 +17,34 @@ export default function ChangePasswordScreen() {
   const {
     control,
     watch,
+    trigger,
     formState: { errors },
   } = useForm<FormData>({
     mode: "onChange",
   
   });
+  const dispatch = useAppDispatch()
+  const { isCurrentPasswordIncorrect } = useAppSelector(state => state.auth)
   const currentPassword = watch("currentPassword");
   // console.log(currentPassword);
   const newPassword = watch("newPassword");
   const mockData: string = "12345678";
+
+  useEffect(() => {
+    dispatch(setCurrentPasswordIncorrect(false))
+
+    dispatch(setCurrentPassword(currentPassword))
+  }, [currentPassword])
+
+  useEffect(() => {
+    dispatch(setNewPassword(newPassword))
+  }, [newPassword])
+
+  // Trigger the Current Password validation every times isCurrentPasswordIncorrect changes
+  useEffect(() => {
+    trigger("currentPassword")
+  }, [isCurrentPasswordIncorrect])
+
   return (
     <View style={styles.container}>
       {/* Title */}
@@ -41,9 +63,11 @@ export default function ChangePasswordScreen() {
             required: "Current password is required",
             validate: (value) =>{
               console.log(value);
-              return value === mockData || "Current password is incorrect"
+              return !isCurrentPasswordIncorrect || "Current password is incorrect"
             },
-          
+            onChange: () => {
+              dispatch(setCurrentPasswordIncorrect(false))
+            }
           }}
           render={({ field: { onChange, onBlur, value } }) => {
             const [showPassword, setShowPassword] = useState(false);

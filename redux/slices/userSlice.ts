@@ -13,9 +13,12 @@ import { jwtDecode } from "jwt-decode";
 const initialState = {
     userAccessToken: "",
     userRefreshToken: "",
-    user: null,
+    user: null as unknown as User,
     userAvatar: "",
-    userChange: null,
+    userCurrentPassword: "",
+    userNewPassword: "",
+    userActivity: null,
+    userChange: null as unknown as User,
     userGroups: null
 };
 
@@ -46,16 +49,32 @@ const userSlice = createSlice({
             state.userGroups = action.payload.groups
         },
 
+        setCurrentPassword(state, action) {
+            state.userCurrentPassword = action.payload
+        },
+
+        setNewPassword(state, action) {
+            state.userNewPassword = action.payload
+        },
+
+        resetPassword(state) {
+            state.userCurrentPassword = ""
+            state.userNewPassword = ""
+        },
+
         reset(state) {
             state.userAccessToken = "";
             state.userRefreshToken = "";
-            state.user = null
-            state.userChange = null
+            state.user = null as unknown as User
+            state.userAvatar = ""
+            state.userCurrentPassword = ""
+            state.userNewPassword = ""
+            state.userChange = null as unknown as User
             state.userGroups = null
         },
 
     },
 });
 
-export const { reset, setCurrentUser, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup } = userSlice.actions;
+export const { reset, resetPassword, setCurrentUser, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup, setCurrentPassword, setNewPassword } = userSlice.actions;
 export default userSlice.reducer;

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
-import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
+import { ChangeCurrentPasswordCredentials, LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { UpdateAvatar, UpdateUser, User, User1 } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
@@ -9,6 +9,7 @@ import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from ".
 import { ResponseFailcode } from "@/enums/failcode.enum";
 import { useAppSelector } from "../hook";
 import { ToastAndroid } from "react-native";
+import { setCurrentBlogDisliked, setCurrentBlogLiked, setCurrentBlogSaved } from "./blogSlice";
 
 const initialState = {
     rememberedSignUpUser: "",
@@ -17,6 +18,7 @@ const initialState = {
     isAccountVerified: false,
     isPasswordVerified: false,
     isUserChangeSaved: false,
+    isCurrentPasswordIncorrect: false,
     passwordVerifyToken: "",
     changedPassword: false,
     isLoading: true,
@@ -304,6 +306,97 @@ export const updateAvatar = createAsyncThunk(
     }
 )
 
+export const changeCurrentPassword = createAsyncThunk<void, ChangeCurrentPasswordCredentials>(
+    'auth/changeCurrentPassword', 
+    async (data: ChangeCurrentPasswordCredentials, thunkAPI) => {
+        try {
+            const res = await api.post("auth/change-current-password", data)
+
+            if (res.data.success) {
+                ToastAndroid.showWithGravity("Current password changed successfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
+export const getUserBlogLikeActivities = createAsyncThunk(
+    'auth/getUserLikeActivity', 
+    async (blogId: string, thunkAPI) => {
+        try {
+            const res = await api.get(`users/get-activity-by-type-blog?type=Like&blogId=${blogId}`)
+
+            if (res.data.success) {
+                if (res.data.data.activities.length > 0) {
+                    thunkAPI.dispatch(setCurrentBlogLiked(true))
+                }
+                else {
+                    thunkAPI.dispatch(setCurrentBlogLiked(false))
+                }
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
+export const getUserBlogDislikeActivities = createAsyncThunk(
+    'auth/getUserDislikeActivity', 
+    async (blogId: string, thunkAPI) => {
+        try {
+            const res = await api.get(`users/get-activity-by-type-blog?type=Dislike&blogId=${blogId}`)
+
+            if (res.data.success) {
+                if (res.data.data.activities.length > 0) {
+                    thunkAPI.dispatch(setCurrentBlogDisliked(true))
+                }
+                else {
+                    thunkAPI.dispatch(setCurrentBlogDisliked(false))
+                }
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
+export const getUserBlogSaveActivities = createAsyncThunk(
+    'auth/getUserSaveActivity', 
+    async (blogId: string, thunkAPI) => {
+        try {
+            const res = await api.get(`users/get-activity-by-type-blog?type=Save&blogId=${blogId}`)
+
+            if (res.data.success) {
+                if (res.data.data.activities.length > 0) {
+                    thunkAPI.dispatch(setCurrentBlogSaved(true))
+                }
+                else {
+                    thunkAPI.dispatch(setCurrentBlogSaved(false))
+                }
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -328,6 +421,10 @@ const authSlice = createSlice({
             state.changedPassword = false
         },
 
+        setCurrentPasswordIncorrect(state, action) {
+            state.isCurrentPasswordIncorrect = action.payload
+        },
+
         setUserChangeSaved(state, action) {
             state.isUserChangeSaved = action.payload
         },
@@ -345,6 +442,7 @@ const authSlice = createSlice({
             state.isPasswordVerified = false
             state.isAccountCreated = false
             state.changedPassword = false
+            state.isCurrentPasswordIncorrect = false
         },
 
     },
@@ -355,7 +453,8 @@ const authSlice = createSlice({
                 state.isAccountVerified = true
             })
             .addCase(login.rejected, (state, action) => {
-                if (action.payload && (action.payload as APIResponse).message && (action.payload as APIResponse).failcode !== ResponseFailcode.USER_NOT_FOUND) {
+                console.log(action.payload)
+                if (action.payload && (action.payload as APIResponse).message && ((action.payload as APIResponse).failcode !== ResponseFailcode.USER_NOT_FOUND && (action.payload as APIResponse).failcode !== ResponseFailcode.IDENTITY_NOT_MATCHED)) {
                     state.isLoggedIn = true
                 }
 
@@ -498,20 +597,30 @@ const authSlice = createSlice({
 
             })
             .addCase(updateUser.fulfilled, (state, action) => {
-                
+                ToastAndroid.showWithGravity("User info updated", ToastAndroid.LONG, ToastAndroid.BOTTOM)
+                console.log("User info updated")
             })
             .addCase(updateUser.rejected, (state, action) => {
 
             })
             .addCase(updateAvatar.fulfilled, (state, action) => {
+                ToastAndroid.showWithGravity("Avatar updated", ToastAndroid.LONG, ToastAndroid.BOTTOM)
                 console.log("Avatar updated")
             })
             .addCase(updateAvatar.rejected, (state, action) => {
                 console.log(action.error)
             })
+            .addCase(changeCurrentPassword.fulfilled, (state, action) => {
+                
+            })
+            .addCase(changeCurrentPassword.rejected, (state, action) => {
+                if ((action.payload as any).data.failcode == ResponseFailcode.IDENTITY_NOT_MATCHED) {
+                    state.isCurrentPasswordIncorrect = true
+                }
+            })
 
     },
 });
 
-export const { setLoading, resetLoggedIn, resetAccountCreated, resetPasswordVerified, setUserChangeSaved, resetChangedPassword, logout } = authSlice.actions;
+export const { setLoading, resetLoggedIn, resetAccountCreated, resetPasswordVerified, setCurrentPasswordIncorrect, setUserChangeSaved, resetChangedPassword, logout } = authSlice.actions;
 export default authSlice.reducer;

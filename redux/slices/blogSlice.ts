@@ -6,7 +6,10 @@ import { AIBlogDetail, UserBlog, UserBlogComment, UserBlogDetail } from "@/inter
 const initialState = {
     currentAIBlog: null as unknown as AIBlogDetail,
     currentUserBlog: null as unknown as UserBlogDetail,
-    currentBlogComments: null as unknown as UserBlogComment[]
+    currentBlogComments: null as unknown as UserBlogComment[],
+    isCurrentBlogLiked: false,
+    isCurrentBlogDisliked: false,
+    isCurrentBlogSaved: false
 }
 
 export const getAIBlogDetail = createAsyncThunk<AIBlogDetail, string>(
@@ -66,13 +69,261 @@ export const getBlogComment = createAsyncThunk<UserBlogComment[], string>(
     }
 )
 
+export const likeBlog = createAsyncThunk(
+    'blog/likeBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const dto = {
+                reactBlogEntries: [
+                    {
+                        BlogID: blogId,
+                        Action: "Like",
+                        createdAt: new Date()
+                    }
+                ],
+                saveBlogEntries: []
+            }
+            const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    } 
+)
+
+export const dislikeBlog = createAsyncThunk(
+    'blog/dislikeBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const dto = {
+                reactBlogEntries: [
+                    {
+                        BlogID: blogId,
+                        Action: "Dislike",
+                        createdAt: new Date()
+                    }
+                ],
+                saveBlogEntries: []
+            }
+            const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    } 
+)
+
+export const removeLikeBlog = createAsyncThunk(
+    'blog/removeLikeBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const dto = {
+                reactBlogEntries: [
+                    {
+                        BlogID: blogId,
+                        Action: "RemoveLike",
+                        createdAt: new Date()
+                    }
+                ],
+                saveBlogEntries: []
+            }
+            const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    } 
+)
+
+export const removeDislikeBlog = createAsyncThunk(
+    'blog/removeDislikeBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const dto = {
+                reactBlogEntries: [
+                    {
+                        BlogID: blogId,
+                        Action: "RemoveDislike",
+                        createdAt: new Date()
+                    }
+                ],
+                saveBlogEntries: []
+            }
+            const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            console.log(error)
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    } 
+)
+
+export const likeToDislikeBlog = createAsyncThunk(
+    'blog/likeToDislikeBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const dto = {
+                reactBlogEntries: [
+                    {
+                        BlogID: blogId,
+                        Action: "LikeToDislike",
+                        createdAt: new Date()
+                    }
+                ],
+                saveBlogEntries: []
+            }
+            const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    } 
+)
+
+export const dislikeToLikeBlog = createAsyncThunk(
+    'blog/dislikeToLikeBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const dto = {
+                reactBlogEntries: [
+                    {
+                        BlogID: blogId,
+                        Action: "DislikeToLike",
+                        createdAt: new Date()
+                    }
+                ],
+                saveBlogEntries: []
+            }
+            const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    } 
+)
+
+export const saveBlog = createAsyncThunk(
+    'blog/saveBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const dto = {
+                reactBlogEntries: [],
+                saveBlogEntries: [
+                    {
+                        BlogID: blogId,
+                        Action: "Save",
+                        createdAt: new Date()
+                    }
+                ]
+            }
+            const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    } 
+)
+
+export const unsaveBlog = createAsyncThunk(
+    'blog/unsaveBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const dto = {
+                reactBlogEntries: [],
+                saveBlogEntries: [
+                    {
+                        BlogID: blogId,
+                        Action: "Unsave",
+                        createdAt: new Date()
+                    }
+                ]
+            }
+            const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    } 
+)
+
 const blogSlice = createSlice({
     name: 'blog',
     initialState,
     reducers: {
-        reset(state, action) {
+        setCurrentBlogLiked(state, action) {
+            state.isCurrentBlogLiked = action.payload
+        },
+
+        setCurrentBlogDisliked(state, action) {
+            state.isCurrentBlogDisliked = action.payload
+        },
+
+        setCurrentBlogSaved(state, action) {
+            state.isCurrentBlogSaved = action.payload
+        },
+
+        reset(state) {
+            state.currentAIBlog = null as unknown as AIBlogDetail
             state.currentUserBlog = null as unknown as UserBlogDetail
             state.currentBlogComments = null as unknown as UserBlogComment[]
+            state.isCurrentBlogLiked = false
+            state.isCurrentBlogDisliked = false
         }
     },
     extraReducers: (builder) => {
@@ -95,8 +346,60 @@ const blogSlice = createSlice({
             .addCase(getBlogComment.rejected, (state, action) => {
                 console.log(action.error)
             })
+            .addCase(likeBlog.fulfilled, (state, action) => {
+                state.isCurrentBlogLiked = true
+            })
+            .addCase(likeBlog.rejected, (state, action) => {
+                console.log(action.error)
+            })
+            .addCase(dislikeBlog.fulfilled, (state, action) => {
+                state.isCurrentBlogDisliked = true
+            })
+            .addCase(dislikeBlog.rejected, (state, action) => {
+                console.log(action.error)
+            })
+            .addCase(removeLikeBlog.fulfilled, (state, action) => {
+                state.isCurrentBlogLiked = false
+            })
+            .addCase(removeLikeBlog.rejected, (state, action) => {
+                console.log(action.error)
+            })
+            .addCase(removeDislikeBlog.fulfilled, (state, action) => {
+                state.isCurrentBlogDisliked = false
+            })
+            .addCase(removeDislikeBlog.rejected, (state, action) => {
+                console.log(action.error)
+            })
+            .addCase(likeToDislikeBlog.fulfilled, (state, action) => {
+                state.isCurrentBlogLiked = false
+                state.isCurrentBlogDisliked = true
+            })
+            .addCase(likeToDislikeBlog.rejected, (state, action) => {
+                console.log(action.error)
+            })
+            .addCase(dislikeToLikeBlog.fulfilled, (state, action) => {
+                state.isCurrentBlogLiked = true
+                state.isCurrentBlogDisliked = false
+            })
+            .addCase(dislikeToLikeBlog.rejected, (state, action) => {
+                console.log(action.error)
+            })
+            .addCase(saveBlog.fulfilled, (state, action) => {
+                console.log("Saved blog")
+                state.isCurrentBlogSaved = true
+            })
+            .addCase(saveBlog.rejected, (state, action) => {
+                console.log(action.error)
+            })
+            .addCase(unsaveBlog.fulfilled, (state, action) => {
+                console.log("Unsaved blog")
+                state.isCurrentBlogSaved = false
+            })
+            .addCase(unsaveBlog.rejected, (state, action) => {
+                console.log(action.error)
+            })
     }
 })
 
-export const { reset } = blogSlice.actions
+export const { reset, setCurrentBlogLiked, setCurrentBlogDisliked, setCurrentBlogSaved } = blogSlice.actions
 export default blogSlice.reducer

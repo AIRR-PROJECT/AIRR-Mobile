@@ -24,6 +24,12 @@ export interface SetPasswordCredentials {
     password: string;
 }
 
+export interface ChangeCurrentPasswordCredentials {
+    email: string;
+    current_password: string;
+    new_password: string;
+}
+
 export interface Tokens {
     accessToken: string;
     refreshToken: string;

@@ -1,12 +1,14 @@
 import { StyleSheet } from "react-native";
 import ButtonGradient from "../ButtonGradient";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { getUserInfo, setUserChangeSaved, updateUser } from "@/redux/slices/authSlice";
+import { changeCurrentPassword, getUserInfo, resetChangedPassword, setUserChangeSaved, updateUser } from "@/redux/slices/authSlice";
 import { User } from "@/interfaces/userInterface";
+import { ChangeCurrentPasswordCredentials } from "@/interfaces/authInterface";
+import { reset, resetPassword } from "@/redux/slices/userSlice";
 
 export default function SaveProfileChanges() {
   const dispatch = useAppDispatch()
-  const { user, userChange } = useAppSelector(state => state.user)
+  const { user, userChange, userCurrentPassword, userNewPassword } = useAppSelector(state => state.user)
 
   // handle on press to save change here
   const handleSaveChanges = () => {
@@ -20,6 +22,17 @@ export default function SaveProfileChanges() {
         dispatch(getUserInfo()).then(() => {
           dispatch(setUserChangeSaved(true))
         })
+      })
+    }
+
+    if (userNewPassword != "") {
+      const credentials: ChangeCurrentPasswordCredentials = {
+        email: user.email!,
+        current_password: userCurrentPassword,
+        new_password: userNewPassword
+      }
+      dispatch(changeCurrentPassword(credentials)).then(() => {
+        // dispatch(resetPassword())
       })
     }
   };

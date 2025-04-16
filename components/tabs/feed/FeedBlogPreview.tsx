@@ -8,15 +8,150 @@ import AnimatedPressable from "@/components/AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "@/redux/hook";
+import { dislikeBlog, dislikeToLikeBlog, likeBlog, likeToDislikeBlog, removeDislikeBlog, removeLikeBlog, saveBlog, unsaveBlog } from "@/redux/slices/blogSlice";
+import { getUserBlogDislikeActivities, getUserBlogLikeActivities, getUserBlogSaveActivities } from "@/redux/slices/authSlice";
 export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   // default to mock blog for this, but later will be passed as props
   const route = useRouter();
+  const dispatch = useAppDispatch()
   const handlePress = () => {
     console.log("Blog Pressed");
     route.push({
       pathname: `/blog?userBlogId=${blog._id}`,
     });
   };
+
+  let isReactInProgress = false
+  const [likes, setLikes] = useState(123)
+  const [dislikes, setDislikes] = useState(123)
+  const [comments, setComments] = useState(123)
+  const [blogLiked, setBlogLiked] = useState<boolean>(false)
+  const [blogDisliked, setBlogDisliked] = useState<boolean>(false)
+  const [blogSaved, setBlogSaved] = useState<boolean>(false)
+
+  useEffect(() => {
+    setLikes(blog.Reaction.Likes)
+    setDislikes(blog.Reaction.Dislikes)
+    setComments(blog.Reaction.Comments)
+    
+    dispatch(getUserBlogLikeActivities(blog._id)).then((data) => {
+      setBlogLiked(data.payload as boolean)
+    })
+    dispatch(getUserBlogDislikeActivities(blog._id)).then((data) => {
+      setBlogDisliked(data.payload as boolean)
+    })
+    dispatch(getUserBlogSaveActivities(blog._id)).then((data) => {
+      setBlogSaved(data.payload as boolean)
+    })
+  }, [])
+
+  const handleLike = () => {
+    if (isReactInProgress) {
+      console.log("A react is already in progress")
+      return
+    }
+
+    isReactInProgress = true
+
+    if (blogLiked) {
+      dispatch(removeLikeBlog(blog._id)).then(() => {
+        setLikes(likes - 1)
+
+        setBlogLiked(false)
+
+        isReactInProgress = false
+      })
+    }
+    else {
+      if (blogDisliked) {
+        dispatch(dislikeToLikeBlog(blog._id)).then(() => {
+          setLikes(likes + 1)
+          setDislikes(dislikes - 1)
+
+          setBlogLiked(true)
+          setBlogDisliked(false)
+
+          isReactInProgress = false
+        })
+      }
+      else {
+        dispatch(likeBlog(blog._id)).then(() => {
+          setLikes(likes + 1)
+
+          setBlogLiked(true)
+
+          isReactInProgress = false
+        })
+      }
+    }
+
+  }
+  const handleDislike = () => {
+    if (isReactInProgress) {
+      console.log("A react is already in progress")
+      return
+    }
+
+    isReactInProgress = true
+
+    if (blogDisliked) {
+      dispatch(removeDislikeBlog(blog._id)).then(() => {
+        setDislikes(dislikes - 1)
+
+        setBlogDisliked(false)
+
+        isReactInProgress = false
+      })
+    }
+    else {
+      if (blogLiked) {
+        dispatch(likeToDislikeBlog(blog._id)).then(() => {
+          setDislikes(dislikes + 1)
+          setLikes(likes - 1)
+
+          setBlogLiked(false)
+          setBlogDisliked(true)
+
+          isReactInProgress = false
+        })
+      }
+      else {
+        dispatch(dislikeBlog(blog._id)).then(() => {
+          setDislikes(dislikes + 1)
+
+          setBlogDisliked(true)
+
+          isReactInProgress = false
+        })
+      }
+    }
+  }
+  const handleBookmark = () => {
+    if (isReactInProgress) {
+      console.log("A react is already in progress")
+      return
+    }
+
+    isReactInProgress = true
+    
+    if (blogSaved) {
+      dispatch(unsaveBlog(blog._id))
+
+      setBlogSaved(false)
+
+      isReactInProgress = false
+    }
+    else {
+      dispatch(saveBlog(blog._id))
+
+      setBlogSaved(true)
+
+      isReactInProgress = false
+    }
+  }
+
   return (
     <View style={styles.outerContainer}>
       <Pressable style={styles.container} onPress={handlePress}>
@@ -33,10 +168,10 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
             <GroupPreviewInfo
               style={{}}
               group={{
-                name: `Group's name`,
-                avatar:
+                GroupName: `Group's name`,
+                GroupCoverURL:
                   "https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png",
-                numberOfMembers: 123,
+                TotalMembers: 123,
               }}
             />
           </View>
@@ -88,44 +223,52 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         {/* 4th Part: Interactions */}
         <View style={styles.interactSection}>
           {/* Likes */}
-          <View style={styles.likeContainer}>
-            <FontAwesome name="thumbs-up" size={24} color="#fff" />
-            <ThemedText
-              style={styles.text}
-              type="default"
-              lightColor="#fff"
-              darkColor="#fff"
-            >
-              123
-            </ThemedText>
-          </View>
-          {/* Dislikes */}
-          <View style={styles.dislikeContainer}>
-            <FontAwesome name="thumbs-down" size={24} color="#fff" />
-            {/* <ThemedText
-              style={styles.text}
-              type="default"
-              lightColor="#fff"
-              darkColor="#fff">
-              123
-            </ThemedText> */}
+          <View style={[styles.rowContainer, { gap: 20 }]}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={handleLike}>
+              <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#000" : "#fff"} />
+              <ThemedText
+                style={{ color: blogLiked ? "#000" : "#fff" }}
+                type="default"
+                lightColor="#fff"
+                darkColor="#fff"
+              >
+                {likes}
+              </ThemedText>
+            </TouchableOpacity>
+            {/* Dislikes */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={handleDislike}>
+              <FontAwesome name="thumbs-down" size={24} color={blogDisliked ? "#000" : "#fff"} />
+              {/* <ThemedText
+                style={styles.text}
+                type="default"
+                lightColor="#fff"
+                darkColor="#fff">
+                123
+              </ThemedText> */}
+            </TouchableOpacity>
           </View>
           {/* Comment */}
           <View style={styles.commentContainer}>
             <MaterialIcons name="comment" size={28} color="#fff" />
             <ThemedText
-              style={styles.text}
+              style={{ color: "#fff" }}
               type="default"
               lightColor="#fff"
               darkColor="#fff"
             >
-              123
+              {comments}
             </ThemedText>
           </View>
           {/* Bookmart Button */}
-          <View style={styles.bookmarkContainer}>
-            <FontAwesome name="bookmark" size={24} color="#fff" />
-          </View>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={blogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={handleBookmark}>
+            <FontAwesome name="bookmark" size={24} color={blogSaved ? "#000" : "#fff"} />
+          </TouchableOpacity>
         </View>
       </Pressable>
     </View>
@@ -225,7 +368,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  likeContainer: {
+  likeContainerYes: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 13,
+    backgroundColor: "#fff",
+  },
+  likeContainerNo: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -236,7 +389,17 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     backgroundColor: "rgba(60, 87, 73, 0.6)",
   },
-  dislikeContainer: {
+  dislikeContainerYes: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 13,
+    backgroundColor: "#fff",
+  },
+  dislikeContainerNo: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -258,7 +421,17 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     backgroundColor: "rgba(60, 87, 73, 0.6)",
   },
-  bookmarkContainer: {
+  bookmarkContainerYes: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 13,
+    backgroundColor: "#fff",
+  },
+  bookmarkContainerNo: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

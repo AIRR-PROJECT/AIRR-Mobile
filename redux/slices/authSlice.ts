@@ -242,7 +242,7 @@ export const getUserPreviewGroups = createAsyncThunk(
         const res = await api.get(`groups/get-preview-group-by-user-id?userID=${user_id}`)
 
         if (res.data.success) {
-            thunkAPI.dispatch(setUserPreviewGroup(res.data.data.groupList))
+            thunkAPI.dispatch(setUserPreviewGroup(res.data.data))
         }
         else {
             return thunkAPI.rejectWithValue(res.data.message)
@@ -334,9 +334,11 @@ export const getUserBlogLikeActivities = createAsyncThunk(
             if (res.data.success) {
                 if (res.data.data.activities.length > 0) {
                     thunkAPI.dispatch(setCurrentBlogLiked(true))
+                    return true
                 }
                 else {
                     thunkAPI.dispatch(setCurrentBlogLiked(false))
+                    return false
                 }
             }
             else {
@@ -358,9 +360,11 @@ export const getUserBlogDislikeActivities = createAsyncThunk(
             if (res.data.success) {
                 if (res.data.data.activities.length > 0) {
                     thunkAPI.dispatch(setCurrentBlogDisliked(true))
+                    return true
                 }
                 else {
                     thunkAPI.dispatch(setCurrentBlogDisliked(false))
+                    return false
                 }
             }
             else {
@@ -382,9 +386,11 @@ export const getUserBlogSaveActivities = createAsyncThunk(
             if (res.data.success) {
                 if (res.data.data.activities.length > 0) {
                     thunkAPI.dispatch(setCurrentBlogSaved(true))
+                    return true
                 }
                 else {
                     thunkAPI.dispatch(setCurrentBlogSaved(false))
+                    return false
                 }
             }
             else {

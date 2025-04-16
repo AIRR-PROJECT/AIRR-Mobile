@@ -49,6 +49,7 @@ export interface UserBlog {
     Description: string;
     BackgroundURL: string;
     UserInteraction: string;
+    IsSavedByUser: boolean;
     Reaction: UserBlogReaction;
     // content: string;
     // timestamp: string;

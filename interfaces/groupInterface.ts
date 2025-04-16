@@ -1,12 +1,13 @@
 import { User1 } from "./userInterface";
 
 export interface Group {
-    name: string;
+    GroupID: string,
+    GroupName: string;
     description: string;
     avatar: string;
-    image: string;
+    GroupCoverURL: string;
     members: string[];
-    numberOfMembers: number;
+    TotalMembers: number;
     timestamp: string;
     groupAdmin: User1;
     tags: string[];

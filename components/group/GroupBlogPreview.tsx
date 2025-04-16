@@ -34,10 +34,10 @@ export default function GroupBlogPreview({ blog }: { blog: UserBlog }) {
             <GroupPreviewInfo
               style={{}}
               group={{
-                GroupName: `Group's name`,
+                Name: `Group's name`,
                 GroupAvatarURL:
                   "https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png",
-                TotalMembers: 123,
+                NumberOfMembers: 123,
               }}
             />
           </View>

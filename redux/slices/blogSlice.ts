@@ -302,6 +302,13 @@ export const unsaveBlog = createAsyncThunk(
     } 
 )
 
+const createBlog = createAsyncThunk(
+    'blog/createBlog',
+    async () => {
+        
+    }
+)
+
 const blogSlice = createSlice({
     name: 'blog',
     initialState,

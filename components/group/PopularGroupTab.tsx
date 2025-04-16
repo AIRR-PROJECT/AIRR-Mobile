@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, SectionList } from "react-native";
 import PopularGroupCardComponent from "./PopularGroupCardComponent";
 import GroupCardComponent from "./GroupCardComponent";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useRef } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { Dimensions } from "react-native";
 import {
   Extrapolation,
@@ -13,6 +13,9 @@ import Carousel, {
   ICarouselInstance,
   Pagination,
 } from "react-native-reanimated-carousel";
+import { Group, PopularGroups } from "@/interfaces/groupInterface";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { getPopularGroups } from "@/redux/slices/groupSlice";
 const mockPopularGroup = {
   name: "Group nameadadadadadasdads",
   avatar: "https://picsum.photos/300",
@@ -28,39 +31,94 @@ const mockPopularGroup = {
 };
 const mockGroupList = Array(10).fill(mockPopularGroup);
 const mockPaginationList = Array(10).fill(""); 
-const DATA = [
+const MOCKDATA: { title: string, data: Group[] }[] = [
   {
     title: "Web",
     data: [
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
     ],
   },
@@ -68,34 +126,89 @@ const DATA = [
     title: "Mobile",
     data: [
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
     ],
   },
@@ -103,34 +216,89 @@ const DATA = [
     title: "Devops",
     data: [
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
     ],
   },
@@ -138,34 +306,89 @@ const DATA = [
     title: "Machine Learning",
     data: [
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
       {
-        id: "group name",
-        name: "Group name",
-        member: 350,
-        avatar: "https://picsum.photos/320",
+        _id: "group name",
+        Name: "Group name",
+        Description: "",
+        Owner: {
+          _id: "owner",
+          Username: "Owner",
+          AvatarURL: "https://picsum.photos/320"
+        },
+        NumberOfMembers: 350,
+        FieldName: "",
+        CoverURL: "",
+        Tags: [],
+        avatar: "",
+        members: [],
+        timestamp: ""
       },
     ],
   },
@@ -179,6 +402,8 @@ const DATA = [
 //   "#F1F1F1",
 // ];
 export default function PopularGroupTab() {
+  const dispatch = useAppDispatch()
+  const { popularGroups } = useAppSelector(state => state.group)
   const progress = useSharedValue(0);
 
   const carouselRef = useRef<ICarouselInstance>(null);
@@ -193,6 +418,27 @@ export default function PopularGroupTab() {
       animated: true,
     });
   };
+
+  const [groupData, setGroupData] = useState<{ title: string, data: Group[] }[]>([])
+  
+  useEffect(() => {
+    dispatch(getPopularGroups())
+  }, [])
+  
+  useEffect(() => {
+    console.log(popularGroups)
+    if (popularGroups) {
+      let data: SetStateAction<{ title: string; data: Group[]; }[]> = []
+      popularGroups.map((fieldData) => {
+        data.push({
+          title: fieldData.fieldName,
+          data: fieldData.groups
+        })
+      })
+      setGroupData(data)
+    }
+  }, [popularGroups])
+
   return (
     // Container for the Popular Group Screen
     <View style={styles.container}>
@@ -288,8 +534,8 @@ export default function PopularGroupTab() {
             />
           </View>
         )}
-        sections={DATA}
-        keyExtractor={(item, index) => item.id + index}
+        sections={groupData ?? MOCKDATA}
+        keyExtractor={(item, index) => item._id + index}
         renderSectionHeader={({ section: { title } }) => (
           <View style={[styles.rowContainer, { padding: 20 }]}>
             <Text style={styles.title}>{title}</Text>
@@ -305,10 +551,10 @@ export default function PopularGroupTab() {
         )}
         renderItem={({ item }) => (
           <GroupCardComponent
-            name={item.name}
-            id={item.id}
-            image={item.avatar}
-            members={item.member}
+            name={item.Name}
+            id={item.Owner.Username}
+            image={item.Owner.AvatarURL}
+            members={item.NumberOfMembers}
             style={{
               paddingHorizontal: 20,
             }}

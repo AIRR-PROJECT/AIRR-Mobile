@@ -1,15 +1,37 @@
 import { User1 } from "./userInterface";
 
 export interface Group {
-    GroupID: string,
-    GroupName: string;
-    description: string;
+    _id: string,
+    Name: string;
+    Description: string;
+    Owner: GroupOwner;
+    NumberOfMembers: number;
+    FieldName: string;
+    CoverURL: string;
+    Tags: GroupTag[];
     avatar: string;
-    GroupCoverURL: string;
     members: string[];
-    TotalMembers: number;
     timestamp: string;
-    groupAdmin: User1;
-    tags: string[];
 }
 
+export interface GroupOwner {
+    _id: string,
+    Username: string,
+    AvatarURL: string
+}
+
+export interface GroupField {
+    _id: string,
+    FieldName: string
+}
+
+export interface GroupTag {
+    _id: string;
+    TagName: string
+}
+
+export interface PopularGroups {
+    _id: string;
+    fieldName: string;
+    groups: Group[]
+}

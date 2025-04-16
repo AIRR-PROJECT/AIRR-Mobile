@@ -1,7 +1,10 @@
 import GroupTab from "@/components/group/GroupTab";
 import PopularGroupTab from "@/components/group/PopularGroupTab";
+import { GroupField } from "@/interfaces/groupInterface";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { getGroupPopularFields, getPopularGroups } from "@/redux/slices/groupSlice";
 import {  FontAwesome } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -10,52 +13,59 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const mockTags = [
-  { id: "1", name: "Popular" }, // Popular is the default selected tab with id "1"
-  { id: "2", name: "Web" },
-  { id: "3", name: "Devops" },
-  { id: "4", name: "AI" },
-  { id: "5", name: "Mobile" },
-  { id: "6", name: "Blockchain" },
-  { id: "7", name: "Security" },
-  { id: "8", name: "Cloud" },
-  { id: "9", name: "Data Science" },
-  { id: "10", name: "Game Development" },
-  { id: "11", name: "VR/AR" },
-  { id: "12", name: "IoT" },
-  { id: "13", name: "Quantum Computing" },
-  { id: "14", name: "Robotics" },
+let fields: GroupField[] = [
+  { _id: "1", FieldName: "Popular" }, // Popular is the default selected tab with id "1"
 ];
 export default function GroupPopularTab() {
+  const dispatch = useAppDispatch()
+  const { popularFields } = useAppSelector(state => state.group)
+
   const [selectedId, setSelectedId] = useState("1");
+
+  useEffect(() => {
+    dispatch(getGroupPopularFields())
+  }, [])
+
+  useEffect(() => {
+    if (popularFields) {
+      fields.push(...popularFields)
+    }
+  }, [popularFields])
+
+  useEffect(() => {
+    if (selectedId === "1") {
+      dispatch(getPopularGroups())
+    }
+  }, [selectedId])
+
   console.log("selectedId", selectedId);
   return (
     <View style={styles.container}>
       {/* list tags */}
       <View style={styles.rowWrapper}>
         <FlatList
-          data={mockTags}
+          data={fields}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
                 styles.tabItem,
-                selectedId === item.id && styles.tabItemActive,
+                selectedId === item._id && styles.tabItemActive,
               ]}
               onPress={() => {
-                setSelectedId(item.id);
+                setSelectedId(item._id);
               }}
             >
               <Text
                 style={{
-                  color: selectedId === item.id ? "#fff" : "#8A94AC",
+                  color: selectedId === item._id ? "#fff" : "#8A94AC",
                   fontWeight: "bold",
                 }}
               >
-                {item.name}
+                {item.FieldName}
               </Text>
             </TouchableOpacity>
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}

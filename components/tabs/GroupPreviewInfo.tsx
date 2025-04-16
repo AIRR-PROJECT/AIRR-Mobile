@@ -2,7 +2,7 @@ import { View, Image, StyleSheet, ViewStyle } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { Group } from "@/interfaces/groupInterface";
 
-type BlogGroup = Pick<Group, "GroupName" | "GroupCoverURL" | "TotalMembers">;
+type BlogGroup = Pick<Group, "Name" | "CoverURL" | "NumberOfMembers">;
 
 interface BlogInGroupProps {
   group: BlogGroup;
@@ -19,7 +19,7 @@ export default function GroupPreviewInfo({ group, style }: BlogInGroupProps) {
           lightColor="#fff"
           darkColor="#fff"
         >
-          {group.GroupName}
+          {group.Name}
         </ThemedText>
         <ThemedText
           style={styles.memberCount}
@@ -27,10 +27,10 @@ export default function GroupPreviewInfo({ group, style }: BlogInGroupProps) {
           lightColor="#fff"
           darkColor="#fff"
         >
-          {group.TotalMembers} members
+          {group.NumberOfMembers} members
         </ThemedText>
       </View>
-      <Image source={{ uri: group.GroupCoverURL }} style={styles.image} />
+      <Image source={{ uri: group.CoverURL }} style={styles.image} />
     </View>
   );
 }

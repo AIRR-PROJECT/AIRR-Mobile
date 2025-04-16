@@ -45,7 +45,7 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
               >
                 Group
               </ThemedText> */}
-              <GroupPreviewInfo style={{}} group={{GroupName:`Group's name`, GroupCoverURL: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', TotalMembers: 123} }/>
+              <GroupPreviewInfo style={{}} group={{Name:`Group's name`, CoverURL: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', NumberOfMembers: 123} }/>
             </View>
             {/* Ask later because it take to much space */}
             {/* <View style={styles.buttonSection}>

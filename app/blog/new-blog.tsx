@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback } from "react";
+import { useRef, useMemo, useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -11,27 +11,55 @@ import {
   GestureHandlerRootView,
   TextInput,
 } from "react-native-gesture-handler";
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetFlatList,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
 import QuillEditor from "@/components/dom-components/QuillEditor.tsx/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
+import { set } from "react-hook-form";
+import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
 const mockGroup = {
   name: "Group's name",
   avatar: "https://picsum.photos/300",
   id: "123",
 };
 const mockGroupList = Array(25).fill(mockGroup);
-
+const mockTags = [
+  "aimachine",
+  "web3",
+  "blockchain",
+  "crypto",
+  "nft",
+  "ai",
+  "machine learning",
+  "artificial intelligence",
+  "technology",
+  "innovation",
+  "future",
+  "science",
+  "data science",
+  "big data",
+  "cloud computing",
+  "internet of things",
+  "iot",
+  "augmented reality",
+  "virtual reality",
+  "mixed reality",
+];
 export default function NewBlog() {
+  const [chosenGroup, setChosenGroup] = useState("");
+  const [chosenTags, setChosenTags] = useState<string[]>([]);
   // Bottom Sheet Refs
   const groupSheetRef = useRef<BottomSheet>(null);
   const tagsSheetRef = useRef<BottomSheet>(null);
   // Variables
-  const groupSnapPoints = useMemo(() => ["25%", "50%", "90%"], []);
-  const tagsSnapPoints = useMemo(() => ["25%", "50%", "90%"], []);
+  const groupSnapPoints = useMemo(() => ["50%", "90%"], []);
+  const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
   // Callbacks
   const handleGroupSnapPress = useCallback((index: number) => {
     groupSheetRef.current?.snapToIndex(index);
@@ -61,10 +89,27 @@ export default function NewBlog() {
         avatar={item.avatar}
         name={item.name}
         id={item.id}
+        onPress={(data) => {
+          console.log("Group selected:", data.name);
+          setChosenGroup(data.name);
+          handleGroupSnapClose();
+        }}
       />
     ),
     []
   );
+  const onPressTag = useCallback(
+    (listTags: string[]) => {
+      console.log("List tags selected:", listTags);
+      setChosenTags(listTags);
+    },
+    [chosenTags]
+  );
+  const handleCreateGroup = () => {
+    // Handle create group logic here
+    console.log("Create Group Pressed");
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -89,7 +134,9 @@ export default function NewBlog() {
             >
               <FontAwesome name="group" size={24} color="#fff" />
 
-              <Text style={styles.headingTitle}>Select Group To Post</Text>
+              <Text style={styles.headingTitle}>
+                {chosenGroup === "" ? "Select Group To Post" : chosenGroup}
+              </Text>
               <IconSymbol
                 name="chevron.right"
                 size={24}
@@ -111,22 +158,31 @@ export default function NewBlog() {
         {/* Tags Selection */}
         <View style={[styles.rowContainer]}>
           <View style={styles.divider} />
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, }}>
             <TouchableOpacity
-              style={styles.heading}
-              onPress={() => handleGroupSnapPress(0)}
+              style={[styles.heading]}
+              onPress={() => handleTagsSnapPress(0)}
               activeOpacity={0.8}
             >
               <Feather name="flag" size={24} color="#fff" />
 
-              <Text style={styles.headingTitle}>Select Tags for blog</Text>
-              <IconSymbol
-                name="chevron.right"
-                size={24}
-                weight="medium"
-                color={"#fff"}
-              />
+              <View style={styles.tagsColumn}>
+                {chosenTags.length > 0 ? (
+                  chosenTags.map((tag) => <TagWrapper key={tag} tag={tag} />)
+                ) : (
+                  <Text style={styles.headingTitle}>Select Tags for blog</Text>
+                )}
+              </View>
+              
+                <IconSymbol
+                  name="chevron.right"
+                  size={24}
+                  weight="medium"
+                  color={"#fff"}
+                />
+              
             </TouchableOpacity>
+            
           </View>
         </View>
 
@@ -209,7 +265,7 @@ export default function NewBlog() {
           <View style={styles.divider} />
           <View style={{ flex: 1 }}>
             {/* QuillJS Here */}
-            <QuillEditor dom={{matchContents: true}} />
+            <QuillEditor dom={{ matchContents: true }} />
           </View>
         </View>
         {/* Post button */}
@@ -232,6 +288,13 @@ export default function NewBlog() {
         handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
         onChange={handleGroupSheetChange}
       >
+        <TouchableOpacity
+          onPress={handleCreateGroup}
+          style={styles.createGroupButton}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.createGroupButtonText}>Create New Group</Text>
+        </TouchableOpacity>
         <BottomSheetFlatList
           data={mockGroupList}
           keyExtractor={(item, index) => index.toString()}
@@ -241,11 +304,29 @@ export default function NewBlog() {
           showsVerticalScrollIndicator={false}
         />
       </BottomSheet>
-      
+      <BottomSheet
+        ref={tagsSheetRef}
+        index={-1} // Start closed
+        snapPoints={tagsSnapPoints}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: "#212531" }}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        onChange={handleGroupSheetChange}
+      >
+        <BottomSheetView>
+          <TagDropdownComponent tags={mockTags} onPress={onPressTag} />
+        </BottomSheetView>
+      </BottomSheet>
     </GestureHandlerRootView>
   );
 }
-
+function TagWrapper({ tag }: { tag: string }) {
+  return (
+    <View style={styles.tagWrapper}>
+      <Text style={styles.tag}># {tag}</Text>
+    </View>
+  );
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -298,6 +379,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#212531",
     borderRadius: 90,
     padding: 20,
+    flex: 1,
   },
   headingTitle: {
     fontSize: 16,
@@ -335,5 +417,34 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000",
     fontWeight: "bold",
-  }
+  },
+  createGroupButton: {
+    backgroundColor: "#B9FF66",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 20,
+    marginTop: 10,
+  },
+  createGroupButtonText: {
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "bold",
+  },
+  tag: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  tagWrapper: {
+    backgroundColor: "#2E3B40",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginHorizontal: 10,
+    borderRadius: 9,
+  },
+  tagsColumn: {
+    gap: 8,
+    alignItems: "center",
+  },
 });

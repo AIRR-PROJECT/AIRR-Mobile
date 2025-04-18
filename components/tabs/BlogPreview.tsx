@@ -1,5 +1,5 @@
 import { UserBlog } from "@/interfaces/blogInterface";
-import { ImageBackground, StyleSheet, View } from "react-native";
+import { ImageBackground, StyleSheet, View, Text } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import BlogAuthor from "./BlogAuthor";
@@ -26,38 +26,13 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
           {/* 1st Part: User, Group, Button */}
           <View style={styles.topSection}>
             <View style={styles.userSection}>
-              {/* <ThemedText
-                style={styles.text}
-                type="default"
-                lightColor="#fff"
-                darkColor="#fff"
-              >
-                User
-              </ThemedText> */}
-              <BlogAuthor author={{name: 'username', avatar: 'https://i.pravatar.cc/150'}}/>
+              <BlogAuthor
+                author={{
+                  name: "username",
+                  avatar: "https://i.pravatar.cc/150",
+                }}
+              />
             </View>
-            <View style={styles.groupSection}>
-              {/* <ThemedText
-                style={styles.text}
-                type="default"
-                lightColor="#fff"
-                darkColor="#fff"
-              >
-                Group
-              </ThemedText> */}
-              <GroupPreviewInfo style={{}} group={{name:`Group's name`, avatar: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', numberOfMembers: 123} }/>
-            </View>
-            {/* Ask later because it take to much space */}
-            {/* <View style={styles.buttonSection}>
-              <ThemedText
-                style={styles.text}
-                type="default"
-                lightColor="#fff"
-                darkColor="#fff"
-              >
-                Button
-              </ThemedText>
-            </View> */}
           </View>
 
           {/* 2nd Part: Title */}
@@ -87,15 +62,12 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
           {/* 4th Part: List of Tags */}
           <View style={styles.tagsSection}>
             {blog.tags.map((tag, index) => (
-              <ThemedText
+              <Text
                 key={index}
                 style={styles.tag}
-                type="default"
-                lightColor="#fff"
-                darkColor="#fff"
               >
                 #{tag}
-              </ThemedText>
+              </Text>
             ))}
           </View>
         </Pressable>
@@ -112,8 +84,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   imageBackground: {
-    width: "100%",
-    height: 400,
+    flex: 1,
   },
   imageStyle: {
     borderRadius: 16,
@@ -122,7 +93,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent overlay
-    
   },
   topSection: {
     flex: 1,
@@ -178,8 +148,7 @@ const styles = StyleSheet.create({
   tag: {
     margin: 8,
     padding: 2,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
     borderRadius: 8,
-    
   },
 });

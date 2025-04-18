@@ -1,4 +1,4 @@
-import { Image, StyleSheet } from "react-native";
+import { Image, StyleSheet, View, Text } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -37,24 +37,20 @@ export default function DashboardScreen() {
     // correct the darkColor and lightColor values later
     <ParallaxScrollView style={{ flex: 1 }}>
       {/* Title */}
-      <ThemedView
+      <View
         style={styles.titleContainer}
-        darkColor="#1E1E1E"
-        lightColor="#1E1E1E"
+   
       >
-        <ThemedText
+        <Text
           style={styles.titleText}
-          type="title"
-          darkColor="#fff"
-          lightColor="#fff"
         >
           Let's Post A New Blog
-        </ThemedText>
+        </Text>
         <ButtonGradient
           style={styles.titleButton}
           label="POST NOW"
         ></ButtonGradient>
-      </ThemedView>
+      </View>
       {/*  */}
       <ThemedView style={styles.longTextContainer}>
         <ThemedText type="default" lightColor="#fff" darkColor="#fff" style={{textAlign: "justify"}}>
@@ -88,6 +84,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexWrap: "wrap",
     width: "100%",
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#fff",
   },
   titleButton: {
     width: 150,

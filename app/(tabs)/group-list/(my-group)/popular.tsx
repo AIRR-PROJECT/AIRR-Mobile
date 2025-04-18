@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View,TouchableOpacity } from "react-native";
 import GroupCardComponent from "@/components/group/GroupCardComponent";
 const mockGroup = {
   image: "https://picsum.photos/200",
@@ -21,7 +21,21 @@ const mockGroups = [
 export default function GroupPopularTab() {
   return (
     <View style={styles.container}>
+      {/* Temp button to create group */}
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#2E2E2E",
+          padding: 10,
+          borderRadius: 5,
+          marginBottom: 20,
+        }}
+      >
+        <Text style={{ color: "#fff", textAlign: "center" }}>
+          Create Group
+        </Text>
+      </TouchableOpacity>
       <FlatList
+
         data={mockGroups}
         renderItem={({ item }) => (
           <GroupCardComponent

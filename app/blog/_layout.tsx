@@ -57,6 +57,13 @@ export default function BlogLayout() {
             headerTitleStyle: {},
           }}
         />
+        <Stack.Screen
+          name="ai-blog"
+          options={{
+            headerShown: false,
+            
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

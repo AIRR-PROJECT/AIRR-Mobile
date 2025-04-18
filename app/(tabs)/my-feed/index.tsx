@@ -159,16 +159,6 @@ export default function MyFeed() {
 
   const carouselRef = useRef<ICarouselInstance>(null);
 
-  const onPressPagination = (index: number) => {
-    carouselRef.current?.scrollTo({
-      /**
-       * Calculate the difference between the current index and the target index
-       * to ensure that the carousel scrolls to the nearest index
-       */
-      count: index - progress.value,
-      animated: true,
-    });
-  };
   return (
     <View style={styles.container}>
       {/* Flat list for lazy load */}
@@ -228,12 +218,12 @@ export default function MyFeed() {
                       autoPlay={true}
                       data={recommendedBlogsQuery.data as AIBlog[]}
                       loop={true}
-                      width={Dimensions.get("window").width}
+                      width={Dimensions.get("window").width }
                       height={Dimensions.get("window").height / 3}
                       pagingEnabled={true}
                       snapEnabled={true}
                       style={{
-                        width: Dimensions.get("window").width - 30,
+                        width: Dimensions.get("window").width,
                       }}
                       mode="parallax"
                       modeConfig={{

@@ -161,6 +161,8 @@ const mockSections: AIBlogSection[] = [
 
 export default function BlogScreen() {
   const searchParams = useLocalSearchParams<{ aiBlogId: string, userBlogId: string }>()
+  // if (searchParams.aiBlogId) {
+  
   const { width } = useWindowDimensions();
   const route = useRouter();
   const dispatch = useAppDispatch()

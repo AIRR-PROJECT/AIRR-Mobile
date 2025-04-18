@@ -8,7 +8,6 @@ import AuthButton from "@/components/auth/AuthButton";
 import ImageViewer from "@/components/ImageViewer";
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import { Dimensions, TouchableOpacity } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { logout, loadToken, getUserInfo } from "@/redux/slices/authSlice";

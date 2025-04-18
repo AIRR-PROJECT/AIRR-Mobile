@@ -1,11 +1,11 @@
 import { AIBlog, UserBlog } from "@/interfaces/blogInterface";
-import { ImageBackground, StyleSheet, View } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import AnimatedPressable from "@/components/AnimatedPressable";
-import { Pressable, TouchableOpacity } from "react-native";
-import { formatISODate, formatUnixDate } from "@/utils/dateConvert";
+import { StyleSheet, View } from "react-native";
+import { TouchableOpacity, Text } from "react-native";
+import { Image, ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
+
+// TODO:  add thumbnail to the AI Blog interface
+const mockThumbnail = "https://picsum.photos/400/200";
 export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
   const route = useRouter();
   const handlePress = () => {
@@ -16,38 +16,24 @@ export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
   };
   return (
     <View style={styles.outerContainer}>
-      <ImageBackground
-        source=/* {{ uri: blog.image }} */ {{ uri: ""}}
-        style={styles.imageBackground}
-        imageStyle={styles.imageStyle}
+      <TouchableOpacity
+        style={styles.container}
+        onPress={handlePress}
+        activeOpacity={0.8}
       >
-        <Pressable style={styles.container} onPress={handlePress}>
-          {/* 1st Part: Date  */}
-
-          {/* <View style={styles.timeSection}>
-            <ThemedText
-              style={styles.timeText}
-              type="default"
-              lightColor="#fff"
-              darkColor="#fff"
-            >
-              {formatISODate(blog.timestamp)}
-            </ThemedText>
-          </View> */}
-
-          {/* 2nd Part: Title */}
-          <View style={styles.titleSection}>
-            <ThemedText
-              style={styles.title}
-              type="title"
-              lightColor="#fff"
-              darkColor="#fff"
-            >
-              {blog.Title}
-            </ThemedText>
-          </View>
-        </Pressable>
-      </ImageBackground>
+        {/* 1st Part: Title */}
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>{blog.Title}</Text>
+        </View>
+        {/* 2nd Part: Thumbnail */}
+        <ImageBackground
+          source={mockThumbnail}
+          imageStyle={styles.thumbnailStyle}
+          style={styles.thumbnail}
+        >
+          <Text style={styles.description}>{blog.Description}</Text>
+        </ImageBackground>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -59,24 +45,29 @@ const styles = StyleSheet.create({
     borderColor: "#48576E",
     borderWidth: 2,
   },
-  imageBackground: {
+  thumbnail: {
     width: 300,
-    height: 250,
+    height: 150,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
   },
-  imageStyle: {
+  thumbnailStyle: {
     borderRadius: 16,
   },
   container: {
     flex: 1,
+    alignItems: "center",
+    width: 350,
     padding: 16,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent overlay
+    backgroundColor: "#fff", // Semi-transparent overlay
   },
 
   timeSection: {
     flex: 0.5,
     justifyContent: "center",
     alignItems: "center",
- 
   },
 
   buttonSection: {
@@ -86,7 +77,9 @@ const styles = StyleSheet.create({
   },
   titleSection: {
     flex: 1,
+    width: "90%",
     justifyContent: "center",
+    marginBottom: 8,
   },
   contentSection: {
     flex: 1,
@@ -102,7 +95,7 @@ const styles = StyleSheet.create({
   text: {
     color: "#fff",
   },
-  timeText:{
+  timeText: {
     color: "#1E1E1E",
     borderWidth: 1,
     borderColor: "#fff",
@@ -115,20 +108,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   title: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000",
   },
   description: {
     fontSize: 16,
     color: "#fff",
+    textAlign: "justify",
   },
   tag: {
     marginVertical: 5,
     marginRight: 8,
-    padding: 5 ,
+    padding: 5,
     backgroundColor: "rgba(114, 150, 115, 0.5)",
     borderRadius: 999,
- 
   },
 });

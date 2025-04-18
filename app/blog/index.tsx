@@ -3,19 +3,14 @@ import {
   Text,
   StyleSheet,
   useWindowDimensions,
-  BackHandler,
-  ScrollView,
-  Pressable,
   TouchableOpacity,
   FlatList,
   RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import {
-  router,
   useLocalSearchParams,
   useRouter,
-  useSegments,
 } from "expo-router";
 import RenderHTML from "react-native-render-html";
 import { useEffect, useState } from "react";
@@ -31,7 +26,6 @@ import BlogAuthor from "@/components/tabs/BlogAuthor";
 import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
 import BlogTagButton from "@/components/blog/BlogTagButton";
 import { ThemedText } from "@/components/ThemedText";
-import { color } from "@rneui/base";
 import BlogCommenter from "@/components/blog/BlogCommenter";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import * as SplashScreen from "expo-splash-screen";

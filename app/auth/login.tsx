@@ -111,7 +111,7 @@ export default function LoginScreen() {
   };
 
   const handleSignUp = () => {
-    router.push("/auth/sign-up");
+    router.push("/auth/sign-up-first-page");
   };
   return (
     <ThemedView

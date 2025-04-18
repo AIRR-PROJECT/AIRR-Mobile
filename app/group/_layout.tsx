@@ -48,7 +48,7 @@ export default function GroupLayout() {
       >
         {/* Define the screens for the navigation stack */}
         <Stack.Screen name="index" options={{ headerTitle: "" }} />
-        
+        <Stack.Screen name="create-group" options={{ headerTitle: "" }} />
       </Stack>
     </ThemeProvider>
   );

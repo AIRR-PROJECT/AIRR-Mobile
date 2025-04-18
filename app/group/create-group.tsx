@@ -1,51 +1,223 @@
-import React from "react";
 import {
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
 } from "react-native";
+import { Image } from "expo-image";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import UploadGroupAvatarComponent from "@/components/group/UploadThumbnailComponent";
+import { useCallback, useMemo, useRef, useState } from "react";
+import BottomSheet, {
+  BottomSheetFlatList,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
+import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
+
+// temporary use this cause figma not provide the image
+const mockGroup = {
+  name: "Group's name",
+  avatar: "https://picsum.photos/300",
+  id: "123",
+};
+const mockGroupList = Array(25).fill(mockGroup);
 export default function CreateGroup() {
+  const [groupName, setGroupName] = useState("");
+  const [groupDescription, setGroupDescription] = useState("");
+  const [groupRules, setGroupRules] = useState("");
+
+  const fieldRef = useRef<BottomSheet>(null);
+  const fieldSnapPoints = useMemo(() => ["30%", "50%"], []);
+  const handleFieldSnapPress = useCallback((index: number) => {
+    fieldRef.current?.snapToIndex(index);
+  }, []);
+  const handleFieldSheetChange = useCallback((index: any) => {
+    console.log("handleGroupSheetChange", index);
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create a New Group</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Group Name"
-        placeholderTextColor="#888"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Group Description"
-        placeholderTextColor="#888"
-      />
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Create Group</Text>
-      </TouchableOpacity>
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+      >
+        <Image
+          source={avatar_arc}
+          style={styles.image}
+          contentFit="contain"
+          transition={1000}
+        />
+        <View style={[styles.rowContainer, { marginBottom: 10 }]}>
+          <MaterialCommunityIcons
+            name="note-plus-outline"
+            size={24}
+            color="#B9FF66"
+          />
+          <Text style={[styles.title, { paddingLeft: 5 }]}>
+            Create a New Group
+          </Text>
+        </View>
+        {/* description */}
+        <Text style={styles.description}>
+          Innovation thrives in collaboration. Create a new group and connect
+          with like-minded tech enthusiasts to shape the future together
+        </Text>
+        {/* Group avatar */}
+        <Text
+          style={[styles.title, { alignSelf: "flex-start", paddingBottom: 10 }]}
+        >
+          Group Avatar
+        </Text>
+        <UploadGroupAvatarComponent />
+        {/* Group Detail */}
+        <Text
+          style={[
+            styles.title,
+            { alignSelf: "flex-start", paddingBottom: 10, paddingTop: 20 },
+          ]}
+        >
+          Group Details
+        </Text>
+        {/* Group Name Input + Character Counter */}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            value={groupName}
+            onChangeText={(text) => {
+              if (text.length <= 30) setGroupName(text);
+            }}
+            placeholder="Enter Group Name *"
+            placeholderTextColor="#888"
+          />
+          <Text style={styles.counter}>{groupName.length}/30</Text>
+        </View>
+        {/* Select Group Field */}
+
+        <TouchableOpacity
+          onPress={() => handleFieldSnapPress(0)}
+          activeOpacity={0.8}
+          style={styles.heading}
+        >
+          <Text style={[styles.buttonText]}>Select Group's Field *</Text>
+          <IconSymbol
+            name="chevron.right"
+            size={24}
+            weight="medium"
+            color={"#fff"}
+            style={{ marginRight: 20 }}
+          />
+        </TouchableOpacity>
+        {/* Group Description Input + Character Counter */}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={[styles.multilineInput]}
+            value={groupDescription}
+            onChangeText={(text) => {
+              if (text.length <= 100) setGroupDescription(text);
+            }}
+            multiline={true}
+            placeholder="Enter Group Description *"
+            placeholderTextColor="#888"
+          />
+          <Text style={styles.counter}>{groupDescription.length}/100</Text>
+        </View>
+        {/* Group Rules Input + Character Counter */}
+        <View style={[styles.inputWrapper, { marginBottom: 40 }]}>
+          <TextInput
+            style={[styles.multilineInput]}
+            value={groupRules}
+            onChangeText={(text) => {
+              if (text.length <= 100) setGroupRules(text);
+            }}
+            multiline={true}
+            placeholder="Enter Group Rules *"
+            placeholderTextColor="#888"
+          />
+          <Text style={styles.counter}>{groupRules.length}/100</Text>
+        </View>
+
+        {/* Group Selection Bottom Sheet */}
+        <BottomSheet
+          ref={fieldRef}
+          index={-1} // Start closed
+          snapPoints={fieldSnapPoints}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: "#212531" }}
+          handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+          onChange={handleFieldSheetChange}
+          maxDynamicContentSize={700}
+        >
+          <BottomSheetScrollView
+            contentContainerStyle={styles.groupListContent}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+            overScrollMode="never"
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            nestedScrollEnabled={true}
+            style={{ flexGrow: 1 }}
+          >
+            {/* Group List */}
+            {/* Change to actual field later */}
+            {mockGroupList.map((item, index) => (
+              <GroupDropdownComponent
+                key={index}
+                avatar={item.avatar}
+                name={item.name}
+                id={item.id}
+              />
+            ))}
+          </BottomSheetScrollView>
+        </BottomSheet>
+      </ScrollView>
+    </GestureHandlerRootView>
   );
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
+    flexGrow: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#1E1E1E",
+  },
+
+  contentContainer: {
+    justifyContent: "center",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  image: {
+    width: "100%",
+    height: 120,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
     textAlign: "center",
+    color: "#fff",
   },
   input: {
     height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    borderRadius: 20,
+    paddingHorizontal: 40,
+    backgroundColor: "#212531",
+    color: "#fff",
+  },
+  multilineInput: {
+    height: 100,
+    borderColor: "#fff",
+    borderRadius: 20,
+    paddingHorizontal: 40,
+    paddingVertical: 12,
+    backgroundColor: "#212531",
+    textAlignVertical: "top",
+    color: "#fff",
   },
   button: {
     backgroundColor: "#007BFF",
@@ -53,8 +225,39 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonText: {
+    color: "#888",
+    fontSize: 16,
+    paddingVertical: 15,
+    paddingLeft: 40,
+    flex: 1,
+  },
+  description: {
+    color: "#B7B7B7",
+    textAlign: "justify",
+    marginBottom: 20,
+  },
+  inputWrapper: {
+    position: "relative",
+    marginBottom: 15,
+  },
+  counter: {
+    position: "absolute",
+    right: 20,
+    bottom: 17,
     color: "#fff",
-    textAlign: "center",
-    fontSize: 18,
+    fontSize: 12,
+  },
+  // remove later
+  groupListContent: {
+    padding: 16,
+    backgroundColor: "#212531",
+  },
+  heading: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#212531",
+    borderRadius: 20,
+    marginBottom: 15,
   },
 });

@@ -5,11 +5,13 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { goBack } from "expo-router/build/global-state/routing";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -33,23 +35,79 @@ export default function GroupLayout() {
   if (!loaded) {
     return null;
   }
-
+  const route = useRouter();
+  const handleGoBack = () => {
+    route.back();
+  };
+  const handleCreateGroup = () => {
+    // Handle the creation of a new group
+    // This function can be implemented to create a new group
+    // and navigate to the appropriate screen
+    // For now, it just logs a message
+    console.log("Create group button pressed");
+  }
   // Render the app layout with theme provider and navigation stack
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack
         screenOptions={{
-          headerStyle:{
+          headerStyle: {
             backgroundColor: "#1E1E1E",
-            
           },
           headerTintColor: "#fff",
         }}
       >
         {/* Define the screens for the navigation stack */}
         <Stack.Screen name="index" options={{ headerTitle: "" }} />
-        <Stack.Screen name="create-group" options={{ headerTitle: "" }} />
+        <Stack.Screen
+          name="create-group"
+          options={{
+            headerTitle: "",
+            headerLeft: () => (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                activeOpacity={0.7}
+                onPress={handleGoBack}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            ),
+            headerRight: () => (
+              <TouchableOpacity
+                style={styles.createButton}
+                activeOpacity={0.7}
+                onPress={handleCreateGroup}
+              >
+                <Text style={styles.createButtonText}>+ New Group</Text>
+              </TouchableOpacity>
+            ),
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
 }
+const styles = StyleSheet.create({
+  cancelButton: {
+    padding: 10,
+    backgroundColor: "#1B1F26",
+    borderRadius: 999,
+  },
+  cancelButtonText: {
+    color: "#DCDCDC",
+    fontSize: 16,
+    paddingHorizontal: 20,
+    fontWeight: "bold",
+  },
+  createButton: {
+    padding: 10,
+    backgroundColor: "#B9FF66",
+    borderRadius: 999,
+  },
+  createButtonText: {
+    color: "#000",
+    fontSize: 16,
+    paddingHorizontal: 15,
+    fontWeight: "bold",
+  },
+});

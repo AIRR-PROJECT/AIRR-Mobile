@@ -1,5 +1,5 @@
 import { AIBlog, UserBlog } from "@/interfaces/blogInterface";
-import { StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { TouchableOpacity, Text } from "react-native";
 import { Image, ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
@@ -44,24 +44,27 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderColor: "#48576E",
     borderWidth: 2,
+    width: Dimensions.get("window").width,
+    height: 280,
   },
   thumbnail: {
-    width: 300,
+    width: Dimensions.get("window").width - 50,
     height: 150,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+    overflow: "hidden",
   },
   thumbnailStyle: {
     borderRadius: 16,
   },
   container: {
-    flex: 1,
     alignItems: "center",
-    width: 350,
+    flex: 1,
     padding: 16,
-    backgroundColor: "#fff", // Semi-transparent overlay
+    backgroundColor: "#fff", 
+    overflow: "hidden",
   },
 
   timeSection: {

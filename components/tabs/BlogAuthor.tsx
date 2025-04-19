@@ -6,11 +6,12 @@ import { User1 } from "@/interfaces/userInterface";
 type Author = Pick<User1, "name" | "avatar">;
 
 interface BlogAuthorProps {
-    author: Author;
-    style?: ViewStyle;
+  author: Author;
+  style?: ViewStyle;
+  time?: string;
 }
-const mockDate = '12 minutes ago'
-export default function BlogAuthor({ author, style }: BlogAuthorProps) {
+const mockDate = "12 minutes ago";
+export default function BlogAuthor({ author, style, time }: BlogAuthorProps) {
   return (
     <View style={[styles.container, style]}>
       <Image source={{ uri: author.avatar }} style={styles.image} />
@@ -29,7 +30,7 @@ export default function BlogAuthor({ author, style }: BlogAuthorProps) {
           lightColor="#fff"
           darkColor="#fff"
         >
-          {mockDate}
+          {mockDate ?? time}
         </ThemedText>
       </View>
     </View>
@@ -43,8 +44,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   image: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     borderRadius: 25,
   },
   textContainer: {

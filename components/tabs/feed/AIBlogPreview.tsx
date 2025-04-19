@@ -3,6 +3,8 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { TouchableOpacity, Text } from "react-native";
 import { Image, ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
 
 // TODO:  add thumbnail to the AI Blog interface
 const mockThumbnail = "https://picsum.photos/400/200";
@@ -32,6 +34,7 @@ export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
           style={styles.thumbnail}
         >
           <Text style={styles.description}>{blog.Description}</Text>
+          <BottomLeftArrowIcon />
         </ImageBackground>
       </TouchableOpacity>
     </View>
@@ -63,7 +66,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     padding: 16,
-    backgroundColor: "#fff", 
+    backgroundColor: "#fff",
     overflow: "hidden",
   },
 
@@ -111,7 +114,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   title: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: "bold",
     color: "#000",
   },
@@ -126,5 +129,15 @@ const styles = StyleSheet.create({
     padding: 5,
     backgroundColor: "rgba(114, 150, 115, 0.5)",
     borderRadius: 999,
+  },
+  bottomRightIcon: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    borderRadius: 999,
+    padding: 8,
+    backdropFilter: "transparent",
+    elevation: 5,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });

@@ -7,6 +7,16 @@ import GroupPreviewInfo from "./GroupPreviewInfo";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import BottomLeftArrowIcon from "../BottomLeftArrowIcon";
+import { color } from "@rneui/base";
+
+const mockGroup = {
+  Name: "Group Name",
+  CoverURL:
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
+  NumberOfMembers: 100,
+};
 
 export default function BlogPreview({ blog }: { blog: UserBlog }) {
   // default to mock blog for this, but later will be passed as props
@@ -16,7 +26,11 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
     route.push("/blog");
   };
   return (
-    <TouchableOpacity style={styles.outerContainer} onPress={handlePress}>
+    <TouchableOpacity
+      style={styles.outerContainer}
+      onPress={handlePress}
+      activeOpacity={0.8}
+    >
       <ImageBackground
         source={{ uri: blog.BackgroundURL }}
         style={styles.imageBackground}
@@ -33,45 +47,76 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
                 }}
               />
             </View>
+            <Entypo name="dots-three-vertical" size={24} color="white" />
           </View>
-
-          {/* 2nd Part: Title */}
-          <View style={styles.titleSection}>
-            <ThemedText
-              style={styles.title}
-              type="title"
-              lightColor="#fff"
-              darkColor="#fff"
-            >
-              {blog.Title}
-            </ThemedText>
-          </View>
-
-          {/* 3rd Part: Preview of Content */}
-          <View style={styles.contentSection}>
-            <ThemedText
-              style={styles.description}
-              type="default"
-              lightColor="#fff"
-              darkColor="#fff"
-            >
-              {blog.content.slice(0, 100)}...
-            </ThemedText>
-          </View>
-
-          {/* 4th Part: List of Tags */}
+          {/* 2nd Part: List of Tags */}
           <View style={styles.tagsSection}>
             {blog.tags.map((tag, index) => (
-              <Text
-                key={index}
-                style={styles.tag}
-              >
+              <Text key={index} style={styles.tag}>
                 #{tag}
               </Text>
             ))}
           </View>
         </Pressable>
       </ImageBackground>
+      <View style={{ padding: 20 }}>
+        {/* 3nd Part: Title */}
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>{blog.Title}</Text>
+        </View>
+        {/* 4th Part: Preview of Content */}
+        <View style={styles.contentSection}>
+          <Text style={styles.description}>
+            {blog.content.slice(0, 115)}...
+          </Text>
+        </View>
+        {/* 5th Part: Group Info */}
+        <View style={styles.rowContainer}>
+          <View style={styles.groupSection}>
+            <GroupPreviewInfo
+              group={{
+                name: mockGroup.Name,
+                avatar: mockGroup.CoverURL,
+              }}
+            />
+          </View>
+          <BottomLeftArrowIcon
+            style={{ backgroundColor: "black", position: "static" }}
+            color="#B9FF66"
+          />
+        </View>
+      </View>
+      {/* Divider */}
+      <View
+        style={{
+          borderColor: "rgba(0, 0, 0, 0.5)",
+          borderWidth: 0.5,
+          width: "100%",
+          marginVertical: 10,
+        }}
+      />
+      {/* Reaction */}
+      {/* 4th Part: Interactions */}
+      <View style={styles.interactSection}>
+        {/* Likes */}
+        <View style={styles.likeContainer}>
+          <FontAwesome name="thumbs-up" size={24} color="#000" />
+          <Text style={styles.text}>123</Text>
+        </View>
+        {/* Dislikes */}
+        <View style={styles.dislikeContainer}>
+          <FontAwesome name="thumbs-down" size={24} color="#000" />
+        </View>
+        {/* Comment */}
+        <View style={styles.commentContainer}>
+          <MaterialIcons name="comment" size={28} color="#000" />
+          <Text style={styles.text}>123</Text>
+        </View>
+        {/* Bookmart Button */}
+        <View style={styles.bookmarkContainer}>
+          <FontAwesome name="bookmark" size={24} color="#000" />
+        </View>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -82,35 +127,33 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderColor: "#48576E",
     borderWidth: 2,
+    backgroundColor: "#fff",
   },
   imageBackground: {
-    flex: 1,
+    height: 200,
+    padding: 16,
+    margin: 20,
+    marginBottom: 0,
   },
   imageStyle: {
-    borderRadius: 16,
+    borderRadius: 30,
   },
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent overlay
   },
   topSection: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-
     gap: 10,
   },
   userSection: {
-    flex: 1,
     justifyContent: "space-evenly",
     alignItems: "center",
   },
   groupSection: {
-    flex: 1.2,
-    width: 100,
-    justifyContent: "center",
+    flexDirection: "row",
     alignItems: "center",
   },
   buttonSection: {
@@ -121,10 +164,12 @@ const styles = StyleSheet.create({
   titleSection: {
     flex: 1,
     justifyContent: "center",
+    marginBottom: 8,
   },
   contentSection: {
     flex: 1,
     justifyContent: "center",
+    marginBottom: 16,
   },
   tagsSection: {
     flex: 1,
@@ -134,21 +179,64 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    color: "#fff",
+    color: "#000",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000",
   },
   description: {
     fontSize: 16,
-    color: "#fff",
+    color: "#000",
+    lineHeight: 24,
+    textAlign: "justify",
   },
   tag: {
     margin: 8,
     padding: 2,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     borderRadius: 8,
+    color: "#fff",
+  },
+  interactSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    marginHorizontal: 10,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  likeContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    padding: 10,
+  },
+  dislikeContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    padding: 10,
+  },
+  commentContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    padding: 10,
+  },
+  bookmarkContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    padding: 10,
   },
 });

@@ -158,7 +158,7 @@ export default function NewBlog() {
         {/* Tags Selection */}
         <View style={[styles.rowContainer]}>
           <View style={styles.divider} />
-          <View style={{ flex: 1, }}>
+          <View style={{ flex: 1 }}>
             <TouchableOpacity
               style={[styles.heading]}
               onPress={() => handleTagsSnapPress(0)}
@@ -173,16 +173,14 @@ export default function NewBlog() {
                   <Text style={styles.headingTitle}>Select Tags for blog</Text>
                 )}
               </View>
-              
-                <IconSymbol
-                  name="chevron.right"
-                  size={24}
-                  weight="medium"
-                  color={"#fff"}
-                />
-              
+
+              <IconSymbol
+                name="chevron.right"
+                size={24}
+                weight="medium"
+                color={"#fff"}
+              />
             </TouchableOpacity>
-            
           </View>
         </View>
 

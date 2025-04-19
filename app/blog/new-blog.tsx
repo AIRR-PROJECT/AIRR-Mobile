@@ -14,6 +14,7 @@ import {
 import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetView,
+  BottomSheetBackdrop
 } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -21,7 +22,6 @@ import { Feather, FontAwesome } from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
 import QuillEditor from "@/components/dom-components/QuillEditor.tsx/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
-import { set } from "react-hook-form";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
 const mockGroup = {
   name: "Group's name",
@@ -285,6 +285,14 @@ export default function NewBlog() {
         backgroundStyle={{ backgroundColor: "#212531" }}
         handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
         onChange={handleGroupSheetChange}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
       >
         <TouchableOpacity
           onPress={handleCreateGroup}
@@ -310,6 +318,14 @@ export default function NewBlog() {
         backgroundStyle={{ backgroundColor: "#212531" }}
         handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
         onChange={handleGroupSheetChange}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
       >
         <BottomSheetView>
           <TagDropdownComponent tags={mockTags} onPress={onPressTag} />

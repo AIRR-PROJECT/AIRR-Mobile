@@ -5,12 +5,14 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Pressable,
 } from "react-native";
 import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import UploadGroupAvatarComponent from "@/components/group/UploadThumbnailComponent";
 import { useCallback, useMemo, useRef, useState } from "react";
 import BottomSheet, {
+  BottomSheetBackdrop,
   BottomSheetFlatList,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
@@ -20,17 +22,27 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 // temporary use this cause figma not provide the image
-const mockGroup = {
-  name: "Group's name",
-  avatar: "https://picsum.photos/300",
-  id: "123",
-};
-const mockGroupList = Array(25).fill(mockGroup);
+const mockFieldList = [
+  "Web Development",
+  "Mobile Development",
+  "Data Science",
+  "Machine Learning",
+  "Artificial Intelligence",
+  "Cloud Computing",
+  "Cyber Security",
+  "DevOps",
+  "Blockchain",
+  "Internet of Things",
+  "Game Development",
+  "UI/UX Design",
+  "Digital Marketing",
+];
+
 export default function CreateGroup() {
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
   const [groupRules, setGroupRules] = useState("");
-
+  const [groupField, setGroupField] = useState("");
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["30%", "50%"], []);
   const handleFieldSnapPress = useCallback((index: number) => {
@@ -39,7 +51,11 @@ export default function CreateGroup() {
   const handleFieldSheetChange = useCallback((index: any) => {
     console.log("handleGroupSheetChange", index);
   }, []);
-
+  const handleGroupFieldPress = useCallback((field: string) => {
+    console.log("Group field: ", field);
+    setGroupField(field);
+    fieldRef.current?.close();
+  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -103,14 +119,25 @@ export default function CreateGroup() {
           activeOpacity={0.8}
           style={styles.heading}
         >
-          <Text style={[styles.buttonText]}>Select Group's Field *</Text>
-          <IconSymbol
-            name="chevron.right"
-            size={24}
-            weight="medium"
-            color={"#fff"}
-            style={{ marginRight: 20 }}
-          />
+          <Text
+            style={[
+              styles.buttonText,
+              {
+                color: groupField ? "#fff" : "#888",
+              },
+            ]}
+          >
+            {groupField.length == 0 ? "Select Group's Field *" : groupField}
+          </Text>
+          {groupField.length == 0 ? null : (
+            <IconSymbol
+              name="chevron.right"
+              size={24}
+              weight="medium"
+              color={"#fff"}
+              style={{ marginRight: 20 }}
+            />
+          )}
         </TouchableOpacity>
         {/* Group Description Input + Character Counter */}
         <View style={styles.inputWrapper}>
@@ -151,7 +178,25 @@ export default function CreateGroup() {
           handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
           onChange={handleFieldSheetChange}
           maxDynamicContentSize={700}
+          backdropComponent={(props) => (
+            <BottomSheetBackdrop
+              {...props}
+              opacity={0.5}
+              disappearsOnIndex={-1}
+              appearsOnIndex={0}
+            />
+          )}
         >
+          {/* 
+              try to use something that can store the list of field
+              and use it to render the list of field
+              we can store it in redux as group field list is static
+              (? ask the team if it is static or dynamic) 
+              if dynamic, use api to get the list of field
+              and use it to render the list of field with flatlist
+              else use the static list of field to render the list of field
+
+            */}
           <BottomSheetScrollView
             contentContainerStyle={styles.groupListContent}
             showsVerticalScrollIndicator={false}
@@ -164,13 +209,17 @@ export default function CreateGroup() {
           >
             {/* Group List */}
             {/* Change to actual field later */}
-            {mockGroupList.map((item, index) => (
-              <GroupDropdownComponent
+
+            {mockFieldList.map((item, index) => (
+              <Pressable
                 key={index}
-                avatar={item.avatar}
-                name={item.name}
-                id={item.id}
-              />
+                onPress={() => handleGroupFieldPress(item)}
+                style={styles.heading}
+              >
+                <Text style={[styles.buttonText, { color: "#fff" }]}>
+                  {item}
+                </Text>
+              </Pressable>
             ))}
           </BottomSheetScrollView>
         </BottomSheet>

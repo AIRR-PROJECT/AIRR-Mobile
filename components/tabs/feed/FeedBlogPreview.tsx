@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     borderColor: "#48576E",
     borderWidth: 2,
     backgroundColor: "#fff",
+    marginHorizontal: 20,
   },
   imageBackground: {
     height: 200,

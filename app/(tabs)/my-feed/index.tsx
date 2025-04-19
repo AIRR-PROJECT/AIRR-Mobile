@@ -175,12 +175,12 @@ export default function MyFeed() {
             scrollEnabled={true}
             keyExtractor={(item, index) => index.toString()}
             ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             onEndReached={handleOnUserBlogListEndReached}
             renderItem={({ item }) => {
               return <FeedBlogPreview blog={item} />;
             }}
-           
+            
             onEndReachedThreshold={0.5}
             ListHeaderComponent={
               <View>

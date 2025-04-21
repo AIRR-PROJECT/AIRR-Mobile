@@ -9,11 +9,12 @@ import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
 import jwt from 'expo-jwt'
 import { jwtDecode } from "jwt-decode";
-import { Group, GroupField, PopularGroups } from "@/interfaces/groupInterface";
+import { Group, GroupField, PopularGroups, PopularGroupsByField } from "@/interfaces/groupInterface";
 
 const initialState = {
     popularFields: null as any as GroupField[],
-    popularGroups: null as any as PopularGroups[]
+    popularGroupsHorizontal: null as any as Group[],
+    popularGroupsVertical: null as any as PopularGroupsByField[]
 };
 
 export const getGroupPopularFields = createAsyncThunk(
@@ -42,7 +43,7 @@ export const getPopularGroups = createAsyncThunk(
             const res = await api.get(`groups/popular-groups`) as AxiosResponse
 
             if (res.data.success) {
-                return res.data.data as PopularGroups[]
+                return res.data.data as PopularGroups
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)
@@ -60,7 +61,8 @@ const groupSlice = createSlice({
     reducers: {
         reset(state) {
             state.popularFields = null as any as GroupField[]
-            state.popularGroups = null as any as PopularGroups[]
+            state.popularGroupsHorizontal = null as any as Group[]
+            state.popularGroupsVertical = null as any as PopularGroupsByField[]
         },
     
     },
@@ -73,7 +75,8 @@ const groupSlice = createSlice({
                 console.log(action.error)
             }) 
             .addCase(getPopularGroups.fulfilled, (state, action) => {
-                state.popularGroups = action.payload
+                state.popularGroupsHorizontal = action.payload.topList
+                state.popularGroupsVertical = action.payload.fieldData
             })
             .addCase(getPopularGroups.rejected, (state, action) => {
                 console.log(action.error)

@@ -45,7 +45,7 @@ export default function PopularGroupCardComponent({
           </Text>
         </View>
         {/* member */}
-        <View style={styles.memberContainer}>
+        {/* <View style={styles.memberContainer}>
           <View style={styles.imageContainer}>
             <Image
               source={threeUserAvatar[0]}
@@ -61,7 +61,7 @@ export default function PopularGroupCardComponent({
             />
           </View>
           <Text style={styles.member}>{numberOfMembers}</Text>
-        </View>
+        </View> */}
       </View>
       {/* Description */}
       <Text style={styles.description}>

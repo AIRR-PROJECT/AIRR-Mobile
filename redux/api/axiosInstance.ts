@@ -81,7 +81,8 @@ api.interceptors.response.use(
                                 await SecureStore.deleteItemAsync("refreshToken")
                                 console.log("dismissed to first screen")
 
-                                router.dismissAll()
+                                if (router.canDismiss())
+                                    router.dismissAll()
                             }
                             else {
                                 exception_message = response.data.message
@@ -103,7 +104,8 @@ api.interceptors.response.use(
                         await SecureStore.deleteItemAsync("refreshToken")
                         console.log("dismissed to first screen")
                         
-                        router.dismissAll()
+                        if (router.canDismiss())
+                            router.dismissAll()
                     }
                     else {
                         exception_message = error.response.data.message

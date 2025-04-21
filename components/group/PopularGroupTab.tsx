@@ -16,18 +16,27 @@ import Carousel, {
 import { Group, PopularGroups } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { getPopularGroups } from "@/redux/slices/groupSlice";
-const mockPopularGroup = {
-  name: "Group nameadadadadadasdads",
-  avatar: "https://picsum.photos/300",
-  numberOfMembers: 350,
-  id: "Group IDasdasdsadsadsadsa",
+const mockPopularGroup: Group = {
+  Name: "Group nameadadadadadasdads",
+  Owner: {
+    _id: "1",
+    Username: "Owner",
+    AvatarURL: "https://picsum.photos/300"
+  },
+  NumberOfMembers: 350,
+  _id: "Group IDasdasdsadsadsadsa",
   threeUserAvatar: [
     "https://picsum.photos/350",
     "https://picsum.photos/350",
     "https://picsum.photos/350",
   ],
-  description:
-    "This group is for React developers of all levels to share knowledge, ask questions, and discuss best practices. Stay updated on the latest features, libraries, and trends in the React ecosystem. Happy coding... Happy coding...Happy coding...Happy coding...Happy coding...",
+  Description: "This group is for React developers of all levels to share knowledge, ask questions, and discuss best practices. Stay updated on the latest features, libraries, and trends in the React ecosystem. Happy coding... Happy coding...Happy coding...Happy coding...Happy coding...",
+  FieldName: "",
+  CoverURL: "",
+  Tags: [],
+  avatar: "",
+  members: [],
+  timestamp: ""
 };
 const mockGroupList = Array(10).fill(mockPopularGroup);
 const mockPaginationList = Array(10).fill(""); 
@@ -403,7 +412,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
 // ];
 export default function PopularGroupTab() {
   const dispatch = useAppDispatch()
-  const { popularGroups } = useAppSelector(state => state.group)
+  const { popularGroupsHorizontal, popularGroupsVertical } = useAppSelector(state => state.group)
   const progress = useSharedValue(0);
 
   const carouselRef = useRef<ICarouselInstance>(null);
@@ -426,10 +435,10 @@ export default function PopularGroupTab() {
   }, [])
   
   useEffect(() => {
-    console.log(popularGroups)
-    if (popularGroups) {
+    // console.log(popularGroupsVertical)
+    if (popularGroupsVertical) {
       let data: SetStateAction<{ title: string; data: Group[]; }[]> = []
-      popularGroups.map((fieldData) => {
+      popularGroupsVertical.map((fieldData) => {
         data.push({
           title: fieldData.fieldName,
           data: fieldData.groups
@@ -437,7 +446,11 @@ export default function PopularGroupTab() {
       })
       setGroupData(data)
     }
-  }, [popularGroups])
+  }, [popularGroupsVertical])
+
+  useEffect(() => {
+    // console.log(popularGroupsHorizontal)
+  }, [popularGroupsHorizontal])
 
   return (
     // Container for the Popular Group Screen
@@ -455,7 +468,7 @@ export default function PopularGroupTab() {
               ref={carouselRef}
               autoPlayInterval={2000}
               autoPlay={true}
-              data={mockGroupList}
+              data={popularGroupsHorizontal ?? mockGroupList}
               loop={true}
               width={Dimensions.get("window").width - 30}
               height={Dimensions.get("window").height / 3}
@@ -472,12 +485,12 @@ export default function PopularGroupTab() {
               onProgressChange={progress}
               renderItem={({ item }) => (
                 <PopularGroupCardComponent
-                  name={item.name}
-                  id={item.id}
-                  avatar={item.avatar}
-                  numberOfMembers={item.numberOfMembers}
-                  threeUserAvatar={item.threeUserAvatar}
-                  description={item.description}
+                  name={item.Name}
+                  id={item._id}
+                  avatar={item.Owner.AvatarURL}
+                  numberOfMembers={item.NumberOfMembers}
+                  threeUserAvatar={[]}
+                  description={item.Description}
                 />
               )}
             />

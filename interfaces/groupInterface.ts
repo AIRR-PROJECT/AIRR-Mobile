@@ -31,6 +31,11 @@ export interface GroupTag {
 }
 
 export interface PopularGroups {
+    topList: Group[]
+    fieldData: PopularGroupsByField[]
+}
+
+export interface PopularGroupsByField {
     _id: string;
     fieldName: string;
     groups: Group[]

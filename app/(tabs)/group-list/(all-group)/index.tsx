@@ -28,6 +28,7 @@ export default function GroupPopularTab() {
 
   useEffect(() => {
     if (popularFields) {
+      // console.log(popularFields)
       fields.push(...popularFields)
     }
   }, [popularFields])

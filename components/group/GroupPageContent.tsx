@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  Pressable,
+  Keyboard,
 } from "react-native";
 import { Image } from "expo-image";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -62,6 +64,7 @@ export default function GroupPageContent({
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+  const [isSearchFocused, setSearchFocused] = useState(false);
   return (
     <View style={styles.container}>
       <View>
@@ -174,10 +177,17 @@ export default function GroupPageContent({
         onRequestClose={handleCancel}
       >
         {/* Modal overlay */}
-        <View style={styles.modalOverlay}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={(event) => {
+            if (event.target === event.currentTarget) {
+              handleCancel();
+            }
+          }}
+        >
           <View style={styles.groupJoinModal}>
             <Image style={styles.joinConfirmImage} source={joinConfirmImage} />
-            <View style={{flex: 1, }}>
+            <View style={{ flex: 1 }}>
               <View style={{}}>
                 <Text style={styles.joinModalTitle}>
                   Are You Ready to Join the Group?
@@ -205,7 +215,7 @@ export default function GroupPageContent({
               </View>
             </View>
           </View>
-        </View>
+        </Pressable>
       </Modal>
     </View>
   );

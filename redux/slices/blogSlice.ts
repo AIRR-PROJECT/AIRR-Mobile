@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { AIBlogDetail, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
+import { AIBlogDetail, CreateBlog, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
 
 const initialState = {
     currentAIBlog: null as unknown as AIBlogDetail,
@@ -304,8 +304,20 @@ export const unsaveBlog = createAsyncThunk(
 
 const createBlog = createAsyncThunk(
     'blog/createBlog',
-    async () => {
-        
+    async (data: CreateBlog, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/create-blog`, data) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
     }
 )
 

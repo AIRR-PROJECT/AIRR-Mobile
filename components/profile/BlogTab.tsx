@@ -112,6 +112,7 @@ export default function BlogTab() {
       renderItem={({ item }) => {
         return <FeedBlogPreview blog={item} />;
       }}
+     
       estimatedItemSize={400}
     />
   );

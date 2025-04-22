@@ -13,6 +13,7 @@ export default function MyFeedTabLayout() {
       <MaterialTopTabs.Screen name="popular" options={{ title: "Popular" }} />
       <MaterialTopTabs.Screen name="web" options={{ title: "Web" }} />
       <MaterialTopTabs.Screen name="devops" options={{ title: "Devops" }} />
+      
     </MaterialTopTabs>
   );
 }

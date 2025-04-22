@@ -89,3 +89,21 @@ export interface BlogActionHistory{
     Action: string;
     Timestamp: string;
 }
+
+
+export interface CreateBlogGroupDtoType {
+    Name: string;
+    _id: string;
+}
+export interface CreateBlogTagDTO {
+    _id: string;
+    TagName: string;
+}
+export interface CreateBlog {
+    Group: CreateBlogGroupDtoType;
+    Tags: CreateBlogTagDTO[];
+    thumbnail: any;
+    Title: string;
+    Description: string;
+    Content: string;
+}

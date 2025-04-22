@@ -1,5 +1,6 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View,TouchableOpacity } from "react-native";
 import GroupCardComponent from "@/components/group/GroupCardComponent";
+import { useRouter } from "expo-router";
 const mockGroup = {
   image: "https://picsum.photos/200",
   name: "Group Name",
@@ -19,9 +20,30 @@ const mockGroups = [
   mockGroup,
 ];
 export default function GroupPopularTab() {
+  const route = useRouter();
+  const handleCreateGroup = () => {
+    route.push("/group/create-group");
+  };
+
   return (
     <View style={styles.container}>
+      {/* Temp button to create group */}
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#2E2E2E",
+          padding: 10,
+          borderRadius: 5,
+          marginBottom: 20,
+        }}
+        onPress={handleCreateGroup}
+        activeOpacity={0.7}
+      >
+        <Text style={{ color: "#fff", textAlign: "center" }}>
+          Create Group
+        </Text>
+      </TouchableOpacity>
       <FlatList
+
         data={mockGroups}
         renderItem={({ item }) => (
           <GroupCardComponent

@@ -49,8 +49,11 @@ import { getUserPreviewGroups } from "@/redux/slices/authSlice";
 //   department: "Software Engineering",
 // };
 
-type UserInfo = Pick<User, "username" | "avatarURL" | "firstName" | "lastName" | "joinDate">
-type StudentInfo = Pick<User, "profile">
+type UserInfo = Pick<
+  User,
+  "username" | "avatarURL" | "firstName" | "lastName" | "joinDate"
+>;
+type StudentInfo = Pick<User, "profile">;
 
 const mockGroup = {
   name: "Group's name",
@@ -72,88 +75,100 @@ export default function ProfileScreen() {
   const selectedTabs = ["Readme", "Blog", "Activity"];
   const [selectedTab, setSelectedTab] = useState(selectedTabs[0]);
 
-  const { user, userGroups } = useAppSelector(state => state.user);
-  const [userInfo, setUserInfo] = useState<UserInfo>(user!)
-  const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!)
+  const { user, userGroups } = useAppSelector((state) => state.user);
+  const [userInfo, setUserInfo] = useState<UserInfo>(user!);
+  const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!);
 
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    dispatch(getUserPreviewGroups(user!["_id"]))
-  }, [])
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log(userGroups)
-  }, [userGroups])
+    dispatch(getUserPreviewGroups(user!["_id"]));
+  }, []);
+
+  useEffect(() => {
+    console.log(userGroups);
+  }, [userGroups]);
 
   return (
     // change light color to #fff later because figma of the app is not ready
 
-    <ParallaxScrollView style={styles.container}>
+    <ParallaxFlatList style={styles.container} contentStyle={{ padding: 0 }}>
       {/* User Info */}
-      <UserInfoComponent {...userInfo} />
-      {/* User student info */}
-      <UserStudentInfoComponent {...studentInfo} />
+      <View style={{ padding: 20, gap: 20 }}>
+        <UserInfoComponent {...userInfo} />
 
-      {/* Active groups */}
-      <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
-      <FlatList
-        data={userGroups}
-        horizontal={true}
-        style={styles.groupContainer}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ columnGap: 25 }}
-        showsHorizontalScrollIndicator={false}
-        ListHeaderComponent={
-          <FontAwesome
-            name="plus-circle"
-            size={50}
-            color="white"
-            style={styles.plusIcon}
-          />
-        }
-        renderItem={({ item }) => {
-          return <GroupPreviewInfo group={item} />;
-        }}
-      />
+        {/* User student info */}
 
-      {/* Readme , Blog, Activity */}
-      <View style={styles.rowContainer}>
-        {selectedTabs.map((tab) => {
-          return (
-            <TouchableOpacity
-              key={tab}
-              style={[
-                styles.tabButton,
-                {
-                  backgroundColor: selectedTab === tab ? "#2F2F2F" : "#1E1E1E",
-                  borderRadius: 10,
-                  borderBottomWidth: selectedTab === tab ? 1 : 0,
-                  borderBottomColor: "#fff",
-                },
-              ]}
-              onPress={() => setSelectedTab(tab)}
-            >
-              <ThemedText
+        <UserStudentInfoComponent {...studentInfo} />
+
+        {/* Active groups */}
+
+        <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
+        <FlatList
+          data={userGroups}
+          horizontal={true}
+          style={styles.groupContainer}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ columnGap: 25 }}
+          showsHorizontalScrollIndicator={false}
+          ListHeaderComponent={
+            <FontAwesome
+              name="plus-circle"
+              size={50}
+              color="white"
+              style={styles.plusIcon}
+            />
+          }
+          renderItem={({ item }) => {
+            return <GroupPreviewInfo group={item} />;
+          }}
+        />
+
+        {/* Readme , Blog, Activity */}
+        <View style={styles.rowContainer}>
+          {selectedTabs.map((tab) => {
+            return (
+              <TouchableOpacity
+                key={tab}
                 style={[
-                  styles.tabText,
+                  styles.tabButton,
                   {
-                    color: selectedTab === tab ? "#fff" : "#8A94AC",
+                    backgroundColor:
+                      selectedTab === tab ? "#2F2F2F" : "#1E1E1E",
+                    borderRadius: 10,
+                    borderBottomWidth: selectedTab === tab ? 1 : 0,
+                    borderBottomColor: "#fff",
                   },
                 ]}
+                onPress={() => setSelectedTab(tab)}
               >
-                {tab}
-              </ThemedText>
-            </TouchableOpacity>
-          );
-        })}
+                <ThemedText
+                  style={[
+                    styles.tabText,
+                    {
+                      color: selectedTab === tab ? "#fff" : "#8A94AC",
+                    },
+                  ]}
+                >
+                  {tab}
+                </ThemedText>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
-      <Divider orientation="horizontal" style={{ width: "100%", borderColor: "#fff", borderWidth: 1 }}/>
+      <Divider
+        orientation="horizontal"
+        style={{ width: "100%", borderColor: "#fff", borderWidth: 1 }}
+      />
+
       {/* Readme if tab == readme */}
-      {selectedTab === "Readme" && <ReadmeTab />}
+      <View style={{ padding: 20 }}>
+        {selectedTab === "Readme" && <ReadmeTab />}
+        {selectedTab === "Activity" && <ActivityTab />}
+      </View>
       {selectedTab === "Blog" && <BlogTab />}
-      {selectedTab === "Activity" && <ActivityTab/>}
-    </ParallaxScrollView>
+    </ParallaxFlatList>
   );
 }
 

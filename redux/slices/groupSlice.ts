@@ -55,6 +55,26 @@ export const getPopularGroups = createAsyncThunk(
     }
 )
 
+export const getPreviewGroups = createAsyncThunk(
+    'group/getPreviewGroups',
+    async (keyword: string, thunkAPI) => {
+        try {
+            let searchQuery = keyword ? `?keyword=${keyword}` : ""
+            const res = await api.get(`groups/preview-groups${searchQuery}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data as PopularGroups
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 const groupSlice = createSlice({
     name: "group",
     initialState,

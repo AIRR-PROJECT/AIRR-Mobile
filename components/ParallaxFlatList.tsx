@@ -8,7 +8,6 @@ import Animated, {
   useAnimatedScrollHandler,
   Extrapolation,
 } from "react-native-reanimated";
-import { FlashList } from "@shopify/flash-list";
 import { ThemedView } from "@/components/ThemedView";
 import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";

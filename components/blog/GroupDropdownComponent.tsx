@@ -1,19 +1,25 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 
 type GroupDropdownComponentProps = {
   avatar: string;
   name: string;
   id: string;
+  onPress: (data: { avatar: string; name: string; id: string }) => void;
 };
 
 export default function GroupDropdownComponent({
   avatar,
   name,
   id,
+  onPress,
 }: GroupDropdownComponentProps) {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      activeOpacity={0.8}
+      onPress={() => onPress({ avatar, name, id })}
+    >
       {/* Group image */}
       <Image
         source={{ uri: avatar }}
@@ -28,7 +34,7 @@ export default function GroupDropdownComponent({
         {/* id */}
         <Text style={styles.id}>{id}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -48,7 +54,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 25,
   },
-    // Group name and id
+  // Group name and id
   nameContainer: {
     flexDirection: "column",
     justifyContent: "center",

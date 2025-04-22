@@ -3,19 +3,14 @@ import {
   Text,
   StyleSheet,
   useWindowDimensions,
-  BackHandler,
-  ScrollView,
-  Pressable,
   TouchableOpacity,
   FlatList,
   RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import {
-  router,
   useLocalSearchParams,
   useRouter,
-  useSegments,
 } from "expo-router";
 import RenderHTML from "react-native-render-html";
 import { useEffect, useState } from "react";
@@ -31,7 +26,6 @@ import BlogAuthor from "@/components/tabs/BlogAuthor";
 import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
 import BlogTagButton from "@/components/blog/BlogTagButton";
 import { ThemedText } from "@/components/ThemedText";
-import { color } from "@rneui/base";
 import BlogCommenter from "@/components/blog/BlogCommenter";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import * as SplashScreen from "expo-splash-screen";
@@ -165,8 +159,11 @@ const mockSections: AIBlogSection[] = [
   }
 ]
 
+let isReactOnTimeout = false
 export default function BlogScreen() {
   const searchParams = useLocalSearchParams<{ aiBlogId: string, userBlogId: string }>()
+  // if (searchParams.aiBlogId) {
+  
   const { width } = useWindowDimensions();
   const route = useRouter();
   const dispatch = useAppDispatch()
@@ -182,9 +179,13 @@ export default function BlogScreen() {
   // User blog properties
   const [author, setAuthor] = useState(mockAuthor)
   const [tags, setTags] = useState(mockTags)
+  const reactTimeout = 500
   const [likes, setLikes] = useState(123)
   const [dislikes, setDislikes] = useState(123)
   const [comments, setComments] = useState(123)
+  const [blogLiked, setBlogLiked] = useState<boolean>(false)
+  const [blogDisliked, setBlogDisliked] = useState<boolean>(false)
+  const [blogSaved, setBlogSaved] = useState<boolean>(false)
   const [html, setHtml] = useState(mockHtml)
   const [commentsDetail, setCommentsDetail] = useState(mockComments)
   // Simulate refresh
@@ -196,9 +197,15 @@ export default function BlogScreen() {
     }
     else {
       dispatch(getUserBlogDetail(searchParams.userBlogId))
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId))
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId))
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId))
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then((data) => {
+        setBlogLiked(data.payload as boolean)
+      })
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then((data) => {
+        setBlogDisliked(data.payload as boolean)
+      })
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then((data) => {
+        setBlogSaved(data.payload as boolean)
+      })
     }
     dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId))
   }, [])
@@ -242,9 +249,15 @@ export default function BlogScreen() {
     }
     else {
       dispatch(getUserBlogDetail(searchParams.userBlogId))
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId))
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId))
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId))
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then((data) => {
+        setBlogLiked(data.payload as boolean)
+      })
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then((data) => {
+        setBlogDisliked(data.payload as boolean)
+      })
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then((data) => {
+        setBlogSaved(data.payload as boolean)
+      })
     }
     dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId))
   }
@@ -253,63 +266,99 @@ export default function BlogScreen() {
     route.back();
   };
   const handleLike = () => {
-    console.log("Pressed Like button")
+    console.log(isReactOnTimeout)
+    if (isReactOnTimeout) {
+      console.log("React still on cooldown")
+      return;
+    };
+    isReactOnTimeout = true
+    setTimeout(() => {
+      isReactOnTimeout = false
+    }, reactTimeout)
 
-    if (isCurrentBlogLiked) {
-      dispatch(removeLikeBlog(searchParams.userBlogId)).then(() => {
-        setLikes(likes - 1)
-      })
+    if (blogLiked) {
+      setLikes(likes - 1)
+
+      setBlogLiked(false)
+
+      dispatch(removeLikeBlog(searchParams.userBlogId))
     }
     else {
-      if (isCurrentBlogDisliked) {
-        dispatch(dislikeToLikeBlog(searchParams.userBlogId)).then(() => {
-          setLikes(likes + 1)
-          setDislikes(dislikes - 1)
-        })
+      if (blogDisliked) {
+        setLikes(likes + 1)
+        setDislikes(dislikes - 1)
+
+        setBlogLiked(true)
+        setBlogDisliked(false)
+
+        dispatch(dislikeToLikeBlog(searchParams.userBlogId))
       }
       else {
-        dispatch(likeBlog(searchParams.userBlogId)).then(() => {
-          setLikes(likes + 1)
-        })
+        setLikes(likes + 1)
+
+        setBlogLiked(true)
+
+        dispatch(likeBlog(searchParams.userBlogId))
       }
     }
   }
   const handleDislike = () => {
-    console.log("Pressed Dislike button")
+    if (isReactOnTimeout) {
+      console.log("React still on cooldown")
+      return;
+    };
+    isReactOnTimeout = true
+    setTimeout(() => {
+      isReactOnTimeout = false
+    }, reactTimeout)
 
-    if (isCurrentBlogDisliked) {
-      dispatch(removeDislikeBlog(searchParams.userBlogId)).then(() => {
-        setDislikes(dislikes - 1)
-      })
+    if (blogDisliked) {
+      setDislikes(dislikes - 1)
+
+      setBlogDisliked(false)
+
+      dispatch(removeDislikeBlog(searchParams.userBlogId))
     }
     else {
-      if (isCurrentBlogLiked) {
-        dispatch(likeToDislikeBlog(searchParams.userBlogId)).then(() => {
-          setDislikes(dislikes + 1)
-          setLikes(likes - 1)
-        })
+      if (blogLiked) {
+        setDislikes(dislikes + 1)
+        setLikes(likes - 1)
+
+        setBlogLiked(false)
+        setBlogDisliked(true)
+        
+        dispatch(likeToDislikeBlog(searchParams.userBlogId))
       }
       else {
-        dispatch(dislikeBlog(searchParams.userBlogId)).then(() => {
-          setDislikes(dislikes + 1)
-        })
+        setDislikes(dislikes + 1)
+
+        setBlogDisliked(true)
+
+        dispatch(dislikeBlog(searchParams.userBlogId))
       }
     }
   }
   const handleBookmark = () => {
-    console.log("Pressed Bookmark")
+    if (isReactOnTimeout) {
+      console.log("React still on cooldown")
+      return;
+    };
+    isReactOnTimeout = true
+    setTimeout(() => {
+      isReactOnTimeout = false
+    }, reactTimeout)
 
-    if (isCurrentBlogSaved) {
+    if (blogSaved) {
       dispatch(unsaveBlog(searchParams.userBlogId))
+
+      setBlogSaved(false)
     }
     else {
       dispatch(saveBlog(searchParams.userBlogId))
+
+      setBlogSaved(true)
     }
   }
-
-  useEffect(() => {
-    console.log(`Current blog saved: ${isCurrentBlogSaved}`)
-  }, [isCurrentBlogSaved])
 
   return (
     <FlatList
@@ -424,10 +473,10 @@ export default function BlogScreen() {
                 <View style={[styles.rowContainer, { gap: 20 }]}>
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    style={isCurrentBlogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={handleLike}>
-                    <FontAwesome name="thumbs-up" size={24} color={isCurrentBlogLiked ? "#000" : "#fff"} />
+                    style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={handleLike}>
+                    <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#000" : "#fff"} />
                     <ThemedText
-                      style={{ color: isCurrentBlogLiked ? "#000" : "#fff" }}
+                      style={{ color: blogLiked ? "#000" : "#fff" }}
                       type="default"
                       lightColor="#fff"
                       darkColor="#fff"
@@ -438,8 +487,8 @@ export default function BlogScreen() {
                   {/* Dislikes */}
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    style={isCurrentBlogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={handleDislike}>
-                    <FontAwesome name="thumbs-down" size={24} color={isCurrentBlogDisliked ? "#000" : "#fff"} />
+                    style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={handleDislike}>
+                    <FontAwesome name="thumbs-down" size={24} color={blogDisliked ? "#000" : "#fff"} />
                     {/* <ThemedText
                       style={styles.text}
                       type="default"
@@ -464,8 +513,8 @@ export default function BlogScreen() {
                 {/* Bookmart Button */}
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  style={isCurrentBlogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={handleBookmark}>
-                  <FontAwesome name="bookmark" size={24} color={isCurrentBlogSaved ? "#000" : "#fff"} />
+                  style={blogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={handleBookmark}>
+                  <FontAwesome name="bookmark" size={24} color={blogSaved ? "#000" : "#fff"} />
                 </TouchableOpacity>
               </View>
             }

@@ -18,6 +18,7 @@ import {
 } from "@expo/vector-icons";
 import { useState } from "react";
 import { Divider } from "@rneui/base";
+import { useRouter } from "expo-router";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -60,11 +61,16 @@ export default function GroupPageContent({
   selectedId,
   setSelectedId,
 }: GroupPageProps) {
+  const route = useRouter();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-  const [isSearchFocused, setSearchFocused] = useState(false);
+  const handlePressGroupMemberList = () => {
+    // Handle the press event for the group member list
+    route.push("/group/group-member-list");
+  };
   return (
     <View style={styles.container}>
       <View>
@@ -73,7 +79,11 @@ export default function GroupPageContent({
       {/* Description */}
       <Text style={styles.description}>{mockGroupDetail.description}</Text>
       <View style={styles.rowContainer}>
-        <View style={styles.infoContainer}>
+        <TouchableOpacity
+          style={styles.infoContainer}
+          activeOpacity={0.8}
+          onPress={handlePressGroupMemberList}
+        >
           {/* Three example user images */}
           <View style={styles.imageContainer}>
             <Image
@@ -91,7 +101,7 @@ export default function GroupPageContent({
           </View>
           {/* Number of member */}
           <Text style={styles.member}>+{mockGroupDetail.numberOfMembers}</Text>
-        </View>
+        </TouchableOpacity>
         {/* render based on user is in group or not */}
         {!mockGroupDetail.isUserInGroup ? (
           <ButtonGradient

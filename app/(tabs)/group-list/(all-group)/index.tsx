@@ -8,8 +8,9 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  Modal,
 } from "react-native";
-
+import { Image } from "expo-image";
 const mockTags = [
   { id: "1", name: "Popular" }, // Popular is the default selected tab with id "1"
   { id: "2", name: "Web" },
@@ -26,9 +27,11 @@ const mockTags = [
   { id: "13", name: "Quantum Computing" },
   { id: "14", name: "Robotics" },
 ];
+
 export default function GroupPopularTab() {
   const [selectedId, setSelectedId] = useState("1");
   console.log("selectedId", selectedId);
+ 
   return (
     <View style={styles.container}>
       {/* list tags */}
@@ -64,6 +67,7 @@ export default function GroupPopularTab() {
       </View>
       {/* Content based on selected tabs */}
       {selectedId === "1" ? <PopularGroupTab /> : <GroupTab/>}
+      
     </View>
   );
 }
@@ -104,4 +108,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
   },
+ 
 });

@@ -61,7 +61,6 @@ export default function BlogLayout() {
           name="ai-blog"
           options={{
             headerShown: false,
-            
           }}
         />
       </Stack>

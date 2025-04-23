@@ -74,7 +74,7 @@ export default function GroupPopularTab() {
         <FontAwesome name="caret-right" size={30} color="white" />
       </View>
       {/* Content based on selected tabs */}
-      {selectedId === "1" ? <PopularGroupTab /> : <GroupTab/>}
+      {selectedId === "1" ? <PopularGroupTab /> : <GroupTab fieldID={selectedId}/>}
     </View>
   );
 }

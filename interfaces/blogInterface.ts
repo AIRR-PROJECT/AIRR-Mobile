@@ -79,6 +79,7 @@ export interface UserBlogComment {
     Content: string
     createdAt: Date
     updatedAt: Date
+    
 }
 
 export interface BlogActionHistory{

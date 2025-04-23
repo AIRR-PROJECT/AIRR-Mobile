@@ -474,7 +474,7 @@ export default function AIBlogScreen() {
                 <Text style={styles.commentText}>Write a comment...</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </View>g
           {/* Write comment button */}
         </View>
       }

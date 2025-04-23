@@ -32,7 +32,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >
-        <Pressable style={styles.container}>
+        <Pressable style={styles.container} onPress={handlePress}>
           {/* 1st Part: User, Group, Button */}
           <View style={styles.topSection}>
             <View style={styles.userSection}>

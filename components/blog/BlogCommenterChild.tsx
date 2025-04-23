@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   replyWrapper: {
-    backgroundColor: "#2D2D43",
+    backgroundColor: "#191926",
     borderRadius: 20,
     padding: 10,
   },

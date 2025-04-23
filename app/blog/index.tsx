@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   FlatList,
   RefreshControl,
+  TextInput,
 } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import RenderHTML from "react-native-render-html";
 import { useEffect, useRef, useState } from "react";
 import {
+  AntDesign,
   Entypo,
   FontAwesome,
   FontAwesome6,
@@ -369,7 +371,7 @@ export default function BlogScreen() {
   }, [isCurrentBlogSaved]);
 
   const flatListRef = useRef<FlatList>(null);
-
+  const [isWriteComment, setIsWriteComment] = useState(false);
   return (
     <FlatList
       ref={flatListRef}
@@ -566,14 +568,64 @@ export default function BlogScreen() {
               style={{ borderColor: "white" }}
             />
             {/* Other user comments */}
-            <View>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.commentButtonContainer}
-              >
-                <Text style={styles.commentText}>Write a comment...</Text>
-              </TouchableOpacity>
-            </View>
+            {!isWriteComment && (
+              <View>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.commentButtonContainer}
+                  onPress={() => {
+                    setIsWriteComment(true);
+                  }}
+                >
+                  <Text style={styles.commentText}>Write a comment...</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {/* User Comment */}
+            {isWriteComment && (
+              <View style={styles.commentWriteContainer}>
+                <View style={[styles.rowContainer, { alignItems: "center" }]}>
+                  {/* User avatar */}
+                  <View style={styles.rowContainer}>
+                    <Image
+                      style={styles.avatar}
+                      source={{ uri: mockUser.AvatarURL }}
+                    />
+                    {/* name and date */}
+                    <View>
+                      <View>
+                        <Text style={styles.name}>Username</Text>
+                        <Text style={styles.date}>
+                          {new Date().toDateString()}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <TouchableOpacity onPress={() => setIsWriteComment(false)}>
+                    <AntDesign name="close" size={24} color="white" />
+                  </TouchableOpacity>
+                </View>
+                {/* Input */}
+                <TextInput
+                  style={styles.replyTextInput}
+                  placeholder="Write a reply..."
+                  placeholderTextColor="#565656"
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+                <Divider />
+                {/* Comment Button */}
+                <TouchableOpacity
+                  style={styles.commentWriteButtonContainer}
+                  onPress={() => {
+                    setIsWriteComment(false);
+                  }}
+                >
+                  <Text style={styles.commentWriteButtonText}>Comment</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
           {/* Write comment button */}
         </View>
@@ -730,6 +782,61 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   commentText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 45,
+    marginRight: 10,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  date: {
+    color: "#fff",
+    fontSize: 14,
+  },
+  comment: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "justify",
+  },
+  replyText: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "justify",
+  },
+  replyTextInput: {
+    color: "#fff",
+    minHeight: 80,
+    textAlign: "justify",
+  },
+  commentWriteContainer: {
+    padding: 20,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: "#fff",
+    borderRadius: 20,
+    backgroundColor: "#191926",
+    marginTop: 20,
+  },
+  commentWriteButtonContainer: {
+    backgroundColor: "#B9FF66",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 90,
+    marginTop: 20,
+    width: "40%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  commentWriteButtonText: {
     color: "#000",
     fontSize: 16,
     fontWeight: "bold",

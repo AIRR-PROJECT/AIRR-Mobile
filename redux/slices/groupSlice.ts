@@ -9,7 +9,8 @@ import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
 import jwt from 'expo-jwt'
 import { jwtDecode } from "jwt-decode";
-import { Group, GroupField, PopularGroups, PopularGroupsByField } from "@/interfaces/groupInterface";
+import { Group, GroupDetailInfo, GroupField, GroupTag, PopularGroups, PopularGroupsByField } from "@/interfaces/groupInterface";
+import { UserBlog } from "@/interfaces/blogInterface";
 
 const initialState = {
     popularFields: null as any as GroupField[],
@@ -83,6 +84,63 @@ export const getFieldDetail = createAsyncThunk(
 
             if (res.data.success) {
                 return res.data.data.detail.groups as Group[]
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getGroupBlogsByID = createAsyncThunk(
+    'group/getGroupBlogsByID',
+    async (data: {groupID: string, userID: string, page: number}, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/group-blogs-by-id?groupID=${data.groupID}&page=${data.page}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.blogs as UserBlog[]
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getGroupTagsByID = createAsyncThunk(
+    'group/getGroupTagsByID',
+    async (data: {groupID: string}, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/group-tags-by-id?groupID=${data.groupID}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data as GroupTag[]
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getGroupInfo = createAsyncThunk(
+    'group/getGroupInfo',
+    async (data: {groupID: string}, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/groups-infos?groupID=${data.groupID}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data as GroupDetailInfo
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)

@@ -24,7 +24,7 @@ export default function PopularGroupCardComponent({
   const handleGroupPress = () => {
     // Handle group press
     console.log(`Group pressed: ${name}`);
-    route.push('/group');
+    route.push(`/group?groupId=${id}`);
   }
   return (
     <TouchableOpacity style={styles.container} activeOpacity={0.6} onPress={handleGroupPress}>

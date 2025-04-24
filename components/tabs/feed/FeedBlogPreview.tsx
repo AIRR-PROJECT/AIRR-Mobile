@@ -217,50 +217,17 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           />
         </View>
 
-        {/* 2nd Part: Title */}
-        <View style={styles.titleSection}>
-          <ThemedText
-            style={styles.title}
-            type="title"
-            lightColor="#fff"
-            darkColor="#fff"
-          >
-            {blog.Title}
-          </ThemedText>
-        </View>
+        {/* Divider */}
+        <View
+          style={{
+            borderColor: "rgba(0, 0, 0, 0.5)",
+            borderWidth: 0.5,
+            width: "100%",
+            marginVertical: 10,
+          }}
+        />
 
-        {/* 3rd Part: Preview of Content */}
-        <View style={styles.contentSection}>
-          <ImageBackground
-            source={{ uri: blog.BackgroundURL }}
-            style={styles.imageBackground}
-            imageStyle={styles.imageStyle}
-          >
-            <ThemedText
-              style={styles.description}
-              type="default"
-              lightColor="#fff"
-              darkColor="#fff"
-            >
-              {blog.Description.slice(0, 100)}...
-            </ThemedText>
-            <View style={styles.tagsSection}>
-              {blog.Tags.slice(0,2).map((tag, index) => (
-                <ThemedText
-                  key={index}
-                  style={styles.tag}
-                  type="default"
-                  lightColor="#fff"
-                  darkColor="#fff"
-                >
-                  #{tag.TagName}
-                </ThemedText>
-              ))}
-            </View>
-          </ImageBackground>
-        </View>
-
-        {/* 4th Part: Interactions */}
+        {/* 6th Part: Interactions */}
         <View style={styles.interactSection}>
           {/* Likes */}
           <View style={[styles.rowContainer, { gap: 20 }]}>

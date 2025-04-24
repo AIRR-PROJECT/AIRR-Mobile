@@ -40,3 +40,21 @@ export interface PopularGroupsByField {
     fieldName: string;
     groups: Group[]
 }
+
+export interface GroupDetailInfo {
+    _id: string;
+    Name: string;
+    Description: string;
+    CreatedBy: {
+        _id: string;
+        Username: string;
+        AvatarURL: string;
+    }
+    NumberOfTag: number;
+    Field: {
+        _id: string;
+        FieldName: string;
+    },
+    CoverURL: string;
+    Tags: GroupTag[]
+}

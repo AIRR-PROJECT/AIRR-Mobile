@@ -2,16 +2,13 @@ import {
   View,
   Text,
   StyleSheet,
-  useWindowDimensions,
   TouchableOpacity,
-  FlatList,
-  RefreshControl,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import RenderHTML from "react-native-render-html";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AntDesign,
   Entypo,
@@ -21,13 +18,10 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
-import BlogAuthor from "@/components/tabs/BlogAuthor";
 import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
 import BlogTagButton from "@/components/blog/BlogTagButton";
 import { ThemedText } from "@/components/ThemedText";
-import BlogCommenter from "@/components/blog/BlogCommenter";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
-import * as SplashScreen from "expo-splash-screen";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   dislikeBlog,
@@ -226,7 +220,6 @@ export default function BlogScreen() {
   }>();
   // if (searchParams.aiBlogId) {
 
-  const { width } = useWindowDimensions();
   const route = useRouter();
   const dispatch = useAppDispatch();
   const {
@@ -370,267 +363,198 @@ export default function BlogScreen() {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
   }, [isCurrentBlogSaved]);
 
-  const flatListRef = useRef<FlatList>(null);
   const [isWriteComment, setIsWriteComment] = useState(false);
+  const handleCommentPress = () => {
+    route.push("/blog/comment-page", {
+      userBlogId: searchParams.userBlogId,
+      aiBlogId: searchParams.aiBlogId,
+    });
+  }
   return (
-    <FlatList
-      ref={flatListRef}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
-      data={currentBlogComments}
-      keyExtractor={(item, index) => item._id + index}
-      renderItem={({ item }) => (
-        <BlogCommenter {...item} replies={mockUserBlogCommentList} />
-      )}
-      style={styles.flatListContainer}
-      contentContainerStyle={styles.contentContainer}
-      ListFooterComponent={<View style={{ height: 20 }}></View>}
-      showsVerticalScrollIndicator={false}
-      ListHeaderComponent={
-        <View style={styles.container}>
-          {/* Back button */}
-          <View
-            style={[styles.rowContainer, { width: "100%", paddingBottom: 20 }]}
-          >
-            <TouchableOpacity onPress={handleBack}>
-              <Entypo name="chevron-small-left" size={30} color="white" />
-            </TouchableOpacity>
-            <Fontisto name="more-v-a" size={30} color="white" />
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Back button */}
+      <View style={[styles.rowContainer, { width: "100%", paddingBottom: 20 }]}>
+        <TouchableOpacity onPress={handleBack}>
+          <Entypo name="chevron-small-left" size={30} color="white" />
+        </TouchableOpacity>
+        <Fontisto name="more-v-a" size={30} color="white" />
+      </View>
+      <Divider
+        orientation="vertical"
+        width={1}
+        style={{ borderColor: "white" }}
+      />
+      <View style={styles.scrollViewContent}>
+        {/* Group Component */}
+        <View style={styles.groupContainer}>
+          <Image source={mockGroup.image} style={styles.groupImage} />
+          <Text style={styles.groupName}>{mockGroup.name}</Text>
+        </View>
+        {/* User Component */}
+        {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
+        {/* Title */}
+        <Text style={styles.title}>{title}</Text>
+        {/* Date and number of comment */}
+        <View style={styles.additionalInfo}>
+          {/* Date */}
+          <View style={styles.dateAndComment}>
+            <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
+            <Text style={styles.smallText}>
+              {commentsDetail && commentsDetail.length > 0
+                ? new Date(commentsDetail[0].createdAt).toDateString()
+                : "No records"}
+            </Text>
           </View>
+          {/* Number of comment */}
+          <View style={styles.dateAndComment}>
+            <MaterialIcons name="comment" size={24} color="#C2C2C2" />
+            <Text style={styles.smallText}>{comments} Comments</Text>
+          </View>
+        </View>
+        {/* Description */}
+        <View style={styles.descriptionContainer}>
+          <Divider
+            orientation="vertical"
+            width={1}
+            style={{ borderColor: "#B9FF66" }}
+          />
+          {/* Actual description */}
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.description]}>
+              <Text
+                style={[
+                  styles.description,
+                  { color: "#B9FF66", fontWeight: "bold" },
+                ]}
+              >
+                Description:{" "}
+              </Text>
+              {description}
+            </Text>
+          </View>
+        </View>
+        {/* List of tags */}
+        {searchParams.userBlogId && (
+          <View style={styles.tagsContainer}>
+            {tags.map((tag, index) => (
+              <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
+            ))}
+          </View>
+        )}
+
+        {/* Thumbnail */}
+        {searchParams.userBlogId && (
+          <Image
+            source={thumbnail}
+            style={{ width: "100%", height: 200, borderRadius: 20 }}
+            contentFit="cover"
+            transition={1000}
+          />
+        )}
+        {/* Blog content (render from html) */}
+        <QuillRenderer dom={{ matchContents: true }} content={html} />
+
+        {searchParams.userBlogId && (
           <Divider
             orientation="vertical"
             width={1}
             style={{ borderColor: "white" }}
           />
-          <View style={styles.scrollViewContent}>
-            {/* Group Component */}
-            <View style={styles.groupContainer}>
-              <Image source={mockGroup.image} style={styles.groupImage} />
-              <Text style={styles.groupName}>{mockGroup.name}</Text>
-            </View>
-            {/* User Component */}
-            {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
-            {/* Title */}
-            <Text style={styles.title}>{title}</Text>
-            {/* Date and number of comment */}
-            <View style={styles.additionalInfo}>
-              {/* Date */}
-              <View style={styles.dateAndComment}>
-                <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
-                <Text style={styles.smallText}>
-                  {commentsDetail && commentsDetail.length > 0
-                    ? new Date(commentsDetail[0].createdAt).toDateString()
-                    : "No records"}
-                </Text>
-              </View>
-              {/* Number of comment */}
-              <View style={styles.dateAndComment}>
-                <MaterialIcons name="comment" size={24} color="#C2C2C2" />
-                <Text style={styles.smallText}>{comments} Comments</Text>
-              </View>
-            </View>
-            {/* Description */}
-            <View style={styles.descriptionContainer}>
-              <Divider
-                orientation="vertical"
-                width={1}
-                style={{ borderColor: "#B9FF66" }}
-              />
-              {/* Actual description */}
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.description]}>
-                  <Text
-                    style={[
-                      styles.description,
-                      { color: "#B9FF66", fontWeight: "bold" },
-                    ]}
-                  >
-                    Description:{" "}
-                  </Text>
-                  {description}
-                </Text>
-              </View>
-            </View>
-            {/* List of tags */}
-            {searchParams.userBlogId && (
-              <View style={styles.tagsContainer}>
-                {tags.map((tag, index) => (
-                  <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
-                ))}
-              </View>
-            )}
-
-            {/* Thumbnail */}
-            {searchParams.userBlogId && (
-              <Image
-                source={thumbnail}
-                style={{ width: "100%", height: 200, borderRadius: 20 }}
-                contentFit="cover"
-                transition={1000}
-              />
-            )}
-            {/* Blog content (render from html) */}
-            <QuillRenderer dom={{ matchContents: true }} content={html} />
-
-            {searchParams.userBlogId && (
-              <Divider
-                orientation="vertical"
-                width={1}
-                style={{ borderColor: "white" }}
-              />
-            )}
-            {/* Like, Dislike, Comment, Markbook */}
-            {searchParams.userBlogId && (
-              <View style={styles.interactSection}>
-                {/* Likes */}
-                <View style={[styles.rowContainer, { gap: 20 }]}>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={
-                      isCurrentBlogLiked
-                        ? styles.likeContainerYes
-                        : styles.likeContainerNo
-                    }
-                    onPress={handleLike}
-                  >
-                    <FontAwesome
-                      name="thumbs-up"
-                      size={24}
-                      color={isCurrentBlogLiked ? "#000" : "#fff"}
-                    />
-                    <ThemedText
-                      style={{ color: isCurrentBlogLiked ? "#000" : "#fff" }}
-                      type="default"
-                      lightColor="#fff"
-                      darkColor="#fff"
-                    >
-                      {likes}
-                    </ThemedText>
-                  </TouchableOpacity>
-                  {/* Dislikes */}
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={
-                      isCurrentBlogDisliked
-                        ? styles.dislikeContainerYes
-                        : styles.dislikeContainerNo
-                    }
-                    onPress={handleDislike}
-                  >
-                    <FontAwesome
-                      name="thumbs-down"
-                      size={24}
-                      color={isCurrentBlogDisliked ? "#000" : "#fff"}
-                    />
-                    {/* <ThemedText
+        )}
+        {/* Like, Dislike, Comment, Markbook */}
+        {searchParams.userBlogId && (
+          <View style={styles.interactSection}>
+            {/* Likes */}
+            <View style={[styles.rowContainer, { gap: 20 }]}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={
+                  isCurrentBlogLiked
+                    ? styles.likeContainerYes
+                    : styles.likeContainerNo
+                }
+                onPress={handleLike}
+              >
+                <FontAwesome
+                  name="thumbs-up"
+                  size={24}
+                  color={isCurrentBlogLiked ? "#000" : "#fff"}
+                />
+                <ThemedText
+                  style={{ color: isCurrentBlogLiked ? "#000" : "#fff" }}
+                  type="default"
+                  lightColor="#fff"
+                  darkColor="#fff"
+                >
+                  {likes}
+                </ThemedText>
+              </TouchableOpacity>
+              {/* Dislikes */}
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={
+                  isCurrentBlogDisliked
+                    ? styles.dislikeContainerYes
+                    : styles.dislikeContainerNo
+                }
+                onPress={handleDislike}
+              >
+                <FontAwesome
+                  name="thumbs-down"
+                  size={24}
+                  color={isCurrentBlogDisliked ? "#000" : "#fff"}
+                />
+                {/* <ThemedText
                       style={styles.text}
                       type="default"
                       lightColor="#fff"
                       darkColor="#fff">
                       123
                     </ThemedText> */}
-                  </TouchableOpacity>
-                </View>
-                {/* Comment */}
-                <View style={styles.commentContainer}>
-                  <MaterialIcons name="comment" size={28} color="#fff" />
-                  <ThemedText
-                    style={{ color: "#fff" }}
-                    type="default"
-                    lightColor="#fff"
-                    darkColor="#fff"
-                  >
-                    {comments}
-                  </ThemedText>
-                </View>
-                {/* Bookmart Button */}
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={
-                    isCurrentBlogSaved
-                      ? styles.bookmarkContainerYes
-                      : styles.bookmarkContainerNo
-                  }
-                  onPress={handleBookmark}
-                >
-                  <FontAwesome
-                    name="bookmark"
-                    size={24}
-                    color={isCurrentBlogSaved ? "#000" : "#fff"}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-            <Divider
-              orientation="vertical"
-              width={1}
-              style={{ borderColor: "white" }}
-            />
-            {/* Other user comments */}
-            {!isWriteComment && (
-              <View>
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={styles.commentButtonContainer}
-                  onPress={() => {
-                    setIsWriteComment(true);
-                  }}
-                >
-                  <Text style={styles.commentText}>Write a comment...</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {/* User Comment */}
-            {isWriteComment && (
-              <View style={styles.commentWriteContainer}>
-                <View style={[styles.rowContainer, { alignItems: "center" }]}>
-                  {/* User avatar */}
-                  <View style={styles.rowContainer}>
-                    <Image
-                      style={styles.avatar}
-                      source={{ uri: mockUser.AvatarURL }}
-                    />
-                    {/* name and date */}
-                    <View>
-                      <View>
-                        <Text style={styles.name}>Username</Text>
-                        <Text style={styles.date}>
-                          {new Date().toDateString()}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  <TouchableOpacity onPress={() => setIsWriteComment(false)}>
-                    <AntDesign name="close" size={24} color="white" />
-                  </TouchableOpacity>
-                </View>
-                {/* Input */}
-                <TextInput
-                  style={styles.replyTextInput}
-                  placeholder="Write a reply..."
-                  placeholderTextColor="#565656"
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-                <Divider />
-                {/* Comment Button */}
-                <TouchableOpacity
-                  style={styles.commentWriteButtonContainer}
-                  onPress={() => {
-                    setIsWriteComment(false);
-                  }}
-                >
-                  <Text style={styles.commentWriteButtonText}>Comment</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+              </TouchableOpacity>
+            </View>
+            {/* Comment */}
+            <TouchableOpacity style={styles.commentContainer} activeOpacity={0.7}
+              onPress={handleCommentPress}
+            
+            >
+              <MaterialIcons name="comment" size={28} color="#fff" />
+              <ThemedText
+                style={{ color: "#fff" }}
+                type="default"
+                lightColor="#fff"
+                darkColor="#fff"
+              >
+                {comments}
+              </ThemedText>
+            </TouchableOpacity>
+            {/* Bookmart Button */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={
+                isCurrentBlogSaved
+                  ? styles.bookmarkContainerYes
+                  : styles.bookmarkContainerNo
+              }
+              onPress={handleBookmark}
+            >
+              <FontAwesome
+                name="bookmark"
+                size={24}
+                color={isCurrentBlogSaved ? "#000" : "#fff"}
+              />
+            </TouchableOpacity>
           </View>
-          {/* Write comment button */}
-        </View>
-      }
-    />
+        )}
+        <Divider
+          orientation="vertical"
+          width={1}
+          style={{ borderColor: "white" }}
+        />
+        
+      </View>
+      {/* Write comment button */}
+    </ScrollView>
   );
 }
 
@@ -649,6 +573,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#1E1E1E",
+    padding: 20,
+    paddingBottom: 100,
   },
   rowContainer: {
     flexDirection: "row",

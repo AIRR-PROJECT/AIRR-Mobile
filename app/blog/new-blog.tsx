@@ -14,7 +14,7 @@ import {
 import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetView,
-  BottomSheetBackdrop
+  BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -308,6 +308,21 @@ export default function NewBlog() {
           contentContainerStyle={styles.groupListContent}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={() => (
+            <View style={styles.searchBar}>
+              <FontAwesome
+                name="search"
+                size={24}
+                color="#fff"
+                style={{ paddingLeft: 10 }}
+              />
+              <TextInput
+                style={styles.searchText}
+                placeholder="Search Groups"
+                placeholderTextColor="#888"
+              />
+            </View>
+          )}
         />
       </BottomSheet>
       <BottomSheet
@@ -460,5 +475,20 @@ const styles = StyleSheet.create({
   tagsColumn: {
     gap: 8,
     alignItems: "center",
+  },
+  searchBar: {
+    backgroundColor: "#2E3B40",
+    padding: 10,
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  searchText: {
+    paddingHorizontal: 10,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

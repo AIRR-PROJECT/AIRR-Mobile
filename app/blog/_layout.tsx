@@ -40,7 +40,6 @@ export default function BlogLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack
         screenOptions={{
-          headerShown: false,
         }}
       >
         {/* Define the screens for the navigation stack */}
@@ -63,6 +62,13 @@ export default function BlogLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen name="comment-page" options={{ 
+          headerTitle: "Comments",
+          headerTintColor: "#fff",
+          headerStyle: {
+            backgroundColor: "#1E1E1E",
+          }
+          }} />
       </Stack>
     </ThemeProvider>
   );

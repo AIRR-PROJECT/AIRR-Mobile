@@ -83,6 +83,12 @@ export default function GroupLayout() {
             ),
           }}
         />
+        <Stack.Screen
+          name="group-member-list"
+          options={{
+            headerTitle: "Group Members",
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

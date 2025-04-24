@@ -5,6 +5,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Modal,
+  Pressable,
+  Keyboard,
 } from "react-native";
 import { Image } from "expo-image";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -15,6 +18,7 @@ import {
 } from "@expo/vector-icons";
 import { useState } from "react";
 import { Divider } from "@rneui/base";
+import { useRouter } from "expo-router";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -44,16 +48,29 @@ const mockGroupDetail: GroupDetailProps = {
     "https://picsum.photos/350",
   ],
   numberOfMembers: 100,
-  isUserInGroup: true,
+  isUserInGroup: false,
 };
 type GroupPageProps = {
   selectedId: number;
   setSelectedId: (id: number) => void;
 };
+
+const joinConfirmImage = require("@/assets/images/group/join_confirm.png");
+
 export default function GroupPageContent({
   selectedId,
   setSelectedId,
 }: GroupPageProps) {
+  const route = useRouter();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+  const handlePressGroupMemberList = () => {
+    // Handle the press event for the group member list
+    route.push("/group/group-member-list");
+  };
   return (
     <View style={styles.container}>
       <View>
@@ -62,7 +79,11 @@ export default function GroupPageContent({
       {/* Description */}
       <Text style={styles.description}>{mockGroupDetail.description}</Text>
       <View style={styles.rowContainer}>
-        <View style={styles.infoContainer}>
+        <TouchableOpacity
+          style={styles.infoContainer}
+          activeOpacity={0.8}
+          onPress={handlePressGroupMemberList}
+        >
           {/* Three example user images */}
           <View style={styles.imageContainer}>
             <Image
@@ -80,13 +101,16 @@ export default function GroupPageContent({
           </View>
           {/* Number of member */}
           <Text style={styles.member}>+{mockGroupDetail.numberOfMembers}</Text>
-        </View>
+        </TouchableOpacity>
         {/* render based on user is in group or not */}
         {!mockGroupDetail.isUserInGroup ? (
           <ButtonGradient
             label="Join Group"
             labelStyle={styles.tabButtonText}
             style={styles.tabButton}
+            onPress={() => {
+              setIsModalVisible(true);
+            }}
           />
         ) : null}
         <MaterialCommunityIcons
@@ -154,6 +178,55 @@ export default function GroupPageContent({
           />
         </View>
       </View>
+
+      {/* Modal for group join */}
+      <Modal
+        transparent={true}
+        visible={isModalVisible}
+        animationType="fade"
+        onRequestClose={handleCancel}
+      >
+        {/* Modal overlay */}
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={(event) => {
+            if (event.target === event.currentTarget) {
+              handleCancel();
+            }
+          }}
+        >
+          <View style={styles.groupJoinModal}>
+            <Image style={styles.joinConfirmImage} source={joinConfirmImage} />
+            <View style={{ flex: 1 }}>
+              <View style={{}}>
+                <Text style={styles.joinModalTitle}>
+                  Are You Ready to Join the Group?
+                </Text>
+              </View>
+              <View style={styles.rowContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsModalVisible(false);
+                  }}
+                  style={styles.joinCancelButton}
+                >
+                  <Text style={styles.joinCancelButtonText}>
+                    LET ME RETHINK
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsModalVisible(false);
+                  }}
+                  style={styles.joinConfirmButton}
+                >
+                  <Text style={styles.joinConfirmButtonText}>COUNT ME IN</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -264,5 +337,54 @@ const styles = StyleSheet.create({
   },
   textInputContainer: {
     paddingTop: 20,
-  }
+  },
+  groupJoinModal: {
+    flexDirection: "row",
+    backgroundColor: "#1E1E1E",
+    padding: 20,
+    borderRadius: 20,
+    margin: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    width: "90%",
+  },
+  joinConfirmImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+  },
+  joinCancelButton: {
+    backgroundColor: "#1B1F26",
+    padding: 10,
+    borderRadius: 20,
+    marginTop: 20,
+  },
+  joinConfirmButton: {
+    backgroundColor: "#B9FF66",
+    padding: 10,
+    borderRadius: 20,
+    marginTop: 20,
+  },
+  joinCancelButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  joinConfirmButtonText: {
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(36, 87, 75, 0.5)", // Semi-transparent dark background
+  },
+  joinModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
 });

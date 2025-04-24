@@ -82,6 +82,26 @@ export interface UserBlogComment {
     updatedAt: Date
 }
 
+export interface UserBlogChildComment {
+    _id: string;
+    User: {
+        _id: string;
+        UserName: string
+        AvatarURL: string
+    };
+    Content: string;
+    ReplyToComment: {
+        _id: string;
+        User: {
+            _id: string;
+            UserName: string
+            AvatarURL: string
+        };
+    };
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export interface BlogActionHistory{
     _id: string;
     Title: string;
@@ -106,4 +126,20 @@ export interface CreateBlog {
     Title: string;
     Description: string;
     Content: string;
+}
+
+export interface PostComment {
+    UserID: string;
+    BlogID: string;
+    Content: string;
+    Method: string;
+}
+
+export interface ReplyToBlogComment {
+    UserID: string;
+    BlogID: string;
+    Content: string;
+    Method: string;
+    ReplyToCommentID: string;
+    RootCommentID: string
 }

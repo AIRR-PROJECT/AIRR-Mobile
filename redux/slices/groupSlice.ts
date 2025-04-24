@@ -94,9 +94,9 @@ export const getFieldDetail = createAsyncThunk(
     }
 )
 
-export const createGroup = createAsyncThunk(
-    
-)
+// export const createGroup = createAsyncThunk(
+
+// )
 
 const groupSlice = createSlice({
     name: "group",

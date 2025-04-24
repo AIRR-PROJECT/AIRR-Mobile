@@ -11,11 +11,13 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 
 let fields: GroupField[] = [
   { _id: "1", FieldName: "Popular" }, // Popular is the default selected tab with id "1"
 ];
+
 export default function GroupPopularTab() {
   const dispatch = useAppDispatch()
   const { popularFields } = useAppSelector(state => state.group)
@@ -40,6 +42,7 @@ export default function GroupPopularTab() {
   }, [selectedId])
 
   console.log("selectedId", selectedId);
+ 
   return (
     <View style={styles.container}>
       {/* list tags */}
@@ -115,4 +118,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
   },
+ 
 });

@@ -6,15 +6,14 @@ import {
   TouchableOpacity,
   FlatList,
   RefreshControl,
+  TextInput,
 } from "react-native";
 import { Image } from "expo-image";
-import {
-  useLocalSearchParams,
-  useRouter,
-} from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import RenderHTML from "react-native-render-html";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  AntDesign,
   Entypo,
   FontAwesome,
   FontAwesome6,
@@ -30,9 +29,32 @@ import BlogCommenter from "@/components/blog/BlogCommenter";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import * as SplashScreen from "expo-splash-screen";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { dislikeBlog, dislikeToLikeBlog, getAIBlogDetail, getBlogComment, getUserBlogDetail, likeBlog, likeToDislikeBlog, removeDislikeBlog, removeLikeBlog, saveBlog, unsaveBlog } from "@/redux/slices/blogSlice";
-import { AIBlogSection, UserBlogComment, UserBlogTag } from "@/interfaces/blogInterface";
-import { getUserBlogDislikeActivities, getUserBlogLikeActivities, getUserBlogSaveActivities } from "@/redux/slices/authSlice";
+import {
+  commentOnBlog,
+  dislikeBlog,
+  dislikeToLikeBlog,
+  getAIBlogDetail,
+  getBlogComment,
+  getUserBlogDetail,
+  likeBlog,
+  likeToDislikeBlog,
+  removeDislikeBlog,
+  removeLikeBlog,
+  saveBlog,
+  setCommentAdded,
+  unsaveBlog,
+} from "@/redux/slices/blogSlice";
+import {
+  AIBlogSection,
+  PostComment,
+  UserBlogComment,
+  UserBlogTag,
+} from "@/interfaces/blogInterface";
+import {
+  getUserBlogDislikeActivities,
+  getUserBlogLikeActivities,
+  getUserBlogSaveActivities,
+} from "@/redux/slices/authSlice";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -77,12 +99,13 @@ const mockCommenter: UserBlogComment = {
   User: {
     _id: "abc",
     UserName: "FullName",
-    AvatarURL: "https://picsum.photos/200"
+    AvatarURL: "https://picsum.photos/200",
   },
   createdAt: new Date("18 Nov 2023"),
   updatedAt: new Date("18 Nov 2023"),
-  Content: "I just tried this recipe and it was amazing! The instructions were clear and easy to follow, and the end result was delicious. I will definitely be making this again. Thanks for sharing!",
-  _id: "123"
+  Content:
+    "I just tried this recipe and it was amazing! The instructions were clear and easy to follow, and the end result was delicious. I will definitely be making this again. Thanks for sharing!",
+  _id: "123",
 };
 const mockComments = [
   mockCommenter,
@@ -94,88 +117,140 @@ const mockComments = [
 const mockThumbnail = "https://picsum.photos/400";
 const mockSections: AIBlogSection[] = [
   {
-      "Heading": "BetterStack Monitoring and Incident Management",
-      "Content": [
-          {
-              "SubHeading": "Uptime Monitoring",
-              "Details": "BetterStack offers free usage of their uptime monitoring tools, allowing users to have up to 10 monitors and a status page, aiding in user trust during downtimes.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": ""
-          },
-          {
-              "SubHeading": "Incident Management",
-              "Details": "The platform provides incident management tools, including incident silencing to reduce alert noise and Slack integration for direct incident resolution.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": ""
-          },
-          {
-              "SubHeading": "Infrastructure Monitoring and Insights",
-              "Details": "BetterStack utilizes OpenTelemetry for native infrastructure monitoring, providing observability dashboards to analyze metrics and gather insights.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": ""
-          }
-      ]
+    Heading: "BetterStack Monitoring and Incident Management",
+    Content: [
+      {
+        SubHeading: "Uptime Monitoring",
+        Details:
+          "BetterStack offers free usage of their uptime monitoring tools, allowing users to have up to 10 monitors and a status page, aiding in user trust during downtimes.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "",
+      },
+      {
+        SubHeading: "Incident Management",
+        Details:
+          "The platform provides incident management tools, including incident silencing to reduce alert noise and Slack integration for direct incident resolution.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "",
+      },
+      {
+        SubHeading: "Infrastructure Monitoring and Insights",
+        Details:
+          "BetterStack utilizes OpenTelemetry for native infrastructure monitoring, providing observability dashboards to analyze metrics and gather insights.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "",
+      },
+    ],
   },
   {
-      "Heading": "Key Features of Express 5",
-      "Content": [
-          {
-              "SubHeading": "Async/Await Enhancements",
-              "Details": "Express 5 simplifies promise rejection handling by forwarding rejected promises to error-handling middleware.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": "app.get('/data', async (req, res, next) => { try { const result = await fetchData(); res.send(result); } catch (err) { next(err); } });"
-          },
-          {
-              "SubHeading": "Route Matching Improvements",
-              "Details": "Improvements enhance security and clarity in route matching, including the removal of inline regex.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": "app.get('/user(.*)', (req, res) => res.send('User'));"
-          },
-          {
-              "SubHeading": "Error Handling",
-              "Details": "Stricter enforcement of HTTP status codes improves error visibility and prevents silent failures.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": "res.status(978).send('Invalid status');"
-          },
-          {
-              "SubHeading": "Body Parsing Enhancements",
-              "Details": "The updated configuration enhances security against deep nested objects while simplifying body parsing.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": "app.use(express.urlencoded({ depth: 10 }));"
-          },
-          {
-              "SubHeading": "Removed Deprecated Features",
-              "Details": "Express 5 eliminates outdated methods, ensuring modern JavaScript compatibility.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": ""
-          },
-          {
-              "SubHeading": "Long-Term Support",
-              "Details": "Express 5 requires Node.js 18 or higher, improving performance and longevity.",
-              "Source": "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
-              "Code": ""
-          }
-      ]
-  }
-]
+    Heading: "Key Features of Express 5",
+    Content: [
+      {
+        SubHeading: "Async/Await Enhancements",
+        Details:
+          "Express 5 simplifies promise rejection handling by forwarding rejected promises to error-handling middleware.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "app.get('/data', async (req, res, next) => { try { const result = await fetchData(); res.send(result); } catch (err) { next(err); } });",
+      },
+      {
+        SubHeading: "Route Matching Improvements",
+        Details:
+          "Improvements enhance security and clarity in route matching, including the removal of inline regex.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "app.get('/user(.*)', (req, res) => res.send('User'));",
+      },
+      {
+        SubHeading: "Error Handling",
+        Details:
+          "Stricter enforcement of HTTP status codes improves error visibility and prevents silent failures.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "res.status(978).send('Invalid status');",
+      },
+      {
+        SubHeading: "Body Parsing Enhancements",
+        Details:
+          "The updated configuration enhances security against deep nested objects while simplifying body parsing.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "app.use(express.urlencoded({ depth: 10 }));",
+      },
+      {
+        SubHeading: "Removed Deprecated Features",
+        Details:
+          "Express 5 eliminates outdated methods, ensuring modern JavaScript compatibility.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "",
+      },
+      {
+        SubHeading: "Long-Term Support",
+        Details:
+          "Express 5 requires Node.js 18 or higher, improving performance and longevity.",
+        Source:
+          "https://betterstack.com/community/guides/scaling-nodejs/express-5-new-features/",
+        Code: "",
+      },
+    ],
+  },
+];
+
+const mockUser = {
+  _id: "testUserId",
+  UserName: "John Doe",
+  AvatarURL:
+    "https://images.unsplash.com/photo-1502685104226-e9df14d4d9f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MXwyMDg5NzN8MHwxfGFsbHwxfHx8fHx8fHwxNjE3NTY2MjQy&ixlib=rb-1.2.1&q=80&w=400",
+};
+
+const mockContent =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+const mockCreatedAt = new Date();
+const mockUserBlogComment = {
+  _id: "testCommentId",
+  User: mockUser,
+  Content: mockContent,
+  createdAt: mockCreatedAt,
+} as UserBlogComment;
+const mockUserBlogCommentList = [
+  mockUserBlogComment,
+  mockUserBlogComment,
+  mockUserBlogComment,
+];
 
 let isReactOnTimeout = false
 export default function BlogScreen() {
-  const searchParams = useLocalSearchParams<{ aiBlogId: string, userBlogId: string }>()
+  const searchParams = useLocalSearchParams<{
+    aiBlogId: string;
+    userBlogId: string;
+  }>();
   // if (searchParams.aiBlogId) {
-  
+
   const { width } = useWindowDimensions();
   const route = useRouter();
-  const dispatch = useAppDispatch()
-  const { currentAIBlog, currentUserBlog, currentBlogComments, isCurrentBlogLiked, isCurrentBlogDisliked, isCurrentBlogSaved } = useAppSelector(state => state.blog)
+  const dispatch = useAppDispatch();
+  const {
+    currentAIBlog,
+    currentUserBlog,
+    currentBlogComments,
+    isCurrentBlogLiked,
+    isCurrentBlogDisliked,
+    isCurrentBlogSaved,
+    commentAdded
+  } = useAppSelector((state) => state.blog);
+  const { user } = useAppSelector((state) => state.user)
 
   // Shared properties
-  const [title, setTitle] = useState("Mock description")
-  const [description, setDescription] = useState("Mock description")
-  const [thumbnail, setThumbnail] = useState(mockThumbnail)
+  const [title, setTitle] = useState("Mock description");
+  const [description, setDescription] = useState("Mock description");
+  const [thumbnail, setThumbnail] = useState(mockThumbnail);
   // AI blog properties
-  const [sections, setSections] = useState(mockSections)
-  const [conclusion, setConclusion] = useState("This is concluded.")
+  const [sections, setSections] = useState(mockSections);
+  const [conclusion, setConclusion] = useState("This is concluded.");
   // User blog properties
   const [author, setAuthor] = useState(mockAuthor)
   const [tags, setTags] = useState(mockTags)
@@ -188,6 +263,8 @@ export default function BlogScreen() {
   const [blogSaved, setBlogSaved] = useState<boolean>(false)
   const [html, setHtml] = useState(mockHtml)
   const [commentsDetail, setCommentsDetail] = useState(mockComments)
+  // Post comment
+  const [postComment, setPostComment] = useState("")
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
 
@@ -207,35 +284,44 @@ export default function BlogScreen() {
         setBlogSaved(data.payload as boolean)
       })
     }
-    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId))
-  }, [])
+    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+  }, []);
 
   useEffect(() => {
     if (currentAIBlog) {
-      setTitle(currentAIBlog.Title)
-      setDescription(currentAIBlog.Description)
-      setSections(currentAIBlog.Sections)
-      setConclusion(currentAIBlog.Conclusion)
+      setTitle(currentAIBlog.Title);
+      setDescription(currentAIBlog.Description);
+      setSections(currentAIBlog.Sections);
+      setConclusion(currentAIBlog.Conclusion);
     }
-  }, [currentAIBlog])
+  }, [currentAIBlog]);
 
   useEffect(() => {
     if (currentUserBlog) {
-      setTitle(currentUserBlog.Title)
-      setDescription(currentUserBlog.Description)
-      setThumbnail(currentUserBlog.BackgroundURL)
-      setTags(currentUserBlog.Tags)
-      setAuthor(currentUserBlog.Author)
-      setLikes(currentUserBlog.Reaction.Likes)
-      setDislikes(currentUserBlog.Reaction.Dislikes)
-      setComments(currentUserBlog.Reaction.Comments)
-      setHtml(currentUserBlog.Content)
+      setTitle(currentUserBlog.Title);
+      setDescription(currentUserBlog.Description);
+      setThumbnail(currentUserBlog.BackgroundURL);
+      setTags(currentUserBlog.Tags);
+      setAuthor(currentUserBlog.Author);
+      setLikes(currentUserBlog.Reaction.Likes);
+      setDislikes(currentUserBlog.Reaction.Dislikes);
+      setComments(currentUserBlog.Reaction.Comments);
+      setHtml(currentUserBlog.Content);
     }
-  }, [currentUserBlog])
+  }, [currentUserBlog]);
 
   useEffect(() => {
-    setCommentsDetail(currentBlogComments)
-  }, [currentBlogComments])
+    setCommentsDetail(currentBlogComments);
+  }, [currentBlogComments]);
+
+  useEffect(() => {
+    console.log(`Comment added: ${commentAdded}`)
+    if (commentAdded) {
+      setComments(comments + 1)
+
+      dispatch(setCommentAdded(false))
+    }
+  }, [commentAdded])
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -259,8 +345,8 @@ export default function BlogScreen() {
         setBlogSaved(data.payload as boolean)
       })
     }
-    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId))
-  }
+    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+  };
 
   const handleBack = () => {
     route.back();
@@ -301,7 +387,7 @@ export default function BlogScreen() {
         dispatch(likeBlog(searchParams.userBlogId))
       }
     }
-  }
+  };
   const handleDislike = () => {
     if (isReactOnTimeout) {
       console.log("React still on cooldown")
@@ -337,7 +423,7 @@ export default function BlogScreen() {
         dispatch(dislikeBlog(searchParams.userBlogId))
       }
     }
-  }
+  };
   const handleBookmark = () => {
     if (isReactOnTimeout) {
       console.log("React still on cooldown")
@@ -360,17 +446,44 @@ export default function BlogScreen() {
     }
   }
 
+  const handleInputUserComment = (val: string) => {
+    setPostComment(val)
+  }
+  const handlePostUserComment = () => {
+    const comment: PostComment = {
+      UserID: user._id,
+      BlogID: currentUserBlog._id,
+      Content: postComment,
+      Method: "Post"
+    }
+    dispatch(commentOnBlog(comment)).then((res) => {
+      if (res.payload === true) {
+        dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+
+        setComments(comments + 1)
+        setPostComment("")
+        setIsWriteComment(false);
+      }
+    })
+  }
+
+  const flatListRef = useRef<FlatList>(null);
+  const [isWriteComment, setIsWriteComment] = useState(false);
   return (
     <FlatList
+      ref={flatListRef}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
       }
       data={currentBlogComments}
       keyExtractor={(item, index) => item._id + index}
-      renderItem={({ item }) => <BlogCommenter {...item} />}
+      renderItem={({ item }) => (
+        <BlogCommenter {...item} replies={item.ChildrenComments} />
+      )}
       style={styles.flatListContainer}
       contentContainerStyle={styles.contentContainer}
-      ListFooterComponent={<View style={{height: 20}}></View>}
+      ListFooterComponent={<View style={{ height: 20 }}></View>}
+      showsVerticalScrollIndicator={false}
       ListHeaderComponent={
         <View style={styles.container}>
           {/* Back button */}
@@ -396,17 +509,15 @@ export default function BlogScreen() {
             {/* User Component */}
             {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
             {/* Title */}
-            <Text style={styles.title}>
-              {title}
-            </Text>
+            <Text style={styles.title}>{title}</Text>
             {/* Date and number of comment */}
             <View style={styles.additionalInfo}>
               {/* Date */}
               <View style={styles.dateAndComment}>
                 <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
                 <Text style={styles.smallText}>
-                  {commentsDetail && commentsDetail.length > 0 ? 
-                    new Date(commentsDetail[0].createdAt).toDateString() 
+                  {commentsDetail && commentsDetail.length > 0
+                    ? new Date(commentsDetail[0].createdAt).toDateString()
                     : "No records"}
                 </Text>
               </View>
@@ -439,35 +550,35 @@ export default function BlogScreen() {
               </View>
             </View>
             {/* List of tags */}
-            {searchParams.userBlogId &&
+            {searchParams.userBlogId && (
               <View style={styles.tagsContainer}>
                 {tags.map((tag, index) => (
                   <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
                 ))}
               </View>
-            }
+            )}
 
             {/* Thumbnail */}
-            {searchParams.userBlogId &&
+            {searchParams.userBlogId && (
               <Image
                 source={thumbnail}
                 style={{ width: "100%", height: 200, borderRadius: 20 }}
                 contentFit="cover"
                 transition={1000}
               />
-            }
+            )}
             {/* Blog content (render from html) */}
-            <QuillRenderer dom={{ matchContents: true }} content={html}/>
+            <QuillRenderer dom={{ matchContents: true }} content={html} />
 
-            {searchParams.userBlogId &&
+            {searchParams.userBlogId && (
               <Divider
                 orientation="vertical"
                 width={1}
                 style={{ borderColor: "white" }}
               />
-            }
+            )}
             {/* Like, Dislike, Comment, Markbook */}
-            {searchParams.userBlogId &&
+            {searchParams.userBlogId && (
               <View style={styles.interactSection}>
                 {/* Likes */}
                 <View style={[styles.rowContainer, { gap: 20 }]}>
@@ -517,21 +628,70 @@ export default function BlogScreen() {
                   <FontAwesome name="bookmark" size={24} color={blogSaved ? "#000" : "#fff"} />
                 </TouchableOpacity>
               </View>
-            }
+            )}
             <Divider
               orientation="vertical"
               width={1}
               style={{ borderColor: "white" }}
             />
             {/* Other user comments */}
-            <View>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.commentButtonContainer}
-              >
-                <Text style={styles.commentText}>Write a comment...</Text>
-              </TouchableOpacity>
-            </View>
+            {!isWriteComment && (
+              <View>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.commentButtonContainer}
+                  onPress={() => {
+                    setIsWriteComment(true);
+                  }}
+                >
+                  <Text style={styles.commentText}>Write a comment...</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {/* User Comment */}
+            {isWriteComment && (
+              <View style={styles.commentWriteContainer}>
+                <View style={[styles.rowContainer, { alignItems: "center" }]}>
+                  {/* User avatar */}
+                  <View style={styles.rowContainer}>
+                    <Image
+                      style={styles.avatar}
+                      source={{ uri: user.avatarURL }}
+                    />
+                    {/* name and date */}
+                    <View>
+                      <View>
+                        <Text style={styles.name}>{user.username}</Text>
+                        <Text style={styles.date}>
+                          {new Date().toDateString()}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <TouchableOpacity onPress={() => setIsWriteComment(false)}>
+                    <AntDesign name="close" size={24} color="white" />
+                  </TouchableOpacity>
+                </View>
+                {/* Input */}
+                <TextInput
+                  onChangeText={handleInputUserComment}
+                  style={styles.replyTextInput}
+                  placeholder="Write a reply..."
+                  placeholderTextColor="#565656"
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+                <Divider />
+                {/* Comment Button */}
+                <TouchableOpacity
+                  style={styles.commentWriteButtonContainer}
+                  onPress={handlePostUserComment}
+                >
+                  <Text style={styles.commentWriteButtonText}>Comment</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
           {/* Write comment button */}
         </View>
@@ -542,6 +702,7 @@ export default function BlogScreen() {
 
 const styles = StyleSheet.create({
   flatListContainer: {
+    flexGrow: 1,
     width: "100%",
     backgroundColor: "#1E1E1E",
   },
@@ -687,6 +848,61 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   commentText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 45,
+    marginRight: 10,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  date: {
+    color: "#fff",
+    fontSize: 14,
+  },
+  comment: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "justify",
+  },
+  replyText: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "justify",
+  },
+  replyTextInput: {
+    color: "#fff",
+    minHeight: 80,
+    textAlign: "justify",
+  },
+  commentWriteContainer: {
+    padding: 20,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: "#fff",
+    borderRadius: 20,
+    backgroundColor: "#191926",
+    marginTop: 20,
+  },
+  commentWriteButtonContainer: {
+    backgroundColor: "#B9FF66",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 90,
+    marginTop: 20,
+    width: "40%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  commentWriteButtonText: {
     color: "#000",
     fontSize: 16,
     fontWeight: "bold",

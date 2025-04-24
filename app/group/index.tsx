@@ -5,34 +5,41 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import GroupPageContent from "@/components/group/GroupPageContent";
 import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
 import { SectionGrid } from "react-native-super-grid";
 import ParallaxFlatList from "@/components/ParallaxFlatList";
-const mockBlog = {
-  Title: "How to fix clipboard if it isn’t working",
-  BackgroundURL:
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
-  Description: "Blog Description",
-  content: loremIpsum({ count: 50, units: "paragraphs" }),
-  timestamp: new Date().toISOString(),
-  Author: {
-    name: "Name of the Author",
-    avatar:
-      "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg",
-    email: "sample_email@gmail.com",
-    phoneNumber: "1234567890",
-    location: "Location",
-    bio: "Bio",
-    socials: [],
-    groups: [],
-    blogs: [],
-  },
-  Tags: ["Frontend", "Backend", "React", "NodeJS", "Express"],
-};
-const Data = Array(10).fill(mockBlog);
+import { UserBlog } from "@/interfaces/blogInterface";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { getGroupBlogsByID, getGroupTagsByID } from "@/redux/slices/groupSlice";
+import { useLocalSearchParams } from "expo-router";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import queryClient from "@/redux/api/queryClient";
+import { GroupTag } from "@/interfaces/groupInterface";
+// const mockBlog = {
+//   Title: "How to fix clipboard if it isn’t working",
+//   BackgroundURL:
+//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
+//   Description: "Blog Description",
+//   content: loremIpsum({ count: 50, units: "paragraphs" }),
+//   timestamp: new Date().toISOString(),
+//   Author: {
+//     name: "Name of the Author",
+//     avatar:
+//       "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg",
+//     email: "sample_email@gmail.com",
+//     phoneNumber: "1234567890",
+//     location: "Location",
+//     bio: "Bio",
+//     socials: [],
+//     groups: [],
+//     blogs: [],
+//   },
+//   Tags: ["Frontend", "Backend", "React", "NodeJS", "Express"],
+// };
+// const Data = Array(10).fill(mockBlog);
 const mockTags = [
   { id: "a", data: ["Artificial Intelligence", "Agile", "Android", "AWS"] },
   { id: "b", data: ["Blockchain", "Bootstrap", "Babel", "Bitbucket"] },
@@ -72,23 +79,99 @@ const mockTags = [
 ];
 
 export default function GroupPage() {
+  const dispatch = useAppDispatch()
+
+  const { groupId } = useLocalSearchParams<{ groupId: string }>()
+  const { user } = useAppSelector(state => state.user)
+
   const [selectedId, setSelectedId] = useState(1);
+  const [tags, setTags] = useState<{ id: string, data: string[] }[]>([])
+
+  const [blogPage, setBlogPage] = useState(1)
+
+  useEffect(() => {
+    dispatch(getGroupTagsByID({
+      groupID: groupId
+    })).then((res) => {
+      const categorizedTags = new Map<string, string[]>()
+      let categorizedTagsList: { id: string, data: string[] }[] = []
+      const retrievedTags = res.payload as GroupTag[]
+
+      retrievedTags.forEach((tags) => {
+        const initial = tags.TagName.charAt(0).toLowerCase()
+        
+        if (categorizedTags.has(initial)) {
+          categorizedTags.get(initial)?.push(tags.TagName)
+        }
+        else {
+          categorizedTags.set(initial, [tags.TagName])
+        }
+      })
+      
+      categorizedTags.entries().forEach((entry) => {
+        categorizedTagsList.push({
+          id: entry[0],
+          data: entry[1]
+        })
+      })
+      setTags(categorizedTagsList)
+    })
+  }, [])
+  
+  const groupBlogsQuery = useQuery({
+    queryKey: ["feed-group-blogs"],
+    queryFn: async () => {
+      const fetchedBlogs = await dispatch(getGroupBlogsByID({
+        groupID: groupId,
+        userID: user._id,
+        page: blogPage
+      }))
+
+      // console.log(fetchedBlogs.payload.blogList.blogs)
+      return fetchedBlogs.payload as UserBlog[];
+    },
+    placeholderData: keepPreviousData,
+  });
+  const groupBlogsMutation = useMutation({
+    mutationFn: async (page: number) => {
+      const moreFetchedBlogs = await dispatch(getGroupBlogsByID({
+        groupID: groupId,
+        userID: user._id,
+        page: blogPage
+      }))
+
+      // console.log(moreFetchedBlogs.payload.blogList.blogs)
+      return moreFetchedBlogs.payload as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-group-blogs"], (oldData: any) => {
+        return [...oldData, ...data] as UserBlog[];
+      });
+    },
+  });
+
+  const handleBlogListEndReached = () => {
+    setBlogPage(blogPage + 1);
+    groupBlogsMutation.mutate(blogPage + 1);
+  }
+
   return (
     <ParallaxFlatList contentStyle={styles.contentStyle}>
-      <GroupPageContent selectedId={selectedId} setSelectedId={setSelectedId} />
+      <GroupPageContent selectedId={selectedId} setSelectedId={setSelectedId} groupID={groupId} />
       {selectedId === 1 ? (
         <FlatList
-          data={Data}
+          data={groupBlogsQuery.data}
           renderItem={({ item }) => <FeedBlogPreview blog={item} />}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[styles.list, {}]}
           style={{paddingBottom: 80}}
+          onEndReached={handleBlogListEndReached}
           ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         />
       ) : (
         <SectionGrid
-          sections={mockTags}
+          sections={tags}
           itemDimension={150} // Controls column width
           spacing={10} // Spacing between items
           style={styles.gridView}

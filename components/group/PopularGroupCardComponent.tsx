@@ -24,7 +24,7 @@ export default function PopularGroupCardComponent({
   const handleGroupPress = () => {
     // Handle group press
     console.log(`Group pressed: ${name}`);
-    route.push('/group');
+    route.push(`/group?groupId=${id}`);
   }
   return (
     <TouchableOpacity style={styles.container} activeOpacity={0.6} onPress={handleGroupPress}>
@@ -45,7 +45,7 @@ export default function PopularGroupCardComponent({
           </Text>
         </View>
         {/* member */}
-        <View style={styles.memberContainer}>
+        {/* <View style={styles.memberContainer}>
           <View style={styles.imageContainer}>
             <Image
               source={threeUserAvatar[0]}
@@ -61,7 +61,7 @@ export default function PopularGroupCardComponent({
             />
           </View>
           <Text style={styles.member}>{numberOfMembers}</Text>
-        </View>
+        </View> */}
       </View>
       {/* Description */}
       <Text style={styles.description}>

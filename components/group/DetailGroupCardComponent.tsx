@@ -4,9 +4,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { FontAwesome6 } from "@expo/vector-icons";
 type DetailGroupCardComponentProps = {
-  name: string;
-  id: string;
-  avatar: string;
+  Name: string;
+  _id: string;
+  CoverURL: string;
   tag: string;
   posts: number;
   views: number;

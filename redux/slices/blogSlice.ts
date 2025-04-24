@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { AIBlogDetail, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
+import { AIBlogDetail, CreateBlog, PostComment, ReplyToBlogComment, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
 
 const initialState = {
     currentAIBlog: null as unknown as AIBlogDetail,
@@ -9,7 +9,8 @@ const initialState = {
     currentBlogComments: null as unknown as UserBlogComment[],
     isCurrentBlogLiked: false,
     isCurrentBlogDisliked: false,
-    isCurrentBlogSaved: false
+    isCurrentBlogSaved: false,
+    commentAdded: false
 }
 
 export const getAIBlogDetail = createAsyncThunk<AIBlogDetail, string>(
@@ -302,6 +303,63 @@ export const unsaveBlog = createAsyncThunk(
     } 
 )
 
+const createBlog = createAsyncThunk(
+    'blog/createBlog',
+    async (data: CreateBlog, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/create-blog`, data) as AxiosResponse
+
+            if (res.data.success) {
+                
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const commentOnBlog = createAsyncThunk(
+    'blog/commentOnBlog',
+    async (data: PostComment, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/post-reply-comment`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const replyToBlogComment = createAsyncThunk(
+    'blog/replyToBlogComment',
+    async (data: ReplyToBlogComment, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/post-reply-comment`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 const blogSlice = createSlice({
     name: 'blog',
     initialState,
@@ -318,12 +376,18 @@ const blogSlice = createSlice({
             state.isCurrentBlogSaved = action.payload
         },
 
+        setCommentAdded(state, action) {
+            state.commentAdded = action.payload
+        },
+
         reset(state) {
             state.currentAIBlog = null as unknown as AIBlogDetail
             state.currentUserBlog = null as unknown as UserBlogDetail
             state.currentBlogComments = null as unknown as UserBlogComment[]
             state.isCurrentBlogLiked = false
             state.isCurrentBlogDisliked = false
+            state.isCurrentBlogSaved = false
+            state.commentAdded = false
         }
     },
     extraReducers: (builder) => {
@@ -401,5 +465,5 @@ const blogSlice = createSlice({
     }
 })
 
-export const { reset, setCurrentBlogLiked, setCurrentBlogDisliked, setCurrentBlogSaved } = blogSlice.actions
+export const { reset, setCurrentBlogLiked, setCurrentBlogDisliked, setCurrentBlogSaved, setCommentAdded } = blogSlice.actions
 export default blogSlice.reducer

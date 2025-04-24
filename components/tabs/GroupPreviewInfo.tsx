@@ -1,7 +1,7 @@
 import { View, Image, StyleSheet, ViewStyle, Text } from "react-native";
 import { Group } from "@/interfaces/groupInterface";
 
-type BlogGroup = Pick<Group, "name" | "avatar">;
+type BlogGroup = Pick<Group, "Name" | "CoverURL" | "NumberOfMembers">;
 
 interface BlogInGroupProps {
   group: BlogGroup;
@@ -11,8 +11,8 @@ interface BlogInGroupProps {
 export default function GroupPreviewInfo({ group, style }: BlogInGroupProps) {
   return (
     <View style={[styles.container, style]}>
-      <Image source={{ uri: group.avatar }} style={styles.image} />
-      <Text style={styles.name}>{group.name}</Text>
+      <Image source={{ uri: group.CoverURL }} style={styles.image} />
+      <Text style={styles.name}>{group.Name}</Text>
     </View>
   );
 }

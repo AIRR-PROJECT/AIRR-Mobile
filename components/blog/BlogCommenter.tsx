@@ -12,9 +12,11 @@ import {
 import { Image } from "expo-image";
 import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
-import { UserBlogComment } from "@/interfaces/blogInterface";
+import { PostComment, ReplyToBlogComment, UserBlogChildComment, UserBlogComment } from "@/interfaces/blogInterface";
 import { useState, useRef, useEffect } from "react";
 import BlogCommenterChild from "./BlogCommenterChild";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { commentOnBlog, getBlogComment, replyToBlogComment, setCommentAdded } from "@/redux/slices/blogSlice";
 
 const mockUser = {
   _id: "testUserId",
@@ -25,27 +27,47 @@ const mockUser = {
 const mockContent =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 const mockCreatedAt = new Date();
-const mockUserBlogComment = {
+const mockUserBlogComment: UserBlogChildComment = {
   _id: "testCommentId",
   User: mockUser,
   Content: mockContent,
   createdAt: mockCreatedAt,
-  replyTo: "hehe",
+  ReplyToComment: {
+    _id: "test",
+    User: {
+      _id: "test",
+      UserName: "Hehe",
+      AvatarURL: ""
+    }
+  },
+  updatedAt: new Date()
 };
 const mockUserBlogCommentList = [
   mockUserBlogComment,
   mockUserBlogComment,
   mockUserBlogComment,
 ];
+
+type BlogCommenterProps = UserBlogComment & {
+  replies: UserBlogChildComment[]
+}
 export default function BlogCommenter({
   User,
   Content,
   createdAt,
-}: UserBlogComment) {
+  _id,
+  replies
+}: BlogCommenterProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const scrollViewRef = useRef<ScrollView>(null);
   const textInputRef = useRef<TextInput>(null);
+  
+  const dispatch = useAppDispatch();
+  const {
+    currentUserBlog,
+  } = useAppSelector((state) => state.blog);
+  const { user } = useAppSelector((state) => state.user)
 
   // Handle keyboard events
   useEffect(() => {
@@ -76,11 +98,27 @@ export default function BlogCommenter({
     }
   };
 
-  const handleSendReply = () => {
-    console.log("Send reply:", replyText);
-    setIsReplying(false);
-    setReplyText("");
-    Keyboard.dismiss();
+  const handleSendReply = (commentID: string) => {
+    const comment: ReplyToBlogComment = {
+      UserID: user._id,
+      BlogID: currentUserBlog._id,
+      Content: replyText.split(' ').slice(1).join(''),
+      Method: "Reply",
+      ReplyToCommentID: commentID,
+      RootCommentID: commentID
+    }
+    dispatch(replyToBlogComment(comment)).then((res) => {
+      if (res.payload === true) {
+        dispatch(getBlogComment(currentUserBlog._id));
+
+        console.log("Send reply:", replyText);
+        setIsReplying(false);
+        setReplyText("");
+        Keyboard.dismiss();
+
+        dispatch(setCommentAdded(true))
+      }
+    })
   };
 
   const handleCloseReply = () => {
@@ -178,7 +216,7 @@ export default function BlogCommenter({
               {/* Send button */}
               <TouchableOpacity
                 style={[styles.sendButton]}
-                onPress={handleSendReply}
+                onPress={() => handleSendReply(_id)}
                 activeOpacity={0.8}
               >
                 <Text style={styles.sendButtonText}>Reply</Text>
@@ -188,14 +226,16 @@ export default function BlogCommenter({
         )}
         {/* Other reply */}
         <View style={styles.otherReplyContainer}>
-          {mockUserBlogCommentList.map((comment, index) => (
+          {(replies ?? []).map((comment, index) => (
             <BlogCommenterChild
               key={index}
               User={comment.User}
               Content={comment.Content}
               createdAt={comment.createdAt}
-              replyTo={comment.replyTo}
+              replyTo={comment.ReplyToComment.User.UserName}
               onReturnContentPress={handleReturnContentPress}
+              _id={comment._id}
+              rootCommentID={_id}
             />
           ))}
         </View>

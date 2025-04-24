@@ -50,6 +50,25 @@ export const fetchUserBlogs = createAsyncThunk(
     }
 )
 
+export const fetchPersonalBlogs = createAsyncThunk(
+    'feed/fetchPersonal',
+    async (page: number, thunkAPI) => {
+        try {
+            const res = await api.get(`blogs/preview-personal-blogs?page=${page}`)
+
+            if (res.data.success) {
+                return res.data.data
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data.message)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 export const saveTags = createAsyncThunk(
     'feed/saveTags',
     async (tags: {tags: SurveyTags[]}, thunkAPI) => {

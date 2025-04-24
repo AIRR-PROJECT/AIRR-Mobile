@@ -12,26 +12,37 @@ import {
 import { Image } from "expo-image";
 import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
-import { UserBlogComment } from "@/interfaces/blogInterface";
+import { ReplyToBlogComment, UserBlogComment } from "@/interfaces/blogInterface";
 import { useState, useRef, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { replyToBlogComment, getBlogComment, setCommentAdded } from "@/redux/slices/blogSlice";
 // reply to là tên của người mà user reply lại trong content
 // nó có thể khác với parent comment
 type BlogCommenterChildProps = UserBlogComment & {
   replyTo: string;
   onReturnContentPress: (childCommentContent: string) => void;
-};
+} & { rootCommentID: string }
 
 export default function BlogCommenterChild({
   User,
   Content,
   createdAt,
   replyTo,
+  _id,
+  rootCommentID,
   onReturnContentPress: returnContentPress,
 }: BlogCommenterChildProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const scrollViewRef = useRef<ScrollView>(null);
   const textInputRef = useRef<TextInput>(null);
+  
+  const dispatch = useAppDispatch();
+  const {
+    currentUserBlog,
+  } = useAppSelector((state) => state.blog);
+  const { user } = useAppSelector((state) => state.user)
+
   // Handle keyboard events
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -61,13 +72,29 @@ export default function BlogCommenterChild({
     }
   };
 
-  const handleSendReply = () => {
-    console.log("Send reply:", replyText);
-    // Call the parent function to handle the reply
-    returnContentPress(replyText);
-    setIsReplying(false);
-    setReplyText("");
-    Keyboard.dismiss();
+  const handleSendReply = (commentID: string, rootCommentID: string) => {
+    const comment: ReplyToBlogComment = {
+      UserID: user._id,
+      BlogID: currentUserBlog._id,
+      Content: replyText.split(' ').slice(1).join(''),
+      Method: "Reply",
+      ReplyToCommentID: commentID,
+      RootCommentID: rootCommentID
+    }
+    dispatch(replyToBlogComment(comment)).then((res) => {
+      if (res.payload === true) {
+        dispatch(getBlogComment(currentUserBlog._id));
+
+        console.log("Send reply:", replyText);
+        // Call the parent function to handle the reply
+        returnContentPress(replyText);
+        setIsReplying(false);
+        setReplyText("");
+        Keyboard.dismiss();
+        
+        dispatch(setCommentAdded(true))
+      }
+    })
   };
 
   const handleCloseReply = () => {
@@ -154,7 +181,7 @@ export default function BlogCommenterChild({
             {/* Send button */}
             <TouchableOpacity
               style={[styles.sendButton]}
-              onPress={handleSendReply}
+              onPress={() => handleSendReply(_id, rootCommentID)}
               activeOpacity={0.8}
             >
               <Text style={styles.sendButtonText}>Reply</Text>

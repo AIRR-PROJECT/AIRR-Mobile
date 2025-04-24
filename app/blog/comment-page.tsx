@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
+  Keyboard,
+  ScrollView,
 } from "react-native";
 
 import { useLocalSearchParams } from "expo-router";
@@ -15,12 +17,14 @@ import BlogCommenter from "@/components/blog/BlogCommenter";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
+  commentOnBlog,
   getAIBlogDetail,
   getBlogComment,
   getUserBlogDetail,
 } from "@/redux/slices/blogSlice";
 import {
   AIBlogSection,
+  PostComment,
   UserBlogComment,
   UserBlogTag,
 } from "@/interfaces/blogInterface";
@@ -201,8 +205,7 @@ const mockUserBlogCommentList = [
 
 export default function CommentBlogScreen() {
   const searchParams = useLocalSearchParams<{
-    aiBlogId: string;
-    userBlogId: string;
+    blogId: string;
   }>();
   // if (searchParams.aiBlogId) {
 
@@ -213,63 +216,33 @@ export default function CommentBlogScreen() {
     currentBlogComments,
     isCurrentBlogSaved,
   } = useAppSelector((state) => state.blog);
-
-  // Shared properties
-  const [title, setTitle] = useState("Mock description");
-  const [description, setDescription] = useState("Mock description");
-  const [thumbnail, setThumbnail] = useState(mockThumbnail);
-  // AI blog properties
-  const [sections, setSections] = useState(mockSections);
-  const [conclusion, setConclusion] = useState("This is concluded.");
-  // User blog properties
-  const [author, setAuthor] = useState(mockAuthor);
-  const [tags, setTags] = useState(mockTags);
-  const [likes, setLikes] = useState(123);
-  const [dislikes, setDislikes] = useState(123);
-  const [comments, setComments] = useState(123);
-  const [html, setHtml] = useState(mockHtml);
-  const [commentsDetail, setCommentsDetail] = useState(mockComments);
+  const { user } = useAppSelector((state) => state.user)
+  // Post comment
+  const [postComment, setPostComment] = useState("Write a reply")
+  const [commentText, setCommentText] = useState("")
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const textInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    } else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId));
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId));
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId));
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId));
-    }
-    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+    dispatch(getBlogComment(searchParams.blogId));
   }, []);
-
+  
+  // Handle keyboard events
   useEffect(() => {
-    if (currentAIBlog) {
-      setTitle(currentAIBlog.Title);
-      setDescription(currentAIBlog.Description);
-      setSections(currentAIBlog.Sections);
-      setConclusion(currentAIBlog.Conclusion);
-    }
-  }, [currentAIBlog]);
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        // Scroll to the bottom when keyboard shows
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }
+    );
 
-  useEffect(() => {
-    if (currentUserBlog) {
-      setTitle(currentUserBlog.Title);
-      setDescription(currentUserBlog.Description);
-      setThumbnail(currentUserBlog.BackgroundURL);
-      setTags(currentUserBlog.Tags);
-      setAuthor(currentUserBlog.Author);
-      setLikes(currentUserBlog.Reaction.Likes);
-      setDislikes(currentUserBlog.Reaction.Dislikes);
-      setComments(currentUserBlog.Reaction.Comments);
-      setHtml(currentUserBlog.Content);
-    }
-  }, [currentUserBlog]);
-
-  useEffect(() => {
-    setCommentsDetail(currentBlogComments);
-  }, [currentBlogComments]);
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -278,16 +251,28 @@ export default function CommentBlogScreen() {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
 
-    if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    } else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId));
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId));
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId));
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId));
-    }
-    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+    dispatch(getBlogComment(searchParams.blogId));
   };
+  
+  const handleInputUserComment = (val: string) => {
+    setPostComment(val)
+  }
+  const handlePostUserComment = () => {
+    const comment: PostComment = {
+      UserID: user._id,
+      BlogID: currentUserBlog._id,
+      Content: postComment,
+      Method: "Post"
+    }
+    dispatch(commentOnBlog(comment)).then((res) => {
+      if (res.payload === true) {
+        dispatch(getBlogComment(searchParams.blogId));
+
+        setPostComment("")
+        setIsWriteComment(false);
+      }
+    })
+  }
 
   useEffect(() => {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
@@ -306,7 +291,7 @@ export default function CommentBlogScreen() {
       data={currentBlogComments}
       keyExtractor={(item, index) => item._id + index}
       renderItem={({ item }) => (
-        <BlogCommenter {...item} replies={mockUserBlogCommentList} />
+        <BlogCommenter {...item} replies={item.ChildrenComments} />
       )}
       style={styles.flatListContainer}
       contentContainerStyle={styles.contentContainer}
@@ -359,15 +344,14 @@ export default function CommentBlogScreen() {
                 placeholderTextColor="#565656"
                 multiline
                 numberOfLines={4}
+                onChangeText={handleInputUserComment}
                 textAlignVertical="top"
               />
               <Divider />
               {/* Comment Button */}
               <TouchableOpacity
                 style={styles.commentWriteButtonContainer}
-                onPress={() => {
-                  setIsWriteComment(false);
-                }}
+                onPress={handlePostUserComment}
               >
                 <Text style={styles.commentWriteButtonText}>Comment</Text>
               </TouchableOpacity>

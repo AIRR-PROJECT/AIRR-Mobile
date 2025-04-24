@@ -59,6 +59,8 @@ export default function MyFeed() {
   const dispatch = useAppDispatch();
   const [recommendedPage, setRecommendedPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
+  const [isRecommendedBlogReset, setRecommendedBlogReset] = useState(false)
+  const [isUserBlogReset, setUserBlogReset] = useState(false)
   const [currentTags, setCurrentTags] = useState();
   const { user } = useAppSelector((state) => state.user);
 
@@ -84,6 +86,18 @@ export default function MyFeed() {
     onSuccess: (data: any) => {
       queryClient.setQueryData(["feed-recommended"], (oldData: any) => {
         return [...oldData, ...data] as AIBlog[];
+      });
+    },
+  });
+  const recommendedBlogsReset = useMutation({
+    mutationFn: async () => {
+      const refetchedBlog = await dispatch(fetchRecommendedBlogs(1));
+
+      return refetchedBlog.payload.blogList.blogs as AIBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-recommended"], (oldData: any) => {
+        return [...data] as AIBlog[];
       });
     },
   });
@@ -136,14 +150,22 @@ export default function MyFeed() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     // Simulate fetching data
+    console.log("Refreshing")
+    setRecommendedBlogReset(true)
+    setUserBlogReset(true)
+    recommendedBlogsReset.mutateAsync().then(() => setRecommendedBlogReset(false))
+    userBlogsReset.mutateAsync().then(() => setUserBlogReset(false))
     setTimeout(() => {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
   }, []);
 
+  useEffect(() => {
+    console.log("Refetching")
+  }, [recommendedBlogsQuery.isFetching])
+
   // Update current tags upon successful query
   useEffect(() => {
-    console.log(userBlogsQuery.isSuccess);
     if (userBlogsQuery.isSuccess) {
       setCurrentTags((user as any).Survey);
     }
@@ -152,7 +174,8 @@ export default function MyFeed() {
   useEffect(() => {
     if (user) {
       setUserPage(1);
-      userBlogsReset.mutate();
+      setUserBlogReset(true)
+      userBlogsReset.mutateAsync().then(() => setUserBlogReset(false))
     }
   }, [user]);
   const progress = useSharedValue(0);
@@ -162,7 +185,7 @@ export default function MyFeed() {
   return (
     <View style={styles.container}>
       {/* Flat list for lazy load */}
-      {userBlogsQuery.isPending ? (
+      {userBlogsQuery.isFetching || isUserBlogReset ? (
         <FeedBlogPreviewSkeleton />
       ) : (
         <View style={{ flex: 1, width: "100%" }}>
@@ -204,7 +227,7 @@ export default function MyFeed() {
                 </View>
 
                 {/* Change to carousel for better ux*/}
-                {recommendedBlogsQuery.isPending ? (
+                {recommendedBlogsQuery.isFetching || isRecommendedBlogReset ? (
                   <AIBlogPreviewSkeleton />
                 ) : (
                   <View

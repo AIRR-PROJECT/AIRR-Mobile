@@ -33,7 +33,7 @@ export default function GroupCardComponent({
   }
   const handleGroupPress = () => {
     // Handle group card press
-    route.push("/group");
+    route.push(`/group?groupId=${id}`);
     console.log(`Group card pressed: ${name}`);
   }
   return (

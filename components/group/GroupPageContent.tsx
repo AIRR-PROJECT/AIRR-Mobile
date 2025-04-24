@@ -16,9 +16,12 @@ import {
   FontAwesome6,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Divider } from "@rneui/base";
 import { useRouter } from "expo-router";
+import { useAppDispatch } from "@/redux/hook";
+import { getGroupInfo } from "@/redux/slices/groupSlice";
+import { GroupDetailInfo } from "@/interfaces/groupInterface";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -53,6 +56,7 @@ const mockGroupDetail: GroupDetailProps = {
 type GroupPageProps = {
   selectedId: number;
   setSelectedId: (id: number) => void;
+  groupID: string
 };
 
 const joinConfirmImage = require("@/assets/images/group/join_confirm.png");
@@ -60,10 +64,22 @@ const joinConfirmImage = require("@/assets/images/group/join_confirm.png");
 export default function GroupPageContent({
   selectedId,
   setSelectedId,
+  groupID
 }: GroupPageProps) {
   const route = useRouter();
+  const dispatch = useAppDispatch()
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>()
+
+  useEffect(() => {
+    dispatch(getGroupInfo({
+      groupID
+    })).then((res) => {
+      setGroupInfo(res.payload as GroupDetailInfo)
+    })
+  }, [groupID])
+
   const handleCancel = () => {
     setIsModalVisible(false);
   };
@@ -74,10 +90,10 @@ export default function GroupPageContent({
   return (
     <View style={styles.container}>
       <View>
-        <DetailGroupCardComponent {...mockGroupDetail} />
+        <DetailGroupCardComponent {...groupInfo} />
       </View>
       {/* Description */}
-      <Text style={styles.description}>{mockGroupDetail.description}</Text>
+      <Text style={styles.description}>{groupInfo ? groupInfo.Description : mockGroupDetail.description}</Text>
       <View style={styles.rowContainer}>
         <TouchableOpacity
           style={styles.infoContainer}

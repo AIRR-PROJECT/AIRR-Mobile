@@ -48,6 +48,28 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
               />
             </View>
             <Entypo name="dots-three-vertical" size={24} color="white" />
+            <View style={styles.groupSection}>
+              {/* <ThemedText
+                style={styles.text}
+                type="default"
+                lightColor="#fff"
+                darkColor="#fff"
+              >
+                Group
+              </ThemedText> */}
+              <GroupPreviewInfo style={{}} group={{Name:`Group's name`, CoverURL: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', NumberOfMembers: 123} }/>
+            </View>
+            {/* Ask later because it take to much space */}
+            {/* <View style={styles.buttonSection}>
+              <ThemedText
+                style={styles.text}
+                type="default"
+                lightColor="#fff"
+                darkColor="#fff"
+              >
+                Button
+              </ThemedText>
+            </View> */}
           </View>
           {/* 2nd Part: List of Tags */}
           <View style={styles.tagsSection}>

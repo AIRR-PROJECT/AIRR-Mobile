@@ -24,6 +24,7 @@ import { ThemedText } from "@/components/ThemedText";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
+  commentOnBlog,
   dislikeBlog,
   dislikeToLikeBlog,
   getAIBlogDetail,
@@ -34,10 +35,12 @@ import {
   removeDislikeBlog,
   removeLikeBlog,
   saveBlog,
+  setCommentAdded,
   unsaveBlog,
 } from "@/redux/slices/blogSlice";
 import {
   AIBlogSection,
+  PostComment,
   UserBlogComment,
   UserBlogTag,
 } from "@/interfaces/blogInterface";
@@ -213,6 +216,7 @@ const mockUserBlogCommentList = [
   mockUserBlogComment,
 ];
 
+let isReactOnTimeout = false
 export default function BlogScreen() {
   const searchParams = useLocalSearchParams<{
     aiBlogId: string;
@@ -229,7 +233,9 @@ export default function BlogScreen() {
     isCurrentBlogLiked,
     isCurrentBlogDisliked,
     isCurrentBlogSaved,
+    commentAdded
   } = useAppSelector((state) => state.blog);
+  const { user } = useAppSelector((state) => state.user)
 
   // Shared properties
   const [title, setTitle] = useState("Mock description");
@@ -239,24 +245,35 @@ export default function BlogScreen() {
   const [sections, setSections] = useState(mockSections);
   const [conclusion, setConclusion] = useState("This is concluded.");
   // User blog properties
-  const [author, setAuthor] = useState(mockAuthor);
-  const [tags, setTags] = useState(mockTags);
-  const [likes, setLikes] = useState(123);
-  const [dislikes, setDislikes] = useState(123);
-  const [comments, setComments] = useState(123);
-  const [html, setHtml] = useState(mockHtml);
-  const [commentsDetail, setCommentsDetail] = useState(mockComments);
+  const [author, setAuthor] = useState(mockAuthor)
+  const [tags, setTags] = useState(mockTags)
+  const reactTimeout = 500
+  const [likes, setLikes] = useState(123)
+  const [dislikes, setDislikes] = useState(123)
+  const [comments, setComments] = useState(123)
+  const [blogLiked, setBlogLiked] = useState<boolean>(false)
+  const [blogDisliked, setBlogDisliked] = useState<boolean>(false)
+  const [blogSaved, setBlogSaved] = useState<boolean>(false)
+  const [html, setHtml] = useState(mockHtml)
+  const [commentsDetail, setCommentsDetail] = useState(mockComments)
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    } else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId));
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId));
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId));
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId));
+      dispatch(getAIBlogDetail(searchParams.aiBlogId))
+    }
+    else {
+      dispatch(getUserBlogDetail(searchParams.userBlogId))
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then((data) => {
+        setBlogLiked(data.payload as boolean)
+      })
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then((data) => {
+        setBlogDisliked(data.payload as boolean)
+      })
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then((data) => {
+        setBlogSaved(data.payload as boolean)
+      })
     }
     dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
   }, []);
@@ -288,6 +305,15 @@ export default function BlogScreen() {
     setCommentsDetail(currentBlogComments);
   }, [currentBlogComments]);
 
+  useEffect(() => {
+    console.log(`Comment added: ${commentAdded}`)
+    if (commentAdded) {
+      setComments(comments + 1)
+
+      dispatch(setCommentAdded(false))
+    }
+  }, [commentAdded])
+
   const handleRefresh = () => {
     setRefreshing(true);
     // Simulate fetching data
@@ -296,12 +322,19 @@ export default function BlogScreen() {
     }, 2000); // 2 seconds refresh
 
     if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    } else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId));
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId));
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId));
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId));
+      dispatch(getAIBlogDetail(searchParams.aiBlogId))
+    }
+    else {
+      dispatch(getUserBlogDetail(searchParams.userBlogId))
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then((data) => {
+        setBlogLiked(data.payload as boolean)
+      })
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then((data) => {
+        setBlogDisliked(data.payload as boolean)
+      })
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then((data) => {
+        setBlogSaved(data.payload as boolean)
+      })
     }
     dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
   };
@@ -310,52 +343,97 @@ export default function BlogScreen() {
     route.back();
   };
   const handleLike = () => {
-    console.log("Pressed Like button");
+    console.log(isReactOnTimeout)
+    if (isReactOnTimeout) {
+      console.log("React still on cooldown")
+      return;
+    };
+    isReactOnTimeout = true
+    setTimeout(() => {
+      isReactOnTimeout = false
+    }, reactTimeout)
 
-    if (isCurrentBlogLiked) {
-      dispatch(removeLikeBlog(searchParams.userBlogId)).then(() => {
-        setLikes(likes - 1);
-      });
-    } else {
-      if (isCurrentBlogDisliked) {
-        dispatch(dislikeToLikeBlog(searchParams.userBlogId)).then(() => {
-          setLikes(likes + 1);
-          setDislikes(dislikes - 1);
-        });
-      } else {
-        dispatch(likeBlog(searchParams.userBlogId)).then(() => {
-          setLikes(likes + 1);
-        });
+    if (blogLiked) {
+      setLikes(likes - 1)
+
+      setBlogLiked(false)
+
+      dispatch(removeLikeBlog(searchParams.userBlogId))
+    }
+    else {
+      if (blogDisliked) {
+        setLikes(likes + 1)
+        setDislikes(dislikes - 1)
+
+        setBlogLiked(true)
+        setBlogDisliked(false)
+
+        dispatch(dislikeToLikeBlog(searchParams.userBlogId))
+      }
+      else {
+        setLikes(likes + 1)
+
+        setBlogLiked(true)
+
+        dispatch(likeBlog(searchParams.userBlogId))
       }
     }
   };
   const handleDislike = () => {
-    console.log("Pressed Dislike button");
+    if (isReactOnTimeout) {
+      console.log("React still on cooldown")
+      return;
+    };
+    isReactOnTimeout = true
+    setTimeout(() => {
+      isReactOnTimeout = false
+    }, reactTimeout)
 
-    if (isCurrentBlogDisliked) {
-      dispatch(removeDislikeBlog(searchParams.userBlogId)).then(() => {
-        setDislikes(dislikes - 1);
-      });
-    } else {
-      if (isCurrentBlogLiked) {
-        dispatch(likeToDislikeBlog(searchParams.userBlogId)).then(() => {
-          setDislikes(dislikes + 1);
-          setLikes(likes - 1);
-        });
-      } else {
-        dispatch(dislikeBlog(searchParams.userBlogId)).then(() => {
-          setDislikes(dislikes + 1);
-        });
+    if (blogDisliked) {
+      setDislikes(dislikes - 1)
+
+      setBlogDisliked(false)
+
+      dispatch(removeDislikeBlog(searchParams.userBlogId))
+    }
+    else {
+      if (blogLiked) {
+        setDislikes(dislikes + 1)
+        setLikes(likes - 1)
+
+        setBlogLiked(false)
+        setBlogDisliked(true)
+        
+        dispatch(likeToDislikeBlog(searchParams.userBlogId))
+      }
+      else {
+        setDislikes(dislikes + 1)
+
+        setBlogDisliked(true)
+
+        dispatch(dislikeBlog(searchParams.userBlogId))
       }
     }
   };
   const handleBookmark = () => {
-    console.log("Pressed Bookmark");
+    if (isReactOnTimeout) {
+      console.log("React still on cooldown")
+      return;
+    };
+    isReactOnTimeout = true
+    setTimeout(() => {
+      isReactOnTimeout = false
+    }, reactTimeout)
 
-    if (isCurrentBlogSaved) {
-      dispatch(unsaveBlog(searchParams.userBlogId));
-    } else {
-      dispatch(saveBlog(searchParams.userBlogId));
+    if (blogSaved) {
+      dispatch(unsaveBlog(searchParams.userBlogId))
+
+      setBlogSaved(false)
+    }
+    else {
+      dispatch(saveBlog(searchParams.userBlogId))
+
+      setBlogSaved(true)
     }
   };
 
@@ -364,11 +442,9 @@ export default function BlogScreen() {
   }, [isCurrentBlogSaved]);
 
   const [isWriteComment, setIsWriteComment] = useState(false);
+  
   const handleCommentPress = () => {
-    route.push("/blog/comment-page", {
-      userBlogId: searchParams.userBlogId,
-      aiBlogId: searchParams.aiBlogId,
-    });
+    route.push(`/blog/comment-page?blogId=${searchParams.userBlogId}`);
   }
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -454,57 +530,37 @@ export default function BlogScreen() {
         {/* Blog content (render from html) */}
         <QuillRenderer dom={{ matchContents: true }} content={html} />
 
-        {searchParams.userBlogId && (
-          <Divider
-            orientation="vertical"
-            width={1}
-            style={{ borderColor: "white" }}
-          />
-        )}
-        {/* Like, Dislike, Comment, Markbook */}
-        {searchParams.userBlogId && (
-          <View style={styles.interactSection}>
-            {/* Likes */}
-            <View style={[styles.rowContainer, { gap: 20 }]}>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={
-                  isCurrentBlogLiked
-                    ? styles.likeContainerYes
-                    : styles.likeContainerNo
-                }
-                onPress={handleLike}
-              >
-                <FontAwesome
-                  name="thumbs-up"
-                  size={24}
-                  color={isCurrentBlogLiked ? "#000" : "#fff"}
-                />
-                <ThemedText
-                  style={{ color: isCurrentBlogLiked ? "#000" : "#fff" }}
-                  type="default"
-                  lightColor="#fff"
-                  darkColor="#fff"
-                >
-                  {likes}
-                </ThemedText>
-              </TouchableOpacity>
-              {/* Dislikes */}
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={
-                  isCurrentBlogDisliked
-                    ? styles.dislikeContainerYes
-                    : styles.dislikeContainerNo
-                }
-                onPress={handleDislike}
-              >
-                <FontAwesome
-                  name="thumbs-down"
-                  size={24}
-                  color={isCurrentBlogDisliked ? "#000" : "#fff"}
-                />
-                {/* <ThemedText
+            {searchParams.userBlogId && (
+              <Divider
+                orientation="vertical"
+                width={1}
+                style={{ borderColor: "white" }}
+              />
+            )}
+            {/* Like, Dislike, Comment, Markbook */}
+            {searchParams.userBlogId && (
+              <View style={styles.interactSection}>
+                {/* Likes */}
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={handleLike}>
+                    <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#000" : "#fff"} />
+                    <ThemedText
+                      style={{ color: blogLiked ? "#000" : "#fff" }}
+                      type="default"
+                      lightColor="#fff"
+                      darkColor="#fff"
+                    >
+                      {likes}
+                    </ThemedText>
+                  </TouchableOpacity>
+                  {/* Dislikes */}
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={handleDislike}>
+                    <FontAwesome name="thumbs-down" size={24} color={blogDisliked ? "#000" : "#fff"} />
+                    {/* <ThemedText
                       style={styles.text}
                       type="default"
                       lightColor="#fff"

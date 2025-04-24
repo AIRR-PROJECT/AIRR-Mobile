@@ -49,6 +49,7 @@ export interface UserBlog {
     Description: string;
     BackgroundURL: string;
     UserInteraction: string;
+    IsSavedByUser: boolean;
     Reaction: UserBlogReaction;
     // content: string;
     // timestamp: string;
@@ -79,7 +80,26 @@ export interface UserBlogComment {
     Content: string
     createdAt: Date
     updatedAt: Date
-    
+}
+
+export interface UserBlogChildComment {
+    _id: string;
+    User: {
+        _id: string;
+        UserName: string
+        AvatarURL: string
+    };
+    Content: string;
+    ReplyToComment: {
+        _id: string;
+        User: {
+            _id: string;
+            UserName: string
+            AvatarURL: string
+        };
+    };
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface BlogActionHistory{
@@ -88,4 +108,38 @@ export interface BlogActionHistory{
     BackgroundURL: string;
     Action: string;
     Timestamp: string;
+}
+
+
+export interface CreateBlogGroupDtoType {
+    Name: string;
+    _id: string;
+}
+export interface CreateBlogTagDTO {
+    _id: string;
+    TagName: string;
+}
+export interface CreateBlog {
+    Group: CreateBlogGroupDtoType;
+    Tags: CreateBlogTagDTO[];
+    thumbnail: any;
+    Title: string;
+    Description: string;
+    Content: string;
+}
+
+export interface PostComment {
+    UserID: string;
+    BlogID: string;
+    Content: string;
+    Method: string;
+}
+
+export interface ReplyToBlogComment {
+    UserID: string;
+    BlogID: string;
+    Content: string;
+    Method: string;
+    ReplyToCommentID: string;
+    RootCommentID: string
 }

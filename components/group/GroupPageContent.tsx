@@ -90,7 +90,7 @@ export default function GroupPageContent({
   return (
     <View style={styles.container}>
       <View>
-        <DetailGroupCardComponent {...groupInfo} />
+        <DetailGroupCardComponent {...mockGroupDetail} />
       </View>
       {/* Description */}
       <Text style={styles.description}>{groupInfo ? groupInfo.Description : mockGroupDetail.description}</Text>

@@ -1,5 +1,6 @@
 import { configureStore, createSerializableStateInvariantMiddleware, Tuple } from "@reduxjs/toolkit";
 
+import loadingReducer from "./slices/loadingSlice";
 import authReducer from "./slices/authSlice";
 import userReducer from './slices/userSlice';
 import feedReducer from './slices/feedSlice';
@@ -14,6 +15,7 @@ const serializableMiddleware = createSerializableStateInvariantMiddleware({
 const store = configureStore({
     reducer: {
         // Add the reducer here
+        loading: loadingReducer,
         auth: authReducer,
         user: userReducer,
         feed: feedReducer,

@@ -9,7 +9,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, StyleSheet, Platform, Text, Modal } from "react-native";
+import { View, StyleSheet, Platform, Text, Modal, ActivityIndicator } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Image } from "expo-image";
 import LeftHeader from "@/components/tabs/LeftHeader";
@@ -21,6 +21,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/redux/api/queryClient";
 import { getUserInfo, loadToken, logout } from "@/redux/slices/authSlice";
 import { injectStoreToAxiosInterceptor } from "@/redux/api/axiosInstance";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -49,6 +50,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
+        <LoadingSpinner></LoadingSpinner>
         {/* // change to dark later */}
         <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
           {/* <StatusBar style="auto" /> */}
@@ -122,5 +124,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: Platform.OS === "android" ? 0 : 0, // Prevent status bar overlap on Android
-  },
+  }
 });

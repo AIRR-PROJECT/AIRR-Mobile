@@ -4,13 +4,14 @@ import Spinner from "react-native-loading-spinner-overlay";
 
 export default function LoadingSpinner() {
     const { loading } = useAppSelector(state => state.loading)
-    
+
     return (
         <Spinner 
           visible={loading}
           size={"large"}
           color="#b9ff66"
           textContent={"Now loading..."}
+          overlayColor="#3d3d3d66"
           textStyle={styles.loadingSpinnerText}
         />
     )

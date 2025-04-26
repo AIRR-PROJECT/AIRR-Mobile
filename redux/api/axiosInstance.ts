@@ -25,8 +25,7 @@ const api = axios.create({
 
 // Attach access token to every request
 api.interceptors.request.use(async (config) => {
-    
-    store.dispatch(showLoading())
+    store.dispatch(showLoading("Now sending request..."))
 
     const accessToken = await SecureStore.getItemAsync('accessToken');
     // const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im90dGVyLm9saXZlLjQ1OCIsInN1YiI6IjY3OGQwNmRlNjcyMjBlZTFjOWRlZDdkYiIsInJvbGUiOiJNZW1iZXIiLCJpYXQiOjE3NDE2OTg5NzQsImV4cCI6MTc0MTY5OTg3NH0.gfuXsPa2XR97yqYNNRZmn0R85MBSKPIK_L3L-yudDas"
@@ -88,8 +87,6 @@ api.interceptors.response.use(
                                 await SecureStore.deleteItemAsync("refreshToken")
                                 console.log("dismissed to first screen")
 
-                                store.dispatch(hideLoading())
-
                                 if (router.canDismiss())
                                     router.dismissAll()
                             }
@@ -113,8 +110,6 @@ api.interceptors.response.use(
                         await SecureStore.deleteItemAsync("accessToken")
                         await SecureStore.deleteItemAsync("refreshToken")
                         console.log("dismissed to first screen")
-
-                        store.dispatch(hideLoading())
                         
                         if (router.canDismiss())
                             router.dismissAll()

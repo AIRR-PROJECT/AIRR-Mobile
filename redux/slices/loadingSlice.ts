@@ -11,15 +11,17 @@ import jwt from 'expo-jwt'
 import { jwtDecode } from "jwt-decode";
 
 const initialState = {
-    loading: false
+    loading: false,
+    message: ""
 };
 
 const loadingSlice = createSlice({
     name: "loading",
     initialState,
     reducers: {
-        showLoading(state) {
+        showLoading(state, action) {
             state.loading = true
+            state.message = action.payload
         },
 
         hideLoading(state) {

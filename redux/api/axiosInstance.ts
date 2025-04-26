@@ -49,7 +49,7 @@ api.interceptors.response.use(
         const originalRequest = error.config;
         const exception_data = error.response?.data
         let exception_status: number = error.status ?? ""
-        let exception_failcode: number
+        let exception_failcode: number = -1
         let exception_message: string = exception_data ? exception_data.message : error.message
 
         if (error.response?.status === 401) {
@@ -78,8 +78,9 @@ api.interceptors.response.use(
                         }
                         else {
                             exception_status = response.status
+                            exception_failcode = response.data.failcode
                             if (response.status === 401 && 
-                                (response.data.failcode === ResponseFailcode.TOKEN_INVALID || error.response.data.failcode === ResponseFailcode.ACCESS_EXPIRED)) {
+                                (response.data.failcode === ResponseFailcode.TOKEN_INVALID || response.data.failcode === ResponseFailcode.ACCESS_EXPIRED)) {
                                 exception_message = "Session expired. Please re-login"
 
                                 store.dispatch(reset())
@@ -102,6 +103,7 @@ api.interceptors.response.use(
                 }
                 catch (error: any) {
                     exception_status = error.status
+                    exception_failcode = error.response.data.failcode
                     if (error.status === 401 
                         && (error.response.data.failcode === ResponseFailcode.TOKEN_INVALID || error.response.data.failcode === ResponseFailcode.ACCESS_EXPIRED)) {
                         exception_message = "Session expired. Please re-login"
@@ -133,7 +135,7 @@ api.interceptors.response.use(
         //     Alert.alert("Error" + error.status, getReasonPhrase(error.status))
         // }
         store.dispatch(hideLoading())
-        ToastAndroid.showWithGravity(`(${exception_status}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+        ToastAndroid.showWithGravity(`(${exception_status}) (${exception_failcode}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
         // Alert.alert((exception_status != -1 ? "Error: " + exception_status : "Error"), exception_message)
         return Promise.reject(error);
     }

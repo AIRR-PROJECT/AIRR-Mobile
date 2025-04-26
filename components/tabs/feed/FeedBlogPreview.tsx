@@ -5,7 +5,7 @@ import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import { Pressable, TouchableOpacity } from "react-native";
 import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { dislikeBlog, dislikeToLikeBlog, likeBlog, likeToDislikeBlog, removeDislikeBlog, removeLikeBlog, saveBlog, unsaveBlog } from "@/redux/slices/blogSlice";
 import { getUserBlogDislikeActivities, getUserBlogLikeActivities, getUserBlogSaveActivities } from "@/redux/slices/authSlice";
@@ -17,6 +17,26 @@ const mockGroup = {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
   NumberOfMembers: 100,
 };
+
+export function debounce<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
+}
 
 let isReactOnTimeout = false
 export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
@@ -42,7 +62,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     setLikes(blog.Reaction.Likes)
     setDislikes(blog.Reaction.Dislikes)
     setComments(blog.Reaction.Comments)
-    
+
     dispatch(getUserBlogLikeActivities(blog._id)).then((data) => {
       setBlogLiked(data.payload as boolean)
     })
@@ -55,17 +75,8 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   }, [])
 
   const handleLike = () => {
-    console.log(isReactOnTimeout)
-    if (isReactOnTimeout) {
-      console.log("React still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
-
     if (blogLiked) {
+      console.log("Remove like")
       setLikes(likes - 1)
 
       setBlogLiked(false)
@@ -74,6 +85,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     }
     else {
       if (blogDisliked) {
+        console.log("Dislike to like")
         setLikes(likes + 1)
         setDislikes(dislikes - 1)
 
@@ -83,6 +95,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         dispatch(dislikeToLikeBlog(blog._id))
       }
       else {
+        console.log("Like")
         setLikes(likes + 1)
 
         setBlogLiked(true)
@@ -92,16 +105,8 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     }
   }
   const handleDislike = () => {
-    if (isReactOnTimeout) {
-      console.log("React still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
-
     if (blogDisliked) {
+      console.log("Remove dislike")
       setDislikes(dislikes - 1)
 
       setBlogDisliked(false)
@@ -110,6 +115,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     }
     else {
       if (blogLiked) {
+        console.log("Like to dislike")
         setDislikes(dislikes + 1)
         setLikes(likes - 1)
 
@@ -119,6 +125,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         dispatch(likeToDislikeBlog(blog._id))
       }
       else {
+        console.log("Dislike blog")
         setDislikes(dislikes + 1)
 
         setBlogDisliked(true)
@@ -128,15 +135,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     }
   }
   const handleBookmark = () => {
-    if (isReactOnTimeout) {
-      console.log("Save still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
-
     if (blogSaved) {
       dispatch(unsaveBlog(blog._id))
 
@@ -148,6 +146,18 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
       setBlogSaved(true)
     }
   }
+
+  const debounceHandleLike = debounce(() => {
+    handleLike()
+  }, 0.5)
+
+  const debounceHandleDislike = debounce(() => {
+    handleDislike()
+  }, 0.5)
+
+  const debounceHandleBookmark = debounce(() => {
+    handleBookmark()
+  }, 0.5)
 
   return (
     <TouchableOpacity
@@ -233,7 +243,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           <View style={[styles.rowContainer, { gap: 20 }]}>
             <TouchableOpacity
               activeOpacity={0.7}
-              style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={handleLike}>
+              style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={debounceHandleLike}>
               <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#fff" : "#000"} />
               <Text style={blogLiked ? styles.textYes : styles.textNo}>{likes}</Text>
               {/* <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#fff" : "#000"} />
@@ -249,7 +259,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
             {/* Dislikes */}
             <TouchableOpacity
               activeOpacity={0.7}
-              style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={handleDislike}>
+              style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={debounceHandleDislike}>
               <FontAwesome name="thumbs-down" size={24} color={blogDisliked ? "#fff" : "#000"} />
             </TouchableOpacity>
           </View>
@@ -261,7 +271,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           {/* Bookmart Button */}
           <TouchableOpacity
             activeOpacity={0.7}
-            style={blogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={handleBookmark}>
+            style={blogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={debounceHandleBookmark}>
             <FontAwesome name="bookmark" size={24} color={blogSaved ? "#fff" : "#000"} />
           </TouchableOpacity>
         </View>

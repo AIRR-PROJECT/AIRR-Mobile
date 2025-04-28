@@ -8,8 +8,11 @@ import {
   TextInput,
   Keyboard,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
 } from "react-native";
-
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 
@@ -216,10 +219,10 @@ export default function CommentBlogScreen() {
     currentBlogComments,
     isCurrentBlogSaved,
   } = useAppSelector((state) => state.blog);
-  const { user } = useAppSelector((state) => state.user)
+  const { user } = useAppSelector((state) => state.user);
   // Post comment
-  const [postComment, setPostComment] = useState("Write a reply")
-  const [commentText, setCommentText] = useState("")
+  const [postComment, setPostComment] = useState("");
+  const [commentText, setCommentText] = useState("");
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -228,21 +231,21 @@ export default function CommentBlogScreen() {
   useEffect(() => {
     dispatch(getBlogComment(searchParams.blogId));
   }, []);
-  
-  // Handle keyboard events
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        // Scroll to the bottom when keyboard shows
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }
-    );
 
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
+  // // Handle keyboard events
+  // useEffect(() => {
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     "keyboardDidShow",
+  //     () => {
+  //       // Scroll to the bottom when keyboard shows
+  //       scrollViewRef.current?.scrollToEnd({ animated: true });
+  //     }
+  //   );
+
+  //   return () => {
+  //     keyboardDidShowListener.remove();
+  //   };
+  // }, []);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -253,27 +256,30 @@ export default function CommentBlogScreen() {
 
     dispatch(getBlogComment(searchParams.blogId));
   };
-  
+
   const handleInputUserComment = (val: string) => {
-    setPostComment(val)
-  }
+    setPostComment(val);
+  };
   const handlePostUserComment = () => {
     const comment: PostComment = {
       UserID: user._id,
       BlogID: currentUserBlog._id,
       Content: postComment,
-      Method: "Post"
-    }
+      Method: "Post",
+    };
     dispatch(commentOnBlog(comment)).then((res) => {
       if (res.payload === true) {
         dispatch(getBlogComment(searchParams.blogId));
 
-        setPostComment("")
+        setPostComment("");
         setIsWriteComment(false);
       }
-    })
-  }
-
+    });
+  };
+  const handleReplyPosted = () => {
+    console.log("Reply posted");
+    // dispatch(getBlogComment(searchParams.blogId));
+  };
   useEffect(() => {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
   }, [isCurrentBlogSaved]);
@@ -283,89 +289,99 @@ export default function CommentBlogScreen() {
   const [isWriteComment, setIsWriteComment] = useState(false);
 
   return (
-    <FlatList
-      ref={flatListRef}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
-      data={currentBlogComments}
-      keyExtractor={(item, index) => item._id + index}
-      renderItem={({ item }) => (
-        <BlogCommenter {...item} replies={item.ChildrenComments} />
-      )}
-      style={styles.flatListContainer}
-      contentContainerStyle={styles.contentContainer}
-      ListFooterComponent={<View style={{ height: 20 }}></View>}
-      showsVerticalScrollIndicator={false}
-      ListHeaderComponent={() => (
-        <View>
-          {/* Other user comments */}
-          {!isWriteComment && (
-            <View>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.commentButtonContainer}
-                onPress={() => {
-                  setIsWriteComment(true);
-                }}
-              >
-                <Text style={styles.commentText}>Write a comment...</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {/* User Comment */}
-          {isWriteComment && (
-            <View style={styles.commentWriteContainer}>
-              <View style={[styles.rowContainer, { alignItems: "center" }]}>
-                {/* User avatar */}
-                <View style={styles.rowContainer}>
-                  <Image
-                    style={styles.avatar}
-                    source={{ uri: mockUser.AvatarURL }}
-                  />
-                  {/* name and date */}
+    <View
+      // behavior={Platform.OS === "ios" ? "padding" : "height"}
+      // keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0} // Add this line
+      style={{ flex: 1 }}
+    >
+      <View style={[styles.container]}>
+        {/* Other user comments */}
+        {!isWriteComment && (
+          <View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.commentButtonContainer}
+              onPress={() => {
+                setIsWriteComment(true);
+              }}
+            >
+              <Text style={styles.commentText}>Write a comment...</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {/* User Comment */}
+        {isWriteComment && (
+          <View style={styles.commentWriteContainer}>
+            <View style={[styles.rowContainer, { alignItems: "center" }]}>
+              {/* User avatar */}
+              <View style={styles.rowContainer}>
+                <Image
+                  style={styles.avatar}
+                  source={{ uri: mockUser.AvatarURL }}
+                />
+                {/* name and date */}
+                <View>
                   <View>
-                    <View>
-                      <Text style={styles.name}>Username</Text>
-                      <Text style={styles.date}>
-                        {new Date().toDateString()}
-                      </Text>
-                    </View>
+                    <Text style={styles.name}>Username</Text>
+                    <Text style={styles.date}>{new Date().toDateString()}</Text>
                   </View>
                 </View>
-                <TouchableOpacity onPress={() => setIsWriteComment(false)}>
-                  <AntDesign name="close" size={24} color="white" />
-                </TouchableOpacity>
               </View>
-              {/* Input */}
-              <TextInput
-                style={styles.replyTextInput}
-                placeholder="Write a reply..."
-                placeholderTextColor="#565656"
-                multiline
-                numberOfLines={4}
-                onChangeText={handleInputUserComment}
-                textAlignVertical="top"
-              />
-              <Divider />
-              {/* Comment Button */}
-              <TouchableOpacity
-                style={styles.commentWriteButtonContainer}
-                onPress={handlePostUserComment}
-              >
-                <Text style={styles.commentWriteButtonText}>Comment</Text>
+              <TouchableOpacity onPress={() => setIsWriteComment(false)}>
+                <AntDesign name="close" size={24} color="white" />
               </TouchableOpacity>
             </View>
+            {/* Input */}
+            <TextInput
+              style={styles.replyTextInput}
+              placeholder="Write a reply..."
+              placeholderTextColor="#565656"
+              multiline
+              numberOfLines={4}
+              onChangeText={handleInputUserComment}
+              textAlignVertical="top"
+            />
+            <Divider />
+            {/* Comment Button */}
+            <TouchableOpacity
+              style={styles.commentWriteButtonContainer}
+              onPress={handlePostUserComment}
+            >
+              <Text style={styles.commentWriteButtonText}>Comment</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+      <View style={{ flex: 1, backgroundColor: "#1E1E1E", position: "fixed" }}>
+        <FlatList
+          ref={flatListRef}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+          data={currentBlogComments}
+          keyExtractor={(item, index) => item._id + index}
+          renderItem={({ item }) => (
+            <BlogCommenter
+              {...item}
+              replies={item.ChildrenComments}
+              onReplyPosted={handleReplyPosted}
+            />
           )}
-        </View>
-      )}
-    />
+          style={[styles.flatListContainer]}
+          contentContainerStyle={[styles.contentContainer]}
+          ListFooterComponent={<View style={{ height: 20 }}></View>}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   flatListContainer: {
-    flexGrow: 1,
+    flex: 1,
     width: "100%",
     backgroundColor: "#1E1E1E",
   },
@@ -375,8 +391,8 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   container: {
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 20,
+    paddingTop: 0,
     backgroundColor: "#1E1E1E",
   },
   rowContainer: {

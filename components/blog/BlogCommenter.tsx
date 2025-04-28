@@ -49,14 +49,16 @@ const mockUserBlogCommentList = [
 ];
 
 type BlogCommenterProps = UserBlogComment & {
-  replies: UserBlogChildComment[]
+  replies: UserBlogChildComment[];
+  onReplyPosted: () => void; 
 }
 export default function BlogCommenter({
   User,
   Content,
   createdAt,
   _id,
-  replies
+  replies,
+  onReplyPosted,
 }: BlogCommenterProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -70,19 +72,7 @@ export default function BlogCommenter({
   const { user } = useAppSelector((state) => state.user)
 
   // Handle keyboard events
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        // Scroll to the bottom when keyboard shows
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }
-    );
 
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   const handleReplyPress = () => {
     setIsReplying(!isReplying);
@@ -99,6 +89,7 @@ export default function BlogCommenter({
   };
 
   const handleSendReply = (commentID: string) => {
+    onReplyPosted();
     const comment: ReplyToBlogComment = {
       UserID: user._id,
       BlogID: currentUserBlog._id,
@@ -117,6 +108,7 @@ export default function BlogCommenter({
         Keyboard.dismiss();
 
         dispatch(setCommentAdded(true))
+       
       }
     })
   };
@@ -131,12 +123,7 @@ export default function BlogCommenter({
     // Handle the child comment content here
   };
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.select({ ios: 110, android: 85 })}
-      style={styles.keyboardAvoidView}
-      enabled
-    >
+    
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={styles.container}
@@ -240,7 +227,7 @@ export default function BlogCommenter({
           ))}
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+
   );
 }
 

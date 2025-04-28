@@ -43,20 +43,20 @@ export default function BlogCommenterChild({
   } = useAppSelector((state) => state.blog);
   const { user } = useAppSelector((state) => state.user)
 
-  // Handle keyboard events
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        // Scroll to the bottom when keyboard shows
-        // scrollViewRef.current?.scrollToEnd({ animated: true });
-      }
-    );
+  // // Handle keyboard events
+  // useEffect(() => {
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     "keyboardDidShow",
+  //     () => {
+  //       // Scroll to the bottom when keyboard shows
+  //       // scrollViewRef.current?.scrollToEnd({ animated: true });
+  //     }
+  //   );
 
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
+  //   return () => {
+  //     keyboardDidShowListener.remove();
+  //   };
+  // }, []);
 
   const handleReplyPress = () => {
     setIsReplying(!isReplying);

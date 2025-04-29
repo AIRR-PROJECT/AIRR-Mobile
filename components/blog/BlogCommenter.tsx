@@ -12,11 +12,21 @@ import {
 import { Image } from "expo-image";
 import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
-import { PostComment, ReplyToBlogComment, UserBlogChildComment, UserBlogComment } from "@/interfaces/blogInterface";
+import {
+  PostComment,
+  ReplyToBlogComment,
+  UserBlogChildComment,
+  UserBlogComment,
+} from "@/interfaces/blogInterface";
 import { useState, useRef, useEffect } from "react";
 import BlogCommenterChild from "./BlogCommenterChild";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { commentOnBlog, getBlogComment, replyToBlogComment, setCommentAdded } from "@/redux/slices/blogSlice";
+import {
+  commentOnBlog,
+  getBlogComment,
+  replyToBlogComment,
+  setCommentAdded,
+} from "@/redux/slices/blogSlice";
 
 const mockUser = {
   _id: "testUserId",
@@ -37,10 +47,10 @@ const mockUserBlogComment: UserBlogChildComment = {
     User: {
       _id: "test",
       UserName: "Hehe",
-      AvatarURL: ""
-    }
+      AvatarURL: "",
+    },
   },
-  updatedAt: new Date()
+  updatedAt: new Date(),
 };
 const mockUserBlogCommentList = [
   mockUserBlogComment,
@@ -50,8 +60,8 @@ const mockUserBlogCommentList = [
 
 type BlogCommenterProps = UserBlogComment & {
   replies: UserBlogChildComment[];
-  onReplyPosted: () => void; 
-}
+  onReplyPosted: () => void;
+};
 export default function BlogCommenter({
   User,
   Content,
@@ -62,17 +72,12 @@ export default function BlogCommenter({
 }: BlogCommenterProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
-  const scrollViewRef = useRef<ScrollView>(null);
   const textInputRef = useRef<TextInput>(null);
-  
+  const childScrollViewRef = useRef<ScrollView>(null);
+
   const dispatch = useAppDispatch();
-  const {
-    currentUserBlog,
-  } = useAppSelector((state) => state.blog);
-  const { user } = useAppSelector((state) => state.user)
-
-  // Handle keyboard events
-
+  const { currentUserBlog } = useAppSelector((state) => state.blog);
+  const { user } = useAppSelector((state) => state.user);
 
   const handleReplyPress = () => {
     setIsReplying(!isReplying);
@@ -93,11 +98,11 @@ export default function BlogCommenter({
     const comment: ReplyToBlogComment = {
       UserID: user._id,
       BlogID: currentUserBlog._id,
-      Content: replyText.split(' ').slice(1).join(''),
+      Content: replyText.split(" ").slice(1).join(""),
       Method: "Reply",
       ReplyToCommentID: commentID,
-      RootCommentID: commentID
-    }
+      RootCommentID: commentID,
+    };
     dispatch(replyToBlogComment(comment)).then((res) => {
       if (res.payload === true) {
         dispatch(getBlogComment(currentUserBlog._id));
@@ -107,10 +112,9 @@ export default function BlogCommenter({
         setReplyText("");
         Keyboard.dismiss();
 
-        dispatch(setCommentAdded(true))
-       
+        dispatch(setCommentAdded(true));
       }
-    })
+    });
   };
 
   const handleCloseReply = () => {
@@ -121,113 +125,111 @@ export default function BlogCommenter({
   const handleReturnContentPress = (childCommentContent: string) => {
     console.log("Child comment content:", childCommentContent);
     // Handle the child comment content here
+    childScrollViewRef.current?.scrollToEnd({ animated: true });
+    // print the childscrollview content
   };
   return (
-    
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={{ padding: 20, gap: 10 }}>
+    <View
+      style={styles.container}
+    >
+      <View style={{ padding: 20, gap: 10 }}>
+        <View
+          style={[styles.rowContainer, { justifyContent: "space-between" }]}
+        >
+          {/* User avatar */}
+          <View style={styles.rowContainer}>
+            <Image style={styles.avatar} source={{ uri: User.AvatarURL }} />
+            {/* name and date */}
+            <View>
+              <View>
+                <Text style={styles.name}>{User.UserName}</Text>
+                <Text style={styles.date}>
+                  {new Date(createdAt).toDateString()}
+                </Text>
+              </View>
+            </View>
+          </View>
+          {/* More button */}
+          <Feather name="more-horizontal" size={24} color="white" />
+        </View>
+        {/* Actual Comment */}
+        <Text style={styles.comment}>{Content}</Text>
+        <Divider />
+        {/* Like, Comment, Share */}
+        {/* Write comment */}
+        <TouchableOpacity
+          style={[styles.rowContainer, { gap: 10 }]}
+          onPress={handleReplyPress}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.replyText}>Reply</Text>
+          <Ionicons
+            name="chevron-down"
+            size={16}
+            color="white"
+            style={{
+              transform: [{ rotate: isReplying ? "0deg" : "270deg" }],
+            }}
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Write comment component */}
+      {isReplying && (
+        <View style={styles.replyWriteContainer}>
           <View
             style={[styles.rowContainer, { justifyContent: "space-between" }]}
           >
-            {/* User avatar */}
-            <View style={styles.rowContainer}>
-              <Image style={styles.avatar} source={{ uri: User.AvatarURL }} />
-              {/* name and date */}
-              <View>
-                <View>
-                  <Text style={styles.name}>{User.UserName}</Text>
-                  <Text style={styles.date}>
-                    {new Date(createdAt).toDateString()}
-                  </Text>
-                </View>
-              </View>
-            </View>
-            {/* More button */}
-            <Feather name="more-horizontal" size={24} color="white" />
+            <Text style={styles.replyTo}>
+              Replying to{" "}
+              <Text style={styles.otherUserUserName}>@{User.UserName}</Text>{" "}
+              comment
+            </Text>
+            <TouchableOpacity onPress={handleCloseReply}>
+              <AntDesign name="close" size={24} color="white" />
+            </TouchableOpacity>
           </View>
-          {/* Actual Comment */}
-          <Text style={styles.comment}>{Content}</Text>
-          <Divider />
-          {/* Like, Comment, Share */}
-          {/* Write comment */}
-          <TouchableOpacity
-            style={[styles.rowContainer, { gap: 10 }]}
-            onPress={handleReplyPress}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.replyText}>Reply</Text>
-            <Ionicons
-              name="chevron-down"
-              size={16}
-              color="white"
-              style={{
-                transform: [{ rotate: isReplying ? "0deg" : "270deg" }],
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Write comment component */}
-        {isReplying && (
-          <View style={styles.replyWriteContainer}>
-            <View
-              style={[styles.rowContainer, { justifyContent: "space-between" }]}
+          <View style={styles.replyWrapper}>
+            <TextInput
+              ref={textInputRef}
+              placeholderTextColor="#fff"
+              style={styles.replyTextInput}
+              multiline
+              textAlignVertical="top"
+              onChangeText={setReplyText}
             >
-              <Text style={styles.replyTo}>
-                Replying to{" "}
-                <Text style={styles.otherUserUserName}>@{User.UserName}</Text>{" "}
-                comment
-              </Text>
-              <TouchableOpacity onPress={handleCloseReply}>
-                <AntDesign name="close" size={24} color="white" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.replyWrapper}>
-              <TextInput
-                ref={textInputRef}
-                placeholderTextColor="#fff"
-                style={styles.replyTextInput}
-                multiline
-                textAlignVertical="top"
-                onChangeText={setReplyText}
-              >
-                <Text style={[styles.otherUserUserName]}>
-                  @{User.UserName}{" "}
-                </Text>{" "}
-              </TextInput>
-              {/* Send button */}
-              <TouchableOpacity
-                style={[styles.sendButton]}
-                onPress={() => handleSendReply(_id)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.sendButtonText}>Reply</Text>
-              </TouchableOpacity>
-            </View>
+              <Text style={[styles.otherUserUserName]}>@{User.UserName} </Text>{" "}
+            </TextInput>
+            {/* Send button */}
+            <TouchableOpacity
+              style={[styles.sendButton]}
+              onPress={() => handleSendReply(_id)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.sendButtonText}>Reply</Text>
+            </TouchableOpacity>
           </View>
-        )}
-        {/* Other reply */}
-        <View style={styles.otherReplyContainer}>
-          {(replies ?? []).map((comment, index) => (
-            <BlogCommenterChild
-              key={index}
-              User={comment.User}
-              Content={comment.Content}
-              createdAt={comment.createdAt}
-              replyTo={comment.ReplyToComment.User.UserName}
-              onReturnContentPress={handleReturnContentPress}
-              _id={comment._id}
-              rootCommentID={_id}
-            />
-          ))}
         </View>
+      )}
+      {/* Other reply */}
+      <ScrollView style={styles.otherReplyContainer}
+        contentContainerStyle={{  gap: 10 }}
+      
+      ref={childScrollViewRef}>
+        {(replies ?? []).map((comment, index) => (
+          <BlogCommenterChild
+            key={index}
+            User={comment.User}
+            Content={comment.Content}
+            createdAt={comment.createdAt}
+            replyTo={comment.ReplyToComment.User.UserName}
+            onReturnContentPress={handleReturnContentPress}
+            _id={comment._id}
+            rootCommentID={_id}
+          />
+        ))}
       </ScrollView>
-
+    </View>
   );
 }
 
@@ -320,8 +322,8 @@ const styles = StyleSheet.create({
     marginLeft: 10, // Indent nested comments
     borderLeftWidth: 1,
     borderLeftColor: "#565656",
-    paddingLeft: 10,
+    paddingHorizontal: 10,
+    marginVertical: 10,
     gap: 20,
-  
   },
 });

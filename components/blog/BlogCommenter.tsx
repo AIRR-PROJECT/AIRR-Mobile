@@ -129,9 +129,7 @@ export default function BlogCommenter({
     // print the childscrollview content
   };
   return (
-    <View
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <View style={{ padding: 20, gap: 10 }}>
         <View
           style={[styles.rowContainer, { justifyContent: "space-between" }]}
@@ -212,10 +210,12 @@ export default function BlogCommenter({
         </View>
       )}
       {/* Other reply */}
-      <ScrollView style={styles.otherReplyContainer}
-        contentContainerStyle={{  gap: 10 }}
-      
-      ref={childScrollViewRef}>
+      <ScrollView
+        style={styles.otherReplyContainer}
+        contentContainerStyle={{ gap: 10 }}
+        ref={childScrollViewRef}
+        
+      >
         {(replies ?? []).map((comment, index) => (
           <BlogCommenterChild
             key={index}

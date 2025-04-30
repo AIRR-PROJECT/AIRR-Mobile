@@ -70,7 +70,7 @@ export default function RootLayout() {
                   },
                   headerLeft: () => <LeftHeader/>,
                   headerTitle: "",
-                  headerRight: () => <RightHeader streak={streak}/>,
+                  headerRight: () => <RightHeader new_noti_counts={streak}/>,
                 }}
               />
               <Stack.Screen name="profile" 
@@ -86,7 +86,7 @@ export default function RootLayout() {
                   },
                   headerLeft: () => <LeftHeader/>,
                   headerTitle: "",
-                  headerRight: () => <RightHeader streak={streak}/>,
+                  headerRight: () => <RightHeader new_noti_counts={streak}/>,
                 }}
               />
               <Stack.Screen name="group" 
@@ -97,7 +97,12 @@ export default function RootLayout() {
                   },
                   headerLeft: () => <LeftHeader/>,
                   headerTitle: "",
-                  headerRight: () => <RightHeader streak={streak}/>,
+                  headerRight: () => <RightHeader new_noti_counts={streak}/>,
+                }}
+              />
+              <Stack.Screen name="notifications" 
+                options={{
+                  headerShown: false,
                 }}
               />
             </Stack>

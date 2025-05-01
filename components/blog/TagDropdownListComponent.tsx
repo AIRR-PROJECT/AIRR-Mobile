@@ -2,6 +2,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TextInput, FlatList } from "react-native";
 import Checkbox from "expo-checkbox";
 import { useState } from "react";
+import { BottomSheetFlatList, BottomSheetView } from "@gorhom/bottom-sheet";
 type TagDropdownComponentProps = {
   tags: string[];
   onPress: (tags: string[]) => void;
@@ -26,17 +27,7 @@ export default function TagDropdownComponent({
 
   return (
     <View style={styles.container}>
-      <FlatList
-        ListHeaderComponent={
-          <View style={styles.searchBox}>
-            <FontAwesome name="search" size={24} color="#fff" style={{ paddingLeft: 10 }} />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Search Tags"
-              placeholderTextColor="#888"
-            />
-          </View>
-        }
+      <BottomSheetFlatList
         data={tags}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
@@ -52,6 +43,7 @@ export default function TagDropdownComponent({
           paddingBottom: 20,
           paddingHorizontal: 20,
         }}
+        ListFooterComponent={() => <View style={{ height: 60 }} />}
       />
     </View>
   );

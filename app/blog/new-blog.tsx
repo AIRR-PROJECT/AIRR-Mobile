@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState } from "react";
+import { useRef, useMemo, useCallback, useState, memo } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import {
+  FlatList,
   GestureHandlerRootView,
   TextInput,
 } from "react-native-gesture-handler";
@@ -15,6 +16,8 @@ import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetView,
   BottomSheetBackdrop,
+  BottomSheetFooterProps,
+  BottomSheetFooter,
 } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -109,7 +112,40 @@ export default function NewBlog() {
     // Handle create group logic here
     console.log("Create Group Pressed");
   };
-
+  const renderGroupFooter = useCallback((props: BottomSheetFooterProps) => {
+    return (
+      <BottomSheetFooter {...props} style={styles.searchBar}>
+        <FontAwesome
+          name="search"
+          size={24}
+          color="#fff"
+          style={{ paddingLeft: 10 }}
+        />
+        <TextInput
+          style={styles.searchText}
+          placeholder="Search Groups"
+          placeholderTextColor="#888"
+        />
+      </BottomSheetFooter>
+    );
+  }, []);
+  const renderTagsFooter = useCallback((props: BottomSheetFooterProps) => {
+    return (
+      <BottomSheetFooter {...props} style={styles.searchBar}>
+        <FontAwesome
+          name="search"
+          size={24}
+          color="#fff"
+          style={{ paddingLeft: 10 }}
+        />
+        <TextInput
+          style={styles.searchText}
+          placeholder="Search Tags"
+          placeholderTextColor="#888"
+        />
+      </BottomSheetFooter>
+    );
+  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -293,6 +329,7 @@ export default function NewBlog() {
             appearsOnIndex={0}
           />
         )}
+        footerComponent={renderGroupFooter}
       >
         <TouchableOpacity
           onPress={handleCreateGroup}
@@ -301,29 +338,17 @@ export default function NewBlog() {
         >
           <Text style={styles.createGroupButtonText}>Create New Group</Text>
         </TouchableOpacity>
-        <BottomSheetFlatList
-          data={mockGroupList}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={renderGroupItem}
-          contentContainerStyle={styles.groupListContent}
-          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={() => (
-            <View style={styles.searchBar}>
-              <FontAwesome
-                name="search"
-                size={24}
-                color="#fff"
-                style={{ paddingLeft: 10 }}
-              />
-              <TextInput
-                style={styles.searchText}
-                placeholder="Search Groups"
-                placeholderTextColor="#888"
-              />
-            </View>
-          )}
-        />
+        <View>
+          <BottomSheetFlatList
+            data={mockGroupList}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={renderGroupItem}
+            contentContainerStyle={styles.groupListContent}
+            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={() => <View style={{ height: 120 }} />}
+          />
+        </View>
       </BottomSheet>
       <BottomSheet
         ref={tagsSheetRef}
@@ -341,10 +366,9 @@ export default function NewBlog() {
             appearsOnIndex={0}
           />
         )}
+        footerComponent={renderTagsFooter}
       >
-        <BottomSheetView>
-          <TagDropdownComponent tags={mockTags} onPress={onPressTag} />
-        </BottomSheetView>
+        <TagDropdownComponent tags={mockTags} onPress={onPressTag} />
       </BottomSheet>
     </GestureHandlerRootView>
   );
@@ -356,6 +380,7 @@ function TagWrapper({ tag }: { tag: string }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -479,11 +504,10 @@ const styles = StyleSheet.create({
   searchBar: {
     backgroundColor: "#2E3B40",
     padding: 10,
-    marginTop: 10,
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 20,
-    marginBottom: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   searchText: {
     paddingHorizontal: 10,

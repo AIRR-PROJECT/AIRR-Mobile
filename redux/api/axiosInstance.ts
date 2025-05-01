@@ -77,7 +77,6 @@ api.interceptors.response.use(
                             return api.request(error.config)
                         }
                         else {
-                            Alert.alert("Kicked1")
                             exception_status = response.status
                             exception_failcode = response.data.failcode
                             if (response.status === 401 && 
@@ -105,7 +104,6 @@ api.interceptors.response.use(
                     }
                 }
                 catch (error: any) {
-                    Alert.alert("Kicked2")
                     exception_status = error.status
                     exception_failcode = error.response.data.failcode
                     if (error.status === 401 

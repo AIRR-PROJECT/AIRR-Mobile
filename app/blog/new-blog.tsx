@@ -51,8 +51,30 @@ const mockTags = [
   "virtual reality",
   "mixed reality",
 ];
+
+export function debounce<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
+}
+
 export default function NewBlog() {
   const [chosenGroup, setChosenGroup] = useState("");
+  const [groupSearchText, setGroupSearchText] = useState("");
   const [chosenTags, setChosenTags] = useState<string[]>([]);
   // Bottom Sheet Refs
   const groupSheetRef = useRef<BottomSheet>(null);
@@ -72,6 +94,10 @@ export default function NewBlog() {
   const handleGroupSheetChange = useCallback((index: any) => {
     console.log("handleGroupSheetChange", index);
   }, []);
+
+  const handleGroupSearchTextChange = (val: string) => {
+    setGroupSearchText(val)
+  }
 
   const handleTagsSnapPress = useCallback((index: number) => {
     tagsSheetRef.current?.snapToIndex(index);
@@ -318,8 +344,10 @@ export default function NewBlog() {
               />
               <TextInput
                 style={styles.searchText}
+                onChangeText={handleGroupSearchTextChange}
                 placeholder="Search Groups"
                 placeholderTextColor="#888"
+                textAlignVertical="top"
               />
             </View>
           )}

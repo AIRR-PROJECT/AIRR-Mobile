@@ -58,3 +58,11 @@ export interface GroupDetailInfo {
     CoverURL: string;
     Tags: GroupTag[]
 }
+
+export interface SearchFieldResult {
+    Fields: {
+        _id: string;
+        FieldName: string;
+        DefaultTags: GroupTag[]
+    }[]
+}

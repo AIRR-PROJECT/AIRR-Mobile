@@ -9,7 +9,7 @@ import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
 import jwt from 'expo-jwt'
 import { jwtDecode } from "jwt-decode";
-import { Group, GroupDetailInfo, GroupField, GroupTag, PopularGroups, PopularGroupsByField } from "@/interfaces/groupInterface";
+import { Group, GroupDetailInfo, GroupField, GroupTag, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
 import { UserBlog } from "@/interfaces/blogInterface";
 
 const initialState = {
@@ -150,6 +150,25 @@ export const getGroupInfo = createAsyncThunk(
             return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
         }
     }
+)
+
+export const searchFields = createAsyncThunk(
+   'group/searchFields',
+   async (keyword: string, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/search-groups?keyword=${keyword}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data as SearchFieldResult
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+   }
 )
 
 // export const createGroup = createAsyncThunk(

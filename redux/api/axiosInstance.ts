@@ -77,10 +77,12 @@ api.interceptors.response.use(
                             return api.request(error.config)
                         }
                         else {
+                            Alert.alert("Kicked1")
                             exception_status = response.status
                             exception_failcode = response.data.failcode
                             if (response.status === 401 && 
                                 (response.data.failcode === ResponseFailcode.TOKEN_INVALID || response.data.failcode === ResponseFailcode.ACCESS_EXPIRED)) {
+                                
                                 exception_message = "Session expired. Please re-login"
 
                                 store.dispatch(reset())
@@ -88,8 +90,9 @@ api.interceptors.response.use(
                                 await SecureStore.deleteItemAsync("refreshToken")
                                 console.log("dismissed to first screen")
 
-                                if (router.canDismiss())
-                                    router.dismissAll()
+                                if (router.canDismiss()){
+                                    router.dismissTo("/")
+                                }
                             }
                             else {
                                 exception_message = response.data.message
@@ -102,6 +105,7 @@ api.interceptors.response.use(
                     }
                 }
                 catch (error: any) {
+                    Alert.alert("Kicked2")
                     exception_status = error.status
                     exception_failcode = error.response.data.failcode
                     if (error.status === 401 
@@ -113,8 +117,9 @@ api.interceptors.response.use(
                         await SecureStore.deleteItemAsync("refreshToken")
                         console.log("dismissed to first screen")
                         
-                        if (router.canDismiss())
-                            router.dismissAll()
+                        if (router.canDismiss()) {
+                            router.dismissTo("/")
+                        }
                     }
                     else {
                         exception_message = error.response.data.message

@@ -38,7 +38,6 @@ export function debounce<T extends (...args: any[]) => void>(
   );
 }
 
-let isReactOnTimeout = false
 export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   // default to mock blog for this, but later will be passed as props
   const route = useRouter();
@@ -76,7 +75,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
 
   const handleLike = () => {
     if (blogLiked) {
-      console.log("Remove like")
       setLikes(likes - 1)
 
       setBlogLiked(false)
@@ -85,7 +83,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     }
     else {
       if (blogDisliked) {
-        console.log("Dislike to like")
         setLikes(likes + 1)
         setDislikes(dislikes - 1)
 
@@ -95,7 +92,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         dispatch(dislikeToLikeBlog(blog._id))
       }
       else {
-        console.log("Like")
         setLikes(likes + 1)
 
         setBlogLiked(true)
@@ -106,7 +102,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   }
   const handleDislike = () => {
     if (blogDisliked) {
-      console.log("Remove dislike")
       setDislikes(dislikes - 1)
 
       setBlogDisliked(false)
@@ -115,7 +110,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     }
     else {
       if (blogLiked) {
-        console.log("Like to dislike")
         setDislikes(dislikes + 1)
         setLikes(likes - 1)
 
@@ -125,7 +119,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         dispatch(likeToDislikeBlog(blog._id))
       }
       else {
-        console.log("Dislike blog")
         setDislikes(dislikes + 1)
 
         setBlogDisliked(true)

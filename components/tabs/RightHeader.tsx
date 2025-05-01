@@ -1,4 +1,11 @@
-import { Keyboard, StyleSheet, Text, TextInput, ToastAndroid } from "react-native";
+import {
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  ScrollView,
+} from "react-native";
 import { View, Modal, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { Entypo, Ionicons } from "@expo/vector-icons";
@@ -18,26 +25,29 @@ import { getUserInfo } from "@/redux/slices/authSlice";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type RightHeaderProps = {
-  streak: number;
+  new_noti_counts: number;
   avatar?: string;
 };
 
 type Tag = {
   _id: string;
   TagName: string;
-}
+};
 
 // const userSelectedTabs = ["Python", "JavaScript", "React", "Vue", "Angular"];
 // const defaultSuggestedTabs = ["Java", "C++", "C#", "Ruby", "Rust", "Go", "Swift"];
-let suggestedTags: Tag[] = []
-let selectedTags: Tag[] = []
-let originalSuggestedTags: Tag[]
-let originalSelectedTags: Tag[]
+let suggestedTags: Tag[] = [];
+let selectedTags: Tag[] = [];
+let originalSuggestedTags: Tag[];
+let originalSelectedTags: Tag[];
 
-export default function RightHeader({ streak, avatar }: RightHeaderProps) {
+export default function RightHeader({
+  new_noti_counts: new_noti_counts,
+  avatar,
+}: RightHeaderProps) {
   const route = useRouter();
-  const dispatch = useAppDispatch()
-  const { user, userAvatar } = useAppSelector(state => state.user)
+  const dispatch = useAppDispatch();
+  const { user, userAvatar } = useAppSelector((state) => state.user);
 
   const [suggestedTagsShow, setSuggestedTagsShow] = useState<boolean[]>([]);
   const [selectedTagsShow, setSelectedTagsShow] = useState<boolean[]>([]);
@@ -53,125 +63,145 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
   const modalButtons = ["Suggested", "My Tags"];
 
   useEffect(() => {
-    refreshTags()
-  }, [])
+    refreshTags();
+  }, []);
 
   // Handle on tags saved
   useEffect(() => {
-    refreshTags()
+    refreshTags();
     // ToastAndroid.showWithGravity(`Selected tags saved`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
     if (isModalVisible) {
-      setModalVisible(false)
+      setModalVisible(false);
     }
-  }, [user])
+  }, [user]);
 
   const refreshTags = () => {
-    suggestedTags = user ? 
-      ((user as any).survey.RelatedTags as Tag[]).map((tag, index) => tag)
-      : []
-    selectedTags = user ? 
-      ((user as any).survey.SelectedTags as Tag[]).map((tag, index) => tag)
-      : []
-    originalSuggestedTags = JSON.parse(JSON.stringify(suggestedTags))
-    originalSelectedTags = JSON.parse(JSON.stringify(selectedTags))
+    suggestedTags = user
+      ? ((user as any).survey.RelatedTags as Tag[]).map((tag, index) => tag)
+      : [];
+    selectedTags = user
+      ? ((user as any).survey.SelectedTags as Tag[]).map((tag, index) => tag)
+      : [];
+    originalSuggestedTags = JSON.parse(JSON.stringify(suggestedTags));
+    originalSelectedTags = JSON.parse(JSON.stringify(selectedTags));
 
-    const initSuggestedTagsShow = suggestedTags.map(() => true)
-    setSuggestedTagsShow(initSuggestedTagsShow)
-    const initSelectedTagsShow = selectedTags.map(() => true)
-    setSelectedTagsShow(initSelectedTagsShow)
-  }
+    const initSuggestedTagsShow = suggestedTags.map(() => true);
+    setSuggestedTagsShow(initSuggestedTagsShow);
+    const initSelectedTagsShow = selectedTags.map(() => true);
+    setSelectedTagsShow(initSelectedTagsShow);
+  };
 
   const handleCancel = () => {
     // Reset
-    selectedTags = JSON.parse(JSON.stringify(originalSuggestedTags))
-    selectedTags = JSON.parse(JSON.stringify(originalSelectedTags))
-    const initSuggestedTagsShow = suggestedTags.map(() => true)
-    setSuggestedTagsShow(initSuggestedTagsShow)
-    const initSelectedTagsShow = selectedTags.map(() => true)
-    setSelectedTagsShow(initSelectedTagsShow)
+    selectedTags = JSON.parse(JSON.stringify(originalSuggestedTags));
+    selectedTags = JSON.parse(JSON.stringify(originalSelectedTags));
+    const initSuggestedTagsShow = suggestedTags.map(() => true);
+    setSuggestedTagsShow(initSuggestedTagsShow);
+    const initSelectedTagsShow = selectedTags.map(() => true);
+    setSelectedTagsShow(initSelectedTagsShow);
 
     // Make modal invisible
-    setModalVisible(false)
-  }
+    setModalVisible(false);
+  };
 
   const handleSaveTags = () => {
     const saveTagsPayload = {
-      tags: selectedTags
-    }
+      tags: selectedTags,
+    };
     dispatch(saveTags(saveTagsPayload)).then(() => {
-      dispatch(getUserInfo())
-    })
-  }
-
-  
-
+      dispatch(getUserInfo());
+    });
+  };
+  const handleNotificationPress = () => {
+    console.log("Notification Pressed");
+    route.push("/notifications");
+  };
   function SuggestedTags() {
     return (
-      <View style={styles.tagsSection}>
-        {suggestedTags ? suggestedTags.map((tag, index) => 
-          (
-            suggestedTagsShow[index] &&
-            <TabButton
-              key={index}
-              title={tag.TagName}
-              onPress={() => {
-                const tag = suggestedTags[index]
+      <ScrollView
+        style={styles.tagsContainer}
+        contentContainerStyle={styles.tagsSection}
+      >
+        {suggestedTags ? (
+          suggestedTags.map(
+            (tag, index) =>
+              suggestedTagsShow[index] && (
+                <TabButton
+                  key={index}
+                  title={tag.TagName}
+                  onPress={() => {
+                    const tag = suggestedTags[index];
 
-                const newSuggestedTagsShow = [...suggestedTagsShow]
-                newSuggestedTagsShow[index] = false
-                setSuggestedTagsShow(newSuggestedTagsShow)
-    
-                if (!selectedTags.includes(tag)) {
-                  selectedTags.push(tag)
-    
-                  const newSelectedTagsShow = [...selectedTagsShow]
-                  newSelectedTagsShow.push(true)
-                  setSelectedTagsShow(newSelectedTagsShow)
-                }
-                else {
-                  const tagIndex = selectedTags.indexOf(suggestedTags[index])
-                  const newSelectedTagsShow = [...selectedTagsShow]
-                  newSelectedTagsShow[tagIndex] = true
-                  setSelectedTagsShow(newSelectedTagsShow)
-                }
-    
-                ToastAndroid.showWithGravity("Added tag to My Tags", ToastAndroid.LONG, ToastAndroid.BOTTOM)
-              }}
-              userSelected={false}
-            />
-          )) :
-          <Ionicons name="sad" size={25} color="#fff" />}
-      </View>
+                    const newSuggestedTagsShow = [...suggestedTagsShow];
+                    newSuggestedTagsShow[index] = false;
+                    setSuggestedTagsShow(newSuggestedTagsShow);
+
+                    if (!selectedTags.includes(tag)) {
+                      selectedTags.push(tag);
+
+                      const newSelectedTagsShow = [...selectedTagsShow];
+                      newSelectedTagsShow.push(true);
+                      setSelectedTagsShow(newSelectedTagsShow);
+                    } else {
+                      const tagIndex = selectedTags.indexOf(
+                        suggestedTags[index]
+                      );
+                      const newSelectedTagsShow = [...selectedTagsShow];
+                      newSelectedTagsShow[tagIndex] = true;
+                      setSelectedTagsShow(newSelectedTagsShow);
+                    }
+
+                    ToastAndroid.showWithGravity(
+                      "Added tag to My Tags",
+                      ToastAndroid.LONG,
+                      ToastAndroid.BOTTOM
+                    );
+                  }}
+                  userSelected={false}
+                />
+              )
+          )
+        ) : (
+          <Ionicons name="sad" size={25} color="#fff" />
+        )}
+      </ScrollView>
     );
   }
   function MyTags() {
     return (
-      <View style={styles.tagsSection}>
-        {selectedTags ? selectedTags.map((tag, index) => 
-          (
-            selectedTagsShow[index] &&
-            <TabButton
-              key={index}
-              title={tag.TagName}
-              onPress={() => {
-                // New suggested tags show list
-                const tagIndex = suggestedTags.indexOf(selectedTags[index])
-                if (tagIndex != -1) {
-                  const newSuggestedTagsShow = [...suggestedTagsShow]
-                  newSuggestedTagsShow[tagIndex] = true
-                  setSuggestedTagsShow(newSuggestedTagsShow)
-                }
+      <ScrollView
+        style={styles.tagsContainer}
+        contentContainerStyle={styles.tagsSection}
+      >
+        {selectedTags ? (
+          selectedTags.map(
+            (tag, index) =>
+              selectedTagsShow[index] && (
+                <TabButton
+                  key={index}
+                  title={tag.TagName}
+                  onPress={() => {
+                    // New suggested tags show list
+                    const tagIndex = suggestedTags.indexOf(selectedTags[index]);
+                    if (tagIndex != -1) {
+                      const newSuggestedTagsShow = [...suggestedTagsShow];
+                      newSuggestedTagsShow[tagIndex] = true;
+                      setSuggestedTagsShow(newSuggestedTagsShow);
+                    }
 
-                // New selected tags show list
-                const newSelectedTagsShow = [...selectedTagsShow]
-                newSelectedTagsShow[index] = false
-                setSelectedTagsShow(newSelectedTagsShow)
-              }}
-              userSelected={true}
-            />
-          )) :
-          <Ionicons name="sad" size={25} color="#fff" />}
-      </View>
+                    // New selected tags show list
+                    const newSelectedTagsShow = [...selectedTagsShow];
+                    newSelectedTagsShow[index] = false;
+                    setSelectedTagsShow(newSelectedTagsShow);
+                  }}
+                  userSelected={true}
+                />
+              )
+          )
+        ) : (
+          <Ionicons name="sad" size={25} color="#fff" />
+        )}
+      </ScrollView>
     );
   }
 
@@ -187,18 +217,17 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
 
       <Divider orientation="vertical" width={1} />
 
-      {/* Streak Tracker */}
-      <View style={styles.streak_container}>
-        <FontAwesome6
-          name="bolt"
-          size={18}
-          color="#B9FF66"
-          style={styles.streak_icon}
-        />
-        <ThemedText style={styles.text} lightColor="#fff" darkColor="#fff">
-          {streak}
-        </ThemedText>
-      </View>
+      {/* Notification Tracker */}
+      <TouchableOpacity
+        style={styles.notification_container}
+        activeOpacity={0.7}
+        onPress={handleNotificationPress}
+      >
+        <Ionicons name="notifications-circle" size={24} color="#B9FF66" />
+        {new_noti_counts > 0 && (
+          <Text style={styles.text}>{new_noti_counts}</Text>
+        )}
+      </TouchableOpacity>
 
       <Divider orientation="vertical" width={1} />
 
@@ -223,7 +252,7 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
           onPress={(event) => {
             if (event.target === event.currentTarget) {
               if (!isSearchFocused) {
-                handleCancel()
+                handleCancel();
               } else {
                 Keyboard.dismiss();
               }
@@ -319,13 +348,8 @@ export default function RightHeader({ streak, avatar }: RightHeaderProps) {
               style={{ width: "100%", borderColor: "#242630", borderWidth: 1 }}
             />
             {/* Content */}
-            
-              {selectedTab === "Suggested" ? (
-                <SuggestedTags />
-              ) : (
-                <MyTags />
-              )}
-       
+
+            {selectedTab === "Suggested" ? <SuggestedTags /> : <MyTags />}
           </View>
         </Pressable>
       </Modal>
@@ -348,12 +372,14 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#fff",
   },
-  streak_container: {
+  notification_container: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 10,
+    gap: 5,
   },
   avatar_container: {
     paddingLeft: 10,
@@ -375,6 +401,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#110F0F", // Dark background for modal
     borderRadius: 20,
     alignItems: "center",
+    height: "70%",
   },
   modalTitle: {
     fontSize: 16,
@@ -474,5 +501,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
     gap: 10,
+  },
+  tagsContainer: {
+    flex: 1,
   },
 });

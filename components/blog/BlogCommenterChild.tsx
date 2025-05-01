@@ -34,7 +34,6 @@ export default function BlogCommenterChild({
 }: BlogCommenterChildProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
-  const scrollViewRef = useRef<ScrollView>(null);
   const textInputRef = useRef<TextInput>(null);
   
   const dispatch = useAppDispatch();
@@ -43,20 +42,20 @@ export default function BlogCommenterChild({
   } = useAppSelector((state) => state.blog);
   const { user } = useAppSelector((state) => state.user)
 
-  // Handle keyboard events
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        // Scroll to the bottom when keyboard shows
-        // scrollViewRef.current?.scrollToEnd({ animated: true });
-      }
-    );
+  // // Handle keyboard events
+  // useEffect(() => {
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     "keyboardDidShow",
+  //     () => {
+  //       // Scroll to the bottom when keyboard shows
+  //       // scrollViewRef.current?.scrollToEnd({ animated: true });
+  //     }
+  //   );
 
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
+  //   return () => {
+  //     keyboardDidShowListener.remove();
+  //   };
+  // }, []);
 
   const handleReplyPress = () => {
     setIsReplying(!isReplying);
@@ -104,11 +103,8 @@ export default function BlogCommenterChild({
   };
 
   return (
-    <ScrollView
-      ref={scrollViewRef}
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
+    <View
+      style={styles.container}
     >
       <View style={{ padding: 20, gap: 10 }}>
         <View
@@ -189,7 +185,7 @@ export default function BlogCommenterChild({
           </View>
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 }
 

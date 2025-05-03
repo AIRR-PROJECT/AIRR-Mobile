@@ -7,7 +7,7 @@ import "@enzedonline/quill-blot-formatter2";
 import BlotFormatter2 from "@enzedonline/quill-blot-formatter2";
 import "./QuillEditorStyles.css";
 
-export default function QuillEditor({}: { dom: import("expo/dom").DOMProps }) {
+export default function QuillEditor({ onValueChange }: { dom: import("expo/dom").DOMProps, onValueChange: (val: string) => void }) {
   const [value, setValue] = useState("");
   const reactQuillRef = useRef<ReactQuill>(null);
   const [editorReady, setEditorReady] = useState(false);
@@ -147,7 +147,10 @@ export default function QuillEditor({}: { dom: import("expo/dom").DOMProps }) {
           ref={reactQuillRef}
           theme="snow"
           value={value}
-          onChange={setValue}
+          onChange={(val: string) => {
+            setValue(val)
+            onValueChange(val)
+          }}
           modules={modules}
           formats={formats}
           placeholder="Write something amazing..."

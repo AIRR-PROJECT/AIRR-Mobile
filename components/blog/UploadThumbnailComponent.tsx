@@ -8,9 +8,10 @@ import { useNavigation } from "expo-router";
 
 type imageProps = {
   imgSource?: ImageSource;
+  onSetImg: (imgSource: ImageSource) => void
 };
 
-export default function UploadThumbnailComponent({ imgSource }: imageProps) {
+export default function UploadThumbnailComponent({ imgSource, onSetImg }: imageProps) {
   // Image picker
   const [image, setImage] = useState<ImageSource | null>(imgSource || null);
   console.log(image);
@@ -21,10 +22,9 @@ export default function UploadThumbnailComponent({ imgSource }: imageProps) {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage({ uri: result.assets[0].uri });
+      onSetImg(result.assets[0])
     }
   };
 

@@ -66,3 +66,9 @@ export interface SearchFieldResult {
         DefaultTags: GroupTag[]
     }[]
 }
+
+// export interface CreateGroup {
+//     Name: string;
+//     Description: string;
+//     GroupField: 
+// }

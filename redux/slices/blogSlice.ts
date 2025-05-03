@@ -303,17 +303,21 @@ export const unsaveBlog = createAsyncThunk(
     } 
 )
 
-const createBlog = createAsyncThunk(
+export const createBlog = createAsyncThunk(
     'blog/createBlog',
-    async (data: CreateBlog, thunkAPI) => {
+    async (data: FormData, thunkAPI) => {
         try {
-            const res = await api.post(`blogs/create-blog`, data) as AxiosResponse
+            const res = await api.post(`blogs/create-blog`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }) as AxiosResponse
 
             if (res.data.success) {
-                
+                return true
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                return false
             }
         }
         catch (error: any) {

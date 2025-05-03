@@ -89,6 +89,12 @@ export default function GroupLayout() {
             headerTitle: "Group Members",
           }}
         />
+        <Stack.Screen
+          name="create-new-group-tag"
+          options={{
+            headerTitle: "Create New Group Tag",
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

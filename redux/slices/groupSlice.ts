@@ -64,7 +64,8 @@ export const getPreviewGroups = createAsyncThunk(
             const res = await api.get(`groups/preview-groups${searchQuery}`) as AxiosResponse
 
             if (res.data.success) {
-                return res.data.data as PopularGroups
+                console.log(res.data.data)
+                return res.data.data.groups as Group[]
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)
@@ -152,11 +153,30 @@ export const getGroupInfo = createAsyncThunk(
     }
 )
 
+export const searchGroups = createAsyncThunk(
+   'group/searchGroups',
+   async (keyword: string, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/search-groups?keyword=${keyword}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data as SearchFieldResult
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+   }
+)
+
 export const searchFields = createAsyncThunk(
    'group/searchFields',
    async (keyword: string, thunkAPI) => {
         try {
-            const res = await api.get(`groups/search-groups?keyword=${keyword}`) as AxiosResponse
+            const res = await api.get(`groups/search-fields?keyword=${keyword}`) as AxiosResponse
 
             if (res.data.success) {
                 return res.data.data as SearchFieldResult

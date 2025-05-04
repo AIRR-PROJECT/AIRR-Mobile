@@ -22,7 +22,9 @@ const initialState = {
     createGroupDescription: "",
     createGroupTags: [] as GroupTag[],
     createGroupField: null as unknown as GroupField,
-    createGroupRules: [] as GroupRule[]
+    createGroupRules: [] as GroupRule[],
+    groupBlogsSearchText: "",
+    groupTagsSearchText: "",
 };
 
 export const getGroupPopularFields = createAsyncThunk(
@@ -248,6 +250,14 @@ const groupSlice = createSlice({
         setCreateGroupRules(state, action) {
             state.createGroupRules = action.payload
         },
+        
+        setGroupBlogsSearchText(state, action) {
+            state.groupBlogsSearchText = action.payload
+        },
+        
+        setGroupTagsSearchText(state, action) {
+            state.groupTagsSearchText = action.payload
+        },
 
         resetCreateGroupProperties(state) {
             state.createGroupName = "",
@@ -261,6 +271,12 @@ const groupSlice = createSlice({
             state.popularFields = null as any as GroupField[]
             state.popularGroupsHorizontal = null as any as Group[]
             state.popularGroupsVertical = null as any as PopularGroupsByField[]
+            state.createGroupName = "",
+            state.createGroupDescription = "",
+            state.createGroupTags = [] as GroupTag[],
+            state.createGroupField = null as unknown as GroupField,
+            state.createGroupRules = [] as GroupRule[]
+            state.groupBlogsSearchText = ""
         },
     
     },
@@ -283,5 +299,5 @@ const groupSlice = createSlice({
 
 });
 
-export const { setCreateGroupCoverImage, setCreateGroupDescription, setCreateGroupField, setCreateGroupName, setCreateGroupRules, setCreateGroupTags, resetCreateGroupProperties, reset } = groupSlice.actions;
+export const { setCreateGroupCoverImage, setCreateGroupDescription, setCreateGroupField, setCreateGroupName, setCreateGroupRules, setCreateGroupTags, setGroupBlogsSearchText, setGroupTagsSearchText, resetCreateGroupProperties, reset } = groupSlice.actions;
 export default groupSlice.reducer;

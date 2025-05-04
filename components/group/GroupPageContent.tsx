@@ -16,11 +16,11 @@ import {
   FontAwesome6,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Divider } from "@rneui/base";
 import { useRouter } from "expo-router";
 import { useAppDispatch } from "@/redux/hook";
-import { getGroupInfo } from "@/redux/slices/groupSlice";
+import { getGroupInfo, setGroupBlogsSearchText, setGroupTagsSearchText } from "@/redux/slices/groupSlice";
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
 type GroupDetailProps = {
   name: string;
@@ -73,6 +73,8 @@ export default function GroupPageContent({
   const dispatch = useAppDispatch()
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const searchText = useRef("")
+  let textInputRef: TextInput
   const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>()
 
   useEffect(() => {
@@ -90,6 +92,24 @@ export default function GroupPageContent({
     // Handle the press event for the group member list
     route.push("/group/group-member-list");
   };
+  const handleSearchTextChange = (val: string) => {
+    searchText.current = val
+  }
+  const handleSearchSubmit = () => {
+    if (selectedId == 1) {
+      dispatch(setGroupBlogsSearchText(searchText.current))
+    }
+    else {
+      dispatch(setGroupTagsSearchText(searchText.current))
+    }
+  }
+  const resetSearchText = () => {
+    dispatch(setGroupBlogsSearchText(""))
+    dispatch(setGroupTagsSearchText(""))
+    searchText.current = ""
+    textInputRef.clear()
+  }
+
   return (
     <View style={styles.container}>
       <View>
@@ -146,6 +166,7 @@ export default function GroupPageContent({
           <TouchableOpacity
             style={[styles.tabItem, selectedId === 1 && styles.tabItemActive]}
             onPress={() => {
+              resetSearchText();
               setSelectedId(1);
             }}
           >
@@ -162,6 +183,7 @@ export default function GroupPageContent({
           <TouchableOpacity
             style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
             onPress={() => {
+              resetSearchText();
               setSelectedId(2);
             }}
           >
@@ -194,6 +216,9 @@ export default function GroupPageContent({
             style={styles.textInput}
             placeholder={selectedId === 1 ? "Search Blog" : "Search Tag"}
             placeholderTextColor={"#8A94AC"}
+            ref={el => textInputRef = el!}
+            onChangeText={handleSearchTextChange}
+            onSubmitEditing={handleSearchSubmit}
           />
         </View>
       </View>

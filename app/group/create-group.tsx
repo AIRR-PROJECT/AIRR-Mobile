@@ -19,6 +19,8 @@ import BottomSheet, {
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { useAppDispatch } from "@/redux/hook";
+import { setCreateGroupDescription, setCreateGroupField, setCreateGroupName, setCreateGroupTags } from "@/redux/slices/groupSlice";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 // temporary use this cause figma not provide the image
@@ -39,12 +41,15 @@ const mockFieldList = [
 ];
 
 export default function CreateGroup() {
+  const dispatch = useAppDispatch();
+
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
   const [groupRules, setGroupRules] = useState("");
   const [groupField, setGroupField] = useState("");
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["30%", "50%"], []);
+  
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
   }, []);
@@ -56,6 +61,23 @@ export default function CreateGroup() {
     setGroupField(field);
     fieldRef.current?.close();
   }, []);
+
+  const handleGroupNameTextChange = (val: string) => {
+    dispatch(setCreateGroupName(val))
+  }
+  const handleGroupDescriptionTextChange = (val: string) => {
+    dispatch(setCreateGroupDescription(val))
+  }
+  const handleGroupFieldTextChange = (val: string) => {
+    dispatch(setCreateGroupField(val))
+  }
+  const handleGroupTagsTextChange = (val: string) => {
+    dispatch(setCreateGroupTags(val))
+  }
+  const handleGroupRulesTextChange = (val: string) => {
+    dispatch(setCreateGroupTags(val))
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -105,7 +127,10 @@ export default function CreateGroup() {
             style={styles.input}
             value={groupName}
             onChangeText={(text) => {
-              if (text.length <= 30) setGroupName(text);
+              if (text.length <= 30) {
+                setGroupName(text);
+                handleGroupNameTextChange(text)
+              }
             }}
             placeholder="Enter Group Name *"
             placeholderTextColor="#888"
@@ -145,7 +170,10 @@ export default function CreateGroup() {
             style={[styles.multilineInput]}
             value={groupDescription}
             onChangeText={(text) => {
-              if (text.length <= 100) setGroupDescription(text);
+              if (text.length <= 100) {
+                setGroupDescription(text);
+                handleGroupDescriptionTextChange(text);
+              }
             }}
             multiline={true}
             placeholder="Enter Group Description *"

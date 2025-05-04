@@ -9,13 +9,20 @@ import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
 import jwt from 'expo-jwt'
 import { jwtDecode } from "jwt-decode";
-import { Group, GroupDetailInfo, GroupField, GroupTag, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { Group, GroupDetailInfo, GroupField, GroupRule, GroupTag, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
 import { UserBlog } from "@/interfaces/blogInterface";
+import { ImageSource } from "expo-image";
 
 const initialState = {
     popularFields: null as any as GroupField[],
     popularGroupsHorizontal: null as any as Group[],
-    popularGroupsVertical: null as any as PopularGroupsByField[]
+    popularGroupsVertical: null as any as PopularGroupsByField[],
+    createGroupCoverImage: null as unknown as ImageSource,
+    createGroupName: "",
+    createGroupDescription: "",
+    createGroupTags: [] as GroupTag[],
+    createGroupField: null as unknown as GroupField,
+    createGroupRules: [] as GroupRule[]
 };
 
 export const getGroupPopularFields = createAsyncThunk(
@@ -191,14 +198,65 @@ export const searchFields = createAsyncThunk(
    }
 )
 
-// export const createGroup = createAsyncThunk(
+export const createGroup = createAsyncThunk(
+    'group/createGroup',
+    async (data: FormData, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/create-group`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }) as AxiosResponse
 
-// )
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
 
 const groupSlice = createSlice({
     name: "group",
     initialState,
     reducers: {
+        setCreateGroupName(state, action) {
+            state.createGroupName = action.payload
+        },
+
+        setCreateGroupField(state, action) {
+            state.createGroupField = action.payload
+        },
+
+        setCreateGroupDescription(state, action) {
+            state.createGroupDescription = action.payload
+        },
+
+        setCreateGroupTags(state, action) {
+            state.createGroupTags = action.payload
+        },
+
+        setCreateGroupCoverImage(state, action) {
+            state.createGroupCoverImage = action.payload
+        },
+
+        setCreateGroupRules(state, action) {
+            state.createGroupRules = action.payload
+        },
+
+        resetCreateGroupProperties(state) {
+            state.createGroupName = "",
+            state.createGroupDescription = "",
+            state.createGroupTags = [] as GroupTag[],
+            state.createGroupField = null as unknown as GroupField,
+            state.createGroupRules = [] as GroupRule[]
+        },
+
         reset(state) {
             state.popularFields = null as any as GroupField[]
             state.popularGroupsHorizontal = null as any as Group[]
@@ -225,5 +283,5 @@ const groupSlice = createSlice({
 
 });
 
-export const { reset } = groupSlice.actions;
+export const { setCreateGroupCoverImage, setCreateGroupDescription, setCreateGroupField, setCreateGroupName, setCreateGroupRules, setCreateGroupTags, resetCreateGroupProperties, reset } = groupSlice.actions;
 export default groupSlice.reducer;

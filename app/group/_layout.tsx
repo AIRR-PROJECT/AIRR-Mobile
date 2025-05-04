@@ -5,18 +5,23 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack, useRouter } from "expo-router";
+import { router, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { goBack } from "expo-router/build/global-state/routing";
+import { createGroup, resetCreateGroupProperties } from "@/redux/slices/groupSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
 
 export default function GroupLayout() {
+  const dispatch = useAppDispatch()
+  const { createGroupCoverImage, createGroupDescription, createGroupField, createGroupName, createGroupRules, createGroupTags } = useAppSelector(state => state.group)
+
   // Get the current color scheme (dark or light)
   const colorScheme = useColorScheme();
   // Load custom fonts
@@ -40,11 +45,26 @@ export default function GroupLayout() {
     route.back();
   };
   const handleCreateGroup = () => {
-    // Handle the creation of a new group
-    // This function can be implemented to create a new group
-    // and navigate to the appropriate screen
-    // For now, it just logs a message
-    console.log("Create group button pressed");
+    const formData = new FormData()
+    formData.append("coverImage", {
+      uri: createGroupCoverImage.uri,
+      name: createGroupCoverImage.fileName,
+      type: createGroupCoverImage.mimeType
+    })
+    formData.append("name", createGroupName)
+    formData.append("tags", JSON.stringify(createGroupTags))
+    formData.append("groupField", JSON.stringify(createGroupField))
+    formData.append("description", createGroupDescription)
+    formData.append("groupRules", JSON.stringify(createGroupRules))
+
+    dispatch(createGroup(formData)).then((res) => {
+      if (res.payload) {
+        // Reset
+        dispatch(resetCreateGroupProperties())
+        
+        router.replace("/group")
+      }
+    })
   }
   // Render the app layout with theme provider and navigation stack
   return (

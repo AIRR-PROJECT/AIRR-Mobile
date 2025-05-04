@@ -67,6 +67,12 @@ export interface SearchFieldResult {
     }[]
 }
 
+export interface GroupRule {
+    _id: string;
+    RuleName: string;
+    RuleDescription: string;
+}
+
 // export interface CreateGroup {
 //     Name: string;
 //     Description: string;

@@ -32,6 +32,15 @@ export interface UserProfile {
     };
 }
 
+export interface PartialUser {
+    username: string;
+    avatarURL: string;
+    firstName: string;
+    lastName: string;
+    joinDate: Date;
+    profile: UserProfile;
+}
+
 export interface User {
     username: string;
     _id: string;

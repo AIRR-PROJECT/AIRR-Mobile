@@ -59,7 +59,7 @@ export interface GroupDetailInfo {
     },
     CoverURL: string;
     Tags: GroupTag[]
-    // Role: ,
+    Role: string,
     isJoined: boolean
 }
 

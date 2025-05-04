@@ -22,6 +22,7 @@ import { useRouter } from "expo-router";
 import { useAppDispatch } from "@/redux/hook";
 import { getGroupInfo, setGroupBlogsSearchText, setGroupTagsSearchText } from "@/redux/slices/groupSlice";
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
+import { setUserRoleInCurrentGroup } from "@/redux/slices/userSlice";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -82,6 +83,7 @@ export default function GroupPageContent({
       groupID
     })).then((res) => {
       setGroupInfo(res.payload as GroupDetailInfo)
+      dispatch(setUserRoleInCurrentGroup((res.payload as GroupDetailInfo).Role))
     })
   }, [groupID])
 

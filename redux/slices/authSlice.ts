@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { ChangeCurrentPasswordCredentials, LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { UpdateAvatar, UpdateUser, User, User1 } from "@/interfaces/userInterface";
+import { PartialUser, UpdateAvatar, UpdateUser, User, User1 } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
 import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
@@ -246,6 +246,25 @@ export const getUserPreviewGroups = createAsyncThunk(
         }
         else {
             return thunkAPI.rejectWithValue(res.data.message)
+        }
+    }
+)
+
+export const getPartialUserInfo = createAsyncThunk(
+    'user/getPartialUserInfo',
+    async (user_id: string, thunkAPI) => {
+        try {
+            const res = await api.get(`users/partial-info-by-user-id?userID=${user_id}`)
+
+            if (res.data.success) {
+                return res.data.data.user as PartialUser
+            }
+            else {
+                return null
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
         }
     }
 )
@@ -600,6 +619,12 @@ const authSlice = createSlice({
                 
             })
             .addCase(getUserPreviewGroups.rejected, (state, action) => {
+
+            })
+            .addCase(getPartialUserInfo.fulfilled, (state, action) => {
+                
+            })
+            .addCase(getPartialUserInfo.rejected, (state, action) => {
 
             })
             .addCase(updateUser.fulfilled, (state, action) => {

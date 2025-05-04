@@ -51,12 +51,16 @@ export interface GroupDetailInfo {
         AvatarURL: string;
     }
     NumberOfTag: number;
+    NumberOfMembers: number;
+    TotalNumberOfBlogsLikes: number;
     Field: {
         _id: string;
         FieldName: string;
     },
     CoverURL: string;
     Tags: GroupTag[]
+    // Role: ,
+    isJoined: boolean
 }
 
 export interface SearchFieldResult {

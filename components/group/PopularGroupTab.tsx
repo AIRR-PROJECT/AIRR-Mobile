@@ -565,7 +565,7 @@ export default function PopularGroupTab() {
         renderItem={({ item }) => (
           <GroupCardComponent
             name={item.Name}
-            id={item.Owner.Username}
+            id={item._id}
             image={item.Owner.AvatarURL}
             members={item.NumberOfMembers}
             style={{

@@ -3,24 +3,20 @@ import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { FontAwesome6 } from "@expo/vector-icons";
-type DetailGroupCardComponentProps = {
-  Name: string;
-  _id: string;
-  CoverURL: string;
-  tag: string;
-  posts: number;
-  views: number;
-  likes: number;
+import { GroupDetailInfo } from "@/interfaces/groupInterface";
+type DetailGroupCardComponentProps = GroupDetailInfo & {
+  posts: number,
+  views: number
 };
 
 export default function DetailGroupCardComponent({
-  name,
-  id,
-  avatar,
-  tag,
+  Name,
+  _id,
+  CoverURL,
+  Field,
   posts,
   views,
-  likes,
+  TotalNumberOfBlogsLikes,
 }: DetailGroupCardComponentProps) {
   return (
     <LinearGradient
@@ -30,19 +26,19 @@ export default function DetailGroupCardComponent({
       style={styles.container}
     >
       {/* Avatar */}
-      <Image style={styles.avatar} source={avatar} />
+      <Image style={styles.avatar} source={CoverURL} />
       <View style={{ gap: 5, flex: 1 }}>
         {/* Title */}
         <View style={styles.textWrap}>
-          <Text style={styles.title}>{name}</Text>
+          <Text style={styles.title}>{Name}</Text>
         </View>
         <View style={styles.tagAndId}>
           {/* Tag and id */}
           <View style={styles.viewBoxShadow}>
             <FontAwesome6 name="tags" size={20} color="black" />
-            <Text style={styles.tag}>{tag}</Text>
+            <Text style={styles.tag}>{Field.FieldName}</Text>
           </View>
-          <Text style={styles.id}>@{id}</Text>
+          <Text style={styles.id}>@{_id}</Text>
         </View>
         <View style={styles.rowContainer}>
           <View style={styles.detailContainer}>
@@ -54,7 +50,7 @@ export default function DetailGroupCardComponent({
                 <Text style={styles.detail}>Views</Text>
             </View>
             <View style={styles.detailContainer}>
-                <Text style={styles.number}>{likes}</Text>
+                <Text style={styles.number}>{TotalNumberOfBlogsLikes}</Text>
                 <Text style={styles.detail}>Likes</Text>
             </View>
         </View>

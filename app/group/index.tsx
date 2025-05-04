@@ -85,7 +85,7 @@ export default function GroupPage() {
   const { user } = useAppSelector(state => state.user)
 
   const [selectedId, setSelectedId] = useState(1);
-  const [tags, setTags] = useState<{ id: string, data: string[] }[]>([])
+  const [tags, setTags] = useState<{ id: string, data: GroupTag[] }[]>([])
 
   const [blogPage, setBlogPage] = useState(1)
 
@@ -93,25 +93,25 @@ export default function GroupPage() {
     dispatch(getGroupTagsByID({
       groupID: groupId
     })).then((res) => {
-      const categorizedTags = new Map<string, string[]>()
-      let categorizedTagsList: { id: string, data: string[] }[] = []
+      let categorizedTags = {}
+      let categorizedTagsList: { id: string, data: GroupTag[] }[] = []
       const retrievedTags = res.payload as GroupTag[]
 
       retrievedTags.forEach((tags) => {
         const initial = tags.TagName.charAt(0).toLowerCase()
         
-        if (categorizedTags.has(initial)) {
-          categorizedTags.get(initial)?.push(tags.TagName)
+        if (Object.hasOwn(categorizedTags, initial)) {
+          (categorizedTags[initial] as GroupTag[]).push(tags)
         }
         else {
-          categorizedTags.set(initial, [tags.TagName])
+          categorizedTags[initial] = [tags]
         }
       })
       
-      categorizedTags.entries().forEach((entry) => {
+      Object.entries(categorizedTags).forEach((entry) => {
         categorizedTagsList.push({
-          id: entry[0],
-          data: entry[1]
+          id: entry[0] as string,
+          data: entry[1] as GroupTag[]
         })
       })
       setTags(categorizedTagsList)
@@ -175,15 +175,16 @@ export default function GroupPage() {
           itemDimension={150} // Controls column width
           spacing={10} // Spacing between items
           style={styles.gridView}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.tagContainer}>
-              <Text style={styles.tag}>#{item}</Text>
+          renderItem={({ item }) => {
+            return (
+            <TouchableOpacity style={styles.tagContainer} onPress={() => console.log(`${item._id} - ${item.TagName}`)}>
+              <Text style={styles.tag}>#{item.TagName}</Text>
             </TouchableOpacity>
-          )}
+          )}}
           renderSectionHeader={({ section }) => (
             <Text style={styles.title}>{section.id}</Text>
           )}
-          keyExtractor={(item, index) => item + index}
+          keyExtractor={(item, index) => item._id}
           contentContainerStyle={styles.list}
         />
       )}

@@ -35,23 +35,26 @@ type GroupDetailProps = {
   numberOfMembers: number;
   isUserInGroup?: boolean;
 };
-const mockGroupDetail: GroupDetailProps = {
-  name: "The Data-Driven Minds Collective",
-  id: "data_minds",
-  avatar: "https://picsum.photos/325",
-  tag: "Web Development",
+const mockGroupDetail: GroupDetailInfo = {
+  Name: "The Data-Driven Minds Collective",
+  _id: "data_minds",
+  CoverURL: "https://picsum.photos/325",
+  Field: {
+    _id: "web-dev",
+    FieldName: "Web Development"
+  },
   posts: 100,
   views: 2000,
-  likes: 500,
-  description:
+  TotalNumberOfBlogsLikes: 500,
+  Description:
     "This group is for React developers of all levels to share knowledge, ask questions, and discuss best practices. Stay updated on the latest features, libraries, and trends in the React ecosystem. Happy coding...",
   threeUserAvatar: [
     "https://picsum.photos/350",
     "https://picsum.photos/350",
     "https://picsum.photos/350",
   ],
-  numberOfMembers: 100,
-  isUserInGroup: false,
+  NumberOfMembers: 100,
+  isJoined: false,
 };
 type GroupPageProps = {
   selectedId: number;
@@ -90,10 +93,10 @@ export default function GroupPageContent({
   return (
     <View style={styles.container}>
       <View>
-        <DetailGroupCardComponent {...mockGroupDetail} />
+        <DetailGroupCardComponent {...groupInfo ? {...groupInfo, posts: 1, views: 1} : mockGroupDetail} />
       </View>
       {/* Description */}
-      <Text style={styles.description}>{groupInfo ? groupInfo.Description : mockGroupDetail.description}</Text>
+      <Text style={styles.description}>{groupInfo ? groupInfo.Description : mockGroupDetail.Description}</Text>
       <View style={styles.rowContainer}>
         <TouchableOpacity
           style={styles.infoContainer}
@@ -116,10 +119,10 @@ export default function GroupPageContent({
             />
           </View>
           {/* Number of member */}
-          <Text style={styles.member}>+{mockGroupDetail.numberOfMembers}</Text>
+          <Text style={styles.member}>+{mockGroupDetail.NumberOfMembers}</Text>
         </TouchableOpacity>
         {/* render based on user is in group or not */}
-        {!mockGroupDetail.isUserInGroup ? (
+        {!mockGroupDetail.isJoined ? (
           <ButtonGradient
             label="Join Group"
             labelStyle={styles.tabButtonText}
@@ -174,7 +177,7 @@ export default function GroupPageContent({
         </View>
 
         {/* Create Post */}
-        {mockGroupDetail.isUserInGroup ? (
+        {mockGroupDetail.isJoined ? (
           selectedId === 1 ? (
             <CreatePost />
           ) : (

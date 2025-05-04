@@ -1,5 +1,11 @@
 import NotificationsItem from "@/components/notifications/NotificationsItem";
-import { StyleSheet, View, SectionList, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  SectionList,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 
 enum NotificationType {
   REACTION = "REACTION",
@@ -28,7 +34,8 @@ const mockData = [
     ...mockFollower,
     type: NotificationType.FOLLOW,
     isRead: false,
-    date: Date.now() / 1000,
+    date: Date.now() / 1000, // Change to ISO or Unix timestamp, which ever you prefer, if
+    // if ISO, change the function in NotificationsItem to handle ISO date
   },
   {
     ...mockFollower,
@@ -122,6 +129,15 @@ export default function NotificationsLayout() {
         contentContainerStyle={{ padding: 20 }}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+        ListFooterComponent={() => (
+          <TouchableOpacity
+            style={styles.prevNotiContainer}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.prevNotiText}>See previous notifications</Text>
+          </TouchableOpacity>
+        )}
+        ListFooterComponentStyle={{ marginTop: 20 }}
       />
     </View>
   );
@@ -137,5 +153,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#FFFFFF",
     marginVertical: 10,
+  },
+  prevNotiContainer: {
+    backgroundColor: "#2E3B40",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  prevNotiText: {
+    color: "#fff",
+    fontSize: 16,
   },
 });

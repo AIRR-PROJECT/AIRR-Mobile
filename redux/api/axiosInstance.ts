@@ -8,6 +8,7 @@ import { reset, setTokens } from '../slices/userSlice';
 import { Store } from '@reduxjs/toolkit';
 import { router } from 'expo-router';
 import { hideLoading, showLoading } from '../slices/loadingSlice';
+import { logout } from '../slices/authSlice';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 let store: Store
@@ -85,12 +86,12 @@ api.interceptors.response.use(
                                 exception_message = "Session expired. Please re-login"
 
                                 store.dispatch(reset())
-                                await SecureStore.deleteItemAsync("accessToken")
-                                await SecureStore.deleteItemAsync("refreshToken")
+                                // await SecureStore.deleteItemAsync("accessToken")
+                                // await SecureStore.deleteItemAsync("refreshToken")
                                 console.log("dismissed to first screen")
 
                                 if (router.canDismiss()){
-                                    router.dismissTo("/auth")
+                                    store.dispatch(logout())
                                 }
                             }
                             else {
@@ -111,12 +112,12 @@ api.interceptors.response.use(
                         exception_message = "Session expired. Please re-login"
 
                         store.dispatch(reset())
-                        await SecureStore.deleteItemAsync("accessToken")
-                        await SecureStore.deleteItemAsync("refreshToken")
+                        // await SecureStore.deleteItemAsync("accessToken")
+                        // await SecureStore.deleteItemAsync("refreshToken")
                         console.log("dismissed to first screen")
                         
                         if (router.canDismiss()) {
-                            router.dismissTo("/auth")
+                            store.dispatch(logout())
                         }
                     }
                     else {

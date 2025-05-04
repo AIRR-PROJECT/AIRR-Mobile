@@ -19,7 +19,7 @@ type NotificationItemProps = {
 
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
-import { formatUnixDateAmPm } from "@/utils/dateConvert";
+import { formatUnixDate } from "@/utils/dateConvert";
 // based on type of notification, handle move to different screen
 // if notification is user like the blog, move to the post screen
 // if notification is user comment on the blog, move to the blog screen
@@ -95,7 +95,7 @@ export default function NotificationsItem({
                   ]}
                 >
                   {" "}
-                  {formatUnixDateAmPm(date)}
+                  {formatUnixDate(date)}
                 </Text>
               </Text>
             </View>

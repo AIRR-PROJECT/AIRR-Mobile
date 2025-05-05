@@ -91,7 +91,7 @@ api.interceptors.response.use(
                                 console.log("dismissed to first screen")
 
                                 if (router.canDismiss()){
-                                    store.dispatch(logout())
+                                    router.navigate("/auth")
                                 }
                             }
                             else {
@@ -117,7 +117,7 @@ api.interceptors.response.use(
                         console.log("dismissed to first screen")
                         
                         if (router.canDismiss()) {
-                            store.dispatch(logout())
+                            router.navigate("/auth")
                         }
                     }
                     else {

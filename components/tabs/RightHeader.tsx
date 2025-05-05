@@ -22,10 +22,10 @@ import TabButton from "./feed/TabButton";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { saveTags } from "@/redux/slices/feedSlice";
 import { getUserInfo } from "@/redux/slices/authSlice";
+import { countUnseenNotif } from "@/redux/slices/notifSlice";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type RightHeaderProps = {
-  new_noti_counts: number;
   avatar?: string;
 };
 
@@ -42,12 +42,12 @@ let originalSuggestedTags: Tag[];
 let originalSelectedTags: Tag[];
 
 export default function RightHeader({
-  new_noti_counts: new_noti_counts,
   avatar,
 }: RightHeaderProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
   const { user, userAvatar } = useAppSelector((state) => state.user);
+  const { notifCount } = useAppSelector(state => state.notif)
 
   const [suggestedTagsShow, setSuggestedTagsShow] = useState<boolean[]>([]);
   const [selectedTagsShow, setSelectedTagsShow] = useState<boolean[]>([]);
@@ -64,6 +64,8 @@ export default function RightHeader({
 
   useEffect(() => {
     refreshTags();
+
+    dispatch(countUnseenNotif())
   }, []);
 
   // Handle on tags saved
@@ -224,8 +226,8 @@ export default function RightHeader({
         onPress={handleNotificationPress}
       >
         <Ionicons name="notifications-circle" size={24} color="#B9FF66" />
-        {new_noti_counts > 0 && (
-          <Text style={styles.text}>{new_noti_counts}</Text>
+        {notifCount > 0 && (
+          <Text style={styles.text}>{notifCount}</Text>
         )}
       </TouchableOpacity>
 

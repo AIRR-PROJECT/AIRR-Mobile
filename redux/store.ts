@@ -6,6 +6,7 @@ import userReducer from './slices/userSlice';
 import feedReducer from './slices/feedSlice';
 import blogReducer from './slices/blogSlice';
 import groupReducer from './slices/groupSlice';
+import notifReducer from './slices/notifSlice';
 
 // Ignore action paths to avoid "non-serializable" error
 const serializableMiddleware = createSerializableStateInvariantMiddleware({
@@ -20,7 +21,8 @@ const store = configureStore({
         user: userReducer,
         feed: feedReducer,
         blog: blogReducer,
-        group: groupReducer
+        group: groupReducer,
+        notif: notifReducer
 
     },
     middleware: (getDefaultMiddleware) =>

@@ -1,17 +1,17 @@
 import { User } from "@/interfaces/userInterface";
 import { useRouter } from "expo-router";
-enum NotificationType {
-  REACTION = "REACTION",
-  COMMENT = "COMMENT",
-  MENTION = "MENTION",
-  FOLLOW = "FOLLOW",
-}
+// enum NotificationType {
+//   REACTION = "REACTION",
+//   COMMENT = "COMMENT",
+//   MENTION = "MENTION",
+//   FOLLOW = "FOLLOW",
+// }
 type NotificationItemProps = {
   id: string;
   description: string;
-  date: number;
+  date: Date;
   isRead: boolean;
-  from: Pick<User, "_id" | "firstName" | "lastName" | "avatarURL">;
+  from: Pick<User, "_id" | "username" | "avatarURL">;
   type: NotificationType;
   blogImage?: string;
   onMarkAsRead: (id: string) => void;
@@ -20,6 +20,7 @@ type NotificationItemProps = {
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { formatUnixDate } from "@/utils/dateConvert";
+import { NotificationType } from "@/enums/notif_type.enum";
 // based on type of notification, handle move to different screen
 // if notification is user like the blog, move to the post screen
 // if notification is user comment on the blog, move to the blog screen
@@ -44,7 +45,7 @@ export default function NotificationsItem({
       onMarkAsRead(id);
       isRead = true;
     }
-    if (type === NotificationType.FOLLOW) {
+    if (type === NotificationType.OTHER) {
       // navigate to user profile screen
       // route.push(`/profile/${from._id}`);
     } else {
@@ -78,7 +79,8 @@ export default function NotificationsItem({
         <View style={styles.innerContainer}>
           <View>
             <Text style={[styles.name, { color: isRead ? "#000" : "#fff" }]}>
-              {from.firstName} {from.lastName}
+              {/* {from.firstName} {from.lastName} */}
+              {from.username}
             </Text>
             <View style={styles.rowContainer}>
               <Text
@@ -95,20 +97,20 @@ export default function NotificationsItem({
                   ]}
                 >
                   {" "}
-                  {formatUnixDate(date)}
+                  {new Date(date).toDateString()}
                 </Text>
               </Text>
             </View>
           </View>
           <View style={{ marginLeft: 4 }}>
-            {type === NotificationType.FOLLOW && (
+            {type === NotificationType.OTHER && (
               <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.7}>
                   <Text style={styles.buttonText}>Follow</Text>
                 </TouchableOpacity>
               </View>
             )}
-            {type !== NotificationType.FOLLOW && (
+            {type !== NotificationType.OTHER && (
               <View>
                 <Image
                   source={blogImage}

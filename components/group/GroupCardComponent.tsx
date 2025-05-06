@@ -15,7 +15,7 @@ type GroupCardComponentProps = {
   name: string;
   id: string;
   members: number;
-  style? : StyleProp<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
   // later add onPress function
   // onPress: () => void;
 };
@@ -30,21 +30,28 @@ export default function GroupCardComponent({
   const handleJoinPress = () => {
     // Handle join button press
     console.log(`Join group ${name}`);
-  }
+  };
   const handleGroupPress = () => {
     // Handle group card press
     route.push(`/group?groupId=${id}`);
     console.log(`Group card pressed: ${name}`);
-  }
+  };
   return (
-    <TouchableOpacity style={[styles.container, style]} onPress={handleGroupPress} activeOpacity={0.6}>
+    <TouchableOpacity
+      style={[styles.container, style]}
+      onPress={handleGroupPress}
+      activeOpacity={0.6}
+    >
       {/* Group image */}
       <View style={styles.rowContainer}>
         <Image style={styles.image} source={image} />
         {/* name, group id, member */}
-        <View>
+        <View style={styles.nameGroupIdMemberContainer}>
           {/* name */}
-          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.name}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >{name}</Text>
           <View style={styles.groupIdAndMember}>
             {/* Group id and member */}
             <Text style={styles.groupId}>@{id}</Text>
@@ -67,7 +74,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    
   },
   image: {
     width: 50,
@@ -76,11 +82,14 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   rowContainer: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   name: {
     fontSize: 16,
+    flex: 1,
     fontWeight: "bold",
     color: "#fff",
   },
@@ -96,6 +105,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+    flex: 1,
   },
   joinButton: {
     backgroundColor: "transparent",
@@ -108,4 +118,8 @@ const styles = StyleSheet.create({
   joinButtonText: {
     color: "#fff",
   },
+  nameGroupIdMemberContainer: {
+    flex: 1,
+    marginRight: 20,
+  }
 });

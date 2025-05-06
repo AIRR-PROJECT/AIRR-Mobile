@@ -1,4 +1,4 @@
-import { InteractType, NotificationType } from "@/enums/notif_type.enum";
+import { InteractType, NotificationType, RequestType } from "@/enums/notif_type.enum";
 
 export interface RegisterNotifToken {
     token: string;
@@ -31,7 +31,7 @@ export interface PermissionNotification {
     report_id?: string
     request_tag_id?: string
     request_permission_id?: string
-    request_type: string
+    request_type: RequestType
     message: string
     title: string
     request_owner: RequestOwner

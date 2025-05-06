@@ -23,7 +23,6 @@ import { getUserInfo, loadToken, logout } from "@/redux/slices/authSlice";
 import { injectStoreToAxiosInterceptor } from "@/redux/api/axiosInstance";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { countUnseenNotif } from "@/redux/slices/notifSlice";
-import { getFCMToken } from "@/firebase/messaging";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -37,20 +36,6 @@ export default function RootLayout() {
   });
   
   injectStoreToAxiosInterceptor(store)
-
-  useEffect(() => {
-    // Get FCM token on component mount
-    const getToken = async () => {
-      const token = await getFCMToken();
-      console.log(token)
-      if (token) {
-        // In a real app, you would send this token to your backend
-        // await sendTokenToBackend(token);
-      }
-    };
-    
-    getToken();
-  }, [])
 
   useEffect(() => {
     if (loaded) {

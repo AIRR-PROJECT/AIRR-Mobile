@@ -78,13 +78,12 @@ export const updateSeenNotif = createAsyncThunk(
     async (dto: UpdateSeenNotif, thunkAPI) => {
         try {
             const res = await api.post(`notif/update-seen`, dto) as AxiosResponse
-            console.log(res)
 
             if (res.data.success) {
-
+                return true
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                return false
             }
         }
         catch (err: any) {

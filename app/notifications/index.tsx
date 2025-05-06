@@ -1,6 +1,6 @@
 import NotificationsItem from "@/components/notifications/NotificationsItem";
-import { NotificationType } from "@/enums/notif_type.enum";
-import { NotificationResponseData, OtherNotification } from "@/interfaces/notifInterface";
+import { NotificationType, RequestType } from "@/enums/notif_type.enum";
+import { BlogInteractNotification, NotificationResponseData, OtherNotification, PermissionNotification } from "@/interfaces/notifInterface";
 import { useAppDispatch } from "@/redux/hook";
 import { getAllNotif } from "@/redux/slices/notifSlice";
 import { useEffect, useState } from "react";
@@ -150,22 +150,86 @@ export default function NotificationsLayout() {
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <NotificationsItem
-            id={item.id}
-            description={descriptionFromType(item.type)}
-            date={item.time}
-            isRead={item.seen}
-            from={{
-              _id: (item.data as OtherNotification).request_owner._id,
-              username: (item.data as OtherNotification).request_owner.Username,
-              avatarURL: (item.data as OtherNotification).request_owner.AvatarURL,
-            }}
-            type={item.type}
-            onMarkAsRead={handleMarkAsRead}
-            // blogImage={item.blogImage ?? null}
-          />
-        )}
+        renderItem={({ item }) => {
+          let notifData
+
+          switch (item.type) {
+            case NotificationType.INTERACTION:
+              notifData = item.data as BlogInteractNotification
+              return (
+                <NotificationsItem
+                  id={item.id}
+                  description={notifData.message ?? `Reacted ${notifData.interact_type} to your blog`}
+                  date={item.time}
+                  isRead={item.seen}
+                  from={{
+                    _id: notifData.blog_owner._id,
+                    username: notifData.blog_owner.Username,
+                    avatarURL: notifData.blog_owner.AvatarURL,
+                  }}
+                  type={item.type}
+                  data={item.data}
+                  onMarkAsRead={handleMarkAsRead}
+                  // blogImage={item.blogImage ?? null}
+                />
+              )
+            case NotificationType.PERMISSION:
+              notifData = item.data as PermissionNotification
+
+              let description
+              switch (notifData.request_type) {
+                case RequestType.REQUEST_JOIN_GROUP:
+                  description = "Requested to join group"
+                  break;
+                case RequestType.REQUEST_NEW_TAG:
+                  description = "Requested to create a new tag"
+                  break;
+                case RequestType.REQUEST_POST_BLOG:
+                  description = "Requested to post a new blog"
+                  break;
+                default:
+                  description = "Requested to report a blog"
+                  break;
+              }
+
+              return (
+                <NotificationsItem
+                  id={item.id}
+                  description={notifData.message ?? description}
+                  date={item.time}
+                  isRead={item.seen}
+                  from={{
+                    _id: notifData.request_owner._id,
+                    username: notifData.request_owner.Username,
+                    avatarURL: notifData.request_owner.AvatarURL,
+                  }}
+                  type={item.type}
+                  data={item.data}
+                  onMarkAsRead={handleMarkAsRead}
+                  // blogImage={item.blogImage ?? null}
+                />
+              )
+            default:
+              notifData = item.data as OtherNotification
+              return (
+                <NotificationsItem
+                  id={item.id}
+                  description={notifData.message ?? "Sent you a notification"}
+                  date={item.time}
+                  isRead={item.seen}
+                  from={{
+                    _id: notifData.request_owner._id,
+                    username: notifData.request_owner.Username,
+                    avatarURL: notifData.request_owner.AvatarURL,
+                  }}
+                  type={item.type}
+                  data={item.data}
+                  onMarkAsRead={handleMarkAsRead}
+                  // blogImage={item.blogImage ?? null}
+                />
+              )
+          }
+        }}
         renderSectionHeader={({ section: { title } }) => (
           <Text style={styles.sectionHeader}>{title}</Text>
         )}

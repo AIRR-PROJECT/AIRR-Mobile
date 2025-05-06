@@ -14,13 +14,18 @@ type NotificationItemProps = {
   from: Pick<User, "_id" | "username" | "avatarURL">;
   type: NotificationType;
   blogImage?: string;
+  data: BlogInteractNotification | PermissionNotification | OtherNotification,
   onMarkAsRead: (id: string) => void;
 };
 
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { formatUnixDate } from "@/utils/dateConvert";
-import { NotificationType } from "@/enums/notif_type.enum";
+import { NotificationType, RequestType } from "@/enums/notif_type.enum";
+import { useState } from "react";
+import { useAppDispatch } from "@/redux/hook";
+import { updateSeenNotif } from "@/redux/slices/notifSlice";
+import { BlogInteractNotification, PermissionNotification, OtherNotification } from "@/interfaces/notifInterface";
 // based on type of notification, handle move to different screen
 // if notification is user like the blog, move to the post screen
 // if notification is user comment on the blog, move to the blog screen
@@ -37,26 +42,65 @@ export default function NotificationsItem({
   from,
   type,
   blogImage,
+  data,
   onMarkAsRead,
 }: NotificationItemProps) {
   const route = useRouter();
+  const dispatch = useAppDispatch()
+
+  const [seen, setSeen] = useState(isRead)
+
   const handlePress = () => {
-    if (!isRead) {
-      onMarkAsRead(id);
-      isRead = true;
-    }
-    if (type === NotificationType.OTHER) {
-      // navigate to user profile screen
-      // route.push(`/profile/${from._id}`);
-    } else {
-      // navigate to blog screen
-      // route.push(`/blog/${id}`);
+    if (!seen) {
+      dispatch(updateSeenNotif({
+        notif_id: id
+      })).then((res) => {
+        if (res.payload) {
+          onMarkAsRead(id);
+          setSeen(true)
+        }
+
+        switch (type) {
+          case NotificationType.PERMISSION:
+            const permissionData = data as PermissionNotification
+            
+            switch (permissionData.request_type) {
+              case RequestType.REQUEST_REPORT_BLOG:
+                // TODO: route to report page  
+                break;
+              case RequestType.REQUEST_POST_BLOG:
+                // TODO: route to new post review page
+                break;
+              case RequestType.REQUEST_JOIN_GROUP:
+                // TODO: route to request join group page
+                break;
+              case RequestType.REQUEST_NEW_TAG:
+                // TODO: route to new tag review page
+                break;
+            }
+            break;
+          case NotificationType.INTERACTION:
+            const interactionData = data as BlogInteractNotification
+    
+            route.push(`/blog?userBlogId=${interactionData.blog_id}`)
+            break;
+          default:
+            const otherData = data as OtherNotification
+            break
+        }
+      })
     }
   };
   const handleFollow = () => {
-    if (!isRead) {
-      onMarkAsRead(id);
-      isRead = true;
+    if (!seen) {
+      dispatch(updateSeenNotif({
+        notif_id: id
+      })).then((res) => {
+        if (res.payload) {
+          onMarkAsRead(id);
+          setSeen(true)
+        }
+      })
     }
   };
   return (
@@ -64,7 +108,7 @@ export default function NotificationsItem({
       <View
         style={[
           styles.container,
-          { backgroundColor: isRead ? "#fff" : "#000" },
+          { backgroundColor: seen ? "#fff" : "#000" },
         ]}
       >
         {/* Image from user noti */}
@@ -78,7 +122,7 @@ export default function NotificationsItem({
         />
         <View style={styles.innerContainer}>
           <View>
-            <Text style={[styles.name, { color: isRead ? "#000" : "#fff" }]}>
+            <Text style={[styles.name, { color: seen ? "#000" : "#fff" }]}>
               {/* {from.firstName} {from.lastName} */}
               {from.username}
             </Text>
@@ -86,14 +130,14 @@ export default function NotificationsItem({
               <Text
                 style={[
                   styles.description,
-                  { color: isRead ? "#000" : "#fff" },
+                  { color: seen ? "#000" : "#fff" },
                 ]}
               >
                 {description}.
                 <Text
                   style={[
                     styles.date,
-                    { color: isRead ? "#9E9E9E" : "#9E9E9E" },
+                    { color: seen ? "#9E9E9E" : "#9E9E9E" },
                   ]}
                 >
                   {" "}

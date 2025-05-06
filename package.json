@@ -38,6 +38,7 @@
     "expo-checkbox": "~4.0.1",
     "expo-clipboard": "~7.0.1",
     "expo-constants": "~17.0.4",
+    "expo-dev-client": "~5.0.20",
     "expo-font": "~13.0.4",
     "expo-haptics": "~14.0.1",
     "expo-image": "~2.0.7",

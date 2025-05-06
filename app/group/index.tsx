@@ -18,6 +18,7 @@ import { useLocalSearchParams } from "expo-router";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import queryClient from "@/redux/api/queryClient";
 import { GroupTag } from "@/interfaces/groupInterface";
+import GroupBlogPreview from "@/components/group/GroupBlogPreview";
 // const mockBlog = {
 //   Title: "How to fix clipboard if it isn’t working",
 //   BackgroundURL:
@@ -161,7 +162,7 @@ export default function GroupPage() {
       {selectedId === 1 ? (
         <FlatList
           data={groupBlogsQuery.data}
-          renderItem={({ item }) => <FeedBlogPreview blog={item} />}
+          renderItem={({ item }) => <GroupBlogPreview blog={item} />}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[styles.list, {}]}

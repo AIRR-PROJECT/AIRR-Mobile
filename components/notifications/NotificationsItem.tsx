@@ -20,6 +20,7 @@ type NotificationItemProps = {
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { formatUnixDate } from "@/utils/dateConvert";
+import { formatDistance } from "date-fns";
 // based on type of notification, handle move to different screen
 // if notification is user like the blog, move to the post screen
 // if notification is user comment on the blog, move to the blog screen
@@ -88,18 +89,18 @@ export default function NotificationsItem({
                 ]}
               >
                 {description}.
-                <Text
-                  style={[
-                    styles.date,
-                    { color: isRead ? "#9E9E9E" : "#9E9E9E" },
-                  ]}
-                >
-                  {" "}
-                  {formatUnixDate(date)}
-                </Text>
               </Text>
             </View>
+            <Text
+              style={[styles.date, { color: isRead ? "#9E9E9E" : "#9E9E9E" }]}
+            >
+              {formatDistance(new Date(date * 1000), new Date(), {
+                addSuffix: true,
+                includeSeconds: true,
+              })}
+            </Text>
           </View>
+
           <View style={{ marginLeft: 4 }}>
             {type === NotificationType.FOLLOW && (
               <View style={styles.buttonContainer}>
@@ -128,7 +129,7 @@ export default function NotificationsItem({
 }
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: 10,
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 20,

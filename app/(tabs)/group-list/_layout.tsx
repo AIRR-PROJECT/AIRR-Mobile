@@ -1,7 +1,7 @@
 import { MaterialTopTabs } from "@/components/MaterialTopTabs";
 import { LinearGradient } from "expo-linear-gradient";
 import { Text, View } from "react-native";
-export default function MyFeedTabLayout() {
+export default function GroupListTabLayout() {
   return (
     <MaterialTopTabs
       style={{ flex: 1 }}

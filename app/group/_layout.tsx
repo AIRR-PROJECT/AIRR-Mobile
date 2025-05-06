@@ -95,6 +95,12 @@ export default function GroupLayout() {
             headerTitle: "Create New Group Tag",
           }}
         />
+        <Stack.Screen
+          name="approvals"
+          options={{
+            headerTitle: "Approvals",
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

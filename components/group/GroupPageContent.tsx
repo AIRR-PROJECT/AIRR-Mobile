@@ -7,7 +7,6 @@ import {
   TextInput,
   Modal,
   Pressable,
-  Keyboard,
 } from "react-native";
 import { Image } from "expo-image";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -16,12 +15,17 @@ import {
   FontAwesome6,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Divider } from "@rneui/base";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import { useAppDispatch } from "@/redux/hook";
 import { getGroupInfo } from "@/redux/slices/groupSlice";
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -56,44 +60,86 @@ const mockGroupDetail: GroupDetailProps = {
 type GroupPageProps = {
   selectedId: number;
   setSelectedId: (id: number) => void;
-  groupID: string
+  groupID: string;
+  // selectedBlogFilter: string;
+  // setSelectedBlogFilter: (filter: string) => void;
+  // selectedTagFilter: string;
+  // setSelectedTagFilter: (filter: string) => void;
 };
 
 const joinConfirmImage = require("@/assets/images/group/join_confirm.png");
-
+const blogsFilters = ["All blogs", "Needs approval"];
+const tagsFilters = ["All tags", "Needs approval"];
 export default function GroupPageContent({
   selectedId,
   setSelectedId,
-  groupID
+  groupID,
+  // selectedBlogFilter,
+  // setSelectedBlogFilter,
+  // selectedTagFilter,
+  // setSelectedTagFilter,
+
 }: GroupPageProps) {
   const route = useRouter();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>()
+  const [isGroupJoinModalVisible, setIsGroupJoinModalVisible] = useState(false);
+  const [isBlogsFilterModalVisible, setIsBlogsFilterModalVisible] =
+    useState(false);
+  const [isTagsFilterModalVisible, setIsTagsFilterModalVisible] =
+    useState(false);
+  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>();
 
   useEffect(() => {
-    dispatch(getGroupInfo({
-      groupID
-    })).then((res) => {
-      setGroupInfo(res.payload as GroupDetailInfo)
-    })
-  }, [groupID])
+    dispatch(
+      getGroupInfo({
+        groupID,
+      })
+    ).then((res) => {
+      setGroupInfo(res.payload as GroupDetailInfo);
+    });
+  }, [groupID]);
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const handleGroupJoinConfirmCancel = () => {
+    setIsGroupJoinModalVisible(false);
+  };
+  const handleBlogFilterCancel = () => {
+    setIsBlogsFilterModalVisible(false);
+  };
+  const handleTagFilterCancel = () => {
+    setIsTagsFilterModalVisible(false);
   };
   const handlePressGroupMemberList = () => {
     // Handle the press event for the group member list
+    // I don't know what the id for current group is
+    // so I just use the mock data for now
+    // modify this url to /group/{groupID}/group-member-list if needed
+    // route.push(`/group/${groupID}/group-member-list`);
     route.push("/group/group-member-list");
   };
+
+  const handleNewPostPress = () => {
+    // Handle the new post button press
+    // When Press it should carry a parameter of groupID or groupName
+    // so that the new blog will automatically be assigned to the group
+    route.push("/blog/new-blog");
+  };
+
+  const handleApprovalPress = () => {
+    // Handle the approval button press
+    // When Press it should carry a parameter of groupID or groupName
+    // so that the new blog will automatically be assigned to the group
+    route.push("/group/approvals");
+  }
   return (
     <View style={styles.container}>
       <View>
         <DetailGroupCardComponent {...mockGroupDetail} />
       </View>
       {/* Description */}
-      <Text style={styles.description}>{groupInfo ? groupInfo.Description : mockGroupDetail.description}</Text>
+      <Text style={styles.description}>
+        {groupInfo ? groupInfo.Description : mockGroupDetail.description}
+      </Text>
       <View style={styles.rowContainer}>
         <TouchableOpacity
           style={styles.infoContainer}
@@ -125,7 +171,7 @@ export default function GroupPageContent({
             labelStyle={styles.tabButtonText}
             style={styles.tabButton}
             onPress={() => {
-              setIsModalVisible(true);
+              setIsGroupJoinModalVisible(true);
             }}
           />
         ) : null}
@@ -171,6 +217,35 @@ export default function GroupPageContent({
               Tags
             </Text>
           </TouchableOpacity>
+          {/* Approval Tab */}
+          <TouchableOpacity
+            style={[styles.tabItem, selectedId === 3 && styles.tabItemActive]}
+            onPress={() => {
+              handleApprovalPress();
+            }}
+            activeOpacity={0.8}
+          >
+            <Text
+              style={{
+                color: selectedId === 3 ? "#fff" : "#8A94AC",
+                fontWeight: "bold",
+              }}
+            >
+              Approvals
+            </Text>
+          </TouchableOpacity>
+          {/* New Blog Button */}
+          <View style={styles.rowContainer}>
+            <TouchableOpacity
+              style={[styles.createBlogButton]}
+              onPress={handleNewPostPress}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.createBlogButtonText}>+ New Post</Text>
+            </TouchableOpacity>
+            {/* Maybe up and down button */}
+            <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
+          </View>
         </View>
 
         {/* Create Post */}
@@ -191,27 +266,48 @@ export default function GroupPageContent({
             style={styles.textInput}
             placeholder={selectedId === 1 ? "Search Blog" : "Search Tag"}
             placeholderTextColor={"#8A94AC"}
+            numberOfLines={1}
+            multiline={false}
           />
         </View>
+
+        {/* {<View style={{ flex: 0.3 }}>
+          <TouchableOpacity
+            style={[styles.filterButton]}
+            activeOpacity={0.8}
+            onPress={() => {
+              if (selectedId === 1) {
+                setIsBlogsFilterModalVisible(true);
+              } else {
+                setIsTagsFilterModalVisible(true);
+              }
+            }}
+          >
+            <FontAwesome6 name="filter" size={24} color="#B9FF66" />
+            <Text style={styles.filterButtonText}>
+              {selectedId === 1 ? selectedBlogFilter : selectedTagFilter}
+            </Text>
+          </TouchableOpacity>
+        </View>} */}
       </View>
 
       {/* Modal for group join */}
       <Modal
         transparent={true}
-        visible={isModalVisible}
+        visible={isGroupJoinModalVisible}
         animationType="fade"
-        onRequestClose={handleCancel}
+        onRequestClose={handleGroupJoinConfirmCancel}
       >
         {/* Modal overlay */}
         <Pressable
           style={styles.modalOverlay}
           onPress={(event) => {
             if (event.target === event.currentTarget) {
-              handleCancel();
+              handleGroupJoinConfirmCancel();
             }
           }}
         >
-          <View style={styles.groupJoinModal}>
+          <View style={styles.modalContentContainer}>
             <Image style={styles.joinConfirmImage} source={joinConfirmImage} />
             <View style={{ flex: 1 }}>
               <View style={{}}>
@@ -222,7 +318,7 @@ export default function GroupPageContent({
               <View style={styles.rowContainer}>
                 <TouchableOpacity
                   onPress={() => {
-                    setIsModalVisible(false);
+                    setIsGroupJoinModalVisible(false);
                   }}
                   style={styles.joinCancelButton}
                 >
@@ -232,7 +328,7 @@ export default function GroupPageContent({
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    setIsModalVisible(false);
+                    setIsGroupJoinModalVisible(false);
                   }}
                   style={styles.joinConfirmButton}
                 >
@@ -243,6 +339,70 @@ export default function GroupPageContent({
           </View>
         </Pressable>
       </Modal>
+      {/* Modal for blogs filter
+      <Modal
+        transparent={true}
+        visible={isBlogsFilterModalVisible}
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={(event) => {
+            if (event.target === event.currentTarget) {
+              handleBlogFilterCancel();
+            }
+          }}
+        >
+          <View style={styles.filterContentContainer}>
+            {blogsFilters.map((filter, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.filterOptionsButton}
+                onPress={() => {
+                  setSelectedBlogFilter(filter);
+                  console.log("Selected blog filter:", filter);
+                  handleBlogFilterCancel();
+                }}
+              >
+                <Text style={styles.filterOptionsButtonText}>{filter}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
+      {/* Modal for Tags Filter */}
+      {/*
+      <Modal
+        transparent={true}
+        visible={isTagsFilterModalVisible}
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={(event) => {
+            if (event.target === event.currentTarget) {
+              handleTagFilterCancel();
+            }
+          }}
+        >
+          <View style={styles.filterContentContainer}>
+            {tagsFilters.map((filter, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.filterOptionsButton}
+                onPress={() => {
+                  setSelectedTagFilter(filter);
+                  handleTagFilterCancel();
+                }}
+              >
+                <Text style={styles.filterOptionsButtonText}>{filter}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Pressable>
+      </Modal> */}
     </View>
   );
 }
@@ -328,6 +488,9 @@ const styles = StyleSheet.create({
   tabList: {
     flexDirection: "row",
     paddingVertical: 20,
+    alignItems: "center",
+    justifyContent: "space-between",
+    flex: 1,
   },
   tabItem: {
     paddingVertical: 10,
@@ -344,17 +507,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#2E3B40",
     borderRadius: 9999,
+    flex: 0.9,
   },
   textInput: {
     padding: 10,
     flex: 0.9,
     borderRadius: 20,
     color: "#fff",
+    fontSize: 16,
   },
   textInputContainer: {
     paddingTop: 20,
   },
-  groupJoinModal: {
+  modalContentContainer: {
     flexDirection: "row",
     backgroundColor: "#1E1E1E",
     padding: 20,
@@ -402,5 +567,56 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
+  },
+  createBlogButton: {
+    backgroundColor: "#B9FF66",
+    padding: 15,
+    paddingBlock: 10,
+    borderRadius: 20,
+  },
+  createBlogButtonText: {
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  filterButton: {
+    width: 140,
+    height: 40,
+    borderRadius: 80,
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+    borderWidth: 1,
+    borderColor: "#B9FF66",
+  },
+  filterButtonText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#B9FF66",
+  },
+  filterContentContainer: {
+    backgroundColor: "#1E1E1E",
+    padding: 20,
+    borderRadius: 20,
+    margin: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    width: "90%",
+  },
+  filterOptionsButton: {
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: "#2E3B40",
+    marginVertical: 5,
+    width: "100%",
+  },
+  filterOptionsButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
   },
 });

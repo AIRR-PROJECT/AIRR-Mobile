@@ -12,15 +12,15 @@ import { useEffect } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { goBack } from "expo-router/build/global-state/routing";
-import { createGroup, resetCreateGroupProperties } from "@/redux/slices/groupSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
 
 export default function GroupLayout() {
   const dispatch = useAppDispatch()
-  const { createGroupCoverImage, createGroupDescription, createGroupField, createGroupName, createGroupRules, createGroupTags } = useAppSelector(state => state.group)
+  useAppSelector(state => state.group)
 
   // Get the current color scheme (dark or light)
   const colorScheme = useColorScheme();
@@ -45,26 +45,7 @@ export default function GroupLayout() {
     route.back();
   };
   const handleCreateGroup = () => {
-    const formData = new FormData()
-    formData.append("coverImage", {
-      uri: createGroupCoverImage.uri,
-      name: createGroupCoverImage.fileName,
-      type: createGroupCoverImage.mimeType
-    })
-    formData.append("name", createGroupName)
-    formData.append("tags", JSON.stringify(createGroupTags))
-    formData.append("groupField", JSON.stringify(createGroupField))
-    formData.append("description", createGroupDescription)
-    formData.append("groupRules", JSON.stringify(createGroupRules))
-
-    dispatch(createGroup(formData)).then((res) => {
-      if (res.payload) {
-        // Reset
-        dispatch(resetCreateGroupProperties())
-        
-        router.replace("/group")
-      }
-    })
+    dispatch(setCreateGroupSubmitted(true))
   }
   // Render the app layout with theme provider and navigation stack
   return (

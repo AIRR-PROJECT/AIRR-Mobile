@@ -63,12 +63,14 @@ export interface GroupDetailInfo {
     isJoined: boolean
 }
 
+export interface SearchedField {
+    _id: string;
+    FieldName: string;
+    DefaultTags: GroupTag[]
+}
+
 export interface SearchFieldResult {
-    Fields: {
-        _id: string;
-        FieldName: string;
-        DefaultTags: GroupTag[]
-    }[]
+    Fields: SearchedField[]
 }
 
 export interface GroupRule {

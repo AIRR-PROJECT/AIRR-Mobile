@@ -17,12 +17,7 @@ const initialState = {
     popularFields: null as any as GroupField[],
     popularGroupsHorizontal: null as any as Group[],
     popularGroupsVertical: null as any as PopularGroupsByField[],
-    createGroupCoverImage: null as unknown as ImageSource,
-    createGroupName: "",
-    createGroupDescription: "",
-    createGroupTags: [] as GroupTag[],
-    createGroupField: null as unknown as GroupField,
-    createGroupRules: [] as GroupRule[],
+    createGroupSubmitted: false,
     groupBlogsSearchText: "",
     groupTagsSearchText: "",
 };
@@ -227,30 +222,6 @@ const groupSlice = createSlice({
     name: "group",
     initialState,
     reducers: {
-        setCreateGroupName(state, action) {
-            state.createGroupName = action.payload
-        },
-
-        setCreateGroupField(state, action) {
-            state.createGroupField = action.payload
-        },
-
-        setCreateGroupDescription(state, action) {
-            state.createGroupDescription = action.payload
-        },
-
-        setCreateGroupTags(state, action) {
-            state.createGroupTags = action.payload
-        },
-
-        setCreateGroupCoverImage(state, action) {
-            state.createGroupCoverImage = action.payload
-        },
-
-        setCreateGroupRules(state, action) {
-            state.createGroupRules = action.payload
-        },
-        
         setGroupBlogsSearchText(state, action) {
             state.groupBlogsSearchText = action.payload
         },
@@ -259,23 +230,15 @@ const groupSlice = createSlice({
             state.groupTagsSearchText = action.payload
         },
 
-        resetCreateGroupProperties(state) {
-            state.createGroupName = "",
-            state.createGroupDescription = "",
-            state.createGroupTags = [] as GroupTag[],
-            state.createGroupField = null as unknown as GroupField,
-            state.createGroupRules = [] as GroupRule[]
+        setCreateGroupSubmitted(state, action) {
+            state.createGroupSubmitted = action.payload
         },
 
         reset(state) {
             state.popularFields = null as any as GroupField[]
             state.popularGroupsHorizontal = null as any as Group[]
             state.popularGroupsVertical = null as any as PopularGroupsByField[]
-            state.createGroupName = "",
-            state.createGroupDescription = "",
-            state.createGroupTags = [] as GroupTag[],
-            state.createGroupField = null as unknown as GroupField,
-            state.createGroupRules = [] as GroupRule[]
+            state.createGroupSubmitted = false
             state.groupBlogsSearchText = ""
         },
     
@@ -299,5 +262,5 @@ const groupSlice = createSlice({
 
 });
 
-export const { setCreateGroupCoverImage, setCreateGroupDescription, setCreateGroupField, setCreateGroupName, setCreateGroupRules, setCreateGroupTags, setGroupBlogsSearchText, setGroupTagsSearchText, resetCreateGroupProperties, reset } = groupSlice.actions;
+export const { setGroupBlogsSearchText, setGroupTagsSearchText, setCreateGroupSubmitted, reset } = groupSlice.actions;
 export default groupSlice.reducer;

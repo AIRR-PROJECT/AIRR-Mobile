@@ -94,7 +94,7 @@ export default function GroupPageContent({
     useState(false);
   const [isTagsFilterModalVisible, setIsTagsFilterModalVisible] =
     useState(false);
-  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>();
+  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>(mockGroupDetail);
 
   useEffect(() => {
     dispatch(getGroupInfo({
@@ -145,7 +145,7 @@ export default function GroupPageContent({
     // Handle the new post button press
     // When Press it should carry a parameter of groupID or groupName
     // so that the new blog will automatically be assigned to the group
-    route.push("/blog/new-blog");
+    route.push(`/blog/new-blog?groupID=${groupID}`);
   };
 
   const handleApprovalPress = () => {
@@ -185,10 +185,10 @@ export default function GroupPageContent({
             />
           </View>
           {/* Number of member */}
-          <Text style={styles.member}>+{mockGroupDetail.NumberOfMembers}</Text>
+          <Text style={styles.member}>+{groupInfo.NumberOfMembers}</Text>
         </TouchableOpacity>
         {/* render based on user is in group or not */}
-        {!mockGroupDetail.isJoined ? (
+        {groupInfo.isJoined ? (
           <ButtonGradient
             label="Join Group"
             labelStyle={styles.tabButtonText}

@@ -6,6 +6,7 @@ import {
   ScrollView,
   Button,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import {
   FlatList,
@@ -26,13 +27,13 @@ import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent
 import QuillEditor from "@/components/dom-components/QuillEditor.tsx/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
-import { getPreviewGroups } from "@/redux/slices/groupSlice";
-import { Group, GroupTag, PopularGroups } from "@/interfaces/groupInterface";
+import { getGroupInfo, getPreviewGroups } from "@/redux/slices/groupSlice";
+import { Group, GroupDetailInfo, GroupTag, PopularGroups } from "@/interfaces/groupInterface";
 import { useAppDispatch } from "@/redux/hook";
 import { ImageSource } from "expo-image";
 import { CreateBlog } from "@/interfaces/blogInterface";
 import { createBlog } from "@/redux/slices/blogSlice";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -96,7 +97,9 @@ export function debounce<T extends (...args: any[]) => void>(
 
 export default function NewBlog() {
   const dispatch = useAppDispatch();
+  const { groupID } = useLocalSearchParams<{ groupID: string }>()
 
+  const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true)
   const [chosenGroup, setChosenGroup] = useState<Group>();
   const groupSearchText = useRef("");
   const [searchFoundGroups, setSearchFoundGroups] = useState<Group[]>([])
@@ -112,6 +115,15 @@ export default function NewBlog() {
   // Variables
   const groupSnapPoints = useMemo(() => ["50%", "90%"], []);
   const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
+
+  useEffect(() => {
+    if (groupID) {
+      dispatch(getGroupInfo({ groupID })).then((res) => {
+        setChosenGroup(res.payload as Group)
+        setSelectGroupAllowed(false)
+      })
+    }
+  }, [groupID])
 
   useEffect(() => {
     if (chosenGroup) {
@@ -164,17 +176,12 @@ export default function NewBlog() {
   }
 
   const handlePostBlogPress = () => {
-    // const createBlogDto: CreateBlog = {
-    //   Group: {
-    //     _id: chosenGroup!._id,
-    //     Name: chosenGroup!.Name
-    //   },
-    //   Tags: chosenTags,
-    //   thumbnail: uploadedImg.current,
-    //   Title: title.current,
-    //   Description: description.current,
-    //   Content: content.current
-    // }
+    if (!uploadedImg.current || !chosenGroup || !chosenTags || !title.current || !description.current || !content.current) {
+      Alert.alert("Error", "Missing field")
+
+      return
+    }
+
     const formData = new FormData()
     formData.append("thumbnail", {
       uri: uploadedImg.current?.uri,
@@ -188,7 +195,7 @@ export default function NewBlog() {
     formData.append("content", content.current)
 
     dispatch(createBlog(formData)).then((res) => {
-      if (res.payload) {
+      if (typeof res.payload === "boolean" && res.payload == true) {
         router.replace("/my-feed")
       }
     })
@@ -273,6 +280,7 @@ export default function NewBlog() {
           <View style={styles.divider} />
           <View style={{ flex: 1 }}>
             <TouchableOpacity
+              disabled={!isSelectGroupAllowed}
               style={styles.heading}
               onPress={() => handleGroupSnapPress(0)}
               activeOpacity={0.8}

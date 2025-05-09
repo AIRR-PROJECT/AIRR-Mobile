@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   Pressable,
+  Alert,
 } from "react-native";
 import { Image, ImageSource } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -18,9 +19,8 @@ import BottomSheet, {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { createGroup, searchFields, setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
+import { searchFields, setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
 import { GroupRule, GroupTag, SearchedField, SearchFieldResult } from "@/interfaces/groupInterface";
-import { router } from "expo-router";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 // temporary use this cause figma not provide the image
@@ -69,6 +69,12 @@ export default function CreateGroup() {
     if (createGroupSubmitted) {
       dispatch(setCreateGroupSubmitted(false))
 
+      if (!uploadedImg.current || !groupName || !groupTags || !groupField || !groupDescription || !groupRules) {
+        Alert.alert("Error", "Missing field")
+  
+        return
+      }
+
       const formData = new FormData()
       formData.append("coverImage", {
         uri: uploadedImg.current?.uri,
@@ -85,8 +91,6 @@ export default function CreateGroup() {
         RuleDescription: groupRules
       }]
       formData.append("GroupRules", JSON.stringify(rulesObject))
-  
-      console.log(formData)
   
       // dispatch(createGroup(formData)).then((res) => {
       //   if (res.payload) {

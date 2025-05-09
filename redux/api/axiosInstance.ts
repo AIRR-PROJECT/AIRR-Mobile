@@ -86,13 +86,15 @@ api.interceptors.response.use(
                                 exception_message = "Session expired. Please re-login"
 
                                 store.dispatch(reset())
-                                // await SecureStore.deleteItemAsync("accessToken")
-                                // await SecureStore.deleteItemAsync("refreshToken")
+                                await SecureStore.deleteItemAsync("accessToken")
+                                await SecureStore.deleteItemAsync("refreshToken")
                                 console.log("dismissed to first screen")
 
-                                if (router.canDismiss()){
-                                    router.navigate("/auth")
-                                }
+                                router.dismissTo("/auth")
+                                router.reload()
+                                // if (router.canDismiss()){
+                                //     console.log("Error")
+                                // }
                             }
                             else {
                                 exception_message = response.data.message
@@ -112,13 +114,16 @@ api.interceptors.response.use(
                         exception_message = "Session expired. Please re-login"
 
                         store.dispatch(reset())
-                        // await SecureStore.deleteItemAsync("accessToken")
-                        // await SecureStore.deleteItemAsync("refreshToken")
+                        await SecureStore.deleteItemAsync("accessToken")
+                        await SecureStore.deleteItemAsync("refreshToken")
                         console.log("dismissed to first screen")
-                        
-                        if (router.canDismiss()) {
-                            router.navigate("/auth")
-                        }
+
+                        router.dismissTo("/auth")
+                        router.reload()
+                        // if (router.canDismiss()) {
+                        //     console.log("Error")
+                        //     router.dismissTo("/auth")
+                        // }
                     }
                     else {
                         exception_message = error.response.data.message

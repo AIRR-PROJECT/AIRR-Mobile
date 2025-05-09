@@ -21,6 +21,7 @@ import queryClient from "@/redux/api/queryClient";
 import { GroupTag } from "@/interfaces/groupInterface";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
+import GroupBlogPreview from "@/components/group/GroupBlogPreview";
 // const mockBlog = {
 //   Title: "How to fix clipboard if it isn’t working",
 //   BackgroundURL:
@@ -82,14 +83,14 @@ const mockTags = [
 ];
 
 export default function GroupPage() {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   const { groupId } = useLocalSearchParams<{ groupId: string }>()
   const { user } = useAppSelector(state => state.user)
   const { groupBlogsSearchText, groupTagsSearchText } = useAppSelector(state => state.group)
 
   const [selectedId, setSelectedId] = useState(1);
-  const [tags, setTags] = useState<{ id: string, data: GroupTag[] }[]>([])
+  const [tags, setTags] = useState<{ id: string; data: GroupTag[] }[]>([]);
 
   const [blogPage, setBlogPage] = useState(1)
   const [displayBlogs, setDisplayBlogs] = useState<UserBlog[]>([])
@@ -177,11 +178,13 @@ export default function GroupPage() {
   const groupBlogsQuery = useQuery({
     queryKey: ["feed-group-blogs"],
     queryFn: async () => {
-      const fetchedBlogs = await dispatch(getGroupBlogsByID({
-        groupID: groupId,
-        userID: user._id,
-        page: blogPage
-      }))
+      const fetchedBlogs = await dispatch(
+        getGroupBlogsByID({
+          groupID: groupId,
+          userID: user._id,
+          page: blogPage,
+        })
+      );
 
       // console.log(fetchedBlogs.payload.blogList.blogs)
       return fetchedBlogs.payload as UserBlog[];
@@ -220,43 +223,86 @@ export default function GroupPage() {
   const handleBlogListEndReached = () => {
     setBlogPage(blogPage + 1);
     groupBlogsMutation.mutate(blogPage + 1);
-  }
+  };
+  // const getFilteredBlogs = () => {
+  //   // TODO: Implement filtering logic based on selectedBlogFilter
+  //   // TODO: then change flatlist data to filteredBlogs
+  //   // TODO: Maybe this wont be needed so do this later
+  //   // TODO: Current task: implement on the approvals page
+  //   const filteredBlogs: UserBlog[] = [];
+  //   // if (!groupBlogsQuery.data) return [];
 
-  return (
-    <ParallaxFlatList contentStyle={styles.contentStyle}>
-      <GroupPageContent selectedId={selectedId} setSelectedId={setSelectedId} groupID={groupId} />
-      {selectedId === 1 ? (
-        <View>
+  //   // if (selectedBlogFilter === "All Blogs") {
+  //   //   return groupBlogsQuery.data;
+  //   // } else if (selectedBlogFilter === "My Blogs") {
+  //   //   return groupBlogsQuery.data.filter(blog => blog.authorId === currentUserId);
+  //   // } else if (selectedBlogFilter === "Liked Blogs") {
+  //   //   return groupBlogsQuery.data.filter(blog => blog.likedByMe);
+  //   // }
+  //   // Add more filter conditions as needed
+
+  //   return filteredBlogs;
+  // };
+  // const getFilteredTags = () => {
+  //   // TODO: Implement filtering logic based on selectedTagFilter
+  //   // TODO: then change sectionGrid data to filteredTags
+  //   // TODO: Maybe this wont be needed
+  //   // TODO: Current task: implement on the approvals page
+  //   const filteredTags: string[] = [];
+  //   return filteredTags;
+  // };
+
+  const renderContent = () => {
+    switch (selectedId) {
+      case 1:
+        return (
           <FlatList
             data={displayBlogs}
-            renderItem={({ item }) => <FeedBlogPreview blog={item} />}
+            renderItem={({ item }) => <GroupBlogPreview blog={item} />}
             keyExtractor={(item, index) => index.toString()}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[styles.list, {}]}
-            style={{paddingBottom: 80}}
+            style={{ paddingBottom: 80 }}
             onEndReached={handleBlogListEndReached}
             ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
           />
-        </View>
-      ) : (
-        <SectionGrid
-          sections={displayTags}
-          itemDimension={150} // Controls column width
-          spacing={10} // Spacing between items
-          style={styles.gridView}
-          renderItem={({ item }) => {
-            return (
-            <TouchableOpacity style={styles.tagContainer} onPress={() => console.log(`${item._id} - ${item.TagName}`)}>
-              <Text style={styles.tag}>#{item.TagName}</Text>
-            </TouchableOpacity>
-          )}}
-          renderSectionHeader={({ section }) => (
-            <Text style={styles.title}>{section.id}</Text>
-          )}
-          keyExtractor={(item, index) => item._id}
-          contentContainerStyle={styles.list}
-        />
-      )}
+        );
+      case 2:
+        return (
+          <SectionGrid
+            sections={displayTags}
+            itemDimension={150} // Controls column width
+            spacing={10} // Spacing between items
+            style={styles.gridView}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.tagContainer}>
+                <Text style={styles.tag}>#{item.TagName}</Text>
+              </TouchableOpacity>
+            )}
+            renderSectionHeader={({ section }) => (
+              <Text style={styles.title}>{section.id}</Text>
+            )}
+            keyExtractor={(item, index) => item.TagName + index}
+            contentContainerStyle={styles.list}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+  return (
+    <ParallaxFlatList contentStyle={styles.contentStyle}>
+      <GroupPageContent
+        selectedId={selectedId}
+        setSelectedId={setSelectedId}
+        groupID={groupId}
+        // setSelectedBlogFilter={setSelectedBlogFilter}
+        // setSelectedTagFilter={setSelectedTagFilter}
+        // selectedBlogFilter={selectedBlogFilter}
+        // selectedTagFilter={selectedTagFilter}
+      />
+
+      <View>{renderContent()}</View>
     </ParallaxFlatList>
   );
 }
@@ -266,8 +312,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1E1E1E",
   },
-  list: {
-  },
+  list: {},
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -304,10 +349,10 @@ const styles = StyleSheet.create({
   },
   gridView: {
     flex: 1,
-    paddingBottom: 40
+    paddingBottom: 40,
   },
   contentStyle: {
     padding: 20,
     flex: 1,
-  }
+  },
 });

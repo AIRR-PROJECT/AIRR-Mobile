@@ -34,6 +34,14 @@ import {
 //   description: "Liked your post",
 //   blogImage: "https://picsum.photos/300",
 // };
+// const mockComment = {
+//   firstName: "Alice",
+//   lastName: "Johnson",
+//   _id: "456789123",
+//   avatarURL: "https://picsum.photos/200",
+//   description: "Commented on your post",
+//   blogImage: "https://picsum.photos/300",
+// };
 // const mockData = [
 //   {
 //     ...mockFollower,
@@ -71,6 +79,18 @@ import {
 //     type: NotificationType.FOLLOW,
 //     isRead: false,
 //     date: Date.now() / 1000 - 420000,
+//   },
+//   {
+//     ...mockComment,
+//     type: NotificationType.COMMENT,
+//     isRead: false,
+//     date: Date.now() / 1000 - 1000000,
+//   },
+//   {
+//     ...mockComment,
+//     type: NotificationType.COMMENT,
+//     isRead: true,
+//     date: Date.now() / 1000 - 2000000,
 //   },
 // ];
 

@@ -101,6 +101,12 @@ export default function GroupLayout() {
             headerTitle: "Approvals",
           }}
         />
+        <Stack.Screen
+          name="pending-blog"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

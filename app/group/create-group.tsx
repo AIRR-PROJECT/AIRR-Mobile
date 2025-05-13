@@ -87,7 +87,7 @@ export default function CreateGroup() {
       formData.append("GroupField", JSON.stringify(groupField))
       formData.append("Description", groupDescription)
       let rulesObject: GroupRule[] = [{
-        _id: "fafds",
+        _id: "rule1",
         RuleName: "Rule 1",
         RuleDescription: groupRules
       }]

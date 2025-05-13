@@ -9,25 +9,20 @@ import { useEffect } from "react";
 import { useAppSelector } from "@/redux/hook";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
-type UserInfoProps = {
-  username: string;
-  avatar: string;
-  fullName: string;
-  dateJoined: string;
-  followers: number;
-  following: number;
-};
 type UserInfo = Pick<User, "username" | "avatarURL" | "firstName" | "lastName" | "joinDate">
+
+type UserInfoProps = UserInfo & { isOwnProfile: boolean };
 
 export default function UserInfoComponent({
   username,
   avatarURL,
   firstName,
   lastName,
-  joinDate
+  joinDate,
+  isOwnProfile
   // followers,
   // following,
-}: UserInfo) {
+}: UserInfoProps) {
   const router = useRouter();
 
   const { userAvatar } = useAppSelector(state => state.user)
@@ -57,12 +52,14 @@ export default function UserInfoComponent({
             {(firstName + " " + lastName).slice(0, 10)}
           </ThemedText>
           {/* Edit profile button */}
-          <ButtonGradient
-            label="Edit profile"
-            onPress={handleEditProfile}
-            style={styles.editProfileButton}
-            labelStyle={styles.editProfileButtonText}
-          />
+          {
+            !isOwnProfile && <ButtonGradient
+              label="Edit profile"
+              onPress={handleEditProfile}
+              style={styles.editProfileButton}
+              labelStyle={styles.editProfileButtonText}
+            />
+          }
         </View>
         {/* user username  and day join*/}
         <View style={{ flexDirection: "row" }}>

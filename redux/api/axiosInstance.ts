@@ -91,7 +91,10 @@ api.interceptors.response.use(
                                 console.log("dismissed to first screen")
 
                                 router.dismissTo("/auth")
-                                router.reload()
+                                try {
+                                    router.reload()
+                                }
+                                catch {}
                                 // if (router.canDismiss()){
                                 //     console.log("Error")
                                 // }
@@ -119,7 +122,10 @@ api.interceptors.response.use(
                         console.log("dismissed to first screen")
 
                         router.dismissTo("/auth")
-                        router.reload()
+                        try {
+                            router.reload()
+                        }
+                        catch {}
                         // if (router.canDismiss()) {
                         //     console.log("Error")
                         //     router.dismissTo("/auth")

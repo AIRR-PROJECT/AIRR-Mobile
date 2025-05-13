@@ -12,10 +12,10 @@ export default function ApprovalsPageTabLayout() {
         tabBarLabel: ({ focused }) => {
           const title =
             route.name === "blogs"
-              ? "Blogs Approvals"
+              ? "Blogs"
               : route.name === "tags"
-              ? "Tags Approvals"
-              : route.name;
+              ? "Tags"
+              : "Members";
           return focused ? (
             <LinearGradient
               colors={["#B9FF66", "#9DE8EE"]}
@@ -43,6 +43,10 @@ export default function ApprovalsPageTabLayout() {
         swipeEnabled: false,
       })}
     >
+      <MaterialTopTabs.Screen
+        name="members"
+        options={{ title: "Members Approvals" }}
+      />
       <MaterialTopTabs.Screen
         name="blogs"
         options={{ title: "Blogs Approvals" }}

@@ -1,11 +1,64 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { View, Text, FlatList, StyleSheet, TextInput } from "react-native";
 import { Image } from "expo-image";
+import { useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, { LinearTransition } from "react-native-reanimated";
+import TagApprovalCardComponent from "@/components/group/TagApprovalCardComponent";
+
+// Initial mock data
+const mockTag1 = {
+  tag: "aimachine",
+  user: {
+    id: "1",
+    name: "John Doe",
+    avatar: "https://picsum.photos/220",
+  },
+  time: new Date().getTime() - 1000 * 60 * 60 * 24,
+};
+const mockTag2 = {
+  tag: "react native",
+  user: {
+    id: "1",
+    name: "John Doe",
+    avatar: "https://picsum.photos/220",
+  },
+  time: new Date().getTime() - 1000 * 60 * 60 * 24,
+};
+const mockTag3 = {
+  tag: "expo",
+  user: {
+    id: "1",
+    name: "John Doe",
+    avatar: "https://picsum.photos/220",
+  },
+  time: new Date().getTime() - 1000 * 60 * 60 * 24,
+};
+const initialTags = [mockTag1, mockTag2, mockTag3]
 
 // later remember to add the props
 export default function TagsApprovalsPage() {
+  const [tags, setTags] = useState(initialTags);
+
+  const onApprove = (tag: string) => {
+    console.log("Approve tag with tag-name: ", tag);
+  };
+  const onReject = (tag: string) => {
+    console.log("Reject tag with tag-name: ", tag);
+    setTags((prev) => prev.filter((b) => b.tag !== tag));
+  };
+  // TODO: Khoa: change the any type to the correct type
+  const renderItem = ({ item }: any) => (
+   <TagApprovalCardComponent
+      tag={item.tag}
+      user={item.user}
+      time={item.time}
+      onApprove={onApprove}
+      onReject={onReject}
+   />
+  );
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       {/* Search bar */}
       <View style={styles.textInputContainer}>
         <View style={styles.textInputWrapper}>
@@ -17,14 +70,20 @@ export default function TagsApprovalsPage() {
           />
         </View>
       </View>
-    </View>
+
+      {/* Animated FlatList */}
+      <Animated.FlatList
+        data={tags}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.tag}
+        showsVerticalScrollIndicator={false}
+        ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+        itemLayoutAnimation={LinearTransition}
+      />
+    </GestureHandlerRootView>
   );
 }
-const colors = {
-  moderator: "#FFBA66",
-  admin: "#B9FF66",
-  member: "#66DBFF",
-};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

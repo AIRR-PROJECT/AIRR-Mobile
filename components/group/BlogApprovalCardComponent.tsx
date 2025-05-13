@@ -113,7 +113,6 @@ export default function BlogApprovalCardComponent({
               <TouchableOpacity
                 style={styles.approveButton}
                 onPress={() => {
-                  console.log("Approve blog with id: ", blog._id);
                   onApprove(blog._id);
                 }}
                 activeOpacity={0.7}
@@ -124,7 +123,6 @@ export default function BlogApprovalCardComponent({
               <TouchableOpacity
                 style={styles.rejectButton}
                 onPress={() => {
-                  console.log("Reject blog with id: ", blog._id);
                   onReject(blog._id);
                 }}
                 activeOpacity={0.7}

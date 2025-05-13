@@ -8,6 +8,7 @@ import Reanimated, {
 import { formatDistance, set } from "date-fns";
 import { AntDesign } from "@expo/vector-icons";
 import { useState } from "react";
+import { useRouter } from "expo-router";
 type BlogApprovalCardComponentProps = {
   blog: {
     _id: string;
@@ -51,6 +52,11 @@ export default function BlogApprovalCardComponent({
     );
   }
   const [isOpenStartDrag, setIsOpenStartDrag] = useState(false);
+  const route = useRouter();
+  const handlePress = () => {
+    console.log("Press blog with id: ", blog._id);
+    route.push('/group/pending-blog');
+  }
   return (
     <ReanimatedSwipeable
       containerStyle={styles.swipeable}
@@ -75,7 +81,9 @@ export default function BlogApprovalCardComponent({
         setIsOpenStartDrag(false);
       }}
     >
-      <View
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={handlePress}
         style={[
           styles.container,
           {
@@ -127,7 +135,7 @@ export default function BlogApprovalCardComponent({
             </View>
           }
         </View>
-      </View>
+      </TouchableOpacity>
     </ReanimatedSwipeable>
   );
 }

@@ -19,8 +19,9 @@ import BottomSheet, {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { searchFields, setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
+import { createGroup, searchFields, setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
 import { GroupRule, GroupTag, SearchedField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { router } from "expo-router";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 // temporary use this cause figma not provide the image
@@ -86,17 +87,17 @@ export default function CreateGroup() {
       formData.append("GroupField", JSON.stringify(groupField))
       formData.append("Description", groupDescription)
       let rulesObject: GroupRule[] = [{
-        _id: "rule1",
+        _id: "fafds",
         RuleName: "Rule 1",
         RuleDescription: groupRules
       }]
       formData.append("GroupRules", JSON.stringify(rulesObject))
   
-      // dispatch(createGroup(formData)).then((res) => {
-      //   if (res.payload) {
-      //     router.replace("/(tabs)/group-list/")
-      //   }
-      // })
+      dispatch(createGroup(formData)).then((res) => {
+        if (res.payload) {
+          router.dismiss()
+        }
+      })
     }
   }, [createGroupSubmitted])
   

@@ -107,6 +107,12 @@ export default function GroupLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="create-tag"
+          options={{
+            headerTitle: "Create New Group Tag",
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

@@ -7,6 +7,7 @@ import {
   TextInput,
   Modal,
   Pressable,
+  ScrollView,
 } from "react-native";
 import { Image } from "expo-image";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -26,6 +27,7 @@ import { useAppDispatch } from "@/redux/hook";
 import { getGroupInfo } from "@/redux/slices/groupSlice";
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Scroll from "quill/blots/scroll";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -55,7 +57,7 @@ const mockGroupDetail: GroupDetailProps = {
     "https://picsum.photos/350",
   ],
   numberOfMembers: 100,
-  isUserInGroup: false,
+  isUserInGroup: true,
 };
 type GroupPageProps = {
   selectedId: number;
@@ -74,12 +76,12 @@ export default function GroupPageContent({
   selectedId,
   setSelectedId,
   groupID,
-  // selectedBlogFilter,
-  // setSelectedBlogFilter,
-  // selectedTagFilter,
-  // setSelectedTagFilter,
+}: // selectedBlogFilter,
+// setSelectedBlogFilter,
+// selectedTagFilter,
+// setSelectedTagFilter,
 
-}: GroupPageProps) {
+GroupPageProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
 
@@ -124,13 +126,15 @@ export default function GroupPageContent({
     // so that the new blog will automatically be assigned to the group
     route.push("/blog/new-blog");
   };
-
+  const handleNewTagPress = () => {
+    route.push("/group/create-tag");
+  }
   const handleApprovalPress = () => {
     // Handle the approval button press
     // When Press it should carry a parameter of groupID or groupName
     // so that the new blog will automatically be assigned to the group
     route.push("/group/approvals");
-  }
+  };
   return (
     <View style={styles.container}>
       <View>
@@ -182,7 +186,8 @@ export default function GroupPageContent({
         />
       </View>
       <Divider color="#242630" width={1} style={{ paddingTop: 20 }} />
-      <View style={styles.rowWrapper}>
+      <View style={styles.rowWrapper}
+      >
         {/* Tabs */}
         <View style={styles.tabList}>
           {/* Blogs Tab */}
@@ -218,42 +223,40 @@ export default function GroupPageContent({
             </Text>
           </TouchableOpacity>
           {/* Approval Tab */}
-          <TouchableOpacity
-            style={[styles.tabItem, selectedId === 3 && styles.tabItemActive]}
-            onPress={() => {
-              handleApprovalPress();
-            }}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={{
-                color: selectedId === 3 ? "#fff" : "#8A94AC",
-                fontWeight: "bold",
-              }}
-            >
-              Approvals
-            </Text>
-          </TouchableOpacity>
-          {/* New Blog Button */}
-          <View style={styles.rowContainer}>
-            <TouchableOpacity
-              style={[styles.createBlogButton]}
-              onPress={handleNewPostPress}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.createBlogButtonText}>+ New Post</Text>
-            </TouchableOpacity>
-            {/* Maybe up and down button */}
-            <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
-          </View>
+
+          {mockGroupDetail.isUserInGroup ? (
+            <View style={styles.rowContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.tabItem,
+                  selectedId === 3 && styles.tabItemActive,
+                ]}
+                onPress={() => {
+                  handleApprovalPress();
+                }}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={{
+                    color: selectedId === 3 ? "#fff" : "#8A94AC",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Approvals
+                </Text>
+              </TouchableOpacity>
+              {/* New Blog Button */}
+              
+            </View>
+          ) : null}
         </View>
 
         {/* Create Post */}
         {mockGroupDetail.isUserInGroup ? (
           selectedId === 1 ? (
-            <CreatePost />
+            <CreatePost onPress={handleNewPostPress} />
           ) : (
-            <CreateTags />
+            <CreateTags onPress={handleNewTagPress}/>
           )
         ) : null}
       </View>
@@ -407,20 +410,23 @@ export default function GroupPageContent({
   );
 }
 
-function CreatePost() {
+function CreatePost({ onPress }: { onPress: () => void }) {
   return (
     <View style={styles.rowContainer}>
-      <TouchableOpacity style={styles.tabButton}>
+      <TouchableOpacity style={styles.tabButton} activeOpacity={0.8}
+        onPress={onPress}
+      >
         <Text style={styles.tabButtonText}>+ Create Post</Text>
       </TouchableOpacity>
-      <Entypo name="select-arrows" size={24} color="#B9FF66" />
+      {/* <Entypo name="select-arrows" size={24} color="#B9FF66" /> */}
     </View>
   );
 }
-function CreateTags() {
+function CreateTags({onPress}: { onPress: () => void }) {
   return (
     <View>
-      <TouchableOpacity style={styles.tabButton}>
+      <TouchableOpacity style={styles.tabButton} activeOpacity={0.8}
+        onPress={onPress}>
         <Text style={styles.tabButtonText}>+ Request Tag</Text>
       </TouchableOpacity>
     </View>
@@ -468,7 +474,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   tabButton: {
-    width: 140,
+    width: 110,
     height: 40,
     borderRadius: 80,
     justifyContent: "center",
@@ -476,7 +482,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#B9FF66",
   },
   tabButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     textAlign: "center",
   },
@@ -484,6 +490,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  scrollrow: {
+    flex: 1,
+    width: "70%",
   },
   tabList: {
     flexDirection: "row",

@@ -4,3 +4,9 @@ export enum GroupRole {
     Owner = 'Owner',
     Guest = 'Guest',
 }
+
+export enum GroupMembershipStage {
+    NOT_JOINED,
+    REQUESTED,
+    JOINED
+}

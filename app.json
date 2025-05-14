@@ -42,10 +42,7 @@
       [
         "expo-font",
         {
-          "fonts": [
-            "./assets/fonts/Poppins-Regular.ttf",
-            "./assets/fonts/SpaceMono-Regular.ttf"
-          ]
+          "fonts": ["./assets/fonts/Poppins-Regular.ttf", "./assets/fonts/SpaceMono-Regular.ttf"]
         }
       ],
       "@react-native-firebase/app",
@@ -53,14 +50,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "758122ca-2905-4af1-aebd-31f3beb55231"
-      }
     }
   }
 }

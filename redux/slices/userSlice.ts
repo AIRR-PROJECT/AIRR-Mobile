@@ -9,7 +9,7 @@ import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
 import jwt from 'expo-jwt'
 import { jwtDecode } from "jwt-decode";
-import { GroupRole } from "@/enums/group_role.enum";
+import { GroupMembershipStage, GroupRole } from "@/enums/group.enum";
 
 const initialState = {
     userAccessToken: "",
@@ -21,6 +21,7 @@ const initialState = {
     userActivity: null,
     userChange: null as unknown as User,
     userGroups: null,
+    userCurrentGroupMembershipStage: GroupMembershipStage.NOT_JOINED,
     userCurrentGroupRole: null as unknown as GroupRole
 };
 
@@ -59,6 +60,10 @@ const userSlice = createSlice({
             state.userNewPassword = action.payload
         },
 
+        setUserMembershipStageInCurrentGroup(state, action) {
+            state.userCurrentGroupMembershipStage = action.payload
+        },
+
         setUserRoleInCurrentGroup(state, action) {
             state.userCurrentGroupRole = action.payload
         },
@@ -83,5 +88,5 @@ const userSlice = createSlice({
     },
 });
 
-export const { reset, resetPassword, setCurrentUser, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup, setCurrentPassword, setNewPassword, setUserRoleInCurrentGroup } = userSlice.actions;
+export const { reset, resetPassword, setCurrentUser, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup, setCurrentPassword, setNewPassword, setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup } = userSlice.actions;
 export default userSlice.reducer;

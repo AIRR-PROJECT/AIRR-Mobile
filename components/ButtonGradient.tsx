@@ -18,6 +18,7 @@ type ButtonGradientProps = {
   defaultAction?: () => void; // Fallback action if no onPress is passed
   lightColor?: string;
   darkColor?: string;
+  disabled?: boolean
 };
 
 export default function ButtonGradient({
@@ -29,6 +30,7 @@ export default function ButtonGradient({
   defaultAction,
   lightColor,
   darkColor,
+  disabled
 }: ButtonGradientProps) {
   const handlePress = onPress || defaultAction || (() => alert("You pressed a button."));
  
@@ -41,7 +43,7 @@ export default function ButtonGradient({
         end={{ x: 1, y: 0 }}
         style={[styles.button, buttonStyle]}
       >
-        <TouchableOpacity style={[styles.button, buttonStyle]} onPress={handlePress} >
+        <TouchableOpacity style={[styles.button, buttonStyle]} onPress={handlePress} disabled={disabled}>
           <ThemedText style={[styles.buttonLabel, labelStyle]} type="defaultSemiBold" lightColor={lightColor} darkColor={darkColor}>
             {label}
           </ThemedText>

@@ -79,6 +79,13 @@ export interface GroupRule {
     RuleDescription: string;
 }
 
+export interface CreateGroupTag {
+    TagName: string,
+    FieldID: string,
+    NumberOfBlogUse: number,
+    IsDefaultTag: boolean
+}
+
 // export interface CreateGroup {
 //     Name: string;
 //     Description: string;

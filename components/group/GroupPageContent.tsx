@@ -22,11 +22,12 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import { useAppDispatch } from "@/redux/hook";
-import { getGroupInfo, setGroupBlogsSearchText, setGroupTagsSearchText } from "@/redux/slices/groupSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { getGroupInfo, requestJoinGroup, setGroupBlogsSearchText, setGroupTagsSearchText } from "@/redux/slices/groupSlice";
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
-import { setUserRoleInCurrentGroup } from "@/redux/slices/userSlice";
+import { setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup } from "@/redux/slices/userSlice";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { GroupMembershipStage } from "@/enums/group.enum";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -86,6 +87,7 @@ export default function GroupPageContent({
 }: GroupPageProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
+  const { userCurrentGroupMembershipStage } = useAppSelector(state => state.user)
 
   const [isGroupJoinModalVisible, setIsGroupJoinModalVisible] = useState(false);
   const searchText = useRef("")
@@ -100,8 +102,13 @@ export default function GroupPageContent({
     dispatch(getGroupInfo({
       groupID
     })).then((res) => {
-      setGroupInfo(res.payload as GroupDetailInfo)
-      dispatch(setUserRoleInCurrentGroup((res.payload as GroupDetailInfo).Role))
+      const groupInfo = res.payload as GroupDetailInfo
+
+      setGroupInfo(groupInfo)
+
+      const membershipStage = (groupInfo.isJoined) ? GroupMembershipStage.JOINED : GroupMembershipStage.NOT_JOINED
+      dispatch(setUserMembershipStageInCurrentGroup(membershipStage))
+      dispatch(setUserRoleInCurrentGroup(groupInfo.Role))
     })
   }, [groupID])
 
@@ -154,6 +161,20 @@ export default function GroupPageContent({
     // so that the new blog will automatically be assigned to the group
     route.push("/group/approvals");
   }
+
+  const handleJoinGroup = () => {
+    dispatch(requestJoinGroup({ groupID })).then((res) => {
+      if (res.payload === true) {
+        dispatch(setUserMembershipStageInCurrentGroup(GroupMembershipStage.REQUESTED))
+
+        setTimeout(() => {
+          dispatch(setUserMembershipStageInCurrentGroup(GroupMembershipStage.JOINED))
+        }, 5000)
+      } 
+    })
+    // setIsGroupJoinModalVisible(true);
+  }
+ 
   return (
     <View style={styles.container}>
       <View>
@@ -188,16 +209,15 @@ export default function GroupPageContent({
           <Text style={styles.member}>+{groupInfo.NumberOfMembers}</Text>
         </TouchableOpacity>
         {/* render based on user is in group or not */}
-        {groupInfo.isJoined ? (
+        {userCurrentGroupMembershipStage != GroupMembershipStage.JOINED && (
           <ButtonGradient
-            label="Join Group"
+            disabled={userCurrentGroupMembershipStage == GroupMembershipStage.REQUESTED}
+            label={userCurrentGroupMembershipStage == GroupMembershipStage.NOT_JOINED ? "Join Group" : "Join request sent"}
             labelStyle={styles.tabButtonText}
             style={styles.tabButton}
-            onPress={() => {
-              setIsGroupJoinModalVisible(true);
-            }}
+            onPress={handleJoinGroup}
           />
-        ) : null}
+        )}
         <MaterialCommunityIcons
           name="dots-horizontal-circle-outline"
           size={55}
@@ -260,21 +280,23 @@ export default function GroupPageContent({
             </Text>
           </TouchableOpacity>
           {/* New Blog Button */}
-          <View style={styles.rowContainer}>
-            <TouchableOpacity
-              style={[styles.createBlogButton]}
-              onPress={handleNewPostPress}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.createBlogButtonText}>+ New Post</Text>
-            </TouchableOpacity>
-            {/* Maybe up and down button */}
-            <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
-          </View>
+          {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED && 
+            <View style={styles.rowContainer}>
+              <TouchableOpacity
+                style={[styles.createBlogButton]}
+                onPress={handleNewPostPress}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.createBlogButtonText}>+ New Post</Text>
+              </TouchableOpacity>
+              {/* Maybe up and down button */}
+              <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
+            </View>
+          }
         </View>
 
         {/* Create Post */}
-        {mockGroupDetail.isJoined ? (
+        {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED ? (
           selectedId === 1 ? (
             <CreatePost />
           ) : (

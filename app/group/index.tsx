@@ -86,7 +86,7 @@ export default function GroupPage() {
   const dispatch = useAppDispatch();
 
   const { groupId } = useLocalSearchParams<{ groupId: string }>()
-  const { user } = useAppSelector(state => state.user)
+  const { user, userCurrentGroupRole } = useAppSelector(state => state.user)
   const { groupBlogsSearchText, groupTagsSearchText } = useAppSelector(state => state.group)
 
   const [selectedId, setSelectedId] = useState(1);

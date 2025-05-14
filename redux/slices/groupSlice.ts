@@ -9,7 +9,7 @@ import { ResponseFailcode } from "@/enums/failcode.enum";
 import { getReasonPhrase } from 'http-status-codes'
 import jwt from 'expo-jwt'
 import { jwtDecode } from "jwt-decode";
-import { Group, GroupDetailInfo, GroupField, GroupRule, GroupTag, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupRule, GroupTag, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
 import { UserBlog } from "@/interfaces/blogInterface";
 import { ImageSource } from "expo-image";
 
@@ -218,6 +218,46 @@ export const createGroup = createAsyncThunk(
     }
 )
 
+export const requestJoinGroup = createAsyncThunk(
+    'group/requestJoin',
+    async (data: { groupID: string }, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/joinGroup`, data) as AxiosResponse
+            console.log(res)
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const createTag = createAsyncThunk(
+    'group/createTag',
+    async (data: CreateGroupTag, thunkAPI) => {
+        try {
+            const res = await api.post(`tag/create-tag`, data) as AxiosResponse
+            console.log(res)
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 const groupSlice = createSlice({
     name: "group",
     initialState,
@@ -256,6 +296,12 @@ const groupSlice = createSlice({
                 state.popularGroupsVertical = action.payload.fieldData
             })
             .addCase(getPopularGroups.rejected, (state, action) => {
+                console.log(action.error)
+            }) 
+            .addCase(requestJoinGroup.fulfilled, (state, action) => {
+                
+            })
+            .addCase(requestJoinGroup.rejected, (state, action) => {
                 console.log(action.error)
             }) 
     }

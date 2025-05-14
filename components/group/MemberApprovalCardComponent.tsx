@@ -10,18 +10,20 @@ import { AntDesign } from "@expo/vector-icons";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 type MemberApprovalCardComponentProps = {
-  user: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
+  id: string;
+  name: string;
+  avatar: string;
+  username: string;
   time: number;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
 };
 
 export default function MemberApprovalCardComponent({
-  user,
+  id,
+  name,
+  avatar,
+  username,
   time,
   onApprove,
   onReject,
@@ -58,7 +60,7 @@ export default function MemberApprovalCardComponent({
       overshootRight={false}
       onSwipeableOpen={() => {
         console.log("onSwipeableOpen");
-        onReject(user.id);
+        onReject(id);
       }}
       onSwipeableOpenStartDrag={(drag) => {
         setIsOpenStartDrag(true);
@@ -82,15 +84,12 @@ export default function MemberApprovalCardComponent({
         ]}
       >
         <View style={styles.imageContainer}>
-          <Image source={user.avatar} style={styles.avatar} />
+          <Image source={avatar} style={styles.avatar} />
         </View>
 
         <View style={styles.detailContainer}>
-          <Text style={styles.title}>
-            {user.name}
-            <Text style={styles.description}> request a new tag</Text>
-          </Text>
-
+          <Text style={styles.title}>{name}</Text>
+          <Text style={styles.description}>request to join group</Text>
           <Text style={styles.time}>
             {formatDistance(new Date(time), new Date(), {
               addSuffix: true,
@@ -102,7 +101,7 @@ export default function MemberApprovalCardComponent({
             <TouchableOpacity
               style={styles.approveButton}
               onPress={() => {
-                onApprove(user.id);
+                onApprove(id);
               }}
               activeOpacity={0.7}
             >
@@ -112,7 +111,7 @@ export default function MemberApprovalCardComponent({
             <TouchableOpacity
               style={styles.rejectButton}
               onPress={() => {
-                onReject(user.id);
+                onReject(id);
               }}
               activeOpacity={0.7}
             >

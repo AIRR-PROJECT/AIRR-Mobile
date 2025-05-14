@@ -4,45 +4,43 @@ import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardCompon
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useState } from "react";
+import MemberApprovalCardComponent from "@/components/group/MemberApprovalCardComponent";
 
 // Initial mock data
-const mockBlog = {
-  blog: {
-    _id: Math.random().toString(),
-    title: "How to build a React Native app",
-    thumbnail: "https://picsum.photos/200",
-  },
-  author: {
-    id: "1",
-    name: "John Doe",
-    avatar: "https://picsum.photos/220",
-  },
+const mockUser = {
+  id: "1",
+  name: "John Doe", 
+  avatar: "https://picsum.photos/200/300",
+  username: "johndoe",
+
   time: new Date().getTime() - 1000 * 60 * 60 * 24,
 };
 
-const initialBlogs = [mockBlog, mockBlog, mockBlog].map((b, i) => ({
-  ...b,
-  blog: { ...b.blog, _id: i.toString() },
+const initialUsers = [mockUser, mockUser, mockUser].map((user, index) => ({
+  ...user,
+  id: index.toString(),
 }));
 
 export default function MemberApprovalsPage() {
-  // Currently use state to manage the blogs
+  // Currently use state to manage the users
   // TODO: Khoa: Change to what you want
-  const [blogs, setBlogs] = useState(initialBlogs);
+  const [users, setUsers] = useState(initialUsers);
 
   const onApprove = (id: string) => {
-    console.log("Approve blog with id: ", id);
+    console.log("Approve user with id: ", id);
   };
 
   const onReject = (id: string) => {
-    console.log("Reject blog with id: ", id);
-    setBlogs((prev) => prev.filter((b) => b.blog._id !== id));
+    console.log("Reject user with id: ", id);
+    setUsers((prev) => prev.filter((u) => u.id !== id));
   };
 
   const renderItem = ({ item }: any) => (
-    <BlogApprovalCardComponent
-      blog={item.blog}
-      author={item.author}
+    <MemberApprovalCardComponent
+      id={item.id}
+      name={item.name}
+      avatar={item.avatar}
+      username={item.username}
       time={item.time}
       onApprove={onApprove}
       onReject={onReject}
@@ -65,9 +63,9 @@ export default function MemberApprovalsPage() {
 
       {/* Animated FlatList */}
       <Animated.FlatList
-        data={blogs}
+        data={initialUsers}
         renderItem={renderItem}
-        keyExtractor={(item) => item.blog._id}
+        keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         itemLayoutAnimation={LinearTransition}

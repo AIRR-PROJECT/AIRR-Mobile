@@ -14,6 +14,8 @@ import { AIBlogSection, UserBlogTag } from "@/interfaces/blogInterface";
 import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
 import BlogTagButton from "@/components/blog/BlogTagButton";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
+import { useEffect } from "react";
+import { getUserBlogDetail } from "@/redux/slices/blogSlice";
 
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
@@ -153,7 +155,7 @@ const mockContent =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 const mockCreatedAt = new Date();
 
-export default function PendingBlogInGroup() {
+export default function PendingBlogInGroup({ blogID }: { blogID: string }) {
   const route = useRouter();
   const handleBack = () => {
     route.back();
@@ -164,6 +166,13 @@ export default function PendingBlogInGroup() {
   const handleReject = () => {
     console.log("Reject blog");
   };
+
+  useEffect(() => {
+    if (blogID) {
+      getUserBlogDetail(blogID)
+    }
+  }, [blogID])
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Back button */}

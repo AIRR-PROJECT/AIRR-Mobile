@@ -10,6 +10,7 @@ import GroupSearch from "@/components/tabs/GroupSearch";
 import GroupJoin from "@/components/tabs/GroupJoinComponent";
 import CareerPathSuggestion from "@/components/tabs/CareerPathSuggestion";
 import AITrendingRecommendation from "@/components/tabs/AITrendingRecommendation";
+import { router } from "expo-router";
 
 const mockBlog: UserBlog = {
   Title: "How to fix clipboard if it isn’t working",
@@ -49,6 +50,7 @@ export default function DashboardScreen() {
         <ButtonGradient
           style={styles.titleButton}
           label="POST NOW"
+          onPress={() => router.push("/blog/new-blog")}
         ></ButtonGradient>
       </View>
       {/*  */}

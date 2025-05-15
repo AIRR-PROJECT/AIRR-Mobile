@@ -205,10 +205,9 @@ export default function GroupBlogPreview({ blog }: { blog: UserBlog }) {
           <View style={styles.groupSection}>
             <GroupPreviewInfo
               group={{
-                Name: `Group's name`,
-                CoverURL:
-                  "https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png",
-                NumberOfMembers: 123,
+                Name: blog.Group.Name,
+                CoverURL: blog.Group.CoverURL,
+                NumberOfMembers: blog.Group.NumberOfMembers,
               }}
             />
           </View>

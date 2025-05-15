@@ -6,19 +6,22 @@ import {
   View,
   ScrollView,
   Pressable,
+  Alert,
 } from "react-native";
-import { Image } from "expo-image";
+import { Image, ImageSource } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import UploadGroupAvatarComponent from "@/components/group/UploadThumbnailComponent";
-import { useCallback, useMemo, useRef, useState } from "react";
+import UploadGroupAvatarComponent from "@/components/group/UploadGroupAvatarComponent";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet, {
   BottomSheetBackdrop,
-  BottomSheetFlatList,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { createGroup, searchFields, setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
+import { GroupRule, GroupTag, SearchedField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { router } from "expo-router";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 // temporary use this cause figma not provide the image
@@ -39,23 +42,78 @@ const mockFieldList = [
 ];
 
 export default function CreateGroup() {
+  const dispatch = useAppDispatch();
+  const { createGroupSubmitted } = useAppSelector(state => state.group);
+
+  const uploadedImg = useRef<ImageSource>()
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
   const [groupRules, setGroupRules] = useState("");
-  const [groupField, setGroupField] = useState("");
+  const [groupField, setGroupField] = useState<SearchedField>();
+  const [groupFields, setGroupFields] = useState<SearchedField[]>([])
+  const [groupTags, setGroupTags] = useState<GroupTag[]>([])
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["30%", "50%"], []);
+
+  useEffect(() => {
+    dispatch(searchFields("Development")).then((res) => {
+      setGroupFields((res.payload as SearchFieldResult).Fields)
+      console.log((res.payload as SearchFieldResult).Fields)
+    })
+  }, [])
+
+  useEffect(() => {
+    console.log(groupFields)
+  }, [groupFields])
+
+  useEffect(() => {
+    if (createGroupSubmitted) {
+      dispatch(setCreateGroupSubmitted(false))
+
+      if (!uploadedImg.current || !groupName || !groupTags || !groupField || !groupDescription || !groupRules) {
+        Alert.alert("Error", "Missing field")
+  
+        return
+      }
+
+      const formData = new FormData()
+      formData.append("coverImage", {
+        uri: uploadedImg.current?.uri,
+        name: uploadedImg.current?.fileName,
+        type: uploadedImg.current?.mimeType
+      })
+      formData.append("Name", groupName)
+      formData.append("Tags", JSON.stringify(groupTags))
+      formData.append("GroupField", JSON.stringify(groupField))
+      formData.append("Description", groupDescription)
+      let rulesObject: GroupRule[] = [{
+        _id: "rule1",
+        RuleName: "Rule 1",
+        RuleDescription: groupRules
+      }]
+      formData.append("GroupRules", JSON.stringify(rulesObject))
+  
+      dispatch(createGroup(formData)).then((res) => {
+        if (res.payload) {
+          router.dismiss()
+        }
+      })
+    }
+  }, [createGroupSubmitted])
+  
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
   }, []);
   const handleFieldSheetChange = useCallback((index: any) => {
     console.log("handleGroupSheetChange", index);
   }, []);
-  const handleGroupFieldPress = useCallback((field: string) => {
-    console.log("Group field: ", field);
+  const handleGroupFieldPress = useCallback((field: SearchedField) => {
+    console.log("Group field: ", field.FieldName);
     setGroupField(field);
+    setGroupTags(field.DefaultTags)
     fieldRef.current?.close();
   }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -89,7 +147,9 @@ export default function CreateGroup() {
         >
           Group Avatar
         </Text>
-        <UploadGroupAvatarComponent />
+        <UploadGroupAvatarComponent onSetImg={(imgSource) => {
+          uploadedImg.current = imgSource
+        }}/>
         {/* Group Detail */}
         <Text
           style={[
@@ -105,7 +165,10 @@ export default function CreateGroup() {
             style={styles.input}
             value={groupName}
             onChangeText={(text) => {
-              if (text.length <= 30) setGroupName(text);
+              if (text.length <= 30) {
+                setGroupName(text);
+                // handleGroupNameTextChange(text)
+              }
             }}
             placeholder="Enter Group Name *"
             placeholderTextColor="#888"
@@ -127,9 +190,9 @@ export default function CreateGroup() {
               },
             ]}
           >
-            {groupField.length == 0 ? "Select Group's Field *" : groupField}
+            {!groupField ? "Select Group's Field *" : groupField.FieldName}
           </Text>
-          {groupField.length == 0 ? null : (
+          {!groupField ? null : (
             <IconSymbol
               name="chevron.right"
               size={24}
@@ -145,7 +208,10 @@ export default function CreateGroup() {
             style={[styles.multilineInput]}
             value={groupDescription}
             onChangeText={(text) => {
-              if (text.length <= 100) setGroupDescription(text);
+              if (text.length <= 100) {
+                setGroupDescription(text);
+                // handleGroupDescriptionTextChange(text);
+              }
             }}
             multiline={true}
             placeholder="Enter Group Description *"
@@ -159,7 +225,14 @@ export default function CreateGroup() {
             style={[styles.multilineInput]}
             value={groupRules}
             onChangeText={(text) => {
-              if (text.length <= 100) setGroupRules(text);
+              if (text.length <= 100) {
+                setGroupRules(text)
+                // handleGroupRulesTextChange([{
+                //   _id: "rule1",
+                //   RuleName: "Rule #1",
+                //   RuleDescription: text
+                // }])  
+              };
             }}
             multiline={true}
             placeholder="Enter Group Rules *"
@@ -210,14 +283,14 @@ export default function CreateGroup() {
             {/* Group List */}
             {/* Change to actual field later */}
 
-            {mockFieldList.map((item, index) => (
+            {groupFields?.map((item, index) => (
               <Pressable
                 key={index}
                 onPress={() => handleGroupFieldPress(item)}
                 style={styles.heading}
               >
                 <Text style={[styles.buttonText, { color: "#fff" }]}>
-                  {item}
+                  {item.FieldName}
                 </Text>
               </Pressable>
             ))}

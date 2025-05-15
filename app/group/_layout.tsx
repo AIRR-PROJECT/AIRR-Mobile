@@ -5,18 +5,23 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack, useRouter } from "expo-router";
+import { router, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { goBack } from "expo-router/build/global-state/routing";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
 
 export default function GroupLayout() {
+  const dispatch = useAppDispatch()
+  useAppSelector(state => state.group)
+
   // Get the current color scheme (dark or light)
   const colorScheme = useColorScheme();
   // Load custom fonts
@@ -40,11 +45,7 @@ export default function GroupLayout() {
     route.back();
   };
   const handleCreateGroup = () => {
-    // Handle the creation of a new group
-    // This function can be implemented to create a new group
-    // and navigate to the appropriate screen
-    // For now, it just logs a message
-    console.log("Create group button pressed");
+    dispatch(setCreateGroupSubmitted(true))
   }
   // Render the app layout with theme provider and navigation stack
   return (

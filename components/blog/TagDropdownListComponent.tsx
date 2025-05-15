@@ -3,17 +3,18 @@ import { View, Text, StyleSheet, TextInput, FlatList } from "react-native";
 import Checkbox from "expo-checkbox";
 import { useState } from "react";
 import { BottomSheetFlatList, BottomSheetView } from "@gorhom/bottom-sheet";
+import { GroupTag } from "@/interfaces/groupInterface";
 type TagDropdownComponentProps = {
-  tags: string[];
-  onPress: (tags: string[]) => void;
+  tags: GroupTag[];
+  onPress: (tags: GroupTag[]) => void;
 };
 export default function TagDropdownComponent({
   tags,
   onPress,
 }: TagDropdownComponentProps) {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<GroupTag[]>([]);
 
-  const handleTagToggle = (tag: string) => {
+  const handleTagToggle = (tag: GroupTag) => {
     if (selectedTags.includes(tag)) {
       const updated = selectedTags.filter((t) => t !== tag);
       setSelectedTags(updated);
@@ -29,10 +30,10 @@ export default function TagDropdownComponent({
     <View style={styles.container}>
       <BottomSheetFlatList
         data={tags}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <TagItem
-            tag={item}
+            tag={item.TagName}
             isChecked={selectedTags.includes(item)}
             onToggle={() => handleTagToggle(item)}
           />

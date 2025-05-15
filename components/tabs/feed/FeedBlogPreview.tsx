@@ -5,7 +5,7 @@ import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import { Pressable, TouchableOpacity } from "react-native";
 import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { dislikeBlog, dislikeToLikeBlog, likeBlog, likeToDislikeBlog, removeDislikeBlog, removeLikeBlog, saveBlog, unsaveBlog } from "@/redux/slices/blogSlice";
 import { getUserBlogDislikeActivities, getUserBlogLikeActivities, getUserBlogSaveActivities } from "@/redux/slices/authSlice";
@@ -18,7 +18,26 @@ const mockGroup = {
   NumberOfMembers: 100,
 };
 
-let isReactOnTimeout = false
+export function debounce<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
+}
+
 export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   // default to mock blog for this, but later will be passed as props
   const route = useRouter();
@@ -42,7 +61,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     setLikes(blog.Reaction.Likes)
     setDislikes(blog.Reaction.Dislikes)
     setComments(blog.Reaction.Comments)
-    
+
     dispatch(getUserBlogLikeActivities(blog._id)).then((data) => {
       setBlogLiked(data.payload as boolean)
     })
@@ -55,16 +74,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   }, [])
 
   const handleLike = () => {
-    console.log(isReactOnTimeout)
-    if (isReactOnTimeout) {
-      console.log("React still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
-
     if (blogLiked) {
       setLikes(likes - 1)
 
@@ -92,15 +101,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     }
   }
   const handleDislike = () => {
-    if (isReactOnTimeout) {
-      console.log("React still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
-
     if (blogDisliked) {
       setDislikes(dislikes - 1)
 
@@ -128,15 +128,6 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     }
   }
   const handleBookmark = () => {
-    if (isReactOnTimeout) {
-      console.log("Save still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
-
     if (blogSaved) {
       dispatch(unsaveBlog(blog._id))
 
@@ -148,6 +139,18 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
       setBlogSaved(true)
     }
   }
+
+  const debounceHandleLike = debounce(() => {
+    handleLike()
+  }, 0.5)
+
+  const debounceHandleDislike = debounce(() => {
+    handleDislike()
+  }, 0.5)
+
+  const debounceHandleBookmark = debounce(() => {
+    handleBookmark()
+  }, 0.5)
 
   return (
     <TouchableOpacity
@@ -204,10 +207,9 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           <View style={styles.groupSection}>
             <GroupPreviewInfo
               group={{
-                Name: `Group's name`,
-                CoverURL:
-                  "https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png",
-                NumberOfMembers: 123,
+                Name: blog.Group.Name,
+                CoverURL: blog.Group.CoverURL,
+                NumberOfMembers: blog.Group.NumberOfMembers,
               }}
             />
           </View>
@@ -233,7 +235,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           <View style={[styles.rowContainer, { gap: 20 }]}>
             <TouchableOpacity
               activeOpacity={0.7}
-              style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={handleLike}>
+              style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={debounceHandleLike}>
               <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#fff" : "#000"} />
               <Text style={blogLiked ? styles.textYes : styles.textNo}>{likes}</Text>
               {/* <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#fff" : "#000"} />
@@ -249,7 +251,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
             {/* Dislikes */}
             <TouchableOpacity
               activeOpacity={0.7}
-              style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={handleDislike}>
+              style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={debounceHandleDislike}>
               <FontAwesome name="thumbs-down" size={24} color={blogDisliked ? "#fff" : "#000"} />
             </TouchableOpacity>
           </View>
@@ -261,7 +263,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           {/* Bookmart Button */}
           <TouchableOpacity
             activeOpacity={0.7}
-            style={blogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={handleBookmark}>
+            style={blogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={debounceHandleBookmark}>
             <FontAwesome name="bookmark" size={24} color={blogSaved ? "#fff" : "#000"} />
           </TouchableOpacity>
         </View>

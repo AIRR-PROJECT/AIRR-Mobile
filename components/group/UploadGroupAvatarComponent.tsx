@@ -5,12 +5,16 @@ import { type ImageSource } from "expo-image";
 import { useLayoutEffect, useState } from "react";
 import { Entypo, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
+import { useAppDispatch } from "@/redux/hook";
 
 type imageProps = {
   imgSource?: ImageSource;
+  onSetImg: (imgSource: ImageSource) => void
 };
 
-export default function UploadGroupAvatarComponent({ imgSource }: imageProps) {
+export default function UploadGroupAvatarComponent({ imgSource, onSetImg }: imageProps) {
+  const dispatch = useAppDispatch();
+
   // Image picker
   const [image, setImage] = useState<ImageSource | null>(imgSource || null);
   console.log(image);
@@ -25,6 +29,7 @@ export default function UploadGroupAvatarComponent({ imgSource }: imageProps) {
 
     if (!result.canceled) {
       setImage({ uri: result.assets[0].uri });
+      onSetImg(result.assets[0])
     }
   };
 

@@ -79,7 +79,7 @@ export const likeBlog = createAsyncThunk(
                     {
                         BlogID: blogId,
                         Action: "Like",
-                        createdAt: new Date()
+                        createdAt: new Date().toDateString()
                     }
                 ],
                 saveBlogEntries: []
@@ -108,7 +108,7 @@ export const dislikeBlog = createAsyncThunk(
                     {
                         BlogID: blogId,
                         Action: "Dislike",
-                        createdAt: new Date()
+                        createdAt: new Date().toDateString()
                     }
                 ],
                 saveBlogEntries: []
@@ -137,7 +137,7 @@ export const removeLikeBlog = createAsyncThunk(
                     {
                         BlogID: blogId,
                         Action: "RemoveLike",
-                        createdAt: new Date()
+                        createdAt: new Date().toDateString()
                     }
                 ],
                 saveBlogEntries: []
@@ -166,7 +166,7 @@ export const removeDislikeBlog = createAsyncThunk(
                     {
                         BlogID: blogId,
                         Action: "RemoveDislike",
-                        createdAt: new Date()
+                        createdAt: new Date().toDateString()
                     }
                 ],
                 saveBlogEntries: []
@@ -196,7 +196,7 @@ export const likeToDislikeBlog = createAsyncThunk(
                     {
                         BlogID: blogId,
                         Action: "LikeToDislike",
-                        createdAt: new Date()
+                        createdAt: new Date().toDateString()
                     }
                 ],
                 saveBlogEntries: []
@@ -225,7 +225,7 @@ export const dislikeToLikeBlog = createAsyncThunk(
                     {
                         BlogID: blogId,
                         Action: "DislikeToLike",
-                        createdAt: new Date()
+                        createdAt: new Date().toDateString()
                     }
                 ],
                 saveBlogEntries: []
@@ -255,7 +255,7 @@ export const saveBlog = createAsyncThunk(
                     {
                         BlogID: blogId,
                         Action: "Save",
-                        createdAt: new Date()
+                        createdAt: new Date().toDateString()
                     }
                 ]
             }
@@ -284,7 +284,7 @@ export const unsaveBlog = createAsyncThunk(
                     {
                         BlogID: blogId,
                         Action: "Unsave",
-                        createdAt: new Date()
+                        createdAt: new Date().toDateString()
                     }
                 ]
             }
@@ -303,17 +303,21 @@ export const unsaveBlog = createAsyncThunk(
     } 
 )
 
-const createBlog = createAsyncThunk(
+export const createBlog = createAsyncThunk(
     'blog/createBlog',
-    async (data: CreateBlog, thunkAPI) => {
+    async (data: FormData, thunkAPI) => {
         try {
-            const res = await api.post(`blogs/create-blog`, data) as AxiosResponse
+            const res = await api.post(`blogs/create-blog`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }) as AxiosResponse
 
             if (res.data.success) {
-                
+                return true
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                return false
             }
         }
         catch (error: any) {

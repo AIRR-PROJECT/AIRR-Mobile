@@ -1,4 +1,6 @@
-import { useRouter } from "expo-router";
+import { CreateGroupTag } from "@/interfaces/groupInterface";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRef } from "react";
 import {
   View,
   StyleSheet,
@@ -6,10 +8,27 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
+import { useDispatch } from "react-redux";
 
 export default function CreateTagPage() {
     const route = useRouter();
+    const dispatch = useDispatch()
+    const { groupID } = useLocalSearchParams<{ groupID: string }>()
+    const tagName = useRef("")
+
+    const handleTagNameTextChange = (val: string) => {
+      tagName.current = val
+    }
+
     const handleSubmit = () => {
+      // const createTagData: CreateGroupTag = {
+      //   TagName: tagName.current,
+      //   FieldID: ,
+      //   NumberOfBlogUse: 0,
+      //   IsDefaultTag: false
+      // }
+      
+      // dispatch()
     }
     const handleCancel = () => {
         route.back();
@@ -23,6 +42,7 @@ export default function CreateTagPage() {
           autoCapitalize="none"
           autoCorrect={false}
           returnKeyType="done"
+          onChangeText={handleTagNameTextChange}
         />
       </View>
       {/* Divider */}

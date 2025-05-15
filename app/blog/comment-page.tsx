@@ -24,6 +24,7 @@ import {
   getAIBlogDetail,
   getBlogComment,
   getUserBlogDetail,
+  setCommentAdded,
 } from "@/redux/slices/blogSlice";
 import {
   AIBlogSection,
@@ -273,6 +274,8 @@ export default function CommentBlogScreen() {
 
         setPostComment("");
         setIsWriteComment(false);
+
+        dispatch(setCommentAdded(true));
       }
     });
   };

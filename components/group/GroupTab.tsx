@@ -52,7 +52,7 @@ export default function GroupTab(props: {fieldID: string}) {
           <GroupCardComponent
             image={item.CoverURL}
             name={item.Name}
-            id={item.Owner.Username}
+            id={item._id}
             members={item.NumberOfMembers}
           />
         )}

@@ -22,8 +22,9 @@ import BlogTab from "@/components/profile/BlogTab";
 import { Divider } from "@rneui/themed";
 import ActivityTab from "@/components/profile/ActivityTab";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { User } from "@/interfaces/userInterface";
-import { getUserPreviewGroups } from "@/redux/slices/authSlice";
+import { PartialUser, User } from "@/interfaces/userInterface";
+import { getPartialUserInfo, getUserPreviewGroups } from "@/redux/slices/authSlice";
+import { useLocalSearchParams } from "expo-router";
 // type UserInfo = {
 //   username: string;
 //   avatar_url: string;
@@ -72,22 +73,40 @@ const Data = [
   mockGroup,
 ];
 export default function ProfileScreen() {
+  const { userID } = useLocalSearchParams<{userID: string}>()
+
   const selectedTabs = ["Readme", "Blog", "Activity"];
   const [selectedTab, setSelectedTab] = useState(selectedTabs[0]);
 
   const { user, userGroups } = useAppSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState<UserInfo>(user!);
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!);
+  const [isOwnProfile, setIsOwnProfile] = useState(true)
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(getUserPreviewGroups(user!["_id"]));
+    if (userID) {
+      setIsOwnProfile(false)
+      dispatch(getPartialUserInfo(userID)).then((res) => {
+        const currentUserInfo = res.payload as PartialUser
+        if (res.payload) {
+          setUserInfo(currentUserInfo)
+          setStudentInfo(currentUserInfo)
+        }
+      })
+    }
+
+    dispatch(getUserPreviewGroups(userID ?? user._id));
   }, []);
 
   useEffect(() => {
     console.log(userGroups);
   }, [userGroups]);
+  
+  useEffect(() => {
+    console.log(isOwnProfile)
+  }, [isOwnProfile])
 
   return (
     // change light color to #fff later because figma of the app is not ready

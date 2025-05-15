@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "109964407356",
+    "project_id": "airr-5f167",
+    "storage_bucket": "airr-5f167.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:109964407356:android:c2afa59ac740256bfc4939",
+        "android_client_info": {
+          "package_name": "com.thesis.airrmobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "109964407356-q69pive7ro12lr21df12u29srei2vsvu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa9wE6htaUCCVdJYSDaeWC8O6NngGTWe0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "109964407356-q69pive7ro12lr21df12u29srei2vsvu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

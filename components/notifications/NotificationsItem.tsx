@@ -1,25 +1,31 @@
 import { User } from "@/interfaces/userInterface";
 import { useRouter } from "expo-router";
-enum NotificationType {
-  REACTION = "REACTION",
-  COMMENT = "COMMENT",
-  MENTION = "MENTION",
-  FOLLOW = "FOLLOW",
-}
+// enum NotificationType {
+//   REACTION = "REACTION",
+//   COMMENT = "COMMENT",
+//   MENTION = "MENTION",
+//   FOLLOW = "FOLLOW",
+// }
 type NotificationItemProps = {
   id: string;
   description: string;
-  date: number;
+  date: Date;
   isRead: boolean;
-  from: Pick<User, "_id" | "firstName" | "lastName" | "avatarURL">;
+  from: Pick<User, "_id" | "username" | "avatarURL">;
   type: NotificationType;
   blogImage?: string;
+  data: BlogInteractNotification | PermissionNotification | OtherNotification,
   onMarkAsRead: (id: string) => void;
 };
 
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { formatUnixDate } from "@/utils/dateConvert";
+import { NotificationType, RequestType } from "@/enums/notif_type.enum";
+import { useState } from "react";
+import { useAppDispatch } from "@/redux/hook";
+import { updateSeenNotif } from "@/redux/slices/notifSlice";
+import { BlogInteractNotification, PermissionNotification, OtherNotification } from "@/interfaces/notifInterface";
 import { formatDistance } from "date-fns";
 // based on type of notification, handle move to different screen
 // if notification is user like the blog, move to the post screen
@@ -37,26 +43,65 @@ export default function NotificationsItem({
   from,
   type,
   blogImage,
+  data,
   onMarkAsRead,
 }: NotificationItemProps) {
   const route = useRouter();
+  const dispatch = useAppDispatch()
+
+  const [seen, setSeen] = useState(isRead)
+
   const handlePress = () => {
-    if (!isRead) {
-      onMarkAsRead(id);
-      isRead = true;
-    }
-    if (type === NotificationType.FOLLOW) {
-      // navigate to user profile screen
-      // route.push(`/profile/${from._id}`);
-    } else {
-      // navigate to blog screen
-      // route.push(`/blog/${id}`);
+    if (!seen) {
+      dispatch(updateSeenNotif({
+        notif_id: id
+      })).then((res) => {
+        if (res.payload) {
+          onMarkAsRead(id);
+          setSeen(true)
+        }
+
+        switch (type) {
+          case NotificationType.PERMISSION:
+            const permissionData = data as PermissionNotification
+            
+            switch (permissionData.request_type) {
+              case RequestType.REQUEST_REPORT_BLOG:
+                // TODO: route to report page  
+                break;
+              case RequestType.REQUEST_POST_BLOG:
+                // TODO: route to new post review page
+                break;
+              case RequestType.REQUEST_JOIN_GROUP:
+                // TODO: route to request join group page
+                break;
+              case RequestType.REQUEST_NEW_TAG:
+                // TODO: route to new tag review page
+                break;
+            }
+            break;
+          case NotificationType.INTERACTION:
+            const interactionData = data as BlogInteractNotification
+    
+            route.push(`/blog?userBlogId=${interactionData.blog_id}`)
+            break;
+          default:
+            const otherData = data as OtherNotification
+            break
+        }
+      })
     }
   };
   const handleFollow = () => {
-    if (!isRead) {
-      onMarkAsRead(id);
-      isRead = true;
+    if (!seen) {
+      dispatch(updateSeenNotif({
+        notif_id: id
+      })).then((res) => {
+        if (res.payload) {
+          onMarkAsRead(id);
+          setSeen(true)
+        }
+      })
     }
   };
   return (
@@ -64,7 +109,7 @@ export default function NotificationsItem({
       <View
         style={[
           styles.container,
-          { backgroundColor: isRead ? "#fff" : "#000" },
+          { backgroundColor: seen ? "#fff" : "#000" },
         ]}
       >
         {/* Image from user noti */}
@@ -78,23 +123,33 @@ export default function NotificationsItem({
         />
         <View style={styles.innerContainer}>
           <View>
-            <Text style={[styles.name, { color: isRead ? "#000" : "#fff" }]}>
-              {from.firstName} {from.lastName}
+            <Text style={[styles.name, { color: seen ? "#000" : "#fff" }]}>
+              {/* {from.firstName} {from.lastName} */}
+              {from.username}
             </Text>
             <View style={styles.rowContainer}>
               <Text
                 style={[
                   styles.description,
-                  { color: isRead ? "#000" : "#fff" },
+                  { color: seen ? "#000" : "#fff" },
                 ]}
               >
                 {description}.
+                <Text
+                  style={[
+                    styles.date,
+                    { color: seen ? "#9E9E9E" : "#9E9E9E" },
+                  ]}
+                >
+                  {" "}
+                  {new Date(date).toDateString()}
+                </Text>
               </Text>
             </View>
             <Text
               style={[styles.date, { color: isRead ? "#9E9E9E" : "#9E9E9E" }]}
             >
-              {formatDistance(new Date(date * 1000), new Date(), {
+              {formatDistance(new Date(date), new Date(), {
                 addSuffix: true,
                 includeSeconds: true,
               })}
@@ -102,14 +157,14 @@ export default function NotificationsItem({
           </View>
 
           <View style={{ marginLeft: 4 }}>
-            {type === NotificationType.FOLLOW && (
+            {type === NotificationType.OTHER && (
               <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.7}>
                   <Text style={styles.buttonText}>Follow</Text>
                 </TouchableOpacity>
               </View>
             )}
-            {type !== NotificationType.FOLLOW && (
+            {type !== NotificationType.OTHER && (
               <View>
                 <Image
                   source={blogImage}

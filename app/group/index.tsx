@@ -4,8 +4,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  TextInput,
 } from "react-native";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import GroupPageContent from "@/components/group/GroupPageContent";
 import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
@@ -13,11 +14,13 @@ import { SectionGrid } from "react-native-super-grid";
 import ParallaxFlatList from "@/components/ParallaxFlatList";
 import { UserBlog } from "@/interfaces/blogInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { getGroupBlogsByID, getGroupTagsByID } from "@/redux/slices/groupSlice";
+import { getGroupBlogsByID, getGroupTagsByID, setGroupBlogsSearchText, setGroupTagsSearchText } from "@/redux/slices/groupSlice";
 import { useLocalSearchParams } from "expo-router";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import queryClient from "@/redux/api/queryClient";
 import { GroupTag } from "@/interfaces/groupInterface";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { Divider } from "@rneui/base";
 import GroupBlogPreview from "@/components/group/GroupBlogPreview";
 // const mockBlog = {
 //   Title: "How to fix clipboard if it isn’t working",
@@ -82,45 +85,96 @@ const mockTags = [
 export default function GroupPage() {
   const dispatch = useAppDispatch();
 
-  const { groupId } = useLocalSearchParams<{ groupId: string }>();
-  const { user } = useAppSelector((state) => state.user);
+  const { groupId } = useLocalSearchParams<{ groupId: string }>()
+  const { user, userCurrentGroupRole } = useAppSelector(state => state.user)
+  const { groupBlogsSearchText, groupTagsSearchText } = useAppSelector(state => state.group)
 
   const [selectedId, setSelectedId] = useState(1);
-  const [tags, setTags] = useState<{ id: string; data: string[] }[]>([]);
+  const [tags, setTags] = useState<{ id: string; data: GroupTag[] }[]>([]);
 
-  const [blogPage, setBlogPage] = useState(1);
-  // const [selectedBlogFilter, setSelectedBlogFilter] = useState("All Blogs");
-  // const [selectedTagFilter, setSelectedTagFilter] = useState("All Tags");
+  const [blogPage, setBlogPage] = useState(1)
+  const [displayBlogs, setDisplayBlogs] = useState<UserBlog[]>([])
+  const [displayTags, setDisplayTags] = useState<{ id: string, data: GroupTag[] }[]>([])
+
   useEffect(() => {
-    dispatch(
-      getGroupTagsByID({
-        groupID: groupId,
-      })
-    ).then((res) => {
-      const categorizedTags = new Map<string, string[]>();
-      let categorizedTagsList: { id: string; data: string[] }[] = [];
-      const retrievedTags = res.payload as GroupTag[];
+    // Reset saved search bar state
+    dispatch(setGroupBlogsSearchText(""))
+    dispatch(setGroupTagsSearchText(""))
+
+    dispatch(getGroupTagsByID({
+      groupID: groupId
+    })).then((res) => {
+      let categorizedTags = {}
+      let categorizedTagsList: { id: string, data: GroupTag[] }[] = []
+      const retrievedTags = res.payload as GroupTag[]
 
       retrievedTags.forEach((tags) => {
-        const initial = tags.TagName.charAt(0).toLowerCase();
-
-        if (categorizedTags.has(initial)) {
-          categorizedTags.get(initial)?.push(tags.TagName);
-        } else {
-          categorizedTags.set(initial, [tags.TagName]);
+        const initial = tags.TagName.charAt(0).toLowerCase()
+        
+        if (Object.hasOwn(categorizedTags, initial)) {
+          (categorizedTags[initial] as GroupTag[]).push(tags)
         }
-      });
-
-      categorizedTags.entries().forEach((entry) => {
+        else {
+          categorizedTags[initial] = [tags]
+        }
+      })
+      
+      Object.entries(categorizedTags).forEach((entry) => {
         categorizedTagsList.push({
-          id: entry[0],
-          data: entry[1],
-        });
-      });
-      setTags(categorizedTagsList);
-    });
-  }, []);
+          id: entry[0] as string,
+          data: entry[1] as GroupTag[]
+        })
+      })
+      setTags(categorizedTagsList)
+    })
+  }, [])
 
+  // Filter blogs search result
+  useEffect(() => {
+    if (groupBlogsSearchText) {
+      if (selectedId == 1) {
+        const data = JSON.parse(JSON.stringify(groupBlogsQuery.data)) as UserBlog[]
+        data.forEach((item) => {
+          const title = item.Title
+          
+          if (!title.toLowerCase().includes(groupBlogsSearchText.toLowerCase())) {
+            data.splice(data.indexOf(item))
+          }
+        })
+
+        setDisplayBlogs(data)
+      }
+    }
+    else {
+      setDisplayBlogs(groupBlogsQuery.data as UserBlog[])
+    }
+  }, [groupBlogsSearchText])
+
+  // Filter tags search result
+  useEffect(() => {
+    if (groupTagsSearchText) {
+      if (selectedId == 2) {
+        const data = JSON.parse(JSON.stringify(tags)) as { id: string, data: GroupTag[] }[]
+        data.forEach((item) => {
+          item.data.forEach((inner_item) => {
+            if (!inner_item.TagName.toLowerCase().includes(groupTagsSearchText.toLowerCase())) {
+              item.data.splice(item.data.indexOf(inner_item))
+            }
+          })
+
+          if (item.data.length == 0) {
+            data.splice(data.indexOf(item))
+          }
+        })
+
+        setDisplayTags(data)
+      }
+    }
+    else {
+      setDisplayTags(tags)
+    }
+  }, [groupTagsSearchText])
+  
   const groupBlogsQuery = useQuery({
     queryKey: ["feed-group-blogs"],
     queryFn: async () => {
@@ -139,13 +193,14 @@ export default function GroupPage() {
   });
   const groupBlogsMutation = useMutation({
     mutationFn: async (page: number) => {
-      const moreFetchedBlogs = await dispatch(
-        getGroupBlogsByID({
-          groupID: groupId,
-          userID: user._id,
-          page: blogPage,
-        })
-      );
+      if (displayBlogs.length == 0) {
+        return [];
+      }
+      const moreFetchedBlogs = await dispatch(getGroupBlogsByID({
+        groupID: groupId,
+        userID: user._id,
+        page: blogPage
+      }))
 
       // console.log(moreFetchedBlogs.payload.blogList.blogs)
       return moreFetchedBlogs.payload as UserBlog[];
@@ -156,6 +211,14 @@ export default function GroupPage() {
       });
     },
   });
+
+  useEffect(() => {
+    setDisplayBlogs(groupBlogsQuery.data as UserBlog[])
+  }, [groupBlogsQuery.data])
+
+  useEffect(() => {
+    setDisplayTags(tags)
+  }, [tags])
 
   const handleBlogListEndReached = () => {
     setBlogPage(blogPage + 1);
@@ -194,7 +257,7 @@ export default function GroupPage() {
       case 1:
         return (
           <FlatList
-            data={groupBlogsQuery.data}
+            data={displayBlogs}
             renderItem={({ item }) => <GroupBlogPreview blog={item} />}
             keyExtractor={(item, index) => index.toString()}
             showsVerticalScrollIndicator={false}
@@ -207,19 +270,19 @@ export default function GroupPage() {
       case 2:
         return (
           <SectionGrid
-            sections={tags}
+            sections={displayTags}
             itemDimension={150} // Controls column width
             spacing={10} // Spacing between items
             style={styles.gridView}
             renderItem={({ item }) => (
               <TouchableOpacity style={styles.tagContainer}>
-                <Text style={styles.tag}>#{item}</Text>
+                <Text style={styles.tag}>#{item.TagName}</Text>
               </TouchableOpacity>
             )}
             renderSectionHeader={({ section }) => (
               <Text style={styles.title}>{section.id}</Text>
             )}
-            keyExtractor={(item, index) => item + index}
+            keyExtractor={(item, index) => item.TagName + index}
             contentContainerStyle={styles.list}
           />
         );
@@ -267,6 +330,22 @@ const styles = StyleSheet.create({
   tag: {
     fontSize: 16,
     color: "#fff",
+  },
+  textInputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2E3B40",
+    borderRadius: 9999,
+  },
+  textInput: {
+    padding: 10,
+    flex: 0.9,
+    borderRadius: 20,
+    color: "#fff",
+  },
+  textInputContainer: {
+    paddingTop: 20,
   },
   gridView: {
     flex: 1,

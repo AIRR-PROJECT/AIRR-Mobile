@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AntDesign,
   Entypo,
@@ -216,6 +216,26 @@ const mockUserBlogCommentList = [
   mockUserBlogComment,
 ];
 
+export function debounce<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
+}
+
 let isReactOnTimeout = false
 export default function BlogScreen() {
   const searchParams = useLocalSearchParams<{
@@ -342,17 +362,8 @@ export default function BlogScreen() {
   const handleBack = () => {
     route.back();
   };
-  const handleLike = () => {
-    console.log(isReactOnTimeout)
-    if (isReactOnTimeout) {
-      console.log("React still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
 
+  const handleLike = () => {
     if (blogLiked) {
       setLikes(likes - 1)
 
@@ -380,15 +391,6 @@ export default function BlogScreen() {
     }
   };
   const handleDislike = () => {
-    if (isReactOnTimeout) {
-      console.log("React still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
-
     if (blogDisliked) {
       setDislikes(dislikes - 1)
 
@@ -416,15 +418,6 @@ export default function BlogScreen() {
     }
   };
   const handleBookmark = () => {
-    if (isReactOnTimeout) {
-      console.log("React still on cooldown")
-      return;
-    };
-    isReactOnTimeout = true
-    setTimeout(() => {
-      isReactOnTimeout = false
-    }, reactTimeout)
-
     if (blogSaved) {
       dispatch(unsaveBlog(searchParams.userBlogId))
 
@@ -436,6 +429,18 @@ export default function BlogScreen() {
       setBlogSaved(true)
     }
   };
+
+  const debounceHandleLike = debounce(() => {
+    handleLike()
+  }, 0.5)
+
+  const debounceHandleDislike = debounce(() => {
+    handleDislike()
+  }, 0.5)
+
+  const debounceHandleBookmark = debounce(() => {
+    handleBookmark()
+  }, 0.5)
 
   useEffect(() => {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
@@ -544,7 +549,7 @@ export default function BlogScreen() {
                 <View style={[styles.rowContainer, { gap: 20 }]}>
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={handleLike}>
+                    style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={debounceHandleLike}>
                     <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#000" : "#fff"} />
                     <ThemedText
                       style={{ color: blogLiked ? "#000" : "#fff" }}
@@ -558,7 +563,7 @@ export default function BlogScreen() {
                   {/* Dislikes */}
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={handleDislike}>
+                    style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={debounceHandleDislike}>
                     <FontAwesome name="thumbs-down" size={24} color={blogDisliked ? "#000" : "#fff"} />
                     {/* <ThemedText
                       style={styles.text}
@@ -592,7 +597,7 @@ export default function BlogScreen() {
                   ? styles.bookmarkContainerYes
                   : styles.bookmarkContainerNo
               }
-              onPress={handleBookmark}
+              onPress={debounceHandleBookmark}
             >
               <FontAwesome
                 name="bookmark"

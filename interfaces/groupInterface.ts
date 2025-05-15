@@ -51,10 +51,43 @@ export interface GroupDetailInfo {
         AvatarURL: string;
     }
     NumberOfTag: number;
+    NumberOfMembers: number;
+    TotalNumberOfBlogsLikes: number;
     Field: {
         _id: string;
         FieldName: string;
     },
     CoverURL: string;
     Tags: GroupTag[]
+    Role: string,
+    isJoined: boolean
 }
+
+export interface SearchedField {
+    _id: string;
+    FieldName: string;
+    DefaultTags: GroupTag[]
+}
+
+export interface SearchFieldResult {
+    Fields: SearchedField[]
+}
+
+export interface GroupRule {
+    _id: string;
+    RuleName: string;
+    RuleDescription: string;
+}
+
+export interface CreateGroupTag {
+    TagName: string,
+    FieldID: string,
+    NumberOfBlogUse: number,
+    IsDefaultTag: boolean
+}
+
+// export interface CreateGroup {
+//     Name: string;
+//     Description: string;
+//     GroupField: 
+// }

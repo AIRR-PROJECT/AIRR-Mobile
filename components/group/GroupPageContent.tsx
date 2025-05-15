@@ -23,10 +23,12 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import { useAppDispatch } from "@/redux/hook";
-import { getGroupInfo } from "@/redux/slices/groupSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { getGroupInfo, requestJoinGroup, setGroupBlogsSearchText, setGroupTagsSearchText } from "@/redux/slices/groupSlice";
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
+import { setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup } from "@/redux/slices/userSlice";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { GroupMembershipStage } from "@/enums/group.enum";
 import Scroll from "quill/blots/scroll";
 type GroupDetailProps = {
   name: string;
@@ -41,23 +43,26 @@ type GroupDetailProps = {
   numberOfMembers: number;
   isUserInGroup?: boolean;
 };
-const mockGroupDetail: GroupDetailProps = {
-  name: "The Data-Driven Minds Collective",
-  id: "data_minds",
-  avatar: "https://picsum.photos/325",
-  tag: "Web Development",
+const mockGroupDetail: GroupDetailInfo = {
+  Name: "The Data-Driven Minds Collective",
+  _id: "data_minds",
+  CoverURL: "https://picsum.photos/325",
+  Field: {
+    _id: "web-dev",
+    FieldName: "Web Development"
+  },
   posts: 100,
   views: 2000,
-  likes: 500,
-  description:
+  TotalNumberOfBlogsLikes: 500,
+  Description:
     "This group is for React developers of all levels to share knowledge, ask questions, and discuss best practices. Stay updated on the latest features, libraries, and trends in the React ecosystem. Happy coding...",
   threeUserAvatar: [
     "https://picsum.photos/350",
     "https://picsum.photos/350",
     "https://picsum.photos/350",
   ],
-  numberOfMembers: 100,
-  isUserInGroup: true,
+  NumberOfMembers: 100,
+  isJoined: false,
 };
 type GroupPageProps = {
   selectedId: number;
@@ -84,23 +89,30 @@ export default function GroupPageContent({
 GroupPageProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
+  const { userCurrentGroupMembershipStage } = useAppSelector(state => state.user)
 
   const [isGroupJoinModalVisible, setIsGroupJoinModalVisible] = useState(false);
+  const searchText = useRef("")
+  let textInputRef: TextInput
   const [isBlogsFilterModalVisible, setIsBlogsFilterModalVisible] =
     useState(false);
   const [isTagsFilterModalVisible, setIsTagsFilterModalVisible] =
     useState(false);
-  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>();
+  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>(mockGroupDetail);
 
   useEffect(() => {
-    dispatch(
-      getGroupInfo({
-        groupID,
-      })
-    ).then((res) => {
-      setGroupInfo(res.payload as GroupDetailInfo);
-    });
-  }, [groupID]);
+    dispatch(getGroupInfo({
+      groupID
+    })).then((res) => {
+      const groupInfo = res.payload as GroupDetailInfo
+
+      setGroupInfo(groupInfo)
+
+      const membershipStage = (groupInfo.isJoined) ? GroupMembershipStage.JOINED : GroupMembershipStage.NOT_JOINED
+      dispatch(setUserMembershipStageInCurrentGroup(membershipStage))
+      dispatch(setUserRoleInCurrentGroup(groupInfo.Role))
+    })
+  }, [groupID])
 
   const handleGroupJoinConfirmCancel = () => {
     setIsGroupJoinModalVisible(false);
@@ -119,30 +131,65 @@ GroupPageProps) {
     // route.push(`/group/${groupID}/group-member-list`);
     route.push("/group/group-member-list");
   };
+  const handleSearchTextChange = (val: string) => {
+    searchText.current = val
+  }
+  const handleSearchSubmit = () => {
+    if (selectedId == 1) {
+      dispatch(setGroupBlogsSearchText(searchText.current))
+    }
+    else {
+      dispatch(setGroupTagsSearchText(searchText.current))
+    }
+  }
+  const resetSearchText = () => {
+    dispatch(setGroupBlogsSearchText(""))
+    dispatch(setGroupTagsSearchText(""))
+    searchText.current = ""
+    textInputRef.clear()
+  }
+
 
   const handleNewPostPress = () => {
     // Handle the new post button press
     // When Press it should carry a parameter of groupID or groupName
     // so that the new blog will automatically be assigned to the group
-    route.push("/blog/new-blog");
+    route.push(`/blog/new-blog?groupID=${groupID}`);
   };
   const handleNewTagPress = () => {
-    route.push("/group/create-tag");
+    route.push(`/group/create-tag?groupID=${groupID}`);
   }
   const handleApprovalPress = () => {
     // Handle the approval button press
     // When Press it should carry a parameter of groupID or groupName
     // so that the new blog will automatically be assigned to the group
     route.push("/group/approvals");
-  };
+  }
+
+  const handlePressJoinGroup = () => {
+    setIsGroupJoinModalVisible(true)
+  }
+
+  const handleConfirmJoinGroup = () => {
+    dispatch(requestJoinGroup({ groupID })).then((res) => {
+      if (res.payload === true) {
+        dispatch(setUserMembershipStageInCurrentGroup(GroupMembershipStage.REQUESTED))
+
+        setTimeout(() => {
+          dispatch(setUserMembershipStageInCurrentGroup(GroupMembershipStage.JOINED))
+        }, 5000)
+      } 
+    })
+  }
+ 
   return (
     <View style={styles.container}>
       <View>
-        <DetailGroupCardComponent {...mockGroupDetail} />
+        <DetailGroupCardComponent {...groupInfo ? {...groupInfo, posts: 1, views: 1} : mockGroupDetail} />
       </View>
       {/* Description */}
       <Text style={styles.description}>
-        {groupInfo ? groupInfo.Description : mockGroupDetail.description}
+        {groupInfo ? groupInfo.Description : mockGroupDetail.Description}
       </Text>
       <View style={styles.rowContainer}>
         <TouchableOpacity
@@ -166,19 +213,18 @@ GroupPageProps) {
             />
           </View>
           {/* Number of member */}
-          <Text style={styles.member}>+{mockGroupDetail.numberOfMembers}</Text>
+          <Text style={styles.member}>+{groupInfo.NumberOfMembers}</Text>
         </TouchableOpacity>
         {/* render based on user is in group or not */}
-        {!mockGroupDetail.isUserInGroup ? (
+        {userCurrentGroupMembershipStage != GroupMembershipStage.JOINED && (
           <ButtonGradient
-            label="Join Group"
+            disabled={userCurrentGroupMembershipStage == GroupMembershipStage.REQUESTED}
+            label={userCurrentGroupMembershipStage == GroupMembershipStage.NOT_JOINED ? "Join Group" : "Join request sent"}
             labelStyle={styles.tabButtonText}
             style={styles.tabButton}
-            onPress={() => {
-              setIsGroupJoinModalVisible(true);
-            }}
+            onPress={handlePressJoinGroup}
           />
-        ) : null}
+        )}
         <MaterialCommunityIcons
           name="dots-horizontal-circle-outline"
           size={55}
@@ -194,6 +240,7 @@ GroupPageProps) {
           <TouchableOpacity
             style={[styles.tabItem, selectedId === 1 && styles.tabItemActive]}
             onPress={() => {
+              resetSearchText();
               setSelectedId(1);
             }}
           >
@@ -210,6 +257,7 @@ GroupPageProps) {
           <TouchableOpacity
             style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
             onPress={() => {
+              resetSearchText();
               setSelectedId(2);
             }}
           >
@@ -224,7 +272,7 @@ GroupPageProps) {
           </TouchableOpacity>
           {/* Approval Tab */}
 
-          {mockGroupDetail.isUserInGroup ? (
+          {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED ? (
             <View style={styles.rowContainer}>
               <TouchableOpacity
                 style={[
@@ -252,7 +300,7 @@ GroupPageProps) {
         </View>
 
         {/* Create Post */}
-        {mockGroupDetail.isUserInGroup ? (
+        {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED ? (
           selectedId === 1 ? (
             <CreatePost onPress={handleNewPostPress} />
           ) : (
@@ -269,6 +317,9 @@ GroupPageProps) {
             style={styles.textInput}
             placeholder={selectedId === 1 ? "Search Blog" : "Search Tag"}
             placeholderTextColor={"#8A94AC"}
+            ref={el => textInputRef = el!}
+            onChangeText={handleSearchTextChange}
+            onSubmitEditing={handleSearchSubmit}
             numberOfLines={1}
             multiline={false}
           />
@@ -331,6 +382,8 @@ GroupPageProps) {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
+                    handleConfirmJoinGroup()
+
                     setIsGroupJoinModalVisible(false);
                   }}
                   style={styles.joinConfirmButton}

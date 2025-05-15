@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState, memo } from "react";
+import { useRef, useMemo, useCallback, useState, memo, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   Button,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import {
   FlatList,
@@ -26,10 +27,29 @@ import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent
 import QuillEditor from "@/components/dom-components/QuillEditor.tsx/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
-const mockGroup = {
-  name: "Group's name",
-  avatar: "https://picsum.photos/300",
-  id: "123",
+import { getGroupInfo, getPreviewGroups } from "@/redux/slices/groupSlice";
+import { Group, GroupDetailInfo, GroupTag, PopularGroups } from "@/interfaces/groupInterface";
+import { useAppDispatch } from "@/redux/hook";
+import { ImageSource } from "expo-image";
+import { CreateBlog } from "@/interfaces/blogInterface";
+import { createBlog } from "@/redux/slices/blogSlice";
+import { router, useLocalSearchParams } from "expo-router";
+const mockGroup: Group = {
+  Name: "Group's name",
+  avatar: "",
+  _id: "123",
+  Description: "",
+  Owner: {
+    _id: "",
+    Username: "",
+    AvatarURL: ""
+  },
+  NumberOfMembers: 0,
+  FieldName: "",
+  CoverURL: "https://picsum.photos/300",
+  Tags: [],
+  members: [],
+  timestamp: ""
 };
 const mockGroupList = Array(25).fill(mockGroup);
 const mockTags = [
@@ -54,15 +74,63 @@ const mockTags = [
   "virtual reality",
   "mixed reality",
 ];
+
+export function debounce<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
+}
+
 export default function NewBlog() {
-  const [chosenGroup, setChosenGroup] = useState("");
-  const [chosenTags, setChosenTags] = useState<string[]>([]);
+  const dispatch = useAppDispatch();
+  const { groupID } = useLocalSearchParams<{ groupID: string }>()
+
+  const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true)
+  const [chosenGroup, setChosenGroup] = useState<Group>();
+  const groupSearchText = useRef("");
+  const [searchFoundGroups, setSearchFoundGroups] = useState<Group[]>([])
+  const [foundTags, setFoundTags] = useState<GroupTag[]>([])
+  const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
+  const uploadedImg = useRef<ImageSource>()
+  const title = useRef("")
+  const description = useRef("")
+  const content = useRef("")
   // Bottom Sheet Refs
   const groupSheetRef = useRef<BottomSheet>(null);
   const tagsSheetRef = useRef<BottomSheet>(null);
   // Variables
   const groupSnapPoints = useMemo(() => ["50%", "90%"], []);
   const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
+
+  useEffect(() => {
+    if (groupID) {
+      dispatch(getGroupInfo({ groupID })).then((res) => {
+        setChosenGroup(res.payload as Group)
+        setSelectGroupAllowed(false)
+      })
+    }
+  }, [groupID])
+
+  useEffect(() => {
+    if (chosenGroup) {
+      setFoundTags(chosenGroup?.Tags)
+    }
+  }, [chosenGroup])
+
   // Callbacks
   const handleGroupSnapPress = useCallback((index: number) => {
     groupSheetRef.current?.snapToIndex(index);
@@ -76,6 +144,15 @@ export default function NewBlog() {
     console.log("handleGroupSheetChange", index);
   }, []);
 
+  const handleGroupSearchTextChange = (val: string) => {
+    groupSearchText.current = val
+  }
+  const handleGroupSearchSubmit = () => {
+    dispatch(getPreviewGroups(groupSearchText.current)).then((res) => {
+      setSearchFoundGroups(res.payload as Group[])
+    })
+  }
+
   const handleTagsSnapPress = useCallback((index: number) => {
     tagsSheetRef.current?.snapToIndex(index);
   }, []);
@@ -85,16 +162,53 @@ export default function NewBlog() {
   const handleTagsSheetChange = useCallback((index: any) => {
     console.log("handleTagsSheetChange", index);
   }, []);
+
+  const handleTitleTextChange = (val: string) => {
+    title.current = val
+  }
+
+  const handleDescriptionTextChange = (val: string) => {
+    description.current = val
+  }
+
+  const handleContentTextChange = (val: string) => {
+    content.current = val
+  }
+
+  const handlePostBlogPress = () => {
+    if (!uploadedImg.current || !chosenGroup || !chosenTags || !title.current || !description.current || !content.current) {
+      Alert.alert("Error", "Missing field")
+
+      return
+    }
+
+    const formData = new FormData()
+    formData.append("thumbnail", {
+      uri: uploadedImg.current?.uri,
+      name: uploadedImg.current?.fileName,
+      type: uploadedImg.current?.mimeType
+    })
+    formData.append("group", JSON.stringify(chosenGroup))
+    formData.append("tags", JSON.stringify(chosenTags))
+    formData.append("title", title.current)
+    formData.append("description", description.current)
+    formData.append("content", content.current)
+
+    dispatch(createBlog(formData)).then((res) => {
+      if (typeof res.payload === "boolean" && res.payload == true) {
+        router.replace("/my-feed")
+      }
+    })
+  }
+
   // Render Item
   const renderGroupItem = useCallback(
-    ({ item }: { item: typeof mockGroup }) => (
+    ({ item }: { item: Group }) => (
       <GroupDropdownComponent
-        avatar={item.avatar}
-        name={item.name}
-        id={item.id}
+        groupData={item}
         onPress={(data) => {
-          console.log("Group selected:", data.name);
-          setChosenGroup(data.name);
+          console.log("Group selected:", data.groupData.Name);
+          setChosenGroup(data.groupData);
           handleGroupSnapClose();
         }}
       />
@@ -102,7 +216,7 @@ export default function NewBlog() {
     []
   );
   const onPressTag = useCallback(
-    (listTags: string[]) => {
+    (listTags: GroupTag[]) => {
       console.log("List tags selected:", listTags);
       setChosenTags(listTags);
     },
@@ -122,9 +236,11 @@ export default function NewBlog() {
           style={{ paddingLeft: 10 }}
         />
         <TextInput
+          onChangeText={handleGroupSearchTextChange}
           style={styles.searchText}
           placeholder="Search Groups"
           placeholderTextColor="#888"
+          onSubmitEditing={handleGroupSearchSubmit}
         />
       </BottomSheetFooter>
     );
@@ -164,6 +280,7 @@ export default function NewBlog() {
           <View style={styles.divider} />
           <View style={{ flex: 1 }}>
             <TouchableOpacity
+              disabled={!isSelectGroupAllowed}
               style={styles.heading}
               onPress={() => handleGroupSnapPress(0)}
               activeOpacity={0.8}
@@ -171,7 +288,7 @@ export default function NewBlog() {
               <FontAwesome name="group" size={24} color="#fff" />
 
               <Text style={styles.headingTitle}>
-                {chosenGroup === "" ? "Select Group To Post" : chosenGroup}
+                {chosenGroup ? chosenGroup.Name : "Select Group To Post"}
               </Text>
               <IconSymbol
                 name="chevron.right"
@@ -204,7 +321,7 @@ export default function NewBlog() {
 
               <View style={styles.tagsColumn}>
                 {chosenTags.length > 0 ? (
-                  chosenTags.map((tag) => <TagWrapper key={tag} tag={tag} />)
+                  chosenTags.map((tag) => <TagWrapper key={tag._id} tag={tag.TagName} />)
                 ) : (
                   <Text style={styles.headingTitle}>Select Tags for blog</Text>
                 )}
@@ -237,7 +354,9 @@ export default function NewBlog() {
               totally you. Let the world see your style!
             </Text>
             <View>
-              <UploadThumbnailComponent />
+              <UploadThumbnailComponent onSetImg={(imgSource) => {
+                uploadedImg.current = imgSource
+              }}/>
             </View>
           </View>
         </View>
@@ -260,6 +379,7 @@ export default function NewBlog() {
               style={styles.titleInput}
               multiline={true}
               numberOfLines={3}
+              onChangeText={handleTitleTextChange}
             />
           </View>
         </View>
@@ -282,6 +402,7 @@ export default function NewBlog() {
               style={styles.titleInput}
               multiline={true}
               numberOfLines={3}
+              onChangeText={handleDescriptionTextChange}
             />
           </View>
         </View>
@@ -299,13 +420,13 @@ export default function NewBlog() {
           <View style={styles.divider} />
           <View style={{ flex: 1 }}>
             {/* QuillJS Here */}
-            <QuillEditor dom={{ matchContents: true }} />
+            <QuillEditor dom={{ matchContents: true }} onValueChange={handleContentTextChange} />
           </View>
         </View>
         {/* Post button */}
         <ButtonGradient
           label="POST BLOG"
-          onPress={() => {}}
+          onPress={handlePostBlogPress}
           style={styles.postButtonStyle}
           labelStyle={styles.postButtonLabel}
         />
@@ -340,7 +461,7 @@ export default function NewBlog() {
         </TouchableOpacity>
         <View>
           <BottomSheetFlatList
-            data={mockGroupList}
+            data={searchFoundGroups}
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderGroupItem}
             contentContainerStyle={styles.groupListContent}
@@ -368,7 +489,7 @@ export default function NewBlog() {
         )}
         footerComponent={renderTagsFooter}
       >
-        <TagDropdownComponent tags={mockTags} onPress={onPressTag} />
+        <TagDropdownComponent tags={foundTags} onPress={onPressTag} />
       </BottomSheet>
     </GestureHandlerRootView>
   );

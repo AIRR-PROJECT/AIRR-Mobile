@@ -7,6 +7,8 @@ import { useAppDispatch } from '../hook';
 import { reset, setTokens } from '../slices/userSlice';
 import { Store } from '@reduxjs/toolkit';
 import { router } from 'expo-router';
+import { hideLoading, showLoading } from '../slices/loadingSlice';
+import { logout } from '../slices/authSlice';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 let store: Store
@@ -24,6 +26,8 @@ const api = axios.create({
 
 // Attach access token to every request
 api.interceptors.request.use(async (config) => {
+    store.dispatch(showLoading("Now sending request..."))
+
     const accessToken = await SecureStore.getItemAsync('accessToken');
     // const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im90dGVyLm9saXZlLjQ1OCIsInN1YiI6IjY3OGQwNmRlNjcyMjBlZTFjOWRlZDdkYiIsInJvbGUiOiJNZW1iZXIiLCJpYXQiOjE3NDE2OTg5NzQsImV4cCI6MTc0MTY5OTg3NH0.gfuXsPa2XR97yqYNNRZmn0R85MBSKPIK_L3L-yudDas"
     // If already has a token in auth header, that is the refresh token => skip this
@@ -38,13 +42,15 @@ api.interceptors.request.use(async (config) => {
 // Handle expired tokens automatically  x
 api.interceptors.response.use(
     (response) => {
+        store.dispatch(hideLoading())
+        
         return response
     }, 
     async (error) => {
         const originalRequest = error.config;
         const exception_data = error.response?.data
         let exception_status: number = error.status ?? ""
-        let exception_failcode: number
+        let exception_failcode: number = -1
         let exception_message: string = exception_data ? exception_data.message : error.message
 
         if (error.response?.status === 401) {
@@ -73,7 +79,10 @@ api.interceptors.response.use(
                         }
                         else {
                             exception_status = response.status
-                            if (response.status === 401 && response.data.failcode === ResponseFailcode.TOKEN_INVALID) {
+                            exception_failcode = response.data.failcode
+                            if (response.status === 401 && 
+                                (response.data.failcode === ResponseFailcode.TOKEN_INVALID || response.data.failcode === ResponseFailcode.ACCESS_EXPIRED)) {
+                                
                                 exception_message = "Session expired. Please re-login"
 
                                 store.dispatch(reset())
@@ -81,8 +90,14 @@ api.interceptors.response.use(
                                 await SecureStore.deleteItemAsync("refreshToken")
                                 console.log("dismissed to first screen")
 
-                                if (router.canDismiss())
-                                    router.dismissAll()
+                                router.dismissTo("/auth")
+                                try {
+                                    router.reload()
+                                }
+                                catch {}
+                                // if (router.canDismiss()){
+                                //     console.log("Error")
+                                // }
                             }
                             else {
                                 exception_message = response.data.message
@@ -96,16 +111,25 @@ api.interceptors.response.use(
                 }
                 catch (error: any) {
                     exception_status = error.status
-                    if (error.status === 401 && error.response.data.failcode === ResponseFailcode.TOKEN_INVALID) {
+                    exception_failcode = error.response.data.failcode
+                    if (error.status === 401 
+                        && (error.response.data.failcode === ResponseFailcode.TOKEN_INVALID || error.response.data.failcode === ResponseFailcode.ACCESS_EXPIRED)) {
                         exception_message = "Session expired. Please re-login"
 
                         store.dispatch(reset())
                         await SecureStore.deleteItemAsync("accessToken")
                         await SecureStore.deleteItemAsync("refreshToken")
                         console.log("dismissed to first screen")
-                        
-                        if (router.canDismiss())
-                            router.dismissAll()
+
+                        router.dismissTo("/auth")
+                        try {
+                            router.reload()
+                        }
+                        catch {}
+                        // if (router.canDismiss()) {
+                        //     console.log("Error")
+                        //     router.dismissTo("/auth")
+                        // }
                     }
                     else {
                         exception_message = error.response.data.message
@@ -125,7 +149,8 @@ api.interceptors.response.use(
         // else {
         //     Alert.alert("Error" + error.status, getReasonPhrase(error.status))
         // }
-        ToastAndroid.showWithGravity(`(${exception_status}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+        store.dispatch(hideLoading())
+        ToastAndroid.showWithGravity(`(${exception_status}) (${exception_failcode}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
         // Alert.alert((exception_status != -1 ? "Error: " + exception_status : "Error"), exception_message)
         return Promise.reject(error);
     }

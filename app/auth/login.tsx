@@ -77,6 +77,8 @@ export default function LoginScreen() {
     if (rememberedSignUpUser) {
       setValue("email", rememberedSignUpUser)
       trigger("email")
+
+      setRememberChecked(true)
     }
   }, [rememberedSignUpUser])
 

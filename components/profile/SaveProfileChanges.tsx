@@ -25,7 +25,7 @@ export default function SaveProfileChanges() {
       })
     }
 
-    if (userNewPassword != "") {
+    if (userNewPassword) {
       const credentials: ChangeCurrentPasswordCredentials = {
         email: user.email!,
         current_password: userCurrentPassword,

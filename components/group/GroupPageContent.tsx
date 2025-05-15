@@ -7,6 +7,7 @@ import {
   TextInput,
   Modal,
   Pressable,
+  ScrollView,
 } from "react-native";
 import { Image } from "expo-image";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -28,6 +29,7 @@ import { GroupDetailInfo } from "@/interfaces/groupInterface";
 import { setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup } from "@/redux/slices/userSlice";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GroupMembershipStage } from "@/enums/group.enum";
+import Scroll from "quill/blots/scroll";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -79,12 +81,12 @@ export default function GroupPageContent({
   selectedId,
   setSelectedId,
   groupID,
-  // selectedBlogFilter,
-  // setSelectedBlogFilter,
-  // selectedTagFilter,
-  // setSelectedTagFilter,
+}: // selectedBlogFilter,
+// setSelectedBlogFilter,
+// selectedTagFilter,
+// setSelectedTagFilter,
 
-}: GroupPageProps) {
+GroupPageProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
   const { userCurrentGroupMembershipStage } = useAppSelector(state => state.user)
@@ -154,7 +156,9 @@ export default function GroupPageContent({
     // so that the new blog will automatically be assigned to the group
     route.push(`/blog/new-blog?groupID=${groupID}`);
   };
-
+  const handleNewTagPress = () => {
+    route.push(`/group/create-tag?groupID=${groupID}`);
+  }
   const handleApprovalPress = () => {
     // Handle the approval button press
     // When Press it should carry a parameter of groupID or groupName
@@ -162,7 +166,11 @@ export default function GroupPageContent({
     route.push("/group/approvals");
   }
 
-  const handleJoinGroup = () => {
+  const handlePressJoinGroup = () => {
+    setIsGroupJoinModalVisible(true)
+  }
+
+  const handleConfirmJoinGroup = () => {
     dispatch(requestJoinGroup({ groupID })).then((res) => {
       if (res.payload === true) {
         dispatch(setUserMembershipStageInCurrentGroup(GroupMembershipStage.REQUESTED))
@@ -172,7 +180,6 @@ export default function GroupPageContent({
         }, 5000)
       } 
     })
-    // setIsGroupJoinModalVisible(true);
   }
  
   return (
@@ -215,7 +222,7 @@ export default function GroupPageContent({
             label={userCurrentGroupMembershipStage == GroupMembershipStage.NOT_JOINED ? "Join Group" : "Join request sent"}
             labelStyle={styles.tabButtonText}
             style={styles.tabButton}
-            onPress={handleJoinGroup}
+            onPress={handlePressJoinGroup}
           />
         )}
         <MaterialCommunityIcons
@@ -225,7 +232,8 @@ export default function GroupPageContent({
         />
       </View>
       <Divider color="#242630" width={1} style={{ paddingTop: 20 }} />
-      <View style={styles.rowWrapper}>
+      <View style={styles.rowWrapper}
+      >
         {/* Tabs */}
         <View style={styles.tabList}>
           {/* Blogs Tab */}
@@ -263,44 +271,40 @@ export default function GroupPageContent({
             </Text>
           </TouchableOpacity>
           {/* Approval Tab */}
-          <TouchableOpacity
-            style={[styles.tabItem, selectedId === 3 && styles.tabItemActive]}
-            onPress={() => {
-              handleApprovalPress();
-            }}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={{
-                color: selectedId === 3 ? "#fff" : "#8A94AC",
-                fontWeight: "bold",
-              }}
-            >
-              Approvals
-            </Text>
-          </TouchableOpacity>
-          {/* New Blog Button */}
-          {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED && 
+
+          {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED ? (
             <View style={styles.rowContainer}>
               <TouchableOpacity
-                style={[styles.createBlogButton]}
-                onPress={handleNewPostPress}
+                style={[
+                  styles.tabItem,
+                  selectedId === 3 && styles.tabItemActive,
+                ]}
+                onPress={() => {
+                  handleApprovalPress();
+                }}
                 activeOpacity={0.8}
               >
-                <Text style={styles.createBlogButtonText}>+ New Post</Text>
+                <Text
+                  style={{
+                    color: selectedId === 3 ? "#fff" : "#8A94AC",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Approvals
+                </Text>
               </TouchableOpacity>
-              {/* Maybe up and down button */}
-              <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
+              {/* New Blog Button */}
+              
             </View>
-          }
+          ) : null}
         </View>
 
         {/* Create Post */}
         {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED ? (
           selectedId === 1 ? (
-            <CreatePost />
+            <CreatePost onPress={handleNewPostPress} />
           ) : (
-            <CreateTags />
+            <CreateTags onPress={handleNewTagPress}/>
           )
         ) : null}
       </View>
@@ -378,6 +382,8 @@ export default function GroupPageContent({
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
+                    handleConfirmJoinGroup()
+
                     setIsGroupJoinModalVisible(false);
                   }}
                   style={styles.joinConfirmButton}
@@ -457,20 +463,23 @@ export default function GroupPageContent({
   );
 }
 
-function CreatePost() {
+function CreatePost({ onPress }: { onPress: () => void }) {
   return (
     <View style={styles.rowContainer}>
-      <TouchableOpacity style={styles.tabButton}>
+      <TouchableOpacity style={styles.tabButton} activeOpacity={0.8}
+        onPress={onPress}
+      >
         <Text style={styles.tabButtonText}>+ Create Post</Text>
       </TouchableOpacity>
-      <Entypo name="select-arrows" size={24} color="#B9FF66" />
+      {/* <Entypo name="select-arrows" size={24} color="#B9FF66" /> */}
     </View>
   );
 }
-function CreateTags() {
+function CreateTags({onPress}: { onPress: () => void }) {
   return (
     <View>
-      <TouchableOpacity style={styles.tabButton}>
+      <TouchableOpacity style={styles.tabButton} activeOpacity={0.8}
+        onPress={onPress}>
         <Text style={styles.tabButtonText}>+ Request Tag</Text>
       </TouchableOpacity>
     </View>
@@ -518,7 +527,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   tabButton: {
-    width: 140,
+    width: 110,
     height: 40,
     borderRadius: 80,
     justifyContent: "center",
@@ -526,7 +535,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#B9FF66",
   },
   tabButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     textAlign: "center",
   },
@@ -534,6 +543,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  scrollrow: {
+    flex: 1,
+    width: "70%",
   },
   tabList: {
     flexDirection: "row",

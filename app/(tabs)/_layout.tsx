@@ -18,6 +18,11 @@ import { Pressable } from "react-native";
 import { useEffect } from "react";
 
 import { GestureResponderEvent } from "react-native";
+import { getFCMToken, onMessage, registerBackgroundHandler, requestUserPermission } from "@/firebase/messaging";
+import { useAppDispatch } from "@/redux/hook";
+import { increaseNotifCount, registerNotifToken } from "@/redux/slices/notifSlice";
+import * as Haptics from 'expo-haptics';
+import * as Notifications from 'expo-notifications';
 
 interface MiddleButtonProps {
   onPress: (event: GestureResponderEvent) => void;
@@ -53,6 +58,67 @@ const MiddleButton = ({ onPress }: MiddleButtonProps) => (
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const route = useRouter();
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,  // This makes the notification appear as a banner
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+
+    Notifications.addNotificationResponseReceivedListener(response => {
+      route.push("/notifications")
+    })
+
+    requestUserPermission().then((res) => {
+      if (res == true) {
+        getFCMToken().then((token) => {
+          if (token) {
+            dispatch(registerNotifToken({ token }))
+            registerBackgroundHandler((message) => {
+              console.log('Message handled in the background: ')
+              console.log(message.notification)
+              console.log('Came with the following data: ')
+              console.log(message.data?.ids)
+
+              dispatch(increaseNotifCount())
+
+              Notifications.scheduleNotificationAsync({
+                content: {
+                  title: message.notification?.title,
+                  body: message.notification?.body,
+                  data: message.data
+                },
+                trigger: null
+              })
+
+            })
+            onMessage((message) => {
+              console.log('Message handled in the foreground: ')
+              console.log(message.notification)
+              console.log('Came with the following data: ')
+              console.log(message.data?.ids)
+
+              dispatch(increaseNotifCount())
+
+              Notifications.scheduleNotificationAsync({
+                content: {
+                  title: message.notification?.title,
+                  body: message.notification?.body,
+                  data: message.data
+                },
+                trigger: null
+              })
+            })
+          }
+        })
+      }
+    })
+  }, [])
+
   const handleMiddleButtonPress = () => {
     console.log("Middle Button Press");
     route.push("/blog/new-blog");

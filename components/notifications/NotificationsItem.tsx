@@ -24,7 +24,7 @@ import { formatUnixDate } from "@/utils/dateConvert";
 import { NotificationType, RequestType } from "@/enums/notif_type.enum";
 import { useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
-import { updateSeenNotif } from "@/redux/slices/notifSlice";
+import { decreaseNotifCount, updateSeenNotif } from "@/redux/slices/notifSlice";
 import { BlogInteractNotification, PermissionNotification, OtherNotification } from "@/interfaces/notifInterface";
 import { formatDistance } from "date-fns";
 // based on type of notification, handle move to different screen
@@ -59,6 +59,8 @@ export default function NotificationsItem({
         if (res.payload) {
           onMarkAsRead(id);
           setSeen(true)
+
+          dispatch(decreaseNotifCount())
         }
 
         switch (type) {

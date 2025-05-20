@@ -7,6 +7,7 @@ import feedReducer from './slices/feedSlice';
 import blogReducer from './slices/blogSlice';
 import groupReducer from './slices/groupSlice';
 import notifReducer from './slices/notifSlice';
+import careerPathReducer from './slices/careerPathSlice';
 
 // Ignore action paths to avoid "non-serializable" error
 const serializableMiddleware = createSerializableStateInvariantMiddleware({
@@ -22,7 +23,8 @@ const store = configureStore({
         feed: feedReducer,
         blog: blogReducer,
         group: groupReducer,
-        notif: notifReducer
+        notif: notifReducer,
+        careerPath: careerPathReducer
 
     },
     middleware: (getDefaultMiddleware) =>

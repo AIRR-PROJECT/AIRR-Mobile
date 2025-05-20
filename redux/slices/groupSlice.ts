@@ -1,17 +1,8 @@
-import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
-import * as SecureStore from 'expo-secure-store';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
-import { LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
-import { Alert } from "react-native";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { User } from "@/interfaces/userInterface";
-import { ResponseFailcode } from "@/enums/failcode.enum";
-import { getReasonPhrase } from 'http-status-codes'
-import jwt from 'expo-jwt'
-import { jwtDecode } from "jwt-decode";
-import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupRule, GroupTag, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { AxiosResponse } from "axios";
+import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupTag, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
 import { UserBlog } from "@/interfaces/blogInterface";
-import { ImageSource } from "expo-image";
 
 const initialState = {
     popularFields: null as any as GroupField[],

@@ -114,7 +114,7 @@ export default function ProfileScreen() {
     <ParallaxFlatList style={styles.container} contentStyle={{ padding: 0 }}>
       {/* User Info */}
       <View style={{ padding: 20, gap: 20 }}>
-        <UserInfoComponent {...userInfo} />
+        <UserInfoComponent {...userInfo} isOwnProfile={isOwnProfile}/>
 
         {/* User student info */}
 

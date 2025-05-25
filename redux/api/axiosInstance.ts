@@ -150,8 +150,12 @@ api.interceptors.response.use(
         //     Alert.alert("Error" + error.status, getReasonPhrase(error.status))
         // }
         store.dispatch(hideLoading())
-        ToastAndroid.showWithGravity(`(${exception_status}) (${exception_failcode}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
-        // Alert.alert((exception_status != -1 ? "Error: " + exception_status : "Error"), exception_message)
+        if (exception_failcode != -1) {
+            ToastAndroid.showWithGravity(`(${exception_status}) (${exception_failcode}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+        }
+        else {
+            Alert.alert("Error:", exception_message)
+        }
         return Promise.reject(error);
     }
 );

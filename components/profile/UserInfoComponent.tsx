@@ -5,7 +5,7 @@ import { Image } from "expo-image";
 import ButtonGradient from "../ButtonGradient";
 import { useRouter } from "expo-router";
 import { User } from "@/interfaces/userInterface";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
@@ -27,6 +27,9 @@ export default function UserInfoComponent({
 
   const { userAvatar } = useAppSelector(state => state.user)
 
+  const [followers, setFollowers] = useState(1)
+  const [following, setFollowing] = useState(1)
+
   const handleEditProfile = () => {
     console.log("Edit profile");
     router.push("/profile/edit-profile");
@@ -36,7 +39,7 @@ export default function UserInfoComponent({
   return (
     <View style={styles.container}>
       {/* User avatar */}
-      <Image source={userAvatar ?? sample_avatar} style={styles.avatar} contentFit="contain" />
+      <Image source={isOwnProfile ? userAvatar : avatarURL} style={styles.avatar} contentFit="contain" />
       {/* user info */}
       <View style={styles.userInfoSection}>
         {/* user full name */}
@@ -53,7 +56,7 @@ export default function UserInfoComponent({
           </ThemedText>
           {/* Edit profile button */}
           {
-            !isOwnProfile && <ButtonGradient
+            isOwnProfile && <ButtonGradient
               label="Edit profile"
               onPress={handleEditProfile}
               style={styles.editProfileButton}
@@ -69,7 +72,7 @@ export default function UserInfoComponent({
           <ThemedText style={styles.userDateJoined}> . {new Date(joinDate!).toDateString()}</ThemedText>
         </View>
         {/* user followers and following */}
-        {/* <View style={{ flexDirection: "row", gap: 10 }}>
+        <View style={{ flexDirection: "row", gap: 10 }}>
           <ThemedText style={styles.userFollowers}>
             {followers}{" "}
             <ThemedText style={styles.followText}>Followers</ThemedText>
@@ -78,7 +81,7 @@ export default function UserInfoComponent({
             {following}{" "}
             <ThemedText style={styles.followText}>Following</ThemedText>
           </ThemedText>
-        </View> */}
+        </View>
       </View>
     </View>
   );

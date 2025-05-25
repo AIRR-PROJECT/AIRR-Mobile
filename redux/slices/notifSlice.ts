@@ -20,7 +20,6 @@ export const registerNotifToken = createAsyncThunk(
     async (dto: RegisterNotifToken, thunkAPI) => {
         try {
             const res = await api.post(`notif/register-token`, dto) as AxiosResponse
-            console.log(res)
 
             if (res.data.success) {
 
@@ -96,8 +95,16 @@ const notifSlice = createSlice({
     name: "notif",
     initialState,
     reducers: {
+        increaseNotifCount(state) {
+            state.notifCount++;
+        },
+
+        decreaseNotifCount(state) {
+            state.notifCount--;
+        },
+
         reset(state) {
-            
+            state.notifCount = 0;
         },
 
     },
@@ -118,5 +125,5 @@ const notifSlice = createSlice({
     }
 });
 
-export const { reset } = notifSlice.actions;
+export const { reset, increaseNotifCount, decreaseNotifCount } = notifSlice.actions;
 export default notifSlice.reducer;

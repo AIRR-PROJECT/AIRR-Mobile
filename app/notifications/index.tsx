@@ -2,7 +2,7 @@ import NotificationsItem from "@/components/notifications/NotificationsItem";
 import { NotificationType, RequestType } from "@/enums/notif_type.enum";
 import { BlogInteractNotification, NotificationResponseData, OtherNotification, PermissionNotification } from "@/interfaces/notifInterface";
 import { useAppDispatch } from "@/redux/hook";
-import { getAllNotif } from "@/redux/slices/notifSlice";
+import { decreaseNotifCount, getAllNotif } from "@/redux/slices/notifSlice";
 import { useEffect, useState } from "react";
 import {
   StyleSheet,

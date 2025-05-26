@@ -1,3 +1,4 @@
+import { GroupRole } from "@/enums/group.enum";
 import { User1 } from "./userInterface";
 
 export interface Group {
@@ -59,8 +60,8 @@ export interface GroupDetailInfo {
     },
     CoverURL: string;
     Tags: GroupTag[]
-    Role: string,
-    isJoined: boolean
+    Role: GroupRole,
+    UserStatus: string
 }
 
 export interface SearchedField {
@@ -84,6 +85,48 @@ export interface CreateGroupTag {
     FieldID: string,
     NumberOfBlogUse: number,
     IsDefaultTag: boolean
+}
+
+export interface PendingMemberRequest {
+    _id: string,
+    Owner: {
+        _id: string;
+        Username: string;
+        AvatarURL: string;
+    },
+    GroupID: string,
+    RequestDate: Date
+}
+
+export interface PendingBlogRequest {
+    _id: string,
+    Owner: {
+        _id: string;
+        Username: string;
+        AvatarURL: string;
+    },
+    GroupID: string,
+    BlogID: string,
+    Title: string,
+    Description: string,
+    RequestDate: Date;
+}
+
+export interface PendingTagRequest {
+    _id: string,
+    TagName: string,
+    BlogReferences: {
+        _id: string;
+        Title: string;
+        CoverURL: string;
+    }[],
+    Owners: {
+        _id: string;
+        Username: string;
+        AvatarURL: string;
+    }[],
+    GroupID: string,
+    RequestDate: Date
 }
 
 // export interface CreateGroup {

@@ -72,13 +72,16 @@ export default function NotificationsItem({
                 // TODO: route to report page  
                 break;
               case RequestType.REQUEST_POST_BLOG:
-                // TODO: route to new post review page
+                route.push(`/group/approvals/blogs?requestID=${permissionData.request_permission_id}`)
+
                 break;
               case RequestType.REQUEST_JOIN_GROUP:
-                // TODO: route to request join group page
+                route.push(`/group/approvals/members?requestID=${permissionData.request_permission_id}`)
+
                 break;
               case RequestType.REQUEST_NEW_TAG:
-                // TODO: route to new tag review page
+                route.push(`/group/approvals/tags?requestID=${permissionData.request_tag_id}`)
+
                 break;
             }
             break;

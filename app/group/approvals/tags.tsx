@@ -1,10 +1,14 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { View, Text, FlatList, StyleSheet, TextInput } from "react-native";
 import { Image } from "expo-image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import TagApprovalCardComponent from "@/components/group/TagApprovalCardComponent";
+import { PendingMemberRequest, PendingTagRequest } from "@/interfaces/groupInterface";
+import { getPendingMemberList, getPendingTagList } from "@/redux/slices/groupSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { useLocalSearchParams } from "expo-router";
 
 // Initial mock data
 const mockTag1 = {
@@ -38,14 +42,24 @@ const initialTags = [mockTag1, mockTag2, mockTag3]
 
 // later remember to add the props
 export default function TagsApprovalsPage() {
-  const [tags, setTags] = useState(initialTags);
+  const dispatch = useAppDispatch()
+  const { groupID, requestID } = useLocalSearchParams<{ groupID: string, requestID: string }>()
+  
+  const [tags, setTags] = useState<PendingTagRequest[]>([]);
+
+  useEffect(() => {
+    dispatch(getPendingTagList(groupID)).then(res => {
+      const list = res.payload as PendingTagRequest[]
+      setTags(list)
+    })
+  }, [])
 
   const onApprove = (tag: string) => {
     console.log("Approve tag with tag-name: ", tag);
   };
   const onReject = (tag: string) => {
     console.log("Reject tag with tag-name: ", tag);
-    setTags((prev) => prev.filter((b) => b.tag !== tag));
+    setTags((prev) => prev.filter((b) => b.TagName !== tag));
   };
   // TODO: Khoa: change the any type to the correct type
   const renderItem = ({ item }: any) => (
@@ -75,7 +89,7 @@ export default function TagsApprovalsPage() {
       <Animated.FlatList
         data={tags}
         renderItem={renderItem}
-        keyExtractor={(item) => item.tag}
+        keyExtractor={(item) => item.TagName}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         itemLayoutAnimation={LinearTransition}

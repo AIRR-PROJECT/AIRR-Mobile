@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
 import { AxiosResponse } from "axios";
-import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupTag, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupTag, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
 import { UserBlog } from "@/interfaces/blogInterface";
 
 const initialState = {
@@ -214,7 +214,6 @@ export const requestJoinGroup = createAsyncThunk(
     async (data: { groupID: string }, thunkAPI) => {
         try {
             const res = await api.post(`groups/joinGroup`, data) as AxiosResponse
-            console.log(res)
 
             if (res.data.success) {
                 return true
@@ -235,6 +234,186 @@ export const createTag = createAsyncThunk(
         try {
             const res = await api.post(`tag/create-tag`, data) as AxiosResponse
             console.log(res)
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getPendingMemberList = createAsyncThunk(
+    'group/getPendingMemberList',
+    async (groupID: string, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/getPendingMemberList?groupID=${groupID}`) as AxiosResponse
+
+            if (res.data.success) {
+                console.log(res.data.data.success)
+                return res.data.data.success as PendingMemberRequest[]
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const approveMember = createAsyncThunk(
+    'group/approveMember',
+    async (data: { groupID: string, userIDToApprove: string }, thunkAPI) => {
+        try {
+            const a = {
+                "groupID": "67849113607148a07c1d94a3",
+                "userIDToApprove": "67cbe57957107366685af45d"
+            }
+            console.log(data)
+
+            const res = await api.post(`groups/approveMember`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const rejectMember = createAsyncThunk(
+    'group/rejectMember',
+    async (data: { groupID: string; userIDToReject: string }, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/rejectMember`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getPendingBlogList = createAsyncThunk(
+    'group/getPendingBlogList',
+    async (groupID: string, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/getPendingBlogList?groupID=${groupID}`) as AxiosResponse
+
+            if (res.data.success) {
+                console.log(res.data.data.success)
+                return res.data.data.success as PendingBlogRequest[]
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const approveBlog = createAsyncThunk(
+    'group/approveBlog',
+    async (data: { groupID: string; blogIDToApprove: string; blogOwnerID: string }, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/approveBlog`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const rejectBlog = createAsyncThunk(
+    'group/rejectBlog',
+    async (data: { groupID: string; blogIDToReject: string; blogOwnerID: string }, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/rejectBlog`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getPendingTagList = createAsyncThunk(
+    'group/getPendingTagList',
+    async (groupID: string, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/getPendingTagList?groupID=${groupID}`) as AxiosResponse
+
+            if (res.data.success) {
+                console.log(res.data.data.success)
+                return res.data.data.success as PendingTagRequest[]
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const approveTag = createAsyncThunk(
+    'group/approveTag',
+    async (data: { groupID: string; tagIDToApprove: string; blogIDsContainTag: string[]; fieldID: string }, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/approveTag`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const rejectTag = createAsyncThunk(
+    'group/rejectTag',
+    async (data: { groupID: string; tagIDToReject: string; blogIDsContainTag: string[]; fieldID: string }, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/rejectTag`, data) as AxiosResponse
 
             if (res.data.success) {
                 return true

@@ -28,7 +28,7 @@ import { getGroupInfo, requestJoinGroup, setGroupBlogsSearchText, setGroupTagsSe
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
 import { setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup } from "@/redux/slices/userSlice";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { GroupMembershipStage } from "@/enums/group.enum";
+import { GroupMembershipStage, GroupRole } from "@/enums/group.enum";
 import Scroll from "quill/blots/scroll";
 type GroupDetailProps = {
   name: string;
@@ -108,7 +108,7 @@ GroupPageProps) {
 
       setGroupInfo(groupInfo)
 
-      const membershipStage = (groupInfo.isJoined) ? GroupMembershipStage.JOINED : GroupMembershipStage.NOT_JOINED
+      const membershipStage = (groupInfo.UserStatus == "Active") ? GroupMembershipStage.JOINED : (groupInfo.UserStatus == "Pending" ? GroupMembershipStage.REQUESTED : GroupMembershipStage.NOT_JOINED)
       dispatch(setUserMembershipStageInCurrentGroup(membershipStage))
       dispatch(setUserRoleInCurrentGroup(groupInfo.Role))
     })
@@ -163,7 +163,7 @@ GroupPageProps) {
     // Handle the approval button press
     // When Press it should carry a parameter of groupID or groupName
     // so that the new blog will automatically be assigned to the group
-    route.push("/group/approvals");
+    route.push(`/group/approvals?groupID=${groupID}`)
   }
 
   const handlePressJoinGroup = () => {
@@ -272,7 +272,7 @@ GroupPageProps) {
           </TouchableOpacity>
           {/* Approval Tab */}
 
-          {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED ? (
+          {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED && groupInfo.Role == GroupRole.Admin ? (
             <View style={styles.rowContainer}>
               <TouchableOpacity
                 style={[

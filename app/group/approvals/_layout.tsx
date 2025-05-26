@@ -1,7 +1,10 @@
 import { MaterialTopTabs } from "@/components/MaterialTopTabs";
 import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 export default function ApprovalsPageTabLayout() {
+  const { groupID, requestID } = useLocalSearchParams<{ groupID: string, requestID: string }>()
+
   return (
     <MaterialTopTabs
       style={{ flex: 1 }}
@@ -46,14 +49,26 @@ export default function ApprovalsPageTabLayout() {
       <MaterialTopTabs.Screen
         name="members"
         options={{ title: "Members Approvals" }}
+        initialParams={{
+          groupID,
+          requestID
+        }}
       />
       <MaterialTopTabs.Screen
         name="blogs"
         options={{ title: "Blogs Approvals" }}
+        initialParams={{
+          groupID,
+          requestID
+        }}
       />
       <MaterialTopTabs.Screen
         name="tags"
         options={{ title: "Tags Approvals" }}
+        initialParams={{
+          groupID,
+          requestID
+        }}
       />
     </MaterialTopTabs>
   );

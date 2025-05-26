@@ -3,7 +3,11 @@ import { View, TextInput, StyleSheet } from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { PendingBlogRequest, PendingMemberRequest } from "@/interfaces/groupInterface";
+import { getPendingTagList } from "@/redux/slices/groupSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { useLocalSearchParams } from "expo-router";
 
 // Initial mock data
 const mockBlog = {
@@ -28,7 +32,17 @@ const initialBlogs = [mockBlog, mockBlog, mockBlog].map((b, i) => ({
 export default function BlogsApprovalsPage() {
   // Currently use state to manage the blogs
   // TODO: Khoa: Change to what you want
-  const [blogs, setBlogs] = useState(initialBlogs);
+  const dispatch = useAppDispatch()
+  const { groupID, requestID } = useLocalSearchParams<{ groupID: string, requestID: string }>()
+  
+  const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
+
+  useEffect(() => {
+    dispatch(getPendingTagList(groupID)).then(res => {
+      const list = res.payload as PendingBlogRequest[]
+      setBlogs(list)
+    })
+  }, [])
 
   const onApprove = (id: string) => {
     console.log("Approve blog with id: ", id);
@@ -36,7 +50,7 @@ export default function BlogsApprovalsPage() {
 
   const onReject = (id: string) => {
     console.log("Reject blog with id: ", id);
-    setBlogs((prev) => prev.filter((b) => b.blog._id !== id));
+    setBlogs((prev) => prev.filter((b) => b.BlogID !== id));
   };
 
   const renderItem = ({ item }: any) => (
@@ -67,7 +81,7 @@ export default function BlogsApprovalsPage() {
       <Animated.FlatList
         data={blogs}
         renderItem={renderItem}
-        keyExtractor={(item) => item.blog._id}
+        keyExtractor={(item) => item.BlogID}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         itemLayoutAnimation={LinearTransition}

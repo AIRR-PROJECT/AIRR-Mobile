@@ -3,7 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 export default function ApprovalsPageTabLayout() {
-  const { groupID, requestID } = useLocalSearchParams<{ groupID: string, requestID: string }>()
+  const { groupID, memberID, requestID } = useLocalSearchParams<{ groupID: string, memberID: string, requestID: string }>()
 
   return (
     <MaterialTopTabs
@@ -51,7 +51,7 @@ export default function ApprovalsPageTabLayout() {
         options={{ title: "Members Approvals" }}
         initialParams={{
           groupID,
-          requestID
+          memberID
         }}
       />
       <MaterialTopTabs.Screen

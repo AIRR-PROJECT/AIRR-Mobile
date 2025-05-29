@@ -29,7 +29,7 @@ import { useLocalSearchParams } from "expo-router";
 export default function MemberApprovalsPage() {
   const dispatch = useAppDispatch()
   const flatlistRef = useRef<any>()
-  const { groupID, requestID } = useLocalSearchParams<{ groupID: string, requestID: string }>()
+  const { groupID, memberID } = useLocalSearchParams<{ groupID: string, memberID: string }>()
 
   const [members, setMembers] = useState<PendingMemberRequest[]>([]);
 
@@ -42,15 +42,15 @@ export default function MemberApprovalsPage() {
 
   useEffect(() => {
     // Scroll to specific index
-    if (members != undefined && requestID != "" && requestID != undefined) {
+    if (members != undefined && memberID != "" && memberID != undefined) {
       members.forEach((value, index) => {
-        if (value._id == requestID) {
-          flatlistRef.current.scrollToView({ animated: true, index: index })
+        if (value.Owner._id == memberID) {
+          flatlistRef.current.scrollToIndex({ animated: true, index: index })
           return
         }
       })
     }
-  }, [members, requestID])
+  }, [members, memberID])
 
   const onApprove = (id: string) => {
     dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(res => {

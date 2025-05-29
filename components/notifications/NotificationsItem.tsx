@@ -62,39 +62,39 @@ export default function NotificationsItem({
 
           dispatch(decreaseNotifCount())
         }
-
-        switch (type) {
-          case NotificationType.PERMISSION:
-            const permissionData = data as PermissionNotification
-            
-            switch (permissionData.request_type) {
-              case RequestType.REQUEST_REPORT_BLOG:
-                // TODO: route to report page  
-                break;
-              case RequestType.REQUEST_POST_BLOG:
-                route.push(`/group/approvals/blogs?requestID=${permissionData.request_permission_id}`)
-
-                break;
-              case RequestType.REQUEST_JOIN_GROUP:
-                route.push(`/group/approvals/members?requestID=${permissionData.request_permission_id}`)
-
-                break;
-              case RequestType.REQUEST_NEW_TAG:
-                route.push(`/group/approvals/tags?requestID=${permissionData.request_tag_id}`)
-
-                break;
-            }
-            break;
-          case NotificationType.INTERACTION:
-            const interactionData = data as BlogInteractNotification
-    
-            route.push(`/blog?userBlogId=${interactionData.blog_id}`)
-            break;
-          default:
-            const otherData = data as OtherNotification
-            break
-        }
       })
+    }
+
+    switch (type) {
+      case NotificationType.PERMISSION:
+        const permissionData = data as PermissionNotification
+        
+        switch (permissionData.request_type) {
+          case RequestType.REQUEST_REPORT_BLOG:
+            // TODO: route to report page  
+            break;
+          case RequestType.REQUEST_POST_BLOG:
+            route.push(`/group/approvals/blogs?groupID=${permissionData.group_id}&blogID=${permissionData.blog_id}`)
+
+            break;
+          case RequestType.REQUEST_JOIN_GROUP:
+            route.push(`/group/approvals/members?groupID=${permissionData.group_id}&memberID=${permissionData.request_owner._id}`)
+
+            break;
+          case RequestType.REQUEST_NEW_TAG:
+            route.push(`/group/approvals/tags?groupID=${permissionData.group_id}&tagID=${permissionData.request_tag_id}`)
+
+            break;
+        }
+        break;
+      case NotificationType.INTERACTION:
+        const interactionData = data as BlogInteractNotification
+
+        route.push(`/blog?userBlogId=${interactionData.blog_id}`)
+        break;
+      default:
+        const otherData = data as OtherNotification
+        break
     }
   };
   const handleFollow = () => {

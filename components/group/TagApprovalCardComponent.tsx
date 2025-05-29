@@ -7,25 +7,20 @@ import Reanimated, {
 } from "react-native-reanimated";
 import { formatDistance, set } from "date-fns";
 import { AntDesign } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "expo-router";
-type TagApprovalCardComponentProps = {
-  tag: string; // TODO: I don't remember tag has id or not, add _id if needed,
-  // TODO: but if it has _id, change to _id in the apporoval or reject with _id for better clarity
-  user: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  time: number;
-  onApprove: (id: string) => void;
-  onReject: (id: string) => void;
+import { PendingTagRequest } from "@/interfaces/groupInterface";
+type TagApprovalCardComponentProps = PendingTagRequest & {
+  onApprove: (id: string, blogIDs: string[]) => void;
+  onReject: (id: string, blogIDs: string[]) => void;
 };
 
 export default function TagApprovalCardComponent({
-  tag,
-  user,
-  time,
+  _id,
+  TagName,
+  BlogReferences,
+  Owners,
+  RequestDate,
   onApprove,
   onReject,
 }: TagApprovalCardComponentProps) {
@@ -51,6 +46,14 @@ export default function TagApprovalCardComponent({
   const [isOpenStartDrag, setIsOpenStartDrag] = useState(false);
   const route = useRouter();
 
+  const blogReferenceIDs = useRef<string[]>([])
+
+  useEffect(() => {
+    blogReferenceIDs.current = BlogReferences.map((value) => {
+      return value._id
+    })
+  }, [BlogReferences])
+
   return (
     <ReanimatedSwipeable
       containerStyle={styles.swipeable}
@@ -61,7 +64,7 @@ export default function TagApprovalCardComponent({
       overshootRight={false}
       onSwipeableOpen={() => {
         console.log("onSwipeableOpen");
-        onReject(tag);
+        onReject(_id, blogReferenceIDs.current);
       }}
       onSwipeableOpenStartDrag={(drag) => {
         setIsOpenStartDrag(true);
@@ -85,19 +88,19 @@ export default function TagApprovalCardComponent({
         ]}
       >
         <View style={styles.imageContainer}>
-          <Image source={user.avatar} style={styles.avatar} />
+          <Image source={Owners[0].AvatarURL} style={styles.avatar} />
         </View>
 
         <View style={styles.detailContainer}>
           <Text style={styles.title}>
-            {user.name}
+            {Owners[0].Username}
             <Text style={styles.description}> request a new tag</Text>
           </Text>
 
           {/* Tag */}
-          <Text style={styles.tagText}># {tag}</Text>
+          <Text style={styles.tagText}># {TagName}</Text>
           <Text style={styles.time}>
-            {formatDistance(new Date(time), new Date(), {
+            {formatDistance(new Date(RequestDate), new Date(), {
               addSuffix: true,
             })}
           </Text>
@@ -107,7 +110,7 @@ export default function TagApprovalCardComponent({
             <TouchableOpacity
               style={styles.approveButton}
               onPress={() => {
-                onApprove(tag);
+                onApprove(_id, blogReferenceIDs.current);
               }}
               activeOpacity={0.7}
             >
@@ -117,7 +120,7 @@ export default function TagApprovalCardComponent({
             <TouchableOpacity
               style={styles.rejectButton}
               onPress={() => {
-                onReject(tag);
+                onReject(_id, blogReferenceIDs.current);
               }}
               activeOpacity={0.7}
             >

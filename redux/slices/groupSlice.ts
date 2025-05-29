@@ -377,7 +377,7 @@ export const getPendingTagList = createAsyncThunk(
             const res = await api.get(`groups/getPendingTagList?groupID=${groupID}`) as AxiosResponse
 
             if (res.data.success) {
-                console.log(res.data.data.success)
+                console.log(JSON.stringify(res.data.data.success))
                 return res.data.data.success as PendingTagRequest[]
             }
             else {
@@ -392,7 +392,7 @@ export const getPendingTagList = createAsyncThunk(
 
 export const approveTag = createAsyncThunk(
     'group/approveTag',
-    async (data: { groupID: string; tagIDToApprove: string; blogIDsContainTag: string[]; fieldID: string }, thunkAPI) => {
+    async (data: { groupID: string; tagIDToApprove: string; blogIDsContainTag: string[] }, thunkAPI) => {
         try {
             const res = await api.post(`groups/approveTag`, data) as AxiosResponse
 
@@ -411,7 +411,7 @@ export const approveTag = createAsyncThunk(
 
 export const rejectTag = createAsyncThunk(
     'group/rejectTag',
-    async (data: { groupID: string; tagIDToReject: string; blogIDsContainTag: string[]; fieldID: string }, thunkAPI) => {
+    async (data: { groupID: string; tagIDToReject: string; blogIDsContainTag: string[] }, thunkAPI) => {
         try {
             const res = await api.post(`groups/rejectTag`, data) as AxiosResponse
 

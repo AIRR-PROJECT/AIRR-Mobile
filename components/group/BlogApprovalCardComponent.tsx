@@ -7,31 +7,38 @@ import Reanimated, {
 } from "react-native-reanimated";
 import { formatDistance, set } from "date-fns";
 import { AntDesign } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-type BlogApprovalCardComponentProps = {
-  blog: {
-    _id: string;
-    title: string;
-    thumbnail: string;
-  };
-  author: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  time: number;
-  onApprove: (id: string) => void;
-  onReject: (id: string) => void;
+import { PendingBlogRequest } from "@/interfaces/groupInterface";
+import { getUserBlogDetail } from "@/redux/slices/blogSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { UserBlogDetail } from "@/interfaces/blogInterface";
+type BlogApprovalCardComponentProps = PendingBlogRequest & {
+  onApprove: (id: string, blogOwnerId: string) => void;
+  onReject: (id: string, blogOwnerId: string) => void;
 };
 
 export default function BlogApprovalCardComponent({
-  blog,
-  author,
-  time,
+  BlogID,
+  Owner,
+  RequestDate,
   onApprove,
   onReject,
 }: BlogApprovalCardComponentProps) {
+  const dispatch = useAppDispatch()
+  const [title, setTitle] = useState("")
+  const [thumbnail, setThumbnail] = useState("")
+  
+  useEffect(() => {
+    dispatch(getUserBlogDetail(BlogID)).then(res => {
+      if (res.payload) {
+        const payload = res.payload as UserBlogDetail
+        setTitle(payload.Title)
+        setThumbnail(payload.BackgroundURL)
+      }
+    })
+  }, [])
+
   function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {
     const styleAnimation = useAnimatedStyle(() => {
       //   console.log("showRightProgress:", prog.value);
@@ -54,7 +61,7 @@ export default function BlogApprovalCardComponent({
   const [isOpenStartDrag, setIsOpenStartDrag] = useState(false);
   const route = useRouter();
   const handlePress = () => {
-    console.log("Press blog with id: ", blog._id);
+    console.log("Press blog with id: ", BlogID);
     route.push('/group/pending-blog');
   }
   return (
@@ -67,7 +74,7 @@ export default function BlogApprovalCardComponent({
       overshootRight={false}
       onSwipeableOpen={() => {
         console.log("onSwipeableOpen");
-        onReject(blog._id);
+        onReject(BlogID, Owner._id);
       }}
       onSwipeableOpenStartDrag={(drag) => {
         setIsOpenStartDrag(true);
@@ -93,17 +100,17 @@ export default function BlogApprovalCardComponent({
         ]}
       >
         <View style={styles.imageContainer}>
-          <Image source={author.avatar} style={styles.avatar} />
-          <Image source={blog.thumbnail} style={styles.thumbnail} />
+          <Image source={Owner.AvatarURL} style={styles.avatar} />
+          <Image source={thumbnail} style={styles.thumbnail} />
         </View>
 
         <View style={styles.detailContainer}>
-          <Text style={styles.title}>{blog.title}</Text>
+          <Text style={styles.title}>{title}</Text>
           <Text style={styles.description}>
-            {author.name} request a new blog
+            {Owner.Username} request a new blog
           </Text>
           <Text style={styles.time}>
-            {formatDistance(new Date(time), new Date(), {
+            {formatDistance(new Date(RequestDate), new Date(), {
               addSuffix: true,
             })}
           </Text>
@@ -113,7 +120,7 @@ export default function BlogApprovalCardComponent({
               <TouchableOpacity
                 style={styles.approveButton}
                 onPress={() => {
-                  onApprove(blog._id);
+                  onApprove(BlogID, Owner._id);
                 }}
                 activeOpacity={0.7}
               >
@@ -123,7 +130,7 @@ export default function BlogApprovalCardComponent({
               <TouchableOpacity
                 style={styles.rejectButton}
                 onPress={() => {
-                  onReject(blog._id);
+                  onReject(BlogID, Owner._id);
                 }}
                 activeOpacity={0.7}
               >

@@ -1,10 +1,14 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { View, Text, FlatList, StyleSheet, TextInput } from "react-native";
 import { Image } from "expo-image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import TagApprovalCardComponent from "@/components/group/TagApprovalCardComponent";
+import { PendingMemberRequest, PendingTagRequest } from "@/interfaces/groupInterface";
+import { approveTag, getPendingMemberList, getPendingTagList, rejectTag } from "@/redux/slices/groupSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { useLocalSearchParams } from "expo-router";
 
 // Initial mock data
 const mockTag1 = {
@@ -38,21 +42,59 @@ const initialTags = [mockTag1, mockTag2, mockTag3]
 
 // later remember to add the props
 export default function TagsApprovalsPage() {
-  const [tags, setTags] = useState(initialTags);
+  const dispatch = useAppDispatch()
+  const flatlistRef = useRef<any>()
+  const { groupID, tagID } = useLocalSearchParams<{ groupID: string, tagID: string }>()
+  
+  const [tags, setTags] = useState<PendingTagRequest[]>([]);
 
-  const onApprove = (tag: string) => {
-    console.log("Approve tag with tag-name: ", tag);
+  useEffect(() => {
+    dispatch(getPendingTagList(groupID)).then(res => {
+      const list = res.payload as PendingTagRequest[]
+      setTags(list)
+    })
+  }, [])
+
+  useEffect(() => {
+    // Scroll to specific index
+    if (tags != undefined && tagID != "" && tagID != undefined) {
+      tags.forEach((value, index) => {
+        if (value._id == tagID) {
+          flatlistRef.current.scrollToIndex({ animated: true, index: index })
+          return
+        }
+      })
+    }
+  }, [tags, tagID])
+
+  const onApprove = (tagId: string, blogIDs: string[]) => {
+    dispatch(approveTag({
+      groupID: groupID,
+      tagIDToApprove: tagId,
+      blogIDsContainTag: blogIDs
+    })).then(res => {
+      if (res.payload === true) {
+        console.log("Approve tag with tag-name: ", tagId);
+        setTags((prev) => prev.filter((b) => b._id !== tagId));
+      }
+    })
   };
-  const onReject = (tag: string) => {
-    console.log("Reject tag with tag-name: ", tag);
-    setTags((prev) => prev.filter((b) => b.tag !== tag));
+  const onReject = (tagId: string, blogIDs: string[]) => {
+    dispatch(rejectTag({
+      groupID: groupID,
+      tagIDToReject: tagId,
+      blogIDsContainTag: blogIDs
+    })).then(res => {
+      if (res.payload === true) {
+        console.log("Reject tag with tag-name: ", tagId);
+        setTags((prev) => prev.filter((b) => b._id !== tagId));
+      }
+    })
   };
   // TODO: Khoa: change the any type to the correct type
   const renderItem = ({ item }: any) => (
    <TagApprovalCardComponent
-      tag={item.tag}
-      user={item.user}
-      time={item.time}
+      {...item}
       onApprove={onApprove}
       onReject={onReject}
    />
@@ -75,7 +117,7 @@ export default function TagsApprovalsPage() {
       <Animated.FlatList
         data={tags}
         renderItem={renderItem}
-        keyExtractor={(item) => item.tag}
+        keyExtractor={(item) => item.TagName}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         itemLayoutAnimation={LinearTransition}

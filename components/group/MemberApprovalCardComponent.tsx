@@ -14,7 +14,7 @@ type MemberApprovalCardComponentProps = {
   name: string;
   avatar: string;
   username: string;
-  time: number;
+  time: Date;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
 };

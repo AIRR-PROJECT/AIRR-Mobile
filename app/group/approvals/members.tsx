@@ -1,47 +1,82 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { View, TextInput, StyleSheet } from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MemberApprovalCardComponent from "@/components/group/MemberApprovalCardComponent";
+import { RequestOwner } from "@/interfaces/notifInterface";
+import { PendingMemberRequest } from "@/interfaces/groupInterface";
+import { useAppDispatch } from "@/redux/hook";
+import { approveMember, getPendingMemberList, rejectBlog, rejectMember } from "@/redux/slices/groupSlice";
+import { useLocalSearchParams } from "expo-router";
 
 // Initial mock data
-const mockUser = {
-  id: "1",
-  name: "John Doe", 
-  avatar: "https://picsum.photos/200/300",
-  username: "johndoe",
+// const mockUser: PendingMemberRequest = {
+//   _id: "1",
+//   Name: "John Doe", 
+//   AvatarURL: "https://picsum.photos/200/300",
+//   Username: "johndoe",
 
-  time: new Date().getTime() - 1000 * 60 * 60 * 24,
-};
+//   CreateDate: (new Date().getTime() - 1000 * 60 * 60 * 24).toLocaleString(),
+// };
 
-const initialUsers = [mockUser, mockUser, mockUser].map((user, index) => ({
-  ...user,
-  id: index.toString(),
-}));
+// const initialUsers = [mockUser, mockUser, mockUser].map((user, index) => ({
+//   ...user,
+//   id: index.toString(),
+// }));
 
 export default function MemberApprovalsPage() {
-  // Currently use state to manage the users
-  // TODO: Khoa: Change to what you want
-  const [users, setUsers] = useState(initialUsers);
+  const dispatch = useAppDispatch()
+  const flatlistRef = useRef<any>()
+  const { groupID, memberID } = useLocalSearchParams<{ groupID: string, memberID: string }>()
+
+  const [members, setMembers] = useState<PendingMemberRequest[]>([]);
+
+  useEffect(() => {
+    dispatch(getPendingMemberList(groupID)).then(res => {
+      const list = res.payload as PendingMemberRequest[]
+      setMembers(list)
+    })
+  }, [])
+
+  useEffect(() => {
+    // Scroll to specific index
+    if (members != undefined && memberID != "" && memberID != undefined) {
+      members.forEach((value, index) => {
+        if (value.Owner._id == memberID) {
+          flatlistRef.current.scrollToIndex({ animated: true, index: index })
+          return
+        }
+      })
+    }
+  }, [members, memberID])
 
   const onApprove = (id: string) => {
-    console.log("Approve user with id: ", id);
+    dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(res => {
+      if (res.payload === true) {
+        console.log("Approve user with id: ", id);
+        setMembers((prev) => prev.filter((u) => u.Owner._id !== id));
+      }
+    })
   };
 
   const onReject = (id: string) => {
-    console.log("Reject user with id: ", id);
-    setUsers((prev) => prev.filter((u) => u.id !== id));
+    dispatch(rejectMember({ groupID, userIDToReject: id })).then(res => {
+      if (res.payload === true) {
+        console.log("Reject user with id: ", id);
+        setMembers((prev) => prev.filter((u) => u.Owner._id !== id));
+      }
+    })
   };
 
   const renderItem = ({ item }: any) => (
     <MemberApprovalCardComponent
-      id={item.id}
-      name={item.name}
-      avatar={item.avatar}
-      username={item.username}
-      time={item.time}
+      id={item.Owner._id}
+      name={item.Owner.Username}
+      avatar={item.Owner.AvatarURL}
+      username={item.Owner.Username}
+      time={item.RequestDate}
       onApprove={onApprove}
       onReject={onReject}
     />
@@ -63,12 +98,13 @@ export default function MemberApprovalsPage() {
 
       {/* Animated FlatList */}
       <Animated.FlatList
-        data={initialUsers}
+        data={members}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         itemLayoutAnimation={LinearTransition}
+        ref={flatlistRef}
       />
     </GestureHandlerRootView>
   );

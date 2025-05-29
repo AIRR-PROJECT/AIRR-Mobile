@@ -3,47 +3,81 @@ import { View, TextInput, StyleSheet } from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { PendingBlogRequest, PendingMemberRequest } from "@/interfaces/groupInterface";
+import { approveBlog, getPendingBlogList, getPendingTagList, rejectBlog } from "@/redux/slices/groupSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { useLocalSearchParams } from "expo-router";
 
 // Initial mock data
-const mockBlog = {
-  blog: {
-    _id: Math.random().toString(),
-    title: "How to build a React Native app",
-    thumbnail: "https://picsum.photos/200",
-  },
-  author: {
-    id: "1",
-    name: "John Doe",
-    avatar: "https://picsum.photos/220",
-  },
-  time: new Date().getTime() - 1000 * 60 * 60 * 24,
-};
+// const mockBlog = {
+//   blog: {
+//     _id: Math.random().toString(),
+//     title: "How to build a React Native app",
+//     thumbnail: "https://picsum.photos/200",
+//   },
+//   author: {
+//     id: "1",
+//     name: "John Doe",
+//     avatar: "https://picsum.photos/220",
+//   },
+//   time: new Date().getTime() - 1000 * 60 * 60 * 24,
+// };
 
-const initialBlogs = [mockBlog, mockBlog, mockBlog].map((b, i) => ({
-  ...b,
-  blog: { ...b.blog, _id: i.toString() },
-}));
+// const initialBlogs = [mockBlog, mockBlog, mockBlog].map((b, i) => ({
+//   ...b,
+//   blog: { ...b.blog, _id: i.toString() },
+// }));
 
 export default function BlogsApprovalsPage() {
   // Currently use state to manage the blogs
   // TODO: Khoa: Change to what you want
-  const [blogs, setBlogs] = useState(initialBlogs);
+  const dispatch = useAppDispatch()
+  const flatlistRef = useRef<any>()
+  const { groupID, blogID } = useLocalSearchParams<{ groupID: string, blogID: string }>()
+  
+  const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
 
-  const onApprove = (id: string) => {
-    console.log("Approve blog with id: ", id);
+  useEffect(() => {
+    dispatch(getPendingBlogList(groupID)).then(res => {
+      const list = res.payload as PendingBlogRequest[]
+      setBlogs(list)
+    })
+  }, [])
+
+  useEffect(() => {
+    // Scroll to specific index
+    if (blogs != undefined && blogID != "" && blogID != undefined) {
+      blogs.forEach((value, index) => {
+        if (value.BlogID == blogID) {
+          flatlistRef.current.scrollToIndex({ animated: true, index: index })
+          return
+        }
+      })
+    }
+  }, [blogs, blogID])
+
+  const onApprove = (id: string, blogOwnerId: string) => {
+    dispatch(approveBlog({ groupID: groupID, blogIDToApprove: id, blogOwnerID: blogOwnerId })).then(res => {
+      if (res.payload === true) {
+        console.log("Approve blog with id: ", id);
+        setBlogs((prev) => prev.filter((b) => b.BlogID !== id));
+      }
+    })
   };
 
-  const onReject = (id: string) => {
-    console.log("Reject blog with id: ", id);
-    setBlogs((prev) => prev.filter((b) => b.blog._id !== id));
+  const onReject = (id: string, blogOwnerId: string) => {
+    dispatch(rejectBlog({ groupID: groupID, blogIDToReject: id, blogOwnerID: blogOwnerId })).then(res => {
+      if (res.payload === true) {
+        console.log("Reject blog with id: ", id);
+        setBlogs((prev) => prev.filter((b) => b.BlogID !== id));
+      }
+    })
   };
 
   const renderItem = ({ item }: any) => (
     <BlogApprovalCardComponent
-      blog={item.blog}
-      author={item.author}
-      time={item.time}
+      {...item}
       onApprove={onApprove}
       onReject={onReject}
     />
@@ -67,10 +101,11 @@ export default function BlogsApprovalsPage() {
       <Animated.FlatList
         data={blogs}
         renderItem={renderItem}
-        keyExtractor={(item) => item.blog._id}
+        keyExtractor={(item) => item.BlogID}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         itemLayoutAnimation={LinearTransition}
+        ref={flatlistRef}
       />
     </GestureHandlerRootView>
   );

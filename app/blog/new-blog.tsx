@@ -24,7 +24,7 @@ import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
-import QuillEditor from "@/components/dom-components/QuillEditor.tsx/QuillEditor";
+import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
 import { getGroupInfo, getPreviewGroups } from "@/redux/slices/groupSlice";

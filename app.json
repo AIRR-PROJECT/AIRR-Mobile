@@ -49,7 +49,8 @@
         }
       ],
       "@react-native-firebase/app",
-      "@react-native-firebase/messaging"
+      "@react-native-firebase/messaging",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true
@@ -59,7 +60,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "758122ca-2905-4af1-aebd-31f3beb55231"
+        "projectId": "54295e4e-3e38-4211-9920-3bff8eb75a52"
       }
     }
   }

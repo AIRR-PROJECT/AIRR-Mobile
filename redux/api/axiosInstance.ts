@@ -17,7 +17,13 @@ export const injectStoreToAxiosInterceptor = (_store: Store) => {
   store = _store
 }
 
+const abortSignal = new AbortController()
+export const abortRequest = () => {
+    abortSignal.abort()
+}
+
 const api = axios.create({
+    signal: abortSignal.signal,
     baseURL: API_URL,
     headers: {
       "Content-Type": "application/json",

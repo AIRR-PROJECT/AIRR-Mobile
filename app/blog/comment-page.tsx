@@ -210,6 +210,7 @@ const mockUserBlogCommentList = [
 export default function CommentBlogScreen() {
   const searchParams = useLocalSearchParams<{
     blogId: string;
+    commentId: string;
   }>();
   // if (searchParams.aiBlogId) {
 
@@ -228,10 +229,22 @@ export default function CommentBlogScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const textInputRef = useRef<TextInput>(null);
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     dispatch(getBlogComment(searchParams.blogId));
   }, []);
+
+  useEffect(() => {
+    if (currentBlogComments.length != 0 && searchParams.commentId != undefined && searchParams.commentId != "") {
+      currentBlogComments.forEach((value, index) => {
+        if (value._id == searchParams.commentId) {
+          flatListRef.current?.scrollToIndex({ animated: true, index: index })
+          return
+        }
+      })
+    }
+  }, [currentBlogComments, searchParams.commentId])
 
   // // Handle keyboard events
   // useEffect(() => {
@@ -286,8 +299,6 @@ export default function CommentBlogScreen() {
   useEffect(() => {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
   }, [isCurrentBlogSaved]);
-
-  const flatListRef = useRef<FlatList>(null);
 
   const [isWriteComment, setIsWriteComment] = useState(false);
 

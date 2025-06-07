@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "109964407356-340uqog28igu1o9mn4ml9t4b641lqmqv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thesis.airrmobile",
+            "certificate_hash": "e47a3fd6519a6b336c13282d2b7e819166d8432d"
+          }
+        },
+        {
           "client_id": "109964407356-q69pive7ro12lr21df12u29srei2vsvu.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "109964407356-q69pive7ro12lr21df12u29srei2vsvu.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "109964407356-q4jbohn8f5v0s7fg3hujfa0c7ao5adcq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.thesis.airrios"
+              }
             }
           ]
         }

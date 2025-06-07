@@ -20,15 +20,18 @@ import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
 type FormData = {
   email: string;
   password: string;
 };
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
-import { login, sendAccountOTP, resetLoggedIn, getUserInfo, setRememberedSignUpUser, getRememberedSignUpUser } from "@/redux/slices/authSlice";
+import { login, sendAccountOTP, resetLoggedIn, getUserInfo, setRememberedSignUpUser, getRememberedSignUpUser, loginGoogle } from "@/redux/slices/authSlice";
 import { LoginCredentials } from "@/interfaces/authInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { getAuth, GoogleAuthProvider } from "@react-native-firebase/auth";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -61,6 +64,27 @@ export default function LoginScreen() {
     // router.replace("/(tabs)");
   };
 
+  const handleOnGoogleIconPress = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      // Get the users ID token
+      const signInResult = await GoogleSignin.signIn();
+      
+      if (signInResult.data) {
+        const idToken = signInResult.data.idToken
+        console.log(signInResult)
+
+        if (idToken)
+          dispatch(loginGoogle({
+            access_token: idToken
+          }))
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
   // Init
   useEffect(() => {
     // Reset
@@ -70,6 +94,10 @@ export default function LoginScreen() {
     dispatch(getRememberedSignUpUser())
 
     setInit(true)
+    
+    GoogleSignin.configure({
+      webClientId: "109964407356-q69pive7ro12lr21df12u29srei2vsvu.apps.googleusercontent.com"
+    });
   }, [])
 
   // Trigger the Email validation if rememberedSignUpUser is not null/undefined
@@ -93,6 +121,7 @@ export default function LoginScreen() {
     }
 
     if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken) {
+      console.log("test")
       dispatch(getUserInfo())
     }
   }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])
@@ -269,7 +298,7 @@ export default function LoginScreen() {
         </ThemedText>
         {/* Or Google or Facebook */}
         <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <AuthButtonTransparent label="Google" style={styles.otherButton} />
+          <AuthButtonTransparent label="Google" style={styles.otherButton} onPress={handleOnGoogleIconPress} />
 
           <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
         </View>

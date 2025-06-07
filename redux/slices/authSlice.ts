@@ -67,6 +67,23 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
     }
 )
 
+export const loginGoogle = createAsyncThunk(
+    'auth/loginGoogle',
+    async (data: { access_token: string }, thunkAPI) => {
+        try {
+            await SecureStore.setItemAsync("accessToken", data.access_token)
+            await SecureStore.setItemAsync("refreshToken", data.access_token)
+
+            thunkAPI.dispatch(setTokens({
+                accessToken: data.access_token,
+                refreshToken: data.access_token
+            }))
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response.data);
+        }
+    }
+)
+
 export const setRememberedSignUpUser = createAsyncThunk(
     'auth/setRememberedSignUpUser',
     async (data: string, thunkAPI) => {
@@ -507,6 +524,10 @@ const authSlice = createSlice({
                 //         Alert.alert("Error", action.error.message)
                 //     }
                 // }
+            })
+            .addCase(loginGoogle.fulfilled, (state, action) => {
+                state.isLoggedIn = true
+                state.isAccountVerified = true
             })
             .addCase(setRememberedSignUpUser.rejected, (state, action) => {
                 ToastAndroid.showWithGravity("Failed to save sign in username", ToastAndroid.LONG, ToastAndroid.BOTTOM)

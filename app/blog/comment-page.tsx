@@ -212,7 +212,6 @@ export default function CommentBlogScreen() {
     blogId: string;
     commentId: string;
   }>();
-  // if (searchParams.aiBlogId) {
 
   const dispatch = useAppDispatch();
   const {

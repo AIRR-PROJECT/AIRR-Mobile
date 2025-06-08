@@ -69,17 +69,34 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
 
 export const loginGoogle = createAsyncThunk(
     'auth/loginGoogle',
-    async (data: { access_token: string }, thunkAPI) => {
+    async (data: { token: string }, thunkAPI) => {
         try {
-            await SecureStore.setItemAsync("accessToken", data.access_token)
-            await SecureStore.setItemAsync("refreshToken", data.access_token)
+            await SecureStore.setItemAsync('accessToken', data.token)
 
+            const response = await api.post('auth/sign-in-gg');
+            console.log(response)
+            const { access_token, refresh_token } = response.data.data;
+
+            if (access_token === undefined) {
+                return thunkAPI.rejectWithValue("Access token must not be undefined")
+            }
+            if (refresh_token === undefined) {
+                return thunkAPI.rejectWithValue("Refresh token must not be undefined")
+            }
+
+            await SecureStore.setItemAsync('accessToken', access_token)
+            await SecureStore.setItemAsync('refreshToken', refresh_token)
             thunkAPI.dispatch(setTokens({
-                accessToken: data.access_token,
-                refreshToken: data.access_token
+                accessToken: access_token,
+                refreshToken: refresh_token
             }))
+    
+            return { 
+                accessToken: access_token,
+                refreshToken: refresh_token
+            };
         } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response.data);
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
         }
     }
 )
@@ -529,6 +546,37 @@ const authSlice = createSlice({
                 state.isLoggedIn = true
                 state.isAccountVerified = true
             })
+            .addCase(loginGoogle.rejected, (state, action) => {
+                console.log(action.payload)
+                if (action.payload && (action.payload as APIResponse).message && ((action.payload as APIResponse).failcode !== ResponseFailcode.USER_NOT_FOUND && (action.payload as APIResponse).failcode !== ResponseFailcode.IDENTITY_NOT_MATCHED)) {
+                    state.isLoggedIn = true
+                }
+
+                /* Handling this somewhere else */
+                // if (action.payload) {
+                //     if ((action.payload as APIResponse).message) {
+                //         Alert.alert("Error", (action.payload as APIResponse).message)
+    
+                //         const payload = (action.payload as APIResponse)
+                //         if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
+                //             state.isLoggedIn = true
+                //         }
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.payload as string)
+                //     }
+                // }
+                // else {
+                //     const check_prefix = "Request failed with status code "
+                //     if (action.error.message?.startsWith("Request failed with status code ")) {
+                //         const code = action.error.message.slice(check_prefix.length)
+                //         Alert.alert("Error", getReasonPhrase(code))
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.error.message)
+                //     }
+                // }
+            })
             .addCase(setRememberedSignUpUser.rejected, (state, action) => {
                 ToastAndroid.showWithGravity("Failed to save sign in username", ToastAndroid.LONG, ToastAndroid.BOTTOM)
             })
@@ -632,6 +680,7 @@ const authSlice = createSlice({
                 // setTokens(undefined)
                 // state.userAccessToken = ""
                 // state.userRefreshToken = ""
+                // console.log(action.meta)
                 console.log(action.error)
                 state.isLoggedIn = false
                 state.isAccountVerified = false

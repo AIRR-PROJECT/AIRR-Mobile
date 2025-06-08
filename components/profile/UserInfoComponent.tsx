@@ -52,7 +52,7 @@ export default function UserInfoComponent({
           }}
         >
           <ThemedText type="title" style={styles.userFullName}>
-            {(firstName + " " + lastName).slice(0, 10)}
+            {(firstName || lastName) ? (firstName + " " + lastName).slice(0, 10) : "No name"}
           </ThemedText>
           {/* Edit profile button */}
           {

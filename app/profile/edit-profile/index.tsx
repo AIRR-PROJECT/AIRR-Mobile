@@ -63,9 +63,9 @@ export default function EditProfileScreen() {
     program: userData.profile.program ?? "",
     gpa: userData.profile.gpa ?? 0,
     startYear: userData.profile.year ? new Date().getFullYear() - userData.profile.year : 0,
-    linkedin: userData.profile.link.LinkedIn ?? "",
-    github: userData.profile.link.Github ?? "",
-    facebook: userData.profile.link.Facebook ?? "",
+    linkedin: userData.profile.link ? (userData.profile.link.LinkedIn ?? "") : "",
+    github: userData.profile.link ? (userData.profile.link.Github ?? "") : "",
+    facebook: userData.profile.link ? (userData.profile.link.Facebook ?? "") : "",
   }
 
   const {
@@ -78,7 +78,7 @@ export default function EditProfileScreen() {
     defaultValues: defaultFormData,
   });
 
-  const userChange: User = JSON.parse(JSON.stringify(userData)) as User
+  let userChange: User = JSON.parse(JSON.stringify(userData)) as User
 
   useEffect(() => {
     if (isUserChangeSaved) {

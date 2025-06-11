@@ -243,7 +243,7 @@ export default function BlogScreen() {
     userBlogId: string;
   }>();
   // if (searchParams.aiBlogId) {
-
+  
   const route = useRouter();
   const dispatch = useAppDispatch();
   const {
@@ -451,6 +451,10 @@ export default function BlogScreen() {
   const handleCommentPress = () => {
     route.push(`/blog/comment-page?blogId=${searchParams.userBlogId}`);
   }
+  // print the blog id for me to test
+  useEffect(() => {
+    console.log(`Blog ID: ${searchParams.userBlogId}`);
+  }, [searchParams.userBlogId]);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Back button */}

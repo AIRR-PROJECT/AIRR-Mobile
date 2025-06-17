@@ -271,8 +271,7 @@ GroupPageProps) {
             </Text>
           </TouchableOpacity>
           {/* Approval Tab */}
-
-          {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED && groupInfo.Role == GroupRole.Admin ? (
+          {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED && (groupInfo.Role == GroupRole.Admin || groupInfo.Role == GroupRole.Owner) ? (
             <View style={styles.rowContainer}>
               <TouchableOpacity
                 style={[

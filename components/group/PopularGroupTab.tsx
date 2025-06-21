@@ -494,7 +494,7 @@ export default function PopularGroupTab() {
                 />
               )}
             />
-            <Pagination.Custom<{ color: string }>
+            {/* <Pagination.Custom<{ color: string }>
               progress={progress}
               data={mockPaginationList}
               size={20}
@@ -544,7 +544,7 @@ export default function PopularGroupTab() {
               //     }}
               //   />
               // )}
-            />
+            /> */}
           </View>
         )}
         sections={groupData ?? MOCKDATA}

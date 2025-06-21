@@ -7,8 +7,21 @@ import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
-import { dislikeBlog, dislikeToLikeBlog, likeBlog, likeToDislikeBlog, removeDislikeBlog, removeLikeBlog, saveBlog, unsaveBlog } from "@/redux/slices/blogSlice";
-import { getUserBlogDislikeActivities, getUserBlogLikeActivities, getUserBlogSaveActivities } from "@/redux/slices/authSlice";
+import {
+  dislikeBlog,
+  dislikeToLikeBlog,
+  likeBlog,
+  likeToDislikeBlog,
+  removeDislikeBlog,
+  removeLikeBlog,
+  saveBlog,
+  unsaveBlog,
+} from "@/redux/slices/blogSlice";
+import {
+  getUserBlogDislikeActivities,
+  getUserBlogLikeActivities,
+  getUserBlogSaveActivities,
+} from "@/redux/slices/authSlice";
 import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
 import { ThemedText } from "@/components/ThemedText";
 const mockGroup = {
@@ -41,7 +54,7 @@ export function debounce<T extends (...args: any[]) => void>(
 export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   // default to mock blog for this, but later will be passed as props
   const route = useRouter();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const handlePress = () => {
     console.log("Blog Pressed");
     route.push({
@@ -49,108 +62,103 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
     });
   };
 
-  const reactTimeout = 500
-  const [likes, setLikes] = useState(123)
-  const [dislikes, setDislikes] = useState(123)
-  const [comments, setComments] = useState(123)
-  const [blogLiked, setBlogLiked] = useState<boolean>(false)
-  const [blogDisliked, setBlogDisliked] = useState<boolean>(false)
-  const [blogSaved, setBlogSaved] = useState<boolean>(false)
+  const reactTimeout = 500;
+  const [likes, setLikes] = useState(123);
+  const [dislikes, setDislikes] = useState(123);
+  const [comments, setComments] = useState(123);
+  const [blogLiked, setBlogLiked] = useState<boolean>(false);
+  const [blogDisliked, setBlogDisliked] = useState<boolean>(false);
+  const [blogSaved, setBlogSaved] = useState<boolean>(false);
 
   useEffect(() => {
-    setLikes(blog.Reaction.Likes)
-    setDislikes(blog.Reaction.Dislikes)
-    setComments(blog.Reaction.Comments)
+    setLikes(blog.Reaction.Likes);
+    setDislikes(blog.Reaction.Dislikes);
+    setComments(blog.Reaction.Comments);
 
     dispatch(getUserBlogLikeActivities(blog._id)).then((data) => {
-      setBlogLiked(data.payload as boolean)
-    })
+      setBlogLiked(data.payload as boolean);
+    });
     dispatch(getUserBlogDislikeActivities(blog._id)).then((data) => {
-      setBlogDisliked(data.payload as boolean)
-    })
+      setBlogDisliked(data.payload as boolean);
+    });
     dispatch(getUserBlogSaveActivities(blog._id)).then((data) => {
-      setBlogSaved(data.payload as boolean)
-    })
-  }, [])
+      setBlogSaved(data.payload as boolean);
+    });
+  }, []);
 
   const handleLike = () => {
     if (blogLiked) {
-      setLikes(likes - 1)
+      setLikes(likes - 1);
 
-      setBlogLiked(false)
+      setBlogLiked(false);
 
-      dispatch(removeLikeBlog(blog._id))
-    }
-    else {
+      dispatch(removeLikeBlog(blog._id));
+    } else {
       if (blogDisliked) {
-        setLikes(likes + 1)
-        setDislikes(dislikes - 1)
+        setLikes(likes + 1);
+        setDislikes(dislikes - 1);
 
-        setBlogLiked(true)
-        setBlogDisliked(false)
+        setBlogLiked(true);
+        setBlogDisliked(false);
 
-        dispatch(dislikeToLikeBlog(blog._id))
-      }
-      else {
-        setLikes(likes + 1)
+        dispatch(dislikeToLikeBlog(blog._id));
+      } else {
+        setLikes(likes + 1);
 
-        setBlogLiked(true)
+        setBlogLiked(true);
 
-        dispatch(likeBlog(blog._id))
+        dispatch(likeBlog(blog._id));
       }
     }
-  }
+  };
   const handleDislike = () => {
     if (blogDisliked) {
-      setDislikes(dislikes - 1)
+      setDislikes(dislikes - 1);
 
-      setBlogDisliked(false)
+      setBlogDisliked(false);
 
-      dispatch(removeDislikeBlog(blog._id))
-    }
-    else {
+      dispatch(removeDislikeBlog(blog._id));
+    } else {
       if (blogLiked) {
-        setDislikes(dislikes + 1)
-        setLikes(likes - 1)
+        setDislikes(dislikes + 1);
+        setLikes(likes - 1);
 
-        setBlogLiked(false)
-        setBlogDisliked(true)
+        setBlogLiked(false);
+        setBlogDisliked(true);
 
-        dispatch(likeToDislikeBlog(blog._id))
-      }
-      else {
-        setDislikes(dislikes + 1)
+        dispatch(likeToDislikeBlog(blog._id));
+      } else {
+        setDislikes(dislikes + 1);
 
-        setBlogDisliked(true)
+        setBlogDisliked(true);
 
-        dispatch(dislikeBlog(blog._id))
+        dispatch(dislikeBlog(blog._id));
       }
     }
-  }
+  };
   const handleBookmark = () => {
     if (blogSaved) {
-      dispatch(unsaveBlog(blog._id))
+      dispatch(unsaveBlog(blog._id));
 
-      setBlogSaved(false)
-    }
-    else {
-      dispatch(saveBlog(blog._id))
+      setBlogSaved(false);
+    } else {
+      dispatch(saveBlog(blog._id));
 
-      setBlogSaved(true)
+      setBlogSaved(true);
     }
-  }
+  };
 
   const debounceHandleLike = debounce(() => {
-    handleLike()
-  }, 0.5)
+    handleLike();
+  }, 0.5);
 
   const debounceHandleDislike = debounce(() => {
-    handleDislike()
-  }, 0.5)
+    handleDislike();
+  }, 0.5);
 
   const debounceHandleBookmark = debounce(() => {
-    handleBookmark()
-  }, 0.5)
+    handleBookmark();
+  }, 0.5);
 
   return (
     <TouchableOpacity
@@ -163,6 +171,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >
+        <View style={styles.overlay}></View>
         <Pressable style={styles.container} onPress={handlePress}>
           {/* 1st Part: User, Group, Button */}
           <View style={styles.topSection}>
@@ -179,13 +188,13 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           </View>
           {/* 2nd Part: List of Tags */}
           <View style={styles.tagsSection}>
-            {blog.Tags.slice(0, 3).map((tag, index) => (
+            {blog.Tags.slice(0, 2).map((tag, index) => (
               <Text key={index} style={styles.tag}>
                 #{tag.TagName}
               </Text>
             ))}
-            {blog.Tags.length > 3 && (
-              <Text style={styles.tag}>+{blog.Tags.length - 3} more</Text>
+            {blog.Tags.length > 2 && (
+              <Text style={styles.tag}>+{blog.Tags.length - 2} more</Text>
             )}
           </View>
         </Pressable>
@@ -235,9 +244,19 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           <View style={[styles.rowContainer, { gap: 20 }]}>
             <TouchableOpacity
               activeOpacity={0.7}
-              style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={debounceHandleLike}>
-              <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#fff" : "#000"} />
-              <Text style={blogLiked ? styles.textYes : styles.textNo}>{likes}</Text>
+              style={
+                blogLiked ? styles.likeContainerYes : styles.likeContainerNo
+              }
+              onPress={debounceHandleLike}
+            >
+              <FontAwesome
+                name="thumbs-up"
+                size={24}
+                color={blogLiked ? "#fff" : "#000"}
+              />
+              <Text style={blogLiked ? styles.textYes : styles.textNo}>
+                {likes}
+              </Text>
               {/* <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#fff" : "#000"} />
               <ThemedText
                 style={{ color: blogLiked ? "#000" : "#fff" }}
@@ -251,8 +270,18 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
             {/* Dislikes */}
             <TouchableOpacity
               activeOpacity={0.7}
-              style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={debounceHandleDislike}>
-              <FontAwesome name="thumbs-down" size={24} color={blogDisliked ? "#fff" : "#000"} />
+              style={
+                blogDisliked
+                  ? styles.dislikeContainerYes
+                  : styles.dislikeContainerNo
+              }
+              onPress={debounceHandleDislike}
+            >
+              <FontAwesome
+                name="thumbs-down"
+                size={24}
+                color={blogDisliked ? "#fff" : "#000"}
+              />
             </TouchableOpacity>
           </View>
           {/* Comment */}
@@ -263,8 +292,18 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           {/* Bookmart Button */}
           <TouchableOpacity
             activeOpacity={0.7}
-            style={blogSaved ? styles.bookmarkContainerYes : styles.bookmarkContainerNo} onPress={debounceHandleBookmark}>
-            <FontAwesome name="bookmark" size={24} color={blogSaved ? "#fff" : "#000"} />
+            style={
+              blogSaved
+                ? styles.bookmarkContainerYes
+                : styles.bookmarkContainerNo
+            }
+            onPress={debounceHandleBookmark}
+          >
+            <FontAwesome
+              name="bookmark"
+              size={24}
+              color={blogSaved ? "#fff" : "#000"}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -288,6 +327,11 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   imageStyle: {
+    borderRadius: 30,
+  },
+  overlay:{
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     borderRadius: 30,
   },
   container: {

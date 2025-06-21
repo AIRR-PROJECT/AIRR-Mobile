@@ -33,6 +33,8 @@ export default function LeftHeader() {
     </View>
   );
 }
+// This based on search API from backend
+// Can search both blog and group
 function SearchScreen({
   visible,
   onClose,
@@ -52,7 +54,7 @@ function SearchScreen({
   ];
 
   return (
-    <Modal visible={visible} transparent={true}>
+    <Modal visible={visible} transparent={true} animationType="fade">
       <View style={styles.modalContainer}>
         {/* Header with Search Bar and Close Button */}
         <View style={styles.header}>
@@ -101,13 +103,13 @@ const styles = StyleSheet.create({
 
   modalContainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#1E1E1E",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingTop: 50, // Status bar height (adjust as needed)
+    paddingTop: 20, // Status bar height (adjust as needed)
     paddingBottom: 10,
     backgroundColor: "#B9FF66",
   },

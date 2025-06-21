@@ -1,3 +1,4 @@
+import { SearchType } from "@/enums/search_type.enum";
 import { FontAwesome } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -10,9 +11,17 @@ import {
   TouchableOpacity,
   View,
   Text,
+  SafeAreaView,
 } from "react-native";
+import { Dimensions } from "react-native";
 const icon_air_tech = require("@/assets/images/logo/logo_icon-air-tech_small.svg");
 export default function LeftHeader() {
+  // Add variable to get type of searchType, with redux or context
+  // If user is in page my feed, then searchType is SearchType.BLOG
+  // If user is in page group, then searchType is SearchType.GROUP
+  // This line here is for testing purpose, remove it after implementing the logic
+  const searchType = SearchType.BLOG;
+
   const [visible, setVisible] = useState(false);
   const route = useRouter();
   const handleSearchPress = () => {
@@ -21,15 +30,31 @@ export default function LeftHeader() {
     // route.push("/search-tab");
     setVisible(true);
   };
+
+  console.log("searchType", searchType);
   return (
     <View style={styles.container}>
-      <Image source={icon_air_tech} style={styles.image} contentFit="contain" />
+      {/* <Image source={icon_air_tech} style={styles.image} contentFit="contain" /> */}
       {/* Search button */}
-      <TouchableOpacity onPress={handleSearchPress} style={styles.button}>
-        <FontAwesome name="search" size={24} color="#B9FF66" />
-      </TouchableOpacity>
+      {searchType != SearchType.NONE && (
+        <TouchableOpacity
+          onPress={handleSearchPress}
+          style={styles.searchBarButton}
+        >
+          <FontAwesome name="search" size={20} color="#B9FF66" />
+          <Text style={styles.searchBarText}>
+            {searchType === SearchType.BLOG
+              ? "Search blog..."
+              : "Search group..."}
+          </Text>
+        </TouchableOpacity>
+      )}
       {/* modal */}
-      <SearchScreen visible={visible} onClose={() => setVisible(false)} />
+      <SearchScreen
+        visible={visible}
+        onClose={() => setVisible(false)}
+        searchType={searchType}
+      />
     </View>
   );
 }
@@ -38,9 +63,11 @@ export default function LeftHeader() {
 function SearchScreen({
   visible,
   onClose,
+  searchType = SearchType.BLOG,
 }: {
   visible: boolean;
   onClose: () => void;
+  searchType?: SearchType;
 }) {
   const [searchText, setSearchText] = useState("");
 
@@ -52,7 +79,7 @@ function SearchScreen({
     "AirTech Four",
     "AirTech Five",
   ];
-
+  if (searchType === SearchType.NONE) return null;
   return (
     <Modal visible={visible} transparent={true} animationType="fade">
       <View style={styles.modalContainer}>
@@ -60,7 +87,11 @@ function SearchScreen({
         <View style={styles.header}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search..."
+            placeholder={
+              searchType === SearchType.BLOG
+                ? "Search blog..."
+                : "Search group..."
+            }
             placeholderTextColor="#999"
             value={searchText}
             onChangeText={setSearchText}
@@ -90,17 +121,39 @@ function SearchScreen({
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
+    width: Dimensions.get("window").width / 2.5,
   },
   image: {
     width: 100,
     height: 15,
   },
-  button: {},
-
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1E1E1E",
+    borderRadius: 8,
+  },
+  searchBarButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#232323",
+    borderRadius: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#B9FF66",
+  },
+  searchBarText: {
+    color: "#B9FF66",
+    fontSize: 14,
+    marginLeft: 10,
+    flex: 1,
+    opacity: 0.7,
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: "#1E1E1E",
@@ -109,17 +162,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingTop: 20, // Status bar height (adjust as needed)
+    paddingTop: 8, // Status bar height (adjust as needed)
     paddingBottom: 10,
-    backgroundColor: "#B9FF66",
+    backgroundColor: "#1E1E1E",
   },
   searchInput: {
     flex: 1,
     height: 40,
-    backgroundColor: "#fff",
+    backgroundColor: "#232323",
     borderRadius: 8,
     paddingHorizontal: 10,
     marginRight: 10,
+    color: "#B9FF66",
+    borderColor: "#B9FF66",
+    borderWidth: 1,
   },
   closeButton: {
     padding: 4,

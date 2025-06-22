@@ -24,7 +24,7 @@ import { injectStoreToAxiosInterceptor } from "@/redux/api/axiosInstance";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { countUnseenNotif } from "@/redux/slices/notifSlice";
 import { getFCMToken, requestUserPermission } from "@/firebase/messaging";
-
+import { SearchType } from "@/enums/search_type.enum";
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
 

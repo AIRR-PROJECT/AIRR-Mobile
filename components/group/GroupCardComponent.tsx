@@ -54,8 +54,8 @@ export default function GroupCardComponent({
           >{name}</Text>
           <View style={styles.groupIdAndMember}>
             {/* Group id and member */}
-            <Text style={styles.groupId}>@{id}</Text>
-            <Entypo name="dot-single" size={10} color="#98AAAE" />
+            {/* <Text style={styles.groupId}>@{id}</Text>
+            <Entypo name="dot-single" size={10} color="#98AAAE" /> */}
             <Text style={styles.member}>{members} members</Text>
           </View>
         </View>

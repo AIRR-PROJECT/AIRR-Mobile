@@ -38,7 +38,7 @@ export default function DetailGroupCardComponent({
             <FontAwesome6 name="tags" size={20} color="black" />
             <Text style={styles.tag}>{Field.FieldName}</Text>
           </View>
-          <Text style={styles.id}>@{_id}</Text>
+          {/* <Text style={styles.id}>@{_id}</Text> */}
         </View>
         <View style={styles.rowContainer}>
           <View style={styles.detailContainer}>

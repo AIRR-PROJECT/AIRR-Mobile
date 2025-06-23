@@ -119,13 +119,6 @@ export default function RootLayout() {
                   headerShown: false,
                 }}
               />
-              <Stack.Screen
-                name="search-tab"
-                options={{
-                  headerShown: true,
-                  title: "Search",
-                }}
-              />
             </Stack>
             {userLoggedIn ? (
               <Redirect href="/(tabs)/dashboard" />

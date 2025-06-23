@@ -1,19 +1,51 @@
-import { MaterialTopTabs } from "@/components/MaterialTopTabs";
-export default function MyFeedTabLayout() {
+// Import necessary modules and components from various libraries
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+
+import { useColorScheme } from "@/hooks/useColorScheme";
+
+// Prevent the splash screen from auto-hiding before asset loading is complete
+SplashScreen.preventAutoHideAsync();
+
+export default function MyGroupLayout() {
+  // Get the current color scheme (dark or light)
+  const colorScheme = useColorScheme();
+  // Load custom fonts
+  const [loaded] = useFonts({
+    SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
+  // Hide the splash screen once fonts are loaded
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  // If fonts are not loaded yet, return null to render nothing
+  if (!loaded) {
+    return null;
+  }
+
+  // Render the app layout with theme provider and navigation stack
   return (
-    <MaterialTopTabs
-      style={{ flex: 1 }}
-      screenOptions={{
-        tabBarStyle: { height: "auto", backgroundColor: "#1E1E1E" }, // Adjust the height of the tab bar
-        tabBarLabelStyle: { fontSize: 12 }, // Adjust the font size of tab labels
-        tabBarIndicatorStyle: { height: 2 }, // Change the indicator thickness
-        tabBarItemStyle: { width: "auto" }, // Adjust the width of the tab bar items
-      }}
-    >
-      <MaterialTopTabs.Screen name="popular" options={{ title: "Popular" }} />
-      <MaterialTopTabs.Screen name="web" options={{ title: "Web" }} />
-      <MaterialTopTabs.Screen name="devops" options={{ title: "Devops" }} />
-      
-    </MaterialTopTabs>
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        {/* Define the screens for the navigation stack */}
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+       
+      </Stack>
+    </ThemeProvider>
   );
 }

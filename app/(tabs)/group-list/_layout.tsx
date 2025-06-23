@@ -10,12 +10,22 @@ export default function GroupListTabLayout() {
         tabBarLabelStyle: { fontSize: 12 }, // Adjust the font size of tab labels
         tabBarIndicatorStyle: { height: 2 }, // Change the indicator thickness
         tabBarLabel: ({ focused }) => {
-          const title =
-            route.name === "(all-group)"
-              ? "All Group"
-              : route.name === "(my-group)"
-              ? "My Group"
-              : route.name;
+          console.log("route", route.name);
+          let title = "";
+          switch (route.name) {
+            case "(all-group)":
+              title = "All Group";
+              break;
+            case "(my-group)":
+              title = "My Group";
+              break;
+            case "(joined-group)":
+              title = "Joined Group";
+              break;
+            default:
+              title = "Group";
+              break;
+          }
 
           return focused ? (
             <LinearGradient
@@ -51,6 +61,10 @@ export default function GroupListTabLayout() {
       <MaterialTopTabs.Screen
         name="(my-group)"
         options={{ title: "My Group" }}
+      />
+      <MaterialTopTabs.Screen
+        name="(joined-group)"
+        options={{ title: "Joined Group" }}
       />
     </MaterialTopTabs>
   );

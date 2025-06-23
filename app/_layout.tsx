@@ -9,7 +9,14 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, StyleSheet, Platform, Text, Modal, ActivityIndicator } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Platform,
+  Text,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Image } from "expo-image";
 import LeftHeader from "@/components/tabs/LeftHeader";
@@ -27,15 +34,14 @@ import { getFCMToken, requestUserPermission } from "@/firebase/messaging";
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
 
-
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const userLoggedIn = false; // Replace with actual user authentication check
   const [loaded] = useFonts({
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
-  
-  injectStoreToAxiosInterceptor(store)
+
+  injectStoreToAxiosInterceptor(store);
 
   useEffect(() => {
     if (loaded) {
@@ -52,7 +58,9 @@ export default function RootLayout() {
       <Provider store={store}>
         <LoadingSpinner></LoadingSpinner>
         {/* // change to dark later */}
-        <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
+        <ThemeProvider
+          value={colorScheme === "light" ? DarkTheme : DefaultTheme}
+        >
           {/* <StatusBar style="auto" /> */}
           {/* <SafeAreaView style={styles.safeArea}> */}
           <View style={styles.container}>
@@ -67,47 +75,52 @@ export default function RootLayout() {
                 name="(tabs)"
                 options={{
                   headerShown: true,
-                  headerStyle:{
+                  headerStyle: {
                     backgroundColor: "#1E1E1E",
                   },
-                  headerLeft: () => <LeftHeader/>,
+                  headerLeft: () => <LeftHeader />,
                   headerTitle: "",
-                  headerRight: () => <RightHeader/>,
+                  headerRight: () => <RightHeader />,
                 }}
               />
-              <Stack.Screen name="profile" 
+              <Stack.Screen
+                name="profile"
                 options={{
                   headerShown: false,
                 }}
               />
-              <Stack.Screen name="blog" 
+              <Stack.Screen
+                name="blog"
                 options={{
                   headerShown: true,
-                  headerStyle:{
+                  headerStyle: {
                     backgroundColor: "#1E1E1E",
                   },
-                  headerLeft: () => <LeftHeader/>,
+                  headerLeft: () => <LeftHeader />,
                   headerTitle: "",
-                  headerRight: () => <RightHeader/>,
+                  headerRight: () => <RightHeader />,
                 }}
               />
-              <Stack.Screen name="group" 
+              <Stack.Screen
+                name="group"
                 options={{
                   headerShown: true,
-                  headerStyle:{
+                  headerStyle: {
                     backgroundColor: "#1E1E1E",
                   },
-                  headerLeft: () => <LeftHeader/>,
+                  headerLeft: () => <LeftHeader />,
                   headerTitle: "",
-                  headerRight: () => <RightHeader/>,
+                  headerRight: () => <RightHeader />,
                 }}
               />
-              <Stack.Screen name="notifications" 
+              <Stack.Screen
+                name="notifications"
                 options={{
                   headerShown: false,
                 }}
               />
-              <Stack.Screen name="search-tab"
+              <Stack.Screen
+                name="search-tab"
                 options={{
                   headerShown: true,
                   title: "Search",
@@ -135,5 +148,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: Platform.OS === "android" ? 0 : 0, // Prevent status bar overlap on Android
-  }
+  },
 });

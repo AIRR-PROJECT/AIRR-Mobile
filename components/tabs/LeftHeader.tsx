@@ -1,140 +1,223 @@
-import { SearchType } from "@/enums/search_type.enum";
-import { FontAwesome } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import {
-  FlatList,
+  SectionList,
   Modal,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
   Text,
-  SafeAreaView,
+  Dimensions,
 } from "react-native";
-import { Dimensions } from "react-native";
-const icon_air_tech = require("@/assets/images/logo/logo_icon-air-tech_small.svg");
-export default function LeftHeader() {
-  // Add variable to get type of searchType, with redux or context
-  // If user is in page my feed, then searchType is SearchType.BLOG
-  // If user is in page group, then searchType is SearchType.GROUP
-  // This line here is for testing purpose, remove it after implementing the logic
-  const searchType = SearchType.BLOG;
+import { useState, useEffect } from "react";
+import { useRouter } from "expo-router";
+import {
+  SearchBlogComponent,
+  SearchGroupComponent,
+  SearchUserComponent,
+} from "../left_header/SearchComponent";
+import { loremIpsum } from "lorem-ipsum";
 
+// 1. Define types
+type BlogItem = {
+  type: "blog";
+  thumbnail: string;
+  title: string;
+  description: string;
+};
+
+type GroupItem = {
+  type: "group";
+  image: string;
+  name: string;
+  description: string;
+  numberOfMembers: number;
+};
+
+type UserItem = {
+  type: "user";
+  avatar: string;
+  name: string;
+};
+
+type SearchItem = BlogItem | GroupItem | UserItem;
+
+type Section = {
+  title: string;
+  data: SearchItem[];
+};
+
+export default function LeftHeader() {
   const [visible, setVisible] = useState(false);
-  const route = useRouter();
+  const router = useRouter();
+
   const handleSearchPress = () => {
-    // Navigate to the search page
     console.log("Search button pressed");
-    // route.push("/search-tab");
     setVisible(true);
   };
 
-  console.log("searchType", searchType);
   return (
     <View style={styles.container}>
-      {/* <Image source={icon_air_tech} style={styles.image} contentFit="contain" /> */}
-      {/* Search button */}
-      {searchType != SearchType.NONE && (
-        <TouchableOpacity
-          onPress={handleSearchPress}
-          style={styles.searchBarButton}
-        >
-          <FontAwesome name="search" size={20} color="#B9FF66" />
-          <Text style={styles.searchBarText}>
-            {searchType === SearchType.BLOG
-              ? "Search blog..."
-              : "Search group..."}
-          </Text>
-        </TouchableOpacity>
-      )}
-      {/* modal */}
-      <SearchScreen
-        visible={visible}
-        onClose={() => setVisible(false)}
-        searchType={searchType}
-      />
+      <TouchableOpacity
+        onPress={handleSearchPress}
+        style={styles.searchBarButton}
+      >
+        <FontAwesome name="search" size={20} color="#B9FF66" />
+        <Text style={styles.searchBarText}>Search ...</Text>
+      </TouchableOpacity>
+      <SearchScreen visible={visible} onClose={() => setVisible(false)} />
     </View>
   );
 }
-// This based on search API from backend
-// Can search both blog and group
+
 function SearchScreen({
   visible,
   onClose,
-  searchType = SearchType.BLOG,
 }: {
   visible: boolean;
   onClose: () => void;
-  searchType?: SearchType;
 }) {
   const [searchText, setSearchText] = useState("");
+  const [items, setItems] = useState<SearchItem[]>([]);
+  const [sections, setSections] = useState<Section[]>([]);
 
-  // Mock data for search results
-  const results = [
-    "AirTech One",
-    "AirTech Two",
-    "AirTech Three",
-    "AirTech Four",
-    "AirTech Five",
-  ];
-  if (searchType === SearchType.NONE) return null;
+  // 2. Simulate fetching mixed data
+  useEffect(() => {
+    const fetchData = async () => {
+      // Simulated API response
+      const response: SearchItem[] = [
+        {
+          type: "blog",
+          thumbnail: "https://picsum.photos/200/300",
+          title: "AirTech One",
+          description: loremIpsum({ count: 100 }),
+        },
+        {
+          type: "group",
+          image: "https://picsum.photos/200/500",
+          name: "AirTech Group",
+          description: "This is a group about AirTech",
+          numberOfMembers: 100,
+        },
+        {
+          type: "user",
+          avatar: "https://picsum.photos/200/400",
+          name: "John Doe",
+        },
+        {
+          type: "blog",
+          thumbnail: "https://picsum.photos/300/300",
+          title: "DevLog",
+          description: "Development journey",
+        },
+        {
+          type: "group",
+          image: "https://picsum.photos/300/500",
+          name: "Tech Enthusiasts",
+          description: loremIpsum({ count: 50 }),
+          numberOfMembers: 200,
+        },
+        {
+          type: "user",
+          avatar: "https://picsum.photos/400/400",
+          name: "Jane Smith",
+        },
+      ];
+      setItems(response);
+    };
+
+    fetchData();
+  }, []);
+
+  // 3. Group into sections when items or searchText changes
+  // Change the search logic to filter based on searchText
+  useEffect(() => {
+    const filtered = items.filter((item) =>
+      JSON.stringify(item).toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    const grouped: Record<string, SearchItem[]> = {
+      Blogs: [],
+      Groups: [],
+      Users: [],
+    };
+
+    filtered.forEach((item) => {
+      if (item.type === "blog") grouped["Blogs"].push(item);
+      else if (item.type === "group") grouped["Groups"].push(item);
+      else if (item.type === "user") grouped["Users"].push(item);
+    });
+
+    const result: Section[] = Object.entries(grouped)
+      .filter(([_, data]) => data.length > 0)
+      .map(([title, data]) => ({ title, data }));
+
+    setSections(result);
+  }, [items, searchText]);
+
+  const renderItem = ({ item }: { item: SearchItem }) => {
+    switch (item.type) {
+      case "blog":
+        return <SearchBlogComponent {...item} />;
+      case "group":
+        return <SearchGroupComponent {...item} />;
+      case "user":
+        return <SearchUserComponent {...item} />;
+    }
+  };
+
   return (
-    <Modal visible={visible} transparent={true} animationType="fade">
+    <Modal visible={visible} transparent animationType="fade">
       <View style={styles.modalContainer}>
-        {/* Header with Search Bar and Close Button */}
         <View style={styles.header}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <AntDesign name="arrowleft" size={24} color="#B9FF66" />
+          </TouchableOpacity>
           <TextInput
             style={styles.searchInput}
-            placeholder={
-              searchType === SearchType.BLOG
-                ? "Search blog..."
-                : "Search group..."
-            }
+            placeholder="Search ..."
             placeholderTextColor="#999"
             value={searchText}
             onChangeText={setSearchText}
             autoFocus
           />
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <FontAwesome name="close" size={24} color="#333" />
-          </TouchableOpacity>
         </View>
 
-        {/* Search results list */}
-        <FlatList
-          data={results.filter((item) =>
-            item.toLowerCase().includes(searchText.toLowerCase())
-          )}
-          keyExtractor={(item) => item}
-          renderItem={({ item }) => (
-            <View style={styles.resultItem}>
-              <Text>{item}</Text>
-            </View>
-          )}
-          contentContainerStyle={styles.resultsContainer}
-        />
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#fff",
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            paddingBottom: 16,
+          }}
+        >
+          <SectionList
+            sections={sections}
+            keyExtractor={(item, index) => item.type + index}
+            renderItem={renderItem}
+            renderSectionHeader={({ section: { title } }) => (
+              <View style={styles.sectionHeaderContainer}>
+                <Text style={styles.sectionHeader}>{title}</Text>
+              </View>
+            )}
+            contentContainerStyle={styles.resultsContainer}
+            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+            SectionSeparatorComponent={() => <View style={{ height: 10 }} />}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
       </View>
     </Modal>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
     width: Dimensions.get("window").width / 2.5,
-  },
-  image: {
-    width: 100,
-    height: 15,
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#1E1E1E",
-    borderRadius: 8,
   },
   searchBarButton: {
     flexDirection: "row",
@@ -162,7 +245,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingTop: 8, // Status bar height (adjust as needed)
+    paddingTop: 16,
     paddingBottom: 10,
     backgroundColor: "#1E1E1E",
   },
@@ -172,7 +255,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#232323",
     borderRadius: 8,
     paddingHorizontal: 10,
-    marginRight: 10,
+    marginLeft: 10,
     color: "#B9FF66",
     borderColor: "#B9FF66",
     borderWidth: 1,
@@ -183,9 +266,16 @@ const styles = StyleSheet.create({
   resultsContainer: {
     padding: 16,
   },
-  resultItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+    paddingVertical: 8,
+  },
+  sectionHeaderContainer: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: "#a1f7b6",
+    borderRadius: 8,
   },
 });

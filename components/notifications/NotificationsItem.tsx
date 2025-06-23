@@ -91,7 +91,7 @@ export default function NotificationsItem({
         const interactionData = data as BlogInteractNotification
 
         if (interactionData.interact_type === InteractType.Comment) {
-          route.push(`/blog/comment-page?blogId=${interactionData.blog_id}&commentId=${interactionData.comment_id}`)
+          route.push(`/blog?userBlogId=${interactionData.blog_id}&userBlogCommentId=${interactionData.comment_id}`)
         }
         else {
           route.push(`/blog?userBlogId=${interactionData.blog_id}`)

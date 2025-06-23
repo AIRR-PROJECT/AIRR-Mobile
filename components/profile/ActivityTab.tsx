@@ -3,10 +3,14 @@ import { View, StyleSheet } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import { ThemedText } from "../ThemedText";
 import { Divider } from "@rneui/base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BlogActionHistory } from "@/interfaces/blogInterface";
 import { FlashList } from "@shopify/flash-list";
 import { BlogActionHistoryComponent } from "./BlogActionHistoryComponent";
+import { useAppDispatch } from "@/redux/hook";
+import { getUserActivity } from "@/redux/slices/authSlice";
+import { UserActivity } from "@/interfaces/userInterface";
+import { formatDistanceStrict, formatDistanceToNow, formatRelative } from "date-fns";
 
 const barData = [
   { value: 140, label: "Mon" },
@@ -32,6 +36,7 @@ const data: (string | BlogActionHistory)[] = [
   {
     _id: "1",
     Title: "Blog 1",
+    CommentID: null,
     BackgroundURL: "https://picsum.photos/600",
     Action: "Liked",
     Timestamp: "2021-11-12T00:00:00.000Z",
@@ -39,6 +44,7 @@ const data: (string | BlogActionHistory)[] = [
   {
     _id: "2",
     Title: "Blog 2",
+    CommentID: "comment1",
     BackgroundURL: "https://picsum.photos/600",
     Action: "Commented",
     Timestamp: "2021-11-12T00:00:00.000Z",
@@ -47,12 +53,53 @@ const data: (string | BlogActionHistory)[] = [
   {
     _id: "3",
     Title: "Blog 3",
+    CommentID: null,
     BackgroundURL: "https://picsum.photos/600",
     Action: "Liked",
     Timestamp: "2021-11-12T00:00:00.000Z",
   },
 ];
 export default function ActivityTab() {
+  const dispatch = useAppDispatch()
+
+  const [listData, setListData] = useState<(string | BlogActionHistory)[]>([])
+
+  useEffect(() => {
+    dispatch(getUserActivity()).then((res) => {
+      let activities = res.payload as UserActivity[]
+
+      let data: (string | BlogActionHistory)[] = []
+      let currentDay = ""
+      activities = activities.sort((a, b) => new Date(b.ActivityDate).getTime() - new Date(a.ActivityDate).getTime())
+      activities.map((act) => {
+        let distance = formatDistanceStrict(new Date(act.ActivityDate), new Date(), { addSuffix: true })
+        let distanceArr = distance.split(' ')
+        if (["second", "seconds", "minute", "minutes", "hour", "hours"].indexOf(distanceArr[1]) != -1) {
+          distance = "Today"
+        }
+        if (distanceArr[1] == "day") {
+          distance = "Yesterday"
+        }
+        if (currentDay == "" || currentDay != distance) {
+          currentDay = distance
+          data.push(currentDay)
+        }
+        
+        const displayAct: BlogActionHistory = {
+          _id: act.Blog._id,
+          Title: act.Blog.Title,
+          CommentID: act.CommentID,
+          BackgroundURL: act.Blog.CoverURL,
+          Action: act.Type,
+          Timestamp: new Date(act.ActivityDate).toString()
+        }
+        data.push(displayAct)
+      })
+
+      setListData(data)
+    })
+  }, [])
+
   return (
     <View style={styles.container}>
       {/* Time bar graph */}
@@ -118,7 +165,7 @@ export default function ActivityTab() {
       {/* User Action History */}
       <View style={{width: "100%"}}>
         <FlashList
-          data={data}
+          data={listData}
           renderItem={({ item }) => {
             if (typeof item === "string") {
               return <ThemedText style={styles.dateHeader}>{item}</ThemedText>;

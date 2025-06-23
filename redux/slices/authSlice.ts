@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { ChangeCurrentPasswordCredentials, LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { PartialUser, UpdateAvatar, UpdateUser, User, User1 } from "@/interfaces/userInterface";
+import { PartialUser, UpdateAvatar, UpdateUser, User, User1, UserActivity } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
 import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
@@ -367,6 +367,25 @@ export const changeCurrentPassword = createAsyncThunk<void, ChangeCurrentPasswor
 
             if (res.data.success) {
                 ToastAndroid.showWithGravity("Current password changed successfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
+export const getUserActivity = createAsyncThunk(
+    'auth/getUserLikeActivity', 
+    async (_, thunkAPI) => {
+        try {
+            const res = await api.get(`users/get-activity-all`)
+
+            if (res.data.success) {
+                return res.data.data.activities as UserActivity[]
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)

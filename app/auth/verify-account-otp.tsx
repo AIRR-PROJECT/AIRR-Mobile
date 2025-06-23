@@ -39,7 +39,7 @@ export default function SignUpScreen() {
     if (isLoggedIn && isAccountVerified) {
       router.back()
     }
-  }, [isAccountVerified])
+  }, [isLoggedIn, isAccountVerified])
   const onSubmit = (data: any) => {
     const verifyData: VerifyAccountCredentials = {
       email: searchParams.resendEmail,

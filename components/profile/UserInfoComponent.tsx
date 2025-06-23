@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
-type UserInfo = Pick<User, "username" | "avatarURL" | "firstName" | "lastName" | "joinDate">
+type UserInfo = Pick<User, "username" | "avatarURL" | "firstName" | "lastName" | "joinDate" | "dateOfBirth">
 
 type UserInfoProps = UserInfo & { isOwnProfile: boolean };
 
@@ -18,7 +18,7 @@ export default function UserInfoComponent({
   avatarURL,
   firstName,
   lastName,
-  joinDate,
+  dateOfBirth,
   isOwnProfile
   // followers,
   // following,
@@ -69,7 +69,7 @@ export default function UserInfoComponent({
           <ThemedText style={styles.userUsername}>
             @{username.slice(0, 8)}
           </ThemedText>
-          <ThemedText style={styles.userDateJoined}> . {new Date(joinDate!).toDateString()}</ThemedText>
+          <ThemedText style={styles.userDateJoined}> . {new Date(dateOfBirth!).toLocaleDateString()}</ThemedText>
         </View>
         {/* user followers and following */}
         <View style={{ flexDirection: "row", gap: 10 }}>

@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { BlogActionHistory } from "@/interfaces/blogInterface";
 import { ThemedText } from "../ThemedText";
 import { formatISODate } from "@/utils/dateConvert";
+import { router } from "expo-router";
 const tempImage = "https://picsum.photos/500";
 
 
@@ -11,12 +12,22 @@ const tempImage = "https://picsum.photos/500";
 export function BlogActionHistoryComponent({
   _id,
   Title,
+  CommentID,
   BackgroundURL,
   Action,
   Timestamp,
 }: BlogActionHistory) {
+  const handleOnPress = () => {
+    if (Action == "Comment") {
+      router.push(`/blog?userBlogId=${_id}&userBlogCommentId=${CommentID}`)
+    }
+    else {
+      router.push(`/blog?userBlogId=${_id}`)
+    }
+  }
+
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={handleOnPress}>
       {/* Temp Image (ask later if it needed or not)*/}
       {/* <Image source={{ uri: tempImage }} style={{position: "absolute", right:50}} /> */}
  

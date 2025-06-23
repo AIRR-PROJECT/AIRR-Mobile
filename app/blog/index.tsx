@@ -241,6 +241,7 @@ export default function BlogScreen() {
   const searchParams = useLocalSearchParams<{
     aiBlogId: string;
     userBlogId: string;
+    userBlogCommentId: string;
   }>();
   // if (searchParams.aiBlogId) {
   
@@ -324,6 +325,11 @@ export default function BlogScreen() {
   useEffect(() => {
     setCommentsDetail(currentBlogComments);
   }, [currentBlogComments]);
+
+  useEffect(() => {
+    if (currentBlogComments != null && currentBlogComments != undefined && currentBlogComments.length != 0 && searchParams.userBlogCommentId != undefined && searchParams.userBlogCommentId != "")
+      route.push(`/blog/comment-page?blogId=${searchParams.userBlogId}&commentId=${searchParams.userBlogCommentId}`);
+  }, [currentBlogComments, searchParams.userBlogCommentId]);
 
   useEffect(() => {
     console.log(`Comment added: ${commentAdded}`)

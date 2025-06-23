@@ -235,7 +235,7 @@ export default function CommentBlogScreen() {
   }, []);
 
   useEffect(() => {
-    if (currentBlogComments.length != 0 && searchParams.commentId != undefined && searchParams.commentId != "") {
+    if (currentBlogComments != null && currentBlogComments != undefined && currentBlogComments.length != 0 && searchParams.commentId != undefined && searchParams.commentId != "") {
       currentBlogComments.forEach((value, index) => {
         if (value._id == searchParams.commentId) {
           flatListRef.current?.scrollToIndex({ animated: true, index: index })
@@ -386,6 +386,13 @@ export default function CommentBlogScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
+          initialNumToRender={currentBlogComments ? currentBlogComments.length : 100}
+          onScrollToIndexFailed={info => {
+            const wait = new Promise(resolve => setTimeout(resolve, 500));
+            wait.then(() => {
+              flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+            });
+          }}
         />
       </View>
     </View>

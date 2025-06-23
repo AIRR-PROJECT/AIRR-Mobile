@@ -18,7 +18,7 @@ export default function LoadingSpinner() {
           overlayColor="#3d3d3d66"
           // textStyle={styles.loadingSpinnerText}
           customIndicator={
-            <View>
+            <View style={styles.frame}>
               <ActivityIndicator size={"large"} color={"#b9ff66"}/>
               <Text style={styles.loadingSpinnerText}>{message}</Text>
 
@@ -42,6 +42,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%'
+  },
+  frame: {
+    backgroundColor: "#878487CC",
+    padding: 15,
+    paddingTop: 45,
+    borderRadius: 10
   },
   loadingSpinnerText: {
     color: "#b9ff66",

@@ -57,8 +57,10 @@ export default function LoginScreen() {
       dispatch(setRememberedSignUpUser(data.email))
     }
 
-    dispatch(login(data)).then(() => {
-      dispatch(getUserInfo())
+    dispatch(login(data)).then((res) => {
+      if ((res.payload as any).success === true) {
+        dispatch(getUserInfo())
+      }
     })
     // Alert.alert("Login Successful", `Welcome, ${data.email}`);
     // router.replace("/(tabs)");

@@ -21,25 +21,23 @@ let fields: GroupField[] = [];
 // Change the impletation to group that user joined
 export default function MyGroupTab() {
   const dispatch = useAppDispatch();
-  const { popularFields } = useAppSelector((state) => state.group);
+  // const { popularFields } = useAppSelector((state) => state.group);
 
   const [selectedId, setSelectedId] = useState("1");
 
-  useEffect(() => {
-    dispatch(getGroupPopularFields());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getGroupPopularFields());
+  // }, []);
+
+  // useEffect(() => {
+  //   if (popularFields) {
+  //     // console.log(popularFields)
+  //     fields.push(...popularFields);
+  //   }
+  // }, [popularFields]);
 
   useEffect(() => {
-    if (popularFields) {
-      // console.log(popularFields)
-      fields.push(...popularFields);
-    }
-  }, [popularFields]);
-
-  useEffect(() => {
-    if (selectedId === "1") {
-      dispatch(getPopularGroups());
-    }
+    console.log(selectedId)
   }, [selectedId]);
 
   console.log("selectedId", selectedId);
@@ -47,7 +45,7 @@ export default function MyGroupTab() {
   return (
     <View style={styles.container}>
       {/* list tags */}
-      <View style={styles.rowWrapper}>
+      {/* <View style={styles.rowWrapper}>
         <FlatList
           data={fields}
           renderItem={({ item }) => (
@@ -70,16 +68,16 @@ export default function MyGroupTab() {
               </Text>
             </TouchableOpacity>
           )}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => index.toString()}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
         />
         <FontAwesome name="caret-right" size={30} color="white" />
-      </View>
+      </View> */}
       {/* Content based on selected tabs */}
      
-      <GroupTab fieldID={selectedId} />
+      <GroupTab type="my"/>
      
     </View>
   );

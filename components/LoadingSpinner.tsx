@@ -58,14 +58,14 @@ const styles = StyleSheet.create({
     textShadowRadius: 1
   },
   cancelButton: {
-    backgroundColor: "#878787",
+    backgroundColor: "white",
     padding: 10,
     borderRadius: 10,
     marginTop: 10,
     marginBottom: 20,
   },
   cancelButtonText: {
-    color: "#ffffff",
+    color: "black",
     textAlign: "center"
   }
 });

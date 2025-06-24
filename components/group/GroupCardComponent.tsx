@@ -15,6 +15,7 @@ type GroupCardComponentProps = {
   name: string;
   id: string;
   members: number;
+  isJoined: boolean;
   style?: StyleProp<ViewStyle>;
   // later add onPress function
   // onPress: () => void;
@@ -24,6 +25,7 @@ export default function GroupCardComponent({
   name,
   id,
   members,
+  isJoined,
   style,
 }: GroupCardComponentProps) {
   const route = useRouter();
@@ -61,9 +63,11 @@ export default function GroupCardComponent({
         </View>
       </View>
       {/* Join button */}
-      <TouchableOpacity style={styles.joinButton} onPress={handleJoinPress}>
-        <Text style={styles.joinButtonText}>Join</Text>
-      </TouchableOpacity>
+      {!isJoined ?
+        <TouchableOpacity style={styles.joinButton} onPress={handleJoinPress}>
+          <Text style={styles.joinButtonText}>Join</Text>
+        </TouchableOpacity>
+      : null}
     </TouchableOpacity>
   );
 }

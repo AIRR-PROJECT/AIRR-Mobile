@@ -12,6 +12,11 @@ import { getUserActivity } from "@/redux/slices/authSlice";
 import { UserActivity } from "@/interfaces/userInterface";
 import { formatDistanceStrict, formatDistanceToNow, formatRelative } from "date-fns";
 
+type ChartType = {
+  value: number,
+  label: string
+}
+
 const barData = [
   { value: 140, label: "Mon" },
   { value: 200, label: "Tue" },
@@ -63,15 +68,51 @@ export default function ActivityTab() {
   const dispatch = useAppDispatch()
 
   const [listData, setListData] = useState<(string | BlogActionHistory)[]>([])
+  const [chartData, setChartData] = useState<ChartType[]>([])
 
   useEffect(() => {
     dispatch(getUserActivity()).then((res) => {
       let activities = res.payload as UserActivity[]
 
-      let data: (string | BlogActionHistory)[] = []
+      let monSum = 0
+      let tueSum = 0
+      let wedSum = 0
+      let thuSum = 0
+      let friSum = 0
+      let satSum = 0
+      let sunSum = 0
+
+      let listData: (string | BlogActionHistory)[] = []
       let currentDay = ""
       activities = activities.sort((a, b) => new Date(b.ActivityDate).getTime() - new Date(a.ActivityDate).getTime())
       activities.map((act) => {
+        // Bar chart data
+        const day = new Date(act.ActivityDate).getDay()
+        switch (day) {
+          case 0:
+            sunSum += 5
+            break
+          case 1:
+            monSum += 5
+            break
+          case 2:
+            tueSum += 5
+            break
+          case 3:
+            wedSum += 5
+            break
+          case 4:
+            thuSum += 5
+            break
+          case 5:
+            friSum += 5
+            break
+          case 6:
+            satSum += 5
+            break
+        }
+
+        // FlatList data
         let distance = formatDistanceStrict(new Date(act.ActivityDate), new Date(), { addSuffix: true })
         let distanceArr = distance.split(' ')
         if (["second", "seconds", "minute", "minutes", "hour", "hours"].indexOf(distanceArr[1]) != -1) {
@@ -82,7 +123,7 @@ export default function ActivityTab() {
         }
         if (currentDay == "" || currentDay != distance) {
           currentDay = distance
-          data.push(currentDay)
+          listData.push(currentDay)
         }
         
         const displayAct: BlogActionHistory = {
@@ -93,10 +134,23 @@ export default function ActivityTab() {
           Action: act.Type,
           Timestamp: new Date(act.ActivityDate).toString()
         }
-        data.push(displayAct)
+        listData.push(displayAct)
       })
 
-      setListData(data)
+      // Set bar chart data
+      const chartData: ChartType[] = [
+        { value: monSum, label: "Mon" },
+        { value: tueSum, label: "Tue" },
+        { value: wedSum, label: "Wed" },
+        { value: thuSum, label: "Thu" },
+        { value: friSum, label: "Fri" },
+        { value: satSum, label: "Sat" },
+        { value: sunSum, label: "Sun" }
+      ]
+      setChartData(chartData)
+
+      // Set FlatList data
+      setListData(listData)
     })
   }, [])
 
@@ -119,7 +173,7 @@ export default function ActivityTab() {
           backgroundColor={"transparent"}
           focusedBarConfig={{ color: "green" }}
           focusBarOnPress={true}
-          data={barData}
+          data={chartData}
           frontColor={"#fff"}
           barWidth={14}
           height={250}

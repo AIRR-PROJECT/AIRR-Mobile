@@ -69,7 +69,7 @@ export default function GroupPopularTab() {
               </Text>
             </TouchableOpacity>
           )}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => item._id + index}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
@@ -77,7 +77,7 @@ export default function GroupPopularTab() {
         <FontAwesome name="caret-right" size={30} color="white" />
       </View>
       {/* Content based on selected tabs */}
-      {selectedId === "1" ? <PopularGroupTab /> : <GroupTab fieldID={selectedId}/>}
+      {selectedId === "1" ? <PopularGroupTab /> : <GroupTab fieldID={selectedId} type="all"/>}
     </View>
   );
 }

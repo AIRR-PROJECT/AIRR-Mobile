@@ -306,35 +306,40 @@ export const getPartialUserInfo = createAsyncThunk(
 export const updateUser = createAsyncThunk(
     'user/update',
     async (userData: User, thunkAPI) => {
-        const inputData: UpdateUser = {
-            userID: userData._id,
-            firstname: userData.firstName ?? "",
-            lastname: userData.lastName ?? "",
-            phone: userData.phoneNumber?.toString() ?? "",
-            dob: userData.dateOfBirth ?? "",
-            studentID: userData.profile.studentID ?? "",
-            department: userData.profile.department ?? "",
-            program: userData.profile.program,
-            entry_year: new Date().getFullYear() - userData.profile.year,
-            gpa: userData.profile.gpa ?? 0
+        try {
+            const inputData: UpdateUser = {
+                userID: userData._id,
+                firstname: userData.firstName ?? "",
+                lastname: userData.lastName ?? "",
+                phone: userData.phoneNumber?.toString() ?? "",
+                dob: userData.dateOfBirth ?? "",
+                studentID: userData.profile.studentID ?? "",
+                department: userData.profile.department ?? "",
+                program: userData.profile.program?? "",
+                entry_year: userData.profile.year ? new Date().getFullYear() - userData.profile.year : 0,
+                gpa: userData.profile.gpa ?? 0
+            }
+            if (userData.profile.link.LinkedIn) {
+                inputData.linkedIn = userData.profile.link.LinkedIn
+            }
+            if (userData.profile.link.Github) {
+                inputData.github = userData.profile.link.Github
+            }
+            if (userData.profile.link.Facebook) {
+                inputData.facebook = userData.profile.link.Facebook
+            }
+    
+            const res = await api.post("users/update", inputData)
+            
+            if (res.data.success) {
+                // thunkAPI.dispatch(setCurrentUser(res.data.data))
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data.message)
+            }
         }
-        if (userData.profile.link.LinkedIn) {
-            inputData.linkedIn = userData.profile.link.LinkedIn
-        }
-        if (userData.profile.link.Github) {
-            inputData.github = userData.profile.link.Github
-        }
-        if (userData.profile.link.Facebook) {
-            inputData.facebook = userData.profile.link.Facebook
-        }
-
-        const res = await api.post("users/update", inputData)
-        
-        if (res.data.success) {
-            // thunkAPI.dispatch(setCurrentUser(res.data.data))
-        }
-        else {
-            return thunkAPI.rejectWithValue(res.data.message)
+        catch (err) {
+            return thunkAPI.rejectWithValue(err)
         }
     }
 )
@@ -721,7 +726,7 @@ const authSlice = createSlice({
                 console.log("User info updated")
             })
             .addCase(updateUser.rejected, (state, action) => {
-
+                console.log(action.error)
             })
             .addCase(updateAvatar.fulfilled, (state, action) => {
                 ToastAndroid.showWithGravity("Avatar updated", ToastAndroid.LONG, ToastAndroid.BOTTOM)

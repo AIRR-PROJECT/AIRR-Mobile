@@ -1,6 +1,11 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { View, Text, FlatList, StyleSheet, TextInput } from "react-native";
 import { Image } from "expo-image";
+import { useEffect, useRef, useState } from "react";
+import { useAppDispatch } from "@/redux/hook";
+import { getMemberList } from "@/redux/slices/groupSlice";
+import { useLocalSearchParams } from "expo-router";
+import { GroupMember } from "@/interfaces/groupInterface";
 const mockModerator = {
   name: "John Doe",
   role: "Moderator",
@@ -30,19 +35,55 @@ const mockGroupMembers = [
   },
 ];
 // sort the list by role Moderator, Admin, Member
-const sortedGroupMembers = [mockModerator, mockAdmin, ...mockGroupMembers];
-type GroupMember = {
-  name: string;
-  role: string;
-  avatar: string;
-};
+// const sortedGroupMembers = [mockModerator, mockAdmin, ...mockGroupMembers];
+// type GroupMember = {
+//   name: string;
+//   role: string;
+//   avatar: string;
+// };
 
-type GroupMemberListProps = {
-  isUserInGroup: boolean;
-  groupList: GroupMember[];
-};
+// type GroupMemberListProps = {
+//   isUserInGroup: boolean;
+//   groupList: GroupMember[];
+// };
 // later remember to add the props
 export default function GroupMemberList() {
+  const dispatch = useAppDispatch()
+
+  const { groupID } = useLocalSearchParams<{ groupID: string }>()
+
+  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([])
+  const [filteredGroupMembers, setFilteredGroupMembers] = useState<GroupMember[]>([])
+  const searchText = useRef("")
+
+  useEffect(() => {
+    if (groupID) {
+      dispatch(getMemberList({ groupID })).then((res) => {
+        let sortOrder = ["Owner", "Admin", "Member"]
+        const groupMembers = res.payload as GroupMember[]
+        const sortedGroupMembers = groupMembers.sort((a, b) => sortOrder.indexOf(a.Role) - sortOrder.indexOf(b.Role))
+
+        setGroupMembers(sortedGroupMembers)
+        setFilteredGroupMembers(sortedGroupMembers)
+      })
+    }
+  }, [groupID])
+
+  const onHandleSearchTextChange = (val: string) => {
+    searchText.current = val
+  }
+
+  const onHandleSubmitEditing = () => {
+    if (searchText.current.length != 0) {
+      const filteredGroupMembers = groupMembers.filter((member) => member.MemberInfo.Username.toLowerCase().includes(searchText.current.toLowerCase()))
+
+      setFilteredGroupMembers(filteredGroupMembers)
+    }
+    else {
+      setFilteredGroupMembers(groupMembers)
+    }
+  }
+
   return (
     <View style={styles.container}>
       {/* Search bar */}
@@ -53,46 +94,48 @@ export default function GroupMemberList() {
             style={styles.textInput}
             placeholder={"Search member"}
             placeholderTextColor={"#8A94AC"}
+            onChangeText={onHandleSearchTextChange}
+            onSubmitEditing={onHandleSubmitEditing}
           />
         </View>
       </View>
       <FlatList
-        data={sortedGroupMembers}
+        data={filteredGroupMembers}
         renderItem={({ item }) => (
           <View
             style={[
               styles.memberContainer,
-              item.role === "Moderator"
-                ? { borderColor: colors.moderator }
-                : item.role === "Admin"
+              item.Role === "Admin"
                 ? { borderColor: colors.admin }
+                : item.Role === "Owner"
+                ? { borderColor: colors.owner }
                 : { borderColor: colors.member },
             ]}
           >
-            <Image source={item.avatar} style={styles.avatar} />
+            <Image source={item.MemberInfo.AvatarURL} style={styles.avatar} />
             <View>
-              <Text style={styles.memberName}>{item.name}</Text>
+              <Text style={styles.memberName}>{item.MemberInfo.Username}</Text>
               <View style={styles.roleWrapper}>
                 <Text
                   style={[
                     styles.role,
-                    item.role === "Moderator"
-                      ? { color: colors.moderator }
-                      : item.role === "Admin"
+                    item.Role === "Admin"
                       ? { color: colors.admin }
+                      : item.Role === "Owner"
+                      ? { color: colors.owner }
                       : { color: colors.member },
                   ]}
                 >
-                  {item.role}
+                  {item.Role}
                 </Text>
                 <FontAwesome6
                   name="bolt"
                   size={24}
                   color={
-                    item.role === "Moderator"
-                      ? colors.moderator
-                      : item.role === "Admin"
+                    item.Role === "Admin"
                       ? colors.admin
+                      : item.Role === "Owner"
+                      ? colors.owner
                       : colors.member
                   }
                 />
@@ -108,8 +151,8 @@ export default function GroupMemberList() {
   );
 }
 const colors = {
-  moderator: "#FFBA66",
-  admin: "#B9FF66",
+  admin: "#FFBA66",
+  owner: "#B9FF66",
   member: "#66DBFF",
 };
 const styles = StyleSheet.create({

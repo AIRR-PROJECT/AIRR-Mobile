@@ -129,7 +129,7 @@ GroupPageProps) {
     // so I just use the mock data for now
     // modify this url to /group/{groupID}/group-member-list if needed
     // route.push(`/group/${groupID}/group-member-list`);
-    route.push("/group/group-member-list");
+    route.push(`/group/group-member-list?groupID=${groupID}`);
   };
   const handleSearchTextChange = (val: string) => {
     searchText.current = val

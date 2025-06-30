@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
 import { AxiosResponse } from "axios";
-import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupTag, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupTag, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
 import { UserBlog } from "@/interfaces/blogInterface";
 
 const initialState = {
@@ -156,6 +156,25 @@ export const getGroupInfo = createAsyncThunk(
 
             if (res.data.success) {
                 return res.data.data as GroupDetailInfo
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getMemberList = createAsyncThunk(
+    'group/getMemberList',
+    async (data: {groupID: string}, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/getMemberList?groupID=${data.groupID}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.success as GroupMember[]
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)

@@ -17,13 +17,12 @@ export const injectStoreToAxiosInterceptor = (_store: Store) => {
   store = _store
 }
 
-const abortSignal = new AbortController()
-export const abortRequest = () => {
-    abortSignal.abort()
+let abortSignal: AbortController | undefined
+export let abortRequest = () => {
+    abortSignal?.abort()
 }
 
 const api = axios.create({
-    signal: abortSignal.signal,
     baseURL: API_URL,
     headers: {
       "Content-Type": "application/json",
@@ -32,6 +31,10 @@ const api = axios.create({
 
 // Attach access token to every request
 api.interceptors.request.use(async (config) => {
+    // Create new abort signal to be used to cancel the request at any time (as long as it is still being processed)
+    abortSignal = new AbortController()
+    config.signal = abortSignal.signal
+
     store.dispatch(showLoading("Now sending request..."))
 
     const accessToken = await SecureStore.getItemAsync('accessToken');
@@ -49,6 +52,8 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
     (response) => {
         store.dispatch(hideLoading())
+
+        abortSignal = undefined
         
         return response
     }, 
@@ -156,6 +161,7 @@ api.interceptors.response.use(
         //     Alert.alert("Error" + error.status, getReasonPhrase(error.status))
         // }
         store.dispatch(hideLoading())
+        abortSignal = undefined
         if (exception_failcode != -1) {
             ToastAndroid.showWithGravity(`(${exception_status}) (${exception_failcode}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
         }

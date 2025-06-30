@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Button,
 } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -49,6 +50,12 @@ import {
   getUserBlogLikeActivities,
   getUserBlogSaveActivities,
 } from "@/redux/slices/authSlice";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -236,7 +243,7 @@ export function debounce<T extends (...args: any[]) => void>(
   );
 }
 
-let isReactOnTimeout = false
+let isReactOnTimeout = false;
 export default function BlogScreen() {
   const searchParams = useLocalSearchParams<{
     aiBlogId: string;
@@ -244,7 +251,7 @@ export default function BlogScreen() {
     userBlogCommentId: string;
   }>();
   // if (searchParams.aiBlogId) {
-  
+
   const route = useRouter();
   const dispatch = useAppDispatch();
   const {
@@ -254,9 +261,9 @@ export default function BlogScreen() {
     isCurrentBlogLiked,
     isCurrentBlogDisliked,
     isCurrentBlogSaved,
-    commentAdded
+    commentAdded,
   } = useAppSelector((state) => state.blog);
-  const { user } = useAppSelector((state) => state.user)
+  const { user } = useAppSelector((state) => state.user);
 
   // Shared properties
   const [title, setTitle] = useState("Mock description");
@@ -266,35 +273,40 @@ export default function BlogScreen() {
   const [sections, setSections] = useState(mockSections);
   const [conclusion, setConclusion] = useState("This is concluded.");
   // User blog properties
-  const [author, setAuthor] = useState(mockAuthor)
-  const [tags, setTags] = useState(mockTags)
-  const reactTimeout = 500
-  const [likes, setLikes] = useState(123)
-  const [dislikes, setDislikes] = useState(123)
-  const [comments, setComments] = useState(123)
-  const [blogLiked, setBlogLiked] = useState<boolean>(false)
-  const [blogDisliked, setBlogDisliked] = useState<boolean>(false)
-  const [blogSaved, setBlogSaved] = useState<boolean>(false)
-  const [html, setHtml] = useState(mockHtml)
-  const [commentsDetail, setCommentsDetail] = useState(mockComments)
+  const [author, setAuthor] = useState(mockAuthor);
+  const [tags, setTags] = useState(mockTags);
+  const reactTimeout = 500;
+  const [likes, setLikes] = useState(123);
+  const [dislikes, setDislikes] = useState(123);
+  const [comments, setComments] = useState(123);
+  const [blogLiked, setBlogLiked] = useState<boolean>(false);
+  const [blogDisliked, setBlogDisliked] = useState<boolean>(false);
+  const [blogSaved, setBlogSaved] = useState<boolean>(false);
+  const [html, setHtml] = useState(mockHtml);
+  const [commentsDetail, setCommentsDetail] = useState(mockComments);
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId))
-    }
-    else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId))
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then((data) => {
-        setBlogLiked(data.payload as boolean)
-      })
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then((data) => {
-        setBlogDisliked(data.payload as boolean)
-      })
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then((data) => {
-        setBlogSaved(data.payload as boolean)
-      })
+      dispatch(getAIBlogDetail(searchParams.aiBlogId));
+    } else {
+      dispatch(getUserBlogDetail(searchParams.userBlogId));
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogLiked(data.payload as boolean);
+        }
+      );
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogDisliked(data.payload as boolean);
+        }
+      );
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogSaved(data.payload as boolean);
+        }
+      );
     }
     dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
   }, []);
@@ -327,18 +339,26 @@ export default function BlogScreen() {
   }, [currentBlogComments]);
 
   useEffect(() => {
-    if (currentBlogComments != null && currentBlogComments != undefined && currentBlogComments.length != 0 && searchParams.userBlogCommentId != undefined && searchParams.userBlogCommentId != "")
-      route.push(`/blog/comment-page?blogId=${searchParams.userBlogId}&commentId=${searchParams.userBlogCommentId}`);
+    if (
+      currentBlogComments != null &&
+      currentBlogComments != undefined &&
+      currentBlogComments.length != 0 &&
+      searchParams.userBlogCommentId != undefined &&
+      searchParams.userBlogCommentId != ""
+    )
+      route.push(
+        `/blog/comment-page?blogId=${searchParams.userBlogId}&commentId=${searchParams.userBlogCommentId}`
+      );
   }, [currentBlogComments, searchParams.userBlogCommentId]);
 
   useEffect(() => {
-    console.log(`Comment added: ${commentAdded}`)
+    console.log(`Comment added: ${commentAdded}`);
     if (commentAdded) {
-      setComments(comments + 1)
+      setComments(comments + 1);
 
-      dispatch(setCommentAdded(false))
+      dispatch(setCommentAdded(false));
     }
-  }, [commentAdded])
+  }, [commentAdded]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -348,19 +368,24 @@ export default function BlogScreen() {
     }, 2000); // 2 seconds refresh
 
     if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId))
-    }
-    else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId))
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then((data) => {
-        setBlogLiked(data.payload as boolean)
-      })
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then((data) => {
-        setBlogDisliked(data.payload as boolean)
-      })
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then((data) => {
-        setBlogSaved(data.payload as boolean)
-      })
+      dispatch(getAIBlogDetail(searchParams.aiBlogId));
+    } else {
+      dispatch(getUserBlogDetail(searchParams.userBlogId));
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogLiked(data.payload as boolean);
+        }
+      );
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogDisliked(data.payload as boolean);
+        }
+      );
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogSaved(data.payload as boolean);
+        }
+      );
     }
     dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
   };
@@ -371,261 +396,294 @@ export default function BlogScreen() {
 
   const handleLike = () => {
     if (blogLiked) {
-      setLikes(likes - 1)
+      setLikes(likes - 1);
 
-      setBlogLiked(false)
+      setBlogLiked(false);
 
-      dispatch(removeLikeBlog(searchParams.userBlogId))
-    }
-    else {
+      dispatch(removeLikeBlog(searchParams.userBlogId));
+    } else {
       if (blogDisliked) {
-        setLikes(likes + 1)
-        setDislikes(dislikes - 1)
+        setLikes(likes + 1);
+        setDislikes(dislikes - 1);
 
-        setBlogLiked(true)
-        setBlogDisliked(false)
+        setBlogLiked(true);
+        setBlogDisliked(false);
 
-        dispatch(dislikeToLikeBlog(searchParams.userBlogId))
-      }
-      else {
-        setLikes(likes + 1)
+        dispatch(dislikeToLikeBlog(searchParams.userBlogId));
+      } else {
+        setLikes(likes + 1);
 
-        setBlogLiked(true)
+        setBlogLiked(true);
 
-        dispatch(likeBlog(searchParams.userBlogId))
+        dispatch(likeBlog(searchParams.userBlogId));
       }
     }
   };
   const handleDislike = () => {
     if (blogDisliked) {
-      setDislikes(dislikes - 1)
+      setDislikes(dislikes - 1);
 
-      setBlogDisliked(false)
+      setBlogDisliked(false);
 
-      dispatch(removeDislikeBlog(searchParams.userBlogId))
-    }
-    else {
+      dispatch(removeDislikeBlog(searchParams.userBlogId));
+    } else {
       if (blogLiked) {
-        setDislikes(dislikes + 1)
-        setLikes(likes - 1)
+        setDislikes(dislikes + 1);
+        setLikes(likes - 1);
 
-        setBlogLiked(false)
-        setBlogDisliked(true)
-        
-        dispatch(likeToDislikeBlog(searchParams.userBlogId))
-      }
-      else {
-        setDislikes(dislikes + 1)
+        setBlogLiked(false);
+        setBlogDisliked(true);
 
-        setBlogDisliked(true)
+        dispatch(likeToDislikeBlog(searchParams.userBlogId));
+      } else {
+        setDislikes(dislikes + 1);
 
-        dispatch(dislikeBlog(searchParams.userBlogId))
+        setBlogDisliked(true);
+
+        dispatch(dislikeBlog(searchParams.userBlogId));
       }
     }
   };
   const handleBookmark = () => {
     if (blogSaved) {
-      dispatch(unsaveBlog(searchParams.userBlogId))
+      dispatch(unsaveBlog(searchParams.userBlogId));
 
-      setBlogSaved(false)
-    }
-    else {
-      dispatch(saveBlog(searchParams.userBlogId))
+      setBlogSaved(false);
+    } else {
+      dispatch(saveBlog(searchParams.userBlogId));
 
-      setBlogSaved(true)
+      setBlogSaved(true);
     }
   };
 
   const debounceHandleLike = debounce(() => {
-    handleLike()
-  }, 0.5)
+    handleLike();
+  }, 0.5);
 
   const debounceHandleDislike = debounce(() => {
-    handleDislike()
-  }, 0.5)
+    handleDislike();
+  }, 0.5);
 
   const debounceHandleBookmark = debounce(() => {
-    handleBookmark()
-  }, 0.5)
+    handleBookmark();
+  }, 0.5);
 
   useEffect(() => {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
   }, [isCurrentBlogSaved]);
 
   const [isWriteComment, setIsWriteComment] = useState(false);
-  
+
   const handleCommentPress = () => {
     route.push(`/blog/comment-page?blogId=${searchParams.userBlogId}`);
-  }
+  };
   // print the blog id for me to test
   useEffect(() => {
     console.log(`Blog ID: ${searchParams.userBlogId}`);
   }, [searchParams.userBlogId]);
+
+  // TODO: check if the blog is written by the user
+  const isUserWrittenBlog = false;
+  const refMoreSheet = useRef<BottomSheet>(null);
+  // callbacks
+  const handleSnapPress = useCallback((index: any) => {
+    refMoreSheet.current?.snapToIndex(index);
+  }, []);
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Back button */}
-      <View style={[styles.rowContainer, { width: "100%", paddingBottom: 20 }]}>
-        <TouchableOpacity onPress={handleBack}>
-          <Entypo name="chevron-small-left" size={30} color="white" />
-        </TouchableOpacity>
-        <Fontisto name="more-v-a" size={30} color="white" />
-      </View>
-      <Divider
-        orientation="vertical"
-        width={1}
-        style={{ borderColor: "white" }}
-      />
-      <View style={styles.scrollViewContent}>
-        {/* Group Component */}
-        <View style={styles.groupContainer}>
-          <Image source={mockGroup.image} style={styles.groupImage} />
-          <Text style={styles.groupName}>{mockGroup.name}</Text>
+    <GestureHandlerRootView>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Back button */}
+        <View
+          style={[styles.rowContainer, { width: "100%", paddingBottom: 20 }]}
+        >
+          <TouchableOpacity onPress={handleBack}>
+            <Entypo name="chevron-small-left" size={30} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSnapPress(0)}>
+            <Fontisto name="more-v-a" size={30} color="white" />
+          </TouchableOpacity>
         </View>
-        {/* User Component */}
-        {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
-        {/* Title */}
-        <Text style={styles.title}>{title}</Text>
-        {/* Date and number of comment */}
-        <View style={styles.additionalInfo}>
-          {/* Date */}
-          <View style={styles.dateAndComment}>
-            <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
-            <Text style={styles.smallText}>
-              {commentsDetail && commentsDetail.length > 0
-                ? new Date(commentsDetail[0].createdAt).toDateString()
-                : "No records"}
-            </Text>
+        <Divider
+          orientation="vertical"
+          width={1}
+          style={{ borderColor: "white" }}
+        />
+        <View style={styles.scrollViewContent}>
+          {/* Group Component */}
+          <View style={styles.groupContainer}>
+            <Image source={mockGroup.image} style={styles.groupImage} />
+            <Text style={styles.groupName}>{mockGroup.name}</Text>
           </View>
-          {/* Number of comment */}
-          <View style={styles.dateAndComment}>
-            <MaterialIcons name="comment" size={24} color="#C2C2C2" />
-            <Text style={styles.smallText}>{comments} Comments</Text>
-          </View>
-        </View>
-        {/* Description */}
-        <View style={styles.descriptionContainer}>
-          <Divider
-            orientation="vertical"
-            width={1}
-            style={{ borderColor: "#B9FF66" }}
-          />
-          {/* Actual description */}
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.description]}>
-              <Text
-                style={[
-                  styles.description,
-                  { color: "#B9FF66", fontWeight: "bold" },
-                ]}
-              >
-                Description:{" "}
+          {/* User Component */}
+          {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
+          {/* Title */}
+          <Text style={styles.title}>{title}</Text>
+          {/* Date and number of comment */}
+          <View style={styles.additionalInfo}>
+            {/* Date */}
+            <View style={styles.dateAndComment}>
+              <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
+              <Text style={styles.smallText}>
+                {commentsDetail && commentsDetail.length > 0
+                  ? new Date(commentsDetail[0].createdAt).toDateString()
+                  : "No records"}
               </Text>
-              {description}
-            </Text>
+            </View>
+            {/* Number of comment */}
+            <View style={styles.dateAndComment}>
+              <MaterialIcons name="comment" size={24} color="#C2C2C2" />
+              <Text style={styles.smallText}>{comments} Comments</Text>
+            </View>
           </View>
-        </View>
-        {/* List of tags */}
-        {searchParams.userBlogId && (
-          <View style={styles.tagsContainer}>
-            {tags.map((tag, index) => (
-              <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
-            ))}
+          {/* Description */}
+          <View style={styles.descriptionContainer}>
+            <Divider
+              orientation="vertical"
+              width={1}
+              style={{ borderColor: "#B9FF66" }}
+            />
+            {/* Actual description */}
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.description]}>
+                <Text
+                  style={[
+                    styles.description,
+                    { color: "#B9FF66", fontWeight: "bold" },
+                  ]}
+                >
+                  Description:{" "}
+                </Text>
+                {description}
+              </Text>
+            </View>
           </View>
-        )}
+          {/* List of tags */}
+          {searchParams.userBlogId && (
+            <View style={styles.tagsContainer}>
+              {tags.map((tag, index) => (
+                <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
+              ))}
+            </View>
+          )}
 
-        {/* Thumbnail */}
-        {searchParams.userBlogId && (
-          <Image
-            source={thumbnail}
-            style={{ width: "100%", height: 200, borderRadius: 20 }}
-            contentFit="cover"
-            transition={1000}
-          />
-        )}
-        {/* Blog content (render from html) */}
-        <QuillRenderer dom={{ matchContents: true }} content={html} />
+          {/* Thumbnail */}
+          {searchParams.userBlogId && (
+            <Image
+              source={thumbnail}
+              style={{ width: "100%", height: 200, borderRadius: 20 }}
+              contentFit="cover"
+              transition={1000}
+            />
+          )}
+          {/* Blog content (render from html) */}
+          <QuillRenderer dom={{ matchContents: true }} content={html} />
 
-            {searchParams.userBlogId && (
-              <Divider
-                orientation="vertical"
-                width={1}
-                style={{ borderColor: "white" }}
-              />
-            )}
-            {/* Like, Dislike, Comment, Markbook */}
-            {searchParams.userBlogId && (
-              <View style={styles.interactSection}>
-                {/* Likes */}
-                <View style={[styles.rowContainer, { gap: 20 }]}>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={blogLiked ? styles.likeContainerYes : styles.likeContainerNo} onPress={debounceHandleLike}>
-                    <FontAwesome name="thumbs-up" size={24} color={blogLiked ? "#000" : "#fff"} />
-                    <ThemedText
-                      style={{ color: blogLiked ? "#000" : "#fff" }}
-                      type="default"
-                      lightColor="#fff"
-                      darkColor="#fff"
-                    >
-                      {likes}
-                    </ThemedText>
-                  </TouchableOpacity>
-                  {/* Dislikes */}
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={blogDisliked ? styles.dislikeContainerYes : styles.dislikeContainerNo} onPress={debounceHandleDislike}>
-                    <FontAwesome name="thumbs-down" size={24} color={blogDisliked ? "#000" : "#fff"} />
-                    {/* <ThemedText
+          {searchParams.userBlogId && (
+            <Divider
+              orientation="vertical"
+              width={1}
+              style={{ borderColor: "white" }}
+            />
+          )}
+          {/* Like, Dislike, Comment, Markbook */}
+          {searchParams.userBlogId && (
+            <View style={styles.interactSection}>
+              {/* Likes */}
+              <View style={[styles.rowContainer, { gap: 20 }]}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={
+                    blogLiked ? styles.likeContainerYes : styles.likeContainerNo
+                  }
+                  onPress={debounceHandleLike}
+                >
+                  <FontAwesome
+                    name="thumbs-up"
+                    size={24}
+                    color={blogLiked ? "#000" : "#fff"}
+                  />
+                  <ThemedText
+                    style={{ color: blogLiked ? "#000" : "#fff" }}
+                    type="default"
+                    lightColor="#fff"
+                    darkColor="#fff"
+                  >
+                    {likes}
+                  </ThemedText>
+                </TouchableOpacity>
+                {/* Dislikes */}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={
+                    blogDisliked
+                      ? styles.dislikeContainerYes
+                      : styles.dislikeContainerNo
+                  }
+                  onPress={debounceHandleDislike}
+                >
+                  <FontAwesome
+                    name="thumbs-down"
+                    size={24}
+                    color={blogDisliked ? "#000" : "#fff"}
+                  />
+                  {/* <ThemedText
                       style={styles.text}
                       type="default"
                       lightColor="#fff"
                       darkColor="#fff">
                       123
                     </ThemedText> */}
+                </TouchableOpacity>
+              </View>
+              {/* Comment */}
+              <TouchableOpacity
+                style={styles.commentContainer}
+                activeOpacity={0.7}
+                onPress={handleCommentPress}
+              >
+                <MaterialIcons name="comment" size={28} color="#fff" />
+                <ThemedText
+                  style={{ color: "#fff" }}
+                  type="default"
+                  lightColor="#fff"
+                  darkColor="#fff"
+                >
+                  {comments}
+                </ThemedText>
+              </TouchableOpacity>
+              {/* Bookmart Button */}
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={
+                  isCurrentBlogSaved
+                    ? styles.bookmarkContainerYes
+                    : styles.bookmarkContainerNo
+                }
+                onPress={debounceHandleBookmark}
+              >
+                <FontAwesome
+                  name="bookmark"
+                  size={24}
+                  color={isCurrentBlogSaved ? "#000" : "#fff"}
+                />
               </TouchableOpacity>
             </View>
-            {/* Comment */}
-            <TouchableOpacity style={styles.commentContainer} activeOpacity={0.7}
-              onPress={handleCommentPress}
-            
-            >
-              <MaterialIcons name="comment" size={28} color="#fff" />
-              <ThemedText
-                style={{ color: "#fff" }}
-                type="default"
-                lightColor="#fff"
-                darkColor="#fff"
-              >
-                {comments}
-              </ThemedText>
-            </TouchableOpacity>
-            {/* Bookmart Button */}
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={
-                isCurrentBlogSaved
-                  ? styles.bookmarkContainerYes
-                  : styles.bookmarkContainerNo
-              }
-              onPress={debounceHandleBookmark}
-            >
-              <FontAwesome
-                name="bookmark"
-                size={24}
-                color={isCurrentBlogSaved ? "#000" : "#fff"}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
-        <Divider
-          orientation="vertical"
-          width={1}
-          style={{ borderColor: "white" }}
-        />
-        
-      </View>
-      {/* Write comment button */}
-    </ScrollView>
+          )}
+          <Divider
+            orientation="vertical"
+            width={1}
+            style={{ borderColor: "white" }}
+          />
+        </View>
+        {/* Write comment button */}
+      </ScrollView>
+      {/* Bottom sheet for more button */}
+      <MoreOptionBottomList
+        sheetRef={refMoreSheet}
+        isUserWrittenBlog={isUserWrittenBlog}
+      />
+    </GestureHandlerRootView>
   );
 }
 

@@ -55,12 +55,15 @@ import Carousel, {
   ICarouselInstance,
   Pagination,
 } from "react-native-reanimated-carousel";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const [recommendedPage, setRecommendedPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
-  const [isRecommendedBlogReset, setRecommendedBlogReset] = useState(false)
-  const [isUserBlogReset, setUserBlogReset] = useState(false)
+  const [isRecommendedBlogReset, setRecommendedBlogReset] = useState(false);
+  const [isUserBlogReset, setUserBlogReset] = useState(false);
   const [currentTags, setCurrentTags] = useState();
   const { user } = useAppSelector((state) => state.user);
 
@@ -150,19 +153,21 @@ export default function MyFeed() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     // Simulate fetching data
-    console.log("Refreshing")
-    setRecommendedBlogReset(true)
-    setUserBlogReset(true)
-    recommendedBlogsReset.mutateAsync().then(() => setRecommendedBlogReset(false))
-    userBlogsReset.mutateAsync().then(() => setUserBlogReset(false))
+    console.log("Refreshing");
+    setRecommendedBlogReset(true);
+    setUserBlogReset(true);
+    recommendedBlogsReset
+      .mutateAsync()
+      .then(() => setRecommendedBlogReset(false));
+    userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
     setTimeout(() => {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
   }, []);
 
   useEffect(() => {
-    console.log("Refetching")
-  }, [recommendedBlogsQuery.isFetching])
+    console.log("Refetching");
+  }, [recommendedBlogsQuery.isFetching]);
 
   // Update current tags upon successful query
   useEffect(() => {
@@ -174,16 +179,25 @@ export default function MyFeed() {
   useEffect(() => {
     if (user) {
       setUserPage(1);
-      setUserBlogReset(true)
-      userBlogsReset.mutateAsync().then(() => setUserBlogReset(false))
+      setUserBlogReset(true);
+      userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
     }
   }, [user]);
   const progress = useSharedValue(0);
 
   const carouselRef = useRef<ICarouselInstance>(null);
 
+  const moreOptionRef = useRef<BottomSheet>(null);
+  const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
+  const handlePressMoreOption = (isUserWritten: boolean) => {
+    setIsUserWrittenBlog(isUserWritten);
+    if (moreOptionRef.current) {
+      moreOptionRef.current.snapToIndex(0);
+    }
+    // console.log("More option pressed", isUserWritten)
+  };
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
       {userBlogsQuery.isFetching || isUserBlogReset ? (
         <FeedBlogPreviewSkeleton />
@@ -201,9 +215,8 @@ export default function MyFeed() {
             showsVerticalScrollIndicator={false}
             onEndReached={handleOnUserBlogListEndReached}
             renderItem={({ item }) => {
-              return <FeedBlogPreview blog={item} />;
+              return <FeedBlogPreview blog={item} onPressMoreButton={handlePressMoreOption}/>;
             }}
-            
             onEndReachedThreshold={0.5}
             ListHeaderComponent={
               <View>
@@ -241,7 +254,7 @@ export default function MyFeed() {
                       autoPlay={true}
                       data={recommendedBlogsQuery.data as AIBlog[]}
                       loop={true}
-                      width={Dimensions.get("window").width }
+                      width={Dimensions.get("window").width}
                       height={Dimensions.get("window").height / 3}
                       pagingEnabled={true}
                       snapEnabled={true}
@@ -279,7 +292,8 @@ export default function MyFeed() {
           />
         </View>
       )}
-    </View>
+      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog/>
+    </GestureHandlerRootView>
   );
 }
 const styles = StyleSheet.create({

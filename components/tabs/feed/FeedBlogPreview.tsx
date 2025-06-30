@@ -24,6 +24,8 @@ import {
 } from "@/redux/slices/authSlice";
 import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
 import { ThemedText } from "@/components/ThemedText";
+import BottomSheet from "@gorhom/bottom-sheet";
+import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 const mockGroup = {
   Name: "Group Name",
   CoverURL:
@@ -51,7 +53,13 @@ export function debounce<T extends (...args: any[]) => void>(
   );
 }
 
-export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
+export default function FeedBlogPreview({
+  blog,
+  onPressMoreButton,
+}: {
+  blog: UserBlog;
+  onPressMoreButton?: (isUserWrittenBlog: boolean) => void;
+}) {
   // default to mock blog for this, but later will be passed as props
   const route = useRouter();
   const dispatch = useAppDispatch();
@@ -159,6 +167,8 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
   const debounceHandleBookmark = debounce(() => {
     handleBookmark();
   }, 0.5);
+  // TODO: check if the blog is written by the user
+  const isUserWrittenBlog = false;
 
   return (
     <TouchableOpacity
@@ -184,7 +194,13 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
                 }}
               />
             </View>
-            <Entypo name="dots-three-vertical" size={24} color="white" />
+            <TouchableOpacity
+              onPress={() =>
+                onPressMoreButton && onPressMoreButton(isUserWrittenBlog)
+              }
+            >
+              <Entypo name="dots-three-vertical" size={24} color="white" />
+            </TouchableOpacity>
           </View>
           {/* 2nd Part: List of Tags */}
           <View style={styles.tagsSection}>
@@ -307,6 +323,7 @@ export default function FeedBlogPreview({ blog }: { blog: UserBlog }) {
           </TouchableOpacity>
         </View>
       </View>
+    
     </TouchableOpacity>
   );
 }
@@ -329,9 +346,9 @@ const styles = StyleSheet.create({
   imageStyle: {
     borderRadius: 30,
   },
-  overlay:{
+  overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
     borderRadius: 30,
   },
   container: {

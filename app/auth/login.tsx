@@ -57,8 +57,10 @@ export default function LoginScreen() {
       dispatch(setRememberedSignUpUser(data.email))
     }
 
-    dispatch(login(data)).then(() => {
-      dispatch(getUserInfo())
+    dispatch(login(data)).then((res) => {
+      if ((res.payload as any).success === true) {
+        dispatch(getUserInfo())
+      }
     })
     // Alert.alert("Login Successful", `Welcome, ${data.email}`);
     // router.replace("/(tabs)");
@@ -72,11 +74,13 @@ export default function LoginScreen() {
       
       if (signInResult.data) {
         const idToken = signInResult.data.idToken
-        console.log(signInResult)
+        const googleCredential = GoogleAuthProvider.credential(idToken)
+        const userCredential = await getAuth().signInWithCredential(googleCredential)
+        const firebaseIdToken = await userCredential.user.getIdToken()
 
         if (idToken)
           dispatch(loginGoogle({
-            access_token: idToken
+            token: firebaseIdToken
           }))
       }
     }
@@ -121,7 +125,6 @@ export default function LoginScreen() {
     }
 
     if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken) {
-      console.log("test")
       dispatch(getUserInfo())
     }
   }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])

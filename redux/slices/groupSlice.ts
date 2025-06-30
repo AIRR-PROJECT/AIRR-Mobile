@@ -72,6 +72,25 @@ export const getPreviewGroups = createAsyncThunk(
     }
 )
 
+export const getCreatedGroups = createAsyncThunk(
+    'group/getCreatedGroups',
+    async (_, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/created-group`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.groups as Group[]
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 export const getFieldDetail = createAsyncThunk(
     'group/getFieldDetail',
     async (fieldID: string, thunkAPI) => {

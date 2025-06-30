@@ -83,3 +83,15 @@ export interface UpdateUser {
 export interface UpdateAvatar {
     avatar: any
 }
+
+export interface UserActivity {
+    ActivityDate: Date,
+    Blog: {
+        CoverURL: string,
+        Title: string,
+        _id: string
+    },
+    CommentID: string,
+    Type: string,
+    UserAvatar: string
+}

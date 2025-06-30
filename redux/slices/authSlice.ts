@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { ChangeCurrentPasswordCredentials, LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { PartialUser, UpdateAvatar, UpdateUser, User, User1 } from "@/interfaces/userInterface";
+import { PartialUser, UpdateAvatar, UpdateUser, User, User1, UserActivity } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
 import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
@@ -69,17 +69,34 @@ export const login = createAsyncThunk<Tokens, LoginCredentials>(
 
 export const loginGoogle = createAsyncThunk(
     'auth/loginGoogle',
-    async (data: { access_token: string }, thunkAPI) => {
+    async (data: { token: string }, thunkAPI) => {
         try {
-            await SecureStore.setItemAsync("accessToken", data.access_token)
-            await SecureStore.setItemAsync("refreshToken", data.access_token)
+            await SecureStore.setItemAsync('accessToken', data.token)
 
+            const response = await api.post('auth/sign-in-gg');
+            console.log(response)
+            const { access_token, refresh_token } = response.data.data;
+
+            if (access_token === undefined) {
+                return thunkAPI.rejectWithValue("Access token must not be undefined")
+            }
+            if (refresh_token === undefined) {
+                return thunkAPI.rejectWithValue("Refresh token must not be undefined")
+            }
+
+            await SecureStore.setItemAsync('accessToken', access_token)
+            await SecureStore.setItemAsync('refreshToken', refresh_token)
             thunkAPI.dispatch(setTokens({
-                accessToken: data.access_token,
-                refreshToken: data.access_token
+                accessToken: access_token,
+                refreshToken: refresh_token
             }))
+    
+            return { 
+                accessToken: access_token,
+                refreshToken: refresh_token
+            };
         } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response.data);
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
         }
     }
 )
@@ -289,35 +306,40 @@ export const getPartialUserInfo = createAsyncThunk(
 export const updateUser = createAsyncThunk(
     'user/update',
     async (userData: User, thunkAPI) => {
-        const inputData: UpdateUser = {
-            userID: userData._id,
-            firstname: userData.firstName ?? "",
-            lastname: userData.lastName ?? "",
-            phone: userData.phoneNumber?.toString() ?? "",
-            dob: userData.dateOfBirth ?? "",
-            studentID: userData.profile.studentID ?? "",
-            department: userData.profile.department ?? "",
-            program: userData.profile.program,
-            entry_year: new Date().getFullYear() - userData.profile.year,
-            gpa: userData.profile.gpa ?? 0
+        try {
+            const inputData: UpdateUser = {
+                userID: userData._id,
+                firstname: userData.firstName ?? "",
+                lastname: userData.lastName ?? "",
+                phone: userData.phoneNumber?.toString() ?? "",
+                dob: userData.dateOfBirth ?? "",
+                studentID: userData.profile.studentID ?? "",
+                department: userData.profile.department ?? "",
+                program: userData.profile.program?? "",
+                entry_year: userData.profile.year ? new Date().getFullYear() - userData.profile.year : 0,
+                gpa: userData.profile.gpa ?? 0
+            }
+            if (userData.profile.link.LinkedIn) {
+                inputData.linkedIn = userData.profile.link.LinkedIn
+            }
+            if (userData.profile.link.Github) {
+                inputData.github = userData.profile.link.Github
+            }
+            if (userData.profile.link.Facebook) {
+                inputData.facebook = userData.profile.link.Facebook
+            }
+    
+            const res = await api.post("users/update", inputData)
+            
+            if (res.data.success) {
+                // thunkAPI.dispatch(setCurrentUser(res.data.data))
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data.message)
+            }
         }
-        if (userData.profile.link.LinkedIn) {
-            inputData.linkedIn = userData.profile.link.LinkedIn
-        }
-        if (userData.profile.link.Github) {
-            inputData.github = userData.profile.link.Github
-        }
-        if (userData.profile.link.Facebook) {
-            inputData.facebook = userData.profile.link.Facebook
-        }
-
-        const res = await api.post("users/update", inputData)
-        
-        if (res.data.success) {
-            // thunkAPI.dispatch(setCurrentUser(res.data.data))
-        }
-        else {
-            return thunkAPI.rejectWithValue(res.data.message)
+        catch (err) {
+            return thunkAPI.rejectWithValue(err)
         }
     }
 )
@@ -350,6 +372,25 @@ export const changeCurrentPassword = createAsyncThunk<void, ChangeCurrentPasswor
 
             if (res.data.success) {
                 ToastAndroid.showWithGravity("Current password changed successfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }   
+)
+
+export const getUserActivity = createAsyncThunk(
+    'auth/getUserLikeActivity', 
+    async (_, thunkAPI) => {
+        try {
+            const res = await api.get(`users/get-activity-all`)
+
+            if (res.data.success) {
+                return res.data.data.activities as UserActivity[]
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)
@@ -529,6 +570,37 @@ const authSlice = createSlice({
                 state.isLoggedIn = true
                 state.isAccountVerified = true
             })
+            .addCase(loginGoogle.rejected, (state, action) => {
+                console.log(action.payload)
+                if (action.payload && (action.payload as APIResponse).message && ((action.payload as APIResponse).failcode !== ResponseFailcode.USER_NOT_FOUND && (action.payload as APIResponse).failcode !== ResponseFailcode.IDENTITY_NOT_MATCHED)) {
+                    state.isLoggedIn = true
+                }
+
+                /* Handling this somewhere else */
+                // if (action.payload) {
+                //     if ((action.payload as APIResponse).message) {
+                //         Alert.alert("Error", (action.payload as APIResponse).message)
+    
+                //         const payload = (action.payload as APIResponse)
+                //         if (payload.failcode === ResponseFailcode.USER_UNVERIFIED) {
+                //             state.isLoggedIn = true
+                //         }
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.payload as string)
+                //     }
+                // }
+                // else {
+                //     const check_prefix = "Request failed with status code "
+                //     if (action.error.message?.startsWith("Request failed with status code ")) {
+                //         const code = action.error.message.slice(check_prefix.length)
+                //         Alert.alert("Error", getReasonPhrase(code))
+                //     }
+                //     else {
+                //         Alert.alert("Error", action.error.message)
+                //     }
+                // }
+            })
             .addCase(setRememberedSignUpUser.rejected, (state, action) => {
                 ToastAndroid.showWithGravity("Failed to save sign in username", ToastAndroid.LONG, ToastAndroid.BOTTOM)
             })
@@ -632,6 +704,7 @@ const authSlice = createSlice({
                 // setTokens(undefined)
                 // state.userAccessToken = ""
                 // state.userRefreshToken = ""
+                // console.log(action.meta)
                 console.log(action.error)
                 state.isLoggedIn = false
                 state.isAccountVerified = false
@@ -653,7 +726,7 @@ const authSlice = createSlice({
                 console.log("User info updated")
             })
             .addCase(updateUser.rejected, (state, action) => {
-
+                console.log(action.error)
             })
             .addCase(updateAvatar.fulfilled, (state, action) => {
                 ToastAndroid.showWithGravity("Avatar updated", ToastAndroid.LONG, ToastAndroid.BOTTOM)

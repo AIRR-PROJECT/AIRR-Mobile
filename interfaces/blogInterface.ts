@@ -105,6 +105,7 @@ export interface UserBlogChildComment {
 export interface BlogActionHistory{
     _id: string;
     Title: string;
+    CommentID: string | null
     BackgroundURL: string;
     Action: string;
     Timestamp: string;

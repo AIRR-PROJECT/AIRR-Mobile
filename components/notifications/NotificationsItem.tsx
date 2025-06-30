@@ -21,7 +21,7 @@ type NotificationItemProps = {
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { formatUnixDate } from "@/utils/dateConvert";
-import { NotificationType, RequestType } from "@/enums/notif_type.enum";
+import { InteractType, NotificationType, RequestType } from "@/enums/notif_type.enum";
 import { useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { decreaseNotifCount, updateSeenNotif } from "@/redux/slices/notifSlice";
@@ -90,7 +90,12 @@ export default function NotificationsItem({
       case NotificationType.INTERACTION:
         const interactionData = data as BlogInteractNotification
 
-        route.push(`/blog?userBlogId=${interactionData.blog_id}`)
+        if (interactionData.interact_type === InteractType.Comment) {
+          route.push(`/blog?userBlogId=${interactionData.blog_id}&userBlogCommentId=${interactionData.comment_id}`)
+        }
+        else {
+          route.push(`/blog?userBlogId=${interactionData.blog_id}`)
+        }
         break;
       default:
         const otherData = data as OtherNotification

@@ -25,16 +25,16 @@ export default function JoinedGroupTab() {
 
   const [selectedId, setSelectedId] = useState("1");
 
-  useEffect(() => {
-    dispatch(getGroupPopularFields());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getGroupPopularFields());
+  // }, []);
 
-  useEffect(() => {
-    if (popularFields) {
-      // console.log(popularFields)
-      fields.push(...popularFields);
-    }
-  }, [popularFields]);
+  // useEffect(() => {
+  //   if (popularFields) {
+  //     // console.log(popularFields)
+  //     fields.push(...popularFields);
+  //   }
+  // }, [popularFields]);
 
   useEffect(() => {
     if (selectedId === "1") {
@@ -70,7 +70,7 @@ export default function JoinedGroupTab() {
               </Text>
             </TouchableOpacity>
           )}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => index.toString()}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}

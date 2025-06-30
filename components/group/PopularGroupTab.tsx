@@ -570,8 +570,7 @@ export default function PopularGroupTab() {
             members={item.NumberOfMembers}
             style={{
               paddingHorizontal: 20,
-            }}
-          />
+            }} isJoined={false}          />
         )}
         style={{marginBottom: 20}}
         stickySectionHeadersEnabled={false}

@@ -3,10 +3,19 @@ import { View, StyleSheet } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import { ThemedText } from "../ThemedText";
 import { Divider } from "@rneui/base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BlogActionHistory } from "@/interfaces/blogInterface";
 import { FlashList } from "@shopify/flash-list";
 import { BlogActionHistoryComponent } from "./BlogActionHistoryComponent";
+import { useAppDispatch } from "@/redux/hook";
+import { getUserActivity } from "@/redux/slices/authSlice";
+import { UserActivity } from "@/interfaces/userInterface";
+import { formatDistanceStrict, formatDistanceToNow, formatRelative } from "date-fns";
+
+type ChartType = {
+  value: number,
+  label: string
+}
 
 const barData = [
   { value: 140, label: "Mon" },
@@ -32,6 +41,7 @@ const data: (string | BlogActionHistory)[] = [
   {
     _id: "1",
     Title: "Blog 1",
+    CommentID: null,
     BackgroundURL: "https://picsum.photos/600",
     Action: "Liked",
     Timestamp: "2021-11-12T00:00:00.000Z",
@@ -39,6 +49,7 @@ const data: (string | BlogActionHistory)[] = [
   {
     _id: "2",
     Title: "Blog 2",
+    CommentID: "comment1",
     BackgroundURL: "https://picsum.photos/600",
     Action: "Commented",
     Timestamp: "2021-11-12T00:00:00.000Z",
@@ -47,12 +58,102 @@ const data: (string | BlogActionHistory)[] = [
   {
     _id: "3",
     Title: "Blog 3",
+    CommentID: null,
     BackgroundURL: "https://picsum.photos/600",
     Action: "Liked",
     Timestamp: "2021-11-12T00:00:00.000Z",
   },
 ];
 export default function ActivityTab() {
+  const dispatch = useAppDispatch()
+
+  const [listData, setListData] = useState<(string | BlogActionHistory)[]>([])
+  const [chartData, setChartData] = useState<ChartType[]>([])
+
+  useEffect(() => {
+    dispatch(getUserActivity()).then((res) => {
+      let activities = res.payload as UserActivity[]
+
+      let monSum = 0
+      let tueSum = 0
+      let wedSum = 0
+      let thuSum = 0
+      let friSum = 0
+      let satSum = 0
+      let sunSum = 0
+
+      let listData: (string | BlogActionHistory)[] = []
+      let currentDay = ""
+      activities = activities.sort((a, b) => new Date(b.ActivityDate).getTime() - new Date(a.ActivityDate).getTime())
+      activities.map((act) => {
+        // Bar chart data
+        const day = new Date(act.ActivityDate).getDay()
+        switch (day) {
+          case 0:
+            sunSum += 5
+            break
+          case 1:
+            monSum += 5
+            break
+          case 2:
+            tueSum += 5
+            break
+          case 3:
+            wedSum += 5
+            break
+          case 4:
+            thuSum += 5
+            break
+          case 5:
+            friSum += 5
+            break
+          case 6:
+            satSum += 5
+            break
+        }
+
+        // FlatList data
+        let distance = formatDistanceStrict(new Date(act.ActivityDate), new Date(), { addSuffix: true })
+        let distanceArr = distance.split(' ')
+        if (["second", "seconds", "minute", "minutes", "hour", "hours"].indexOf(distanceArr[1]) != -1) {
+          distance = "Today"
+        }
+        if (distanceArr[1] == "day") {
+          distance = "Yesterday"
+        }
+        if (currentDay == "" || currentDay != distance) {
+          currentDay = distance
+          listData.push(currentDay)
+        }
+        
+        const displayAct: BlogActionHistory = {
+          _id: act.Blog._id,
+          Title: act.Blog.Title,
+          CommentID: act.CommentID,
+          BackgroundURL: act.Blog.CoverURL,
+          Action: act.Type,
+          Timestamp: new Date(act.ActivityDate).toString()
+        }
+        listData.push(displayAct)
+      })
+
+      // Set bar chart data
+      const chartData: ChartType[] = [
+        { value: monSum, label: "Mon" },
+        { value: tueSum, label: "Tue" },
+        { value: wedSum, label: "Wed" },
+        { value: thuSum, label: "Thu" },
+        { value: friSum, label: "Fri" },
+        { value: satSum, label: "Sat" },
+        { value: sunSum, label: "Sun" }
+      ]
+      setChartData(chartData)
+
+      // Set FlatList data
+      setListData(listData)
+    })
+  }, [])
+
   return (
     <View style={styles.container}>
       {/* Time bar graph */}
@@ -72,7 +173,7 @@ export default function ActivityTab() {
           backgroundColor={"transparent"}
           focusedBarConfig={{ color: "green" }}
           focusBarOnPress={true}
-          data={barData}
+          data={chartData}
           frontColor={"#fff"}
           barWidth={14}
           height={250}
@@ -118,7 +219,7 @@ export default function ActivityTab() {
       {/* User Action History */}
       <View style={{width: "100%"}}>
         <FlashList
-          data={data}
+          data={listData}
           renderItem={({ item }) => {
             if (typeof item === "string") {
               return <ThemedText style={styles.dateHeader}>{item}</ThemedText>;

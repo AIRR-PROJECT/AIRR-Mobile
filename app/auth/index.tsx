@@ -1,5 +1,5 @@
 import { EffectCallback, useRouter } from "expo-router";
-import { StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -27,29 +27,39 @@ export default function AuthScreen() {
   //     router.replace("/(tabs)");
   //   }
   // })
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const { isLoggedIn, isAccountVerified } = useAppSelector(state => state.auth)
-  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
+  const { isLoggedIn, isAccountVerified } = useAppSelector(
+    (state) => state.auth
+  );
+  const { userAccessToken, userRefreshToken, user } = useAppSelector(
+    (state) => state.user
+  );
 
   // Init
   useEffect(() => {
-    if (isLoggedIn && isAccountVerified && !userAccessToken && !userAccessToken && !user) {
-      dispatch(logout())
+    if (
+      isLoggedIn &&
+      isAccountVerified &&
+      !userAccessToken &&
+      !userAccessToken &&
+      !user
+    ) {
+      dispatch(logout());
     }
 
     dispatch(loadToken()).then(() => {
-        dispatch(getUserInfo())
-    })
-  }, [])
+      dispatch(getUserInfo());
+    });
+  }, []);
 
   useEffect(() => {
     // console.log(user)
     if (user != undefined) {
-      router.replace("/(tabs)/dashboard")
+      router.replace("/(tabs)/dashboard");
     }
-    console.log("Tag changed test")
-  }, [user])
+    console.log("Tag changed test");
+  }, [user]);
 
   const handleLogin = () => {
     router.push("/auth/login");
@@ -59,44 +69,36 @@ export default function AuthScreen() {
   };
   const handleGuest = () => {
     router.push("/(tabs)/dashboard");
-  }
+  };
   return (
-    <ThemedView
+    <ScrollView
       style={styles.container}
-      darkColor="#1E1E1E"
-      lightColor="#1E1E1E"
+      contentContainerStyle={{ flexGrow: 1, alignItems: "center" }}
     >
-      <ThemedView
-        style={styles.imageContainer}
-        darkColor="#1E1E1E"
-        lightColor="#1E1E1E"
-      >
-        
+      <View style={styles.imageContainer}>
         <ImageViewer imgSource={logo} />
-      </ThemedView>
+      </View>
       <ThemedView
         style={styles.footerContainer}
         darkColor="#1E1E1E"
         lightColor="#1E1E1E"
       >
-        <AuthButtonGradient label="Log In" onPress={handleLogin}/>
-        <AuthButton label="Sign Up" onPress={handleSignUp}/>
+        <AuthButtonGradient label="Log In" onPress={handleLogin} />
+        <AuthButton label="Sign Up" onPress={handleSignUp} />
         <TouchableOpacity onPress={handleGuest}>
           <ThemedText type="link" style={{ color: "white" }}>
             Continue as guest
           </ThemedText>
-
         </TouchableOpacity>
       </ThemedView>
-    </ThemedView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
-    alignItems: "center",
+    backgroundColor: "#1E1E1E",
   },
   imageContainer: {
     flex: 0.8,

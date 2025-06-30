@@ -1,4 +1,3 @@
-
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedText } from "@/components/ThemedText";
@@ -6,7 +5,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import GradientText from "@/components/GradientText";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
@@ -23,8 +22,8 @@ export default function ForgotPasswordScreen() {
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
-  const emailWatch = watch('email')
-  
+  const emailWatch = watch("email");
+
   const onSubmit = (data: any) => {
     router.push(`/auth/verify-password-otp?resendEmail=${emailWatch}`);
   };
@@ -33,117 +32,128 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <ThemedView
-      style={styles.container}
-      darkColor="#1E1E1E"
-      lightColor="#1E1E1E"
-    >
-      <AuthHeader />
-      <TouchableOpacity
-        onPress={handleBackToLogin}
-        style={{ alignSelf: "flex-start", padding: 10 }}
+    <ScrollView>
+      <ThemedView
+        style={styles.container}
+        darkColor="#1E1E1E"
+        lightColor="#1E1E1E"
       >
-        <ThemedText style={[{ color: "white" }]}>
-          {" < "}Back to login
-        </ThemedText>
-      </TouchableOpacity>
-
-      <View style={{ alignSelf: "flex-start", flexDirection: "row", paddingHorizontal: 10 }}>
-        <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
-          Forgot password?
-        </GradientText>
-      </View>
-      
-      <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
-        <ThemedText style={styles.paragraph}>
-          Don't worry, happens to all of us. Enter your email below to recover
-          your password.
-        </ThemedText>
-      </View>
-      <ThemedView style={styles.formContainer}>
-        {/* Email Input */}
-        <Text style={[styles.paragraph]}>Username</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "Email is required",
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Enter a valid email address",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <LinearGradient
-              colors={["#B9FF66", "#9DE8EE"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ borderRadius: 20 }}
-            >
-              <TextInput
-                style={[styles.input, errors.email && styles.errorInput]}
-                placeholder="Email"
-                placeholderTextColor="#999"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </LinearGradient>
-          )}
-          name="email"
-        />
-        {errors.email && (
-          <ThemedText style={styles.errorText}>
-            {errors.email.message}
-          </ThemedText>
-        )}
-        <AuthButtonGradient
-          label="Reset Password"
-          onPress={handleSubmit(onSubmit)}
-          style={[{ marginTop: 15, width: "100%", marginHorizontal: 0 }]}
-        />
-
-        {/* Other Options */}
-        <ThemedText
-          type="default"
-          style={[{ color: "#fff", alignSelf: "center" }]}
+        <AuthHeader />
+        <TouchableOpacity
+          onPress={handleBackToLogin}
+          style={{ alignSelf: "flex-start", padding: 10 }}
         >
-          Or
-        </ThemedText>
-        {/* Or Google or Facebook */}
-        <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <AuthButtonTransparent label="Google" style={styles.otherButton} />
+          <ThemedText style={[{ color: "white" }]}>
+            {" < "}Back to login
+          </ThemedText>
+        </TouchableOpacity>
 
-          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
+        <View
+          style={{
+            alignSelf: "flex-start",
+            flexDirection: "row",
+            paddingHorizontal: 10,
+          }}
+        >
+          <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
+            Forgot password?
+          </GradientText>
         </View>
 
-        <ThemedText
-          type="link"
-          style={[
-            {
-              color: "#fff",
-              alignSelf: "flex-start",
-              marginTop: 5,
-              textDecorationLine: "underline",
-              marginHorizontal: 10,
-            },
-          ]}
-        >
-          Don't have a account,{" "}
+        <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
+          <ThemedText style={styles.paragraph}>
+            Don't worry, happens to all of us. Enter your email below to recover
+            your password.
+          </ThemedText>
+        </View>
+        <ThemedView style={styles.formContainer}>
+          {/* Email Input */}
+          <Text style={[styles.paragraph]}>Username</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Enter a valid email address",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <LinearGradient
+                colors={["#B9FF66", "#9DE8EE"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ borderRadius: 20 }}
+              >
+                <TextInput
+                  style={[styles.input, errors.email && styles.errorInput]}
+                  placeholder="Email"
+                  placeholderTextColor="#999"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
+              </LinearGradient>
+            )}
+            name="email"
+          />
+          {errors.email && (
+            <ThemedText style={styles.errorText}>
+              {errors.email.message}
+            </ThemedText>
+          )}
+          <AuthButtonGradient
+            label="Reset Password"
+            onPress={handleSubmit(onSubmit)}
+            style={[{ marginTop: 15, width: "100%", marginHorizontal: 0 }]}
+          />
+
+          {/* Other Options */}
+          <ThemedText
+            type="default"
+            style={[{ color: "#fff", alignSelf: "center" }]}
+          >
+            Or
+          </ThemedText>
+          {/* Or Google or Facebook */}
+          <View style={[styles.section, { justifyContent: "space-between" }]}>
+            <AuthButtonTransparent label="Google" style={styles.otherButton} />
+
+            <AuthButtonTransparent
+              label="Facebook"
+              style={styles.otherButton}
+            />
+          </View>
+
           <ThemedText
             type="link"
             style={[
               {
                 color: "#fff",
+                alignSelf: "flex-start",
+                marginTop: 5,
                 textDecorationLine: "underline",
-                fontWeight: "bold",
+                marginHorizontal: 10,
               },
             ]}
           >
-            Sign Up
+            Don't have a account,{" "}
+            <ThemedText
+              type="link"
+              style={[
+                {
+                  color: "#fff",
+                  textDecorationLine: "underline",
+                  fontWeight: "bold",
+                },
+              ]}
+            >
+              Sign Up
+            </ThemedText>
           </ThemedText>
-        </ThemedText>
+        </ThemedView>
       </ThemedView>
-    </ThemedView>
+    </ScrollView>
   );
 }
 

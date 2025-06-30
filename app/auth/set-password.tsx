@@ -5,7 +5,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import GradientText from "@/components/GradientText";
 import { TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
@@ -29,92 +29,160 @@ export default function SetPasswordScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const newPassword = watch("newPassword");
-  const searchParams = useLocalSearchParams<{ email: string }>()
-  const { changedPassword } = useAppSelector(state => state.auth)
+  const searchParams = useLocalSearchParams<{ email: string }>();
+  const { changedPassword } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log(changedPassword)
+    console.log(changedPassword);
     if (changedPassword) {
       // Reset
-      dispatch(resetChangedPassword(false))
+      dispatch(resetChangedPassword(false));
 
       router.push("/auth/login");
     }
-  }, [changedPassword])
+  }, [changedPassword]);
 
   const onSubmit = (data: FormData) => {
     const setPasswordData = {
       email: searchParams.email,
-      password: newPassword
-    }
-    
-    dispatch(setPassword(setPasswordData))
+      password: newPassword,
+    };
+
+    dispatch(setPassword(setPasswordData));
   };
   const handleBackToForgotPassword = () => {
     router.push("/auth/forgot-password");
   };
 
   return (
-    <ThemedView
-      style={styles.container}
-      darkColor="#1E1E1E"
-      lightColor="#1E1E1E"
-    >
-      <AuthHeader />
-      <TouchableOpacity
-        onPress={handleBackToForgotPassword}
-        style={{ alignSelf: "flex-start", padding: 10 }}
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ThemedView
+        style={styles.container}
+        darkColor="#1E1E1E"
+        lightColor="#1E1E1E"
       >
-        <ThemedText style={[{ color: "white" }]}>
-          {" < "}Back to login
-        </ThemedText>
-      </TouchableOpacity>
-      <View style={{ alignSelf: "flex-start", flexDirection: "row", paddingHorizontal: 10 }}>
-        <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
-          Set a password!
-        </GradientText>
-      </View>
-
-      <View style={{ alignSelf: "flex-start", flexDirection: "row", }}>
-        <ThemedText style={styles.paragraph}>
-          Your previous password has been resetted. Please set a new password for
-          your account.
-        </ThemedText>
-      </View>
-      <ThemedView style={styles.formContainer}>
-        {/* New Password Input */}
-        <Text style={[styles.paragraph]}>New Password</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "New Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters long",
-            },
+        <AuthHeader />
+        <TouchableOpacity
+          onPress={handleBackToForgotPassword}
+          style={{ alignSelf: "flex-start", padding: 10 }}
+        >
+          <ThemedText style={[{ color: "white" }]}>
+            {" < "}Back to login
+          </ThemedText>
+        </TouchableOpacity>
+        <View
+          style={{
+            alignSelf: "flex-start",
+            flexDirection: "row",
+            paddingHorizontal: 10,
           }}
-          
-          render={({ field: { onChange, onBlur, value } }) => {
-            const [showPassword, setShowPassword] = useState(false);
-            return (
-              <LinearGradient
-                colors={["#B9FF66", "#9DE8EE"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={{ borderRadius: 20 }}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      errors.newPassword && styles.errorInput,
-                    ]}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="New Password"
-                    secureTextEntry={!showPassword} // Toggle secure text entry
-                  />
+        >
+          <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
+            Set a password!
+          </GradientText>
+        </View>
+
+        <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
+          <ThemedText style={styles.paragraph}>
+            Your previous password has been resetted. Please set a new password
+            for your account.
+          </ThemedText>
+        </View>
+        <ThemedView style={styles.formContainer}>
+          {/* New Password Input */}
+          <Text style={[styles.paragraph]}>New Password</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "New Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => {
+              const [showPassword, setShowPassword] = useState(false);
+              return (
+                <LinearGradient
+                  colors={["#B9FF66", "#9DE8EE"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ borderRadius: 20 }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        errors.newPassword && styles.errorInput,
+                      ]}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="New Password"
+                      secureTextEntry={!showPassword} // Toggle secure text entry
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        right: 10, // Position inside the input
+                        padding: 10,
+                      }}
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye" : "eye-off"}
+                        size={24}
+                        color="#000"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </LinearGradient>
+              );
+            }}
+            name="newPassword"
+            defaultValue=""
+          />
+          {errors.newPassword && (
+            <ThemedText style={styles.errorText}>
+              {errors.newPassword.message}
+            </ThemedText>
+          )}
+
+          {/* Confirm New Password Input */}
+          <Text style={[styles.paragraph]}>Confirm New Password</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "Confirm New Password is required",
+              validate: (value) =>
+                value === newPassword || "Passwords do not match",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => {
+              const [showPassword, setShowPassword] = useState(false);
+              return (
+                <LinearGradient
+                  colors={["#B9FF66", "#9DE8EE"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ borderRadius: 20 }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        errors.confirmNewPassword && styles.errorInput,
+                      ]}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Confirm New Password"
+                      secureTextEntry={!showPassword} // Toggle secure text entry
+                    />
+                  </View>
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     style={{
@@ -129,86 +197,26 @@ export default function SetPasswordScreen() {
                       color="#000"
                     />
                   </TouchableOpacity>
-                </View>
-              </LinearGradient>
-            );
-          }}
-          name="newPassword"
-          defaultValue=""
-        />
-        {errors.newPassword && (
-          <ThemedText style={styles.errorText}>
-            {errors.newPassword.message}
-          </ThemedText>
-        )}
+                </LinearGradient>
+              );
+            }}
+            name="confirmNewPassword"
+            defaultValue=""
+          />
+          {errors.confirmNewPassword && (
+            <ThemedText style={styles.errorText}>
+              {errors.confirmNewPassword.message}
+            </ThemedText>
+          )}
 
-        {/* Confirm New Password Input */}
-        <Text style={[styles.paragraph]}>Confirm New Password</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "Confirm New Password is required",
-            validate: (value) =>
-              value === newPassword || "Passwords do not match",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters long",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => {
-            const [showPassword, setShowPassword] = useState(false);
-            return (
-            <LinearGradient
-              colors={["#B9FF66", "#9DE8EE"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ borderRadius: 20 }}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TextInput
-                  style={[
-                    styles.input,
-                    errors.confirmNewPassword && styles.errorInput,
-                  ]}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                  placeholder="Confirm New Password"
-                  secureTextEntry={!showPassword} // Toggle secure text entry
-                />
-              </View>
-              <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: "absolute",
-                      right: 10, // Position inside the input
-                      padding: 10,
-                    }}
-                  >
-                    <Ionicons
-                      name={showPassword ? "eye" : "eye-off"}
-                      size={24}
-                      color="#000"
-                    />
-                  </TouchableOpacity>
-            </LinearGradient>
-          )}}
-          name="confirmNewPassword"
-          defaultValue=""
-        />
-        {errors.confirmNewPassword && (
-          <ThemedText style={styles.errorText}>
-            {errors.confirmNewPassword.message}
-          </ThemedText>
-        )}
-
-        <AuthButtonGradient
-          label="Set Password"
-          onPress={handleSubmit(onSubmit)}
-          style={[{ marginTop: 15, width: "100%", marginHorizontal: 0 }]}
-        />
+          <AuthButtonGradient
+            label="Set Password"
+            onPress={handleSubmit(onSubmit)}
+            style={[{ marginTop: 15, width: "100%", marginHorizontal: 0 }]}
+          />
+        </ThemedView>
       </ThemedView>
-    </ThemedView>
+    </ScrollView>
   );
 }
 

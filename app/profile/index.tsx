@@ -23,8 +23,12 @@ import { Divider } from "@rneui/themed";
 import ActivityTab from "@/components/profile/ActivityTab";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { PartialUser, User } from "@/interfaces/userInterface";
-import { getPartialUserInfo, getUserPreviewGroups } from "@/redux/slices/authSlice";
+import {
+  getPartialUserInfo,
+  getUserPreviewGroups,
+} from "@/redux/slices/authSlice";
 import { useLocalSearchParams } from "expo-router";
+import { signOut } from "@react-native-firebase/auth";
 // type UserInfo = {
 //   username: string;
 //   avatar_url: string;
@@ -73,7 +77,7 @@ const Data = [
   mockGroup,
 ];
 export default function ProfileScreen() {
-  const { userID } = useLocalSearchParams<{userID: string}>()
+  const { userID } = useLocalSearchParams<{ userID: string }>();
 
   const selectedTabs = ["Readme", "Blog", "Activity"];
   const [selectedTab, setSelectedTab] = useState(selectedTabs[0]);
@@ -81,20 +85,20 @@ export default function ProfileScreen() {
   const { user, userGroups } = useAppSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState<UserInfo>(user!);
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!);
-  const [isOwnProfile, setIsOwnProfile] = useState(true)
+  const [isOwnProfile, setIsOwnProfile] = useState(true);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (userID) {
-      setIsOwnProfile(false)
+      setIsOwnProfile(false);
       dispatch(getPartialUserInfo(userID)).then((res) => {
-        const currentUserInfo = res.payload as PartialUser
+        const currentUserInfo = res.payload as PartialUser;
         if (res.payload) {
-          setUserInfo(currentUserInfo)
-          setStudentInfo(currentUserInfo)
+          setUserInfo(currentUserInfo);
+          setStudentInfo(currentUserInfo);
         }
-      })
+      });
     }
 
     dispatch(getUserPreviewGroups(userID ?? user._id));
@@ -103,10 +107,10 @@ export default function ProfileScreen() {
   useEffect(() => {
     console.log(userGroups);
   }, [userGroups]);
-  
+
   useEffect(() => {
-    console.log(isOwnProfile)
-  }, [isOwnProfile])
+    console.log(isOwnProfile);
+  }, [isOwnProfile]);
 
   return (
     // change light color to #fff later because figma of the app is not ready
@@ -114,7 +118,7 @@ export default function ProfileScreen() {
     <ParallaxFlatList style={styles.container} contentStyle={{ padding: 0 }}>
       {/* User Info */}
       <View style={{ padding: 20, gap: 20 }}>
-        <UserInfoComponent {...userInfo} isOwnProfile={isOwnProfile}/>
+        <UserInfoComponent {...userInfo} isOwnProfile={isOwnProfile} />
 
         {/* User student info */}
 
@@ -187,6 +191,8 @@ export default function ProfileScreen() {
         {selectedTab === "Activity" && <ActivityTab />}
       </View>
       {selectedTab === "Blog" && <BlogTab />}
+      {/* Sign out */}
+      
     </ParallaxFlatList>
   );
 }
@@ -220,4 +226,5 @@ const styles = StyleSheet.create({
     color: "#8A94AC",
     fontWeight: "bold",
   },
+  
 });

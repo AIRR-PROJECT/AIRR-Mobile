@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
@@ -72,6 +72,7 @@ export default function SignUpSecondPage() {
   };
   return (
     // change light color to #000 later because figma didn't have a color for light mode
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
     <ThemedView
       style={[styles.container]}
       darkColor="#1E1E1E"
@@ -311,6 +312,7 @@ export default function SignUpSecondPage() {
         </TouchableOpacity>
       </ThemedView>
     </ThemedView>
+    </ScrollView>
   );
 }
 

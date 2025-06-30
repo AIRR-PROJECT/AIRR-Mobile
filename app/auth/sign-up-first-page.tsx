@@ -3,7 +3,7 @@ import GradientText from "@/components/GradientText";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
@@ -44,7 +44,8 @@ export default function SignUpFirstPage() {
   };
   return (
     // change light color to #000 later because figma didn't have a color for light mode
-    <ThemedView
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+<ThemedView
       style={[styles.container]}
       darkColor="#1E1E1E"
       lightColor="#1E1E1E"
@@ -214,6 +215,8 @@ export default function SignUpFirstPage() {
       
       </ThemedView>
     </ThemedView>
+    </ScrollView>
+    
   );
 }
 

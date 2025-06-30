@@ -4,6 +4,7 @@ import {
   TextInput,
   View,
   Text,
+  ScrollView,
 } from "react-native";
 import AuthHeader from "@/components/auth/AuthHeader";
 import { ThemedView } from "@/components/ThemedView";
@@ -20,14 +21,22 @@ import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 type FormData = {
   email: string;
   password: string;
 };
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
-import { login, sendAccountOTP, resetLoggedIn, getUserInfo, setRememberedSignUpUser, getRememberedSignUpUser, loginGoogle } from "@/redux/slices/authSlice";
+import {
+  login,
+  sendAccountOTP,
+  resetLoggedIn,
+  getUserInfo,
+  setRememberedSignUpUser,
+  getRememberedSignUpUser,
+  loginGoogle,
+} from "@/redux/slices/authSlice";
 import { LoginCredentials } from "@/interfaces/authInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { getAuth, GoogleAuthProvider } from "@react-native-firebase/auth";
@@ -36,8 +45,11 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 export default function LoginScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isLoggedIn, isAccountVerified, rememberedSignUpUser } = useAppSelector(state => state.auth)
-  const { userAccessToken, userRefreshToken, user } = useAppSelector(state => state.user)
+  const { isLoggedIn, isAccountVerified, rememberedSignUpUser } =
+    useAppSelector((state) => state.auth);
+  const { userAccessToken, userRefreshToken, user } = useAppSelector(
+    (state) => state.user
+  );
 
   const {
     control,
@@ -47,98 +59,108 @@ export default function LoginScreen() {
     setValue,
     formState: { errors },
   } = useForm<FormData>();
-  
-  const emailWatch = watch('email')
 
-  const [init, setInit] = useState(false)
+  const emailWatch = watch("email");
+
+  const [init, setInit] = useState(false);
 
   const onSubmit = (data: LoginCredentials) => {
     if (isRememberChecked) {
-      dispatch(setRememberedSignUpUser(data.email))
+      dispatch(setRememberedSignUpUser(data.email));
     }
 
     dispatch(login(data)).then((res) => {
       if ((res.payload as any).success === true) {
-        dispatch(getUserInfo())
+        dispatch(getUserInfo());
       }
-    })
+    });
     // Alert.alert("Login Successful", `Welcome, ${data.email}`);
     // router.replace("/(tabs)");
   };
 
   const handleOnGoogleIconPress = async () => {
     try {
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
 
       // Sign out of google to allow re-selection of account
       await GoogleSignin.revokeAccess();
 
       // Get the users ID token
       const signInResult = await GoogleSignin.signIn();
-      
+
       if (signInResult.data) {
-        const idToken = signInResult.data.idToken
-        const googleCredential = GoogleAuthProvider.credential(idToken)
-        const userCredential = await getAuth().signInWithCredential(googleCredential)
-        const firebaseIdToken = await userCredential.user.getIdToken()
+        const idToken = signInResult.data.idToken;
+        const googleCredential = GoogleAuthProvider.credential(idToken);
+        const userCredential = await getAuth().signInWithCredential(
+          googleCredential
+        );
+        const firebaseIdToken = await userCredential.user.getIdToken();
 
         if (idToken)
-          dispatch(loginGoogle({
-            token: firebaseIdToken
-          }))
+          dispatch(
+            loginGoogle({
+              token: firebaseIdToken,
+            })
+          );
       }
+    } catch (err) {
+      console.log(err);
     }
-    catch (err) {
-      console.log(err)
-    }
-  }
+  };
 
   // Init
   useEffect(() => {
     // Reset
-    dispatch(resetLoggedIn(false))
+    dispatch(resetLoggedIn(false));
 
     // Get remembered sign in username
-    dispatch(getRememberedSignUpUser())
+    dispatch(getRememberedSignUpUser());
 
-    setInit(true)
-    
+    setInit(true);
+
     GoogleSignin.configure({
-      webClientId: "109964407356-q69pive7ro12lr21df12u29srei2vsvu.apps.googleusercontent.com"
+      webClientId:
+        "109964407356-q69pive7ro12lr21df12u29srei2vsvu.apps.googleusercontent.com",
     });
-  }, [])
+  }, []);
 
   // Trigger the Email validation if rememberedSignUpUser is not null/undefined
   useEffect(() => {
     if (rememberedSignUpUser) {
-      setValue("email", rememberedSignUpUser)
-      trigger("email")
+      setValue("email", rememberedSignUpUser);
+      trigger("email");
 
-      setRememberChecked(true)
+      setRememberChecked(true);
     }
-  }, [rememberedSignUpUser])
+  }, [rememberedSignUpUser]);
 
   useEffect(() => {
-    if (!init) return
+    if (!init) return;
 
     if (isLoggedIn && !isAccountVerified) {
       router.push({
         pathname: "/auth/verify-account-otp",
-        params: { resendEmail: emailWatch } 
+        params: { resendEmail: emailWatch },
       });
     }
 
-    if (isLoggedIn && isAccountVerified && userAccessToken && userRefreshToken) {
-      dispatch(getUserInfo())
+    if (
+      isLoggedIn &&
+      isAccountVerified &&
+      userAccessToken &&
+      userRefreshToken
+    ) {
+      dispatch(getUserInfo());
     }
-  }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken])
+  }, [isLoggedIn, isAccountVerified, userAccessToken, userRefreshToken]);
 
   useEffect(() => {
     if (user) {
-      router.replace("/(tabs)/dashboard")
+      router.replace("/(tabs)/dashboard");
     }
-  }, [user])
-
+  }, [user]);
 
   const [isRememberChecked, setRememberChecked] = useState(false);
   const handleToggleCheckbox = () => {
@@ -152,193 +174,211 @@ export default function LoginScreen() {
     router.push("/auth/sign-up-first-page");
   };
   return (
-    <ThemedView
-      style={styles.container}
-      darkColor="#1E1E1E"
-      lightColor="#1E1E1E"
-    >
-      <View>
-        <AuthHeader />
-      </View>
-      <View>
-        <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
-          Login
-        </GradientText>
-        <Text style={styles.text}>to get started!</Text>
-      </View>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+      <ThemedView
+        style={styles.container}
+        darkColor="#1E1E1E"
+        lightColor="#1E1E1E"
+      >
+        <View>
+          <AuthHeader />
+        </View>
+        <View>
+          <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
+            Login
+          </GradientText>
+          <Text style={styles.text}>to get started!</Text>
+        </View>
 
-      <ThemedView style={styles.formContainer}>
-        {/* Email Input */}
-        <Text style={[styles.paragraph]}>Username</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "Email is required",
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Enter a valid email address",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <LinearGradient
-              colors={["#B9FF66", "#9DE8EE"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ borderRadius: 20 }}
-            >
-              <TextInput
-                style={[styles.input, errors.email && styles.errorInput]}
-                placeholder="Email"
-                placeholderTextColor="#999"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </LinearGradient>
-          )}
-          name="email"
-        />
-        {errors.email && (
-          <ThemedText style={styles.errorText}>
-            {errors.email.message}
-          </ThemedText>
-        )}
-
-        {/* Password Input */}
-        <Text style={[styles.paragraph]}>Password</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters long",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => {
-            const [showPassword, setShowPassword] = useState(false);
-
-            return (
+        <ThemedView style={styles.formContainer}>
+          {/* Email Input */}
+          <Text style={[styles.paragraph]}>Username</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Enter a valid email address",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
               <LinearGradient
                 colors={["#B9FF66", "#9DE8EE"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                style={[{ borderRadius: 20 }]}
+                style={{ borderRadius: 20 }}
               >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <TextInput
-                    style={[styles.input, errors.password && styles.errorInput]}
-                    placeholder="Password"
-                    placeholderTextColor="#999"
-                    secureTextEntry={!showPassword} // Toggle secure text entry
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: "absolute",
-                      right: 10, // Position inside the input
-                      padding: 10,
-                    }}
-                  >
-                    <Ionicons
-                      name={showPassword ? "eye" : "eye-off"}
-                      size={24}
-                      color="#000"
-                    />
-                  </TouchableOpacity>
-                </View>
+                <TextInput
+                  style={[styles.input, errors.email && styles.errorInput]}
+                  placeholder="Email"
+                  placeholderTextColor="#999"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
               </LinearGradient>
-            );
-          }}
-          name="password"
-        />
+            )}
+            name="email"
+          />
+          {errors.email && (
+            <ThemedText style={styles.errorText}>
+              {errors.email.message}
+            </ThemedText>
+          )}
 
-        {errors.password && (
-          <ThemedText style={styles.errorText}>
-            {errors.password.message}
-          </ThemedText>
-        )}
+          {/* Password Input */}
+          <Text style={[styles.paragraph]}>Password</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => {
+              const [showPassword, setShowPassword] = useState(false);
 
-        <View style={[styles.section, { justifyContent: "space-between" }]}>
-          {/* Remember Me */}
+              return (
+                <LinearGradient
+                  colors={["#B9FF66", "#9DE8EE"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[{ borderRadius: 20 }]}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        errors.password && styles.errorInput,
+                      ]}
+                      placeholder="Password"
+                      placeholderTextColor="#999"
+                      secureTextEntry={!showPassword} // Toggle secure text entry
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        right: 10, // Position inside the input
+                        padding: 10,
+                      }}
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye" : "eye-off"}
+                        size={24}
+                        color="#000"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </LinearGradient>
+              );
+            }}
+            name="password"
+          />
 
-          <TouchableOpacity style={styles.section} onPress={handleToggleCheckbox}>
-            <Checkbox
-              style={styles.checkbox}
-              value={isRememberChecked}
-              onValueChange={setRememberChecked}
-              color={isRememberChecked ? "#B9FF66" : undefined}
-            />
-            <Text style={styles.paragraph}>Remember me</Text>
-          </TouchableOpacity>
+          {errors.password && (
+            <ThemedText style={styles.errorText}>
+              {errors.password.message}
+            </ThemedText>
+          )}
 
-          {/* Forgot Password */}
-          <TouchableOpacity onPress={handleForgotPassword}>
-            <GradientText
-              style={[
-                styles.text,
-                { textDecorationLine: "underline", fontSize: 15 },
-              ]}
-              colors={["#B9FF66", "#9DE8EE"]}
+          <View style={[styles.section, { justifyContent: "space-between" }]}>
+            {/* Remember Me */}
+
+            <TouchableOpacity
+              style={styles.section}
+              onPress={handleToggleCheckbox}
             >
-              Forgot password?
-            </GradientText>
-          </TouchableOpacity>
-        </View>
+              <Checkbox
+                style={styles.checkbox}
+                value={isRememberChecked}
+                onValueChange={setRememberChecked}
+                color={isRememberChecked ? "#B9FF66" : undefined}
+              />
+              <Text style={styles.paragraph}>Remember me</Text>
+            </TouchableOpacity>
 
-        {/* Submit Button */}
-        <AuthButtonGradient
-          label="Sign In"
-          onPress={handleSubmit(onSubmit)}
-          style={[{ marginTop: 10, width: "100%", marginHorizontal: 0 }]}
-        />
+            {/* Forgot Password */}
+            <TouchableOpacity onPress={handleForgotPassword}>
+              <GradientText
+                style={[
+                  styles.text,
+                  { textDecorationLine: "underline", fontSize: 15 },
+                ]}
+                colors={["#B9FF66", "#9DE8EE"]}
+              >
+                Forgot password?
+              </GradientText>
+            </TouchableOpacity>
+          </View>
 
-        {/* Other Options */}
-        <ThemedText
-          type="default"
-          style={[{ color: "#fff", alignSelf: "center" }]}
+          {/* Submit Button */}
+          <AuthButtonGradient
+            label="Sign In"
+            onPress={handleSubmit(onSubmit)}
+            style={[{ marginTop: 10, width: "100%", marginHorizontal: 0 }]}
+          />
+
+          {/* Other Options */}
+          <ThemedText
+            type="default"
+            style={[{ color: "#fff", alignSelf: "center" }]}
+          >
+            Or
+          </ThemedText>
+          {/* Or Google or Facebook */}
+          <View style={[styles.section, { justifyContent: "space-between" }]}>
+            <AuthButtonTransparent
+              label="Google"
+              style={styles.otherButton}
+              onPress={handleOnGoogleIconPress}
+            />
+
+            <AuthButtonTransparent
+              label="Facebook"
+              style={styles.otherButton}
+            />
+          </View>
+        </ThemedView>
+
+        {/* Sign Up Link*/}
+        <TouchableOpacity
+          style={{ alignSelf: "flex-start", marginHorizontal: 10 }}
+          onPress={handleSignUp}
         >
-          Or
-        </ThemedText>
-        {/* Or Google or Facebook */}
-        <View style={[styles.section, { justifyContent: "space-between" }]}>
-          <AuthButtonTransparent label="Google" style={styles.otherButton} onPress={handleOnGoogleIconPress} />
-
-          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
-        </View>
-      </ThemedView>
-
-      {/* Sign Up Link*/}
-      <TouchableOpacity style={{ alignSelf:'flex-start', marginHorizontal: 10 }} onPress={handleSignUp}>
-        <ThemedText
-          type="link"
-          style={[
-            {
-              color: "#fff",
-              alignSelf: "flex-start",
-              marginTop: 5,
-              textDecorationLine: "underline",
-            },
-          ]}
-        >
-          Don't have a account,{" "}
           <ThemedText
             type="link"
             style={[
               {
                 color: "#fff",
-                fontWeight: "bold",
+                alignSelf: "flex-start",
+                marginTop: 5,
+                textDecorationLine: "underline",
               },
             ]}
           >
-            Sign Up
+            Don't have a account,{" "}
+            <ThemedText
+              type="link"
+              style={[
+                {
+                  color: "#fff",
+                  fontWeight: "bold",
+                },
+              ]}
+            >
+              Sign Up
+            </ThemedText>
           </ThemedText>
-        </ThemedText>
-      </TouchableOpacity>
-    </ThemedView>
+        </TouchableOpacity>
+      </ThemedView>
+    </ScrollView>
   );
 }
 

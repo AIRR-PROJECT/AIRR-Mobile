@@ -5,7 +5,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
+import { StyleSheet, Text, TextInput, View, Pressable, ScrollView } from "react-native";
 import GradientText from "@/components/GradientText";
 import { EffectCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -56,6 +56,7 @@ export default function SignUpScreen() {
   }
 
   return (
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
     <ThemedView
       style={styles.container}
       darkColor="#1E1E1E"
@@ -160,6 +161,7 @@ export default function SignUpScreen() {
         />
       </ThemedView>
     </ThemedView>
+    </ScrollView>
   );
 }
 

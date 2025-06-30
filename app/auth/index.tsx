@@ -11,6 +11,7 @@ import { Dimensions, TouchableOpacity } from "react-native";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { logout, loadToken, getUserInfo } from "@/redux/slices/authSlice";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 

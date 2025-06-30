@@ -129,6 +129,16 @@ export interface PendingTagRequest {
     RequestDate: Date
 }
 
+export interface GroupMember {
+    MemberInfo: {
+        _id: string
+        Username: string
+        AvatarURL: string
+    },
+    Role: string,
+    JoinedDate?: Date
+}
+
 // export interface CreateGroup {
 //     Name: string;
 //     Description: string;

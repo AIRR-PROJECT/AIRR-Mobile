@@ -69,6 +69,10 @@ export default function LoginScreen() {
   const handleOnGoogleIconPress = async () => {
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+      // Sign out of google to allow re-selection of account
+      await GoogleSignin.revokeAccess();
+
       // Get the users ID token
       const signInResult = await GoogleSignin.signIn();
       

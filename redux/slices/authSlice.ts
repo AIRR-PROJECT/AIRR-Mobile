@@ -5,11 +5,12 @@ import { ChangeCurrentPasswordCredentials, LoginCredentials, SetPasswordCredenti
 import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { PartialUser, UpdateAvatar, UpdateUser, User, User1, UserActivity } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
-import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar } from "./userSlice";
+import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar, reset } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 import { useAppSelector } from "../hook";
 import { ToastAndroid } from "react-native";
 import { setCurrentBlogDisliked, setCurrentBlogLiked, setCurrentBlogSaved } from "./blogSlice";
+import { router } from "expo-router";
 
 const initialState = {
     rememberedSignUpUser: "",
@@ -478,6 +479,28 @@ export const getUserBlogSaveActivities = createAsyncThunk(
             return thunkAPI.rejectWithValue(err.response)
         }
     }   
+)
+
+export const logOut = createAsyncThunk(
+    'auth/logOut',
+    async (_, thunkAPI) => {
+        try {
+            const res = await api.post(`auth/revoke`)
+            if (res.data.success) {
+                thunkAPI.dispatch(reset())
+                await SecureStore.deleteItemAsync("accessToken")
+                await SecureStore.deleteItemAsync("refreshToken")
+                console.log("dismissed to first screen")
+                
+                return true
+            }
+            
+            return false
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }
 )
 
 const authSlice = createSlice({

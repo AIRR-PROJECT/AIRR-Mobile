@@ -215,7 +215,9 @@ export default function MyFeed() {
             showsVerticalScrollIndicator={false}
             onEndReached={handleOnUserBlogListEndReached}
             renderItem={({ item }) => {
-              return <FeedBlogPreview blog={item} onPressMoreButton={handlePressMoreOption}/>;
+              return <FeedBlogPreview blog={item} onPressMoreButton={
+                () => handlePressMoreOption(item.Author._id === user._id)
+              }/>;
             }}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={

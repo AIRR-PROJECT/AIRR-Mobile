@@ -189,8 +189,10 @@ export default function MyFeed() {
 
   const moreOptionRef = useRef<BottomSheet>(null);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
-  const handlePressMoreOption = (isUserWritten: boolean) => {
+  const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string) => {
     setIsUserWrittenBlog(isUserWritten);
+    setMoreOptionBlogId(blogId)
     if (moreOptionRef.current) {
       moreOptionRef.current.snapToIndex(0);
     }
@@ -216,7 +218,7 @@ export default function MyFeed() {
             onEndReached={handleOnUserBlogListEndReached}
             renderItem={({ item }) => {
               return <FeedBlogPreview blog={item} onPressMoreButton={
-                () => handlePressMoreOption(item.Author._id === user._id)
+                () => handlePressMoreOption(item.Author._id === user._id, item._id)
               }/>;
             }}
             onEndReachedThreshold={0.5}
@@ -294,7 +296,7 @@ export default function MyFeed() {
           />
         </View>
       )}
-      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog/>
+      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog={isUserWrittenBlog} blogId={moreOptionBlogId}/>
     </GestureHandlerRootView>
   );
 }

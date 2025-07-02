@@ -1,4 +1,6 @@
 import { CreateGroupTag } from "@/interfaces/groupInterface";
+import { useAppDispatch } from "@/redux/hook";
+import { createTag } from "@/redux/slices/groupSlice";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef } from "react";
 import {
@@ -12,8 +14,8 @@ import { useDispatch } from "react-redux";
 
 export default function CreateTagPage() {
     const route = useRouter();
-    const dispatch = useDispatch()
-    const { groupID } = useLocalSearchParams<{ groupID: string }>()
+    const dispatch = useAppDispatch()
+    const { groupID, fieldID } = useLocalSearchParams<{ groupID: string, fieldID: string }>()
     const tagName = useRef("")
 
     const handleTagNameTextChange = (val: string) => {
@@ -21,14 +23,14 @@ export default function CreateTagPage() {
     }
 
     const handleSubmit = () => {
-      // const createTagData: CreateGroupTag = {
-      //   TagName: tagName.current,
-      //   FieldID: ,
-      //   NumberOfBlogUse: 0,
-      //   IsDefaultTag: false
-      // }
+      const createTagData: CreateGroupTag = {
+        TagName: tagName.current,
+        FieldID: fieldID,
+        NumberOfBlogUse: 0,
+        IsDefaultTag: false
+      }
       
-      // dispatch()
+      dispatch(createTag(createTagData))
     }
     const handleCancel = () => {
         route.back();

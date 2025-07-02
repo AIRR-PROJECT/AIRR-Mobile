@@ -17,11 +17,15 @@ import { FlashList } from "@shopify/flash-list";
 import ProfileTabButton from "./ProfileTabButton";
 import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
+import { useAppDispatch } from "@/redux/hook";
+import { logOut } from "@/redux/slices/authSlice";
 // Get list of tags [max 10]
 const tags = Array(10).fill("Frontend");
 const chunkedTags = chunkArray(tags, 5);
 const mockLink = "https://dly.to/dfdsc";
 export default function ReadmeTab() {
+  const dispatch = useAppDispatch()
+
   const handleCopyLink = async () => {
     await Clipboard.setStringAsync(mockLink);
 
@@ -29,9 +33,11 @@ export default function ReadmeTab() {
   };
   const route = useRouter();
   const handleSignOut = () => {
-    // Handle sign out logic here
-    // For example, clear user data, navigate to login screen, etc.
-    route.push("/auth");
+    dispatch(logOut()).then((res) => {
+      if ((res.payload as boolean) === true) {
+        route.push("/auth");
+      }
+    })
   };
   return (
     // Readme

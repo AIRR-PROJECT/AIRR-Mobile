@@ -364,6 +364,25 @@ export const replyToBlogComment = createAsyncThunk(
     }
 )
 
+export const deleteBlog = createAsyncThunk(
+    'blog/deleteBlog',
+    async (blogId: string, thunkAPI) => {
+        try {
+            const res = await api.delete(`blogs/delete-blog?blogId=${blogId}`) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 const blogSlice = createSlice({
     name: 'blog',
     initialState,

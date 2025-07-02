@@ -1,3 +1,5 @@
+import { useAppDispatch } from "@/redux/hook";
+import { deleteBlog } from "@/redux/slices/blogSlice";
 import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -8,11 +10,19 @@ import { TouchableOpacity, StyleSheet, Text } from "react-native";
 type MoreOptionComponentProps = {
   sheetRef: React.RefObject<BottomSheet>;
   isUserWrittenBlog: boolean;
+  blogId: string
 };
 export default function MoreOptionBottomList({
   sheetRef,
   isUserWrittenBlog,
+  blogId
 }: MoreOptionComponentProps) {
+  const dispatch = useAppDispatch()
+
+  const onDeleteBlog = () => {
+    dispatch(deleteBlog(blogId))
+  }
+
   return (
     <BottomSheet
       ref={sheetRef}
@@ -40,7 +50,7 @@ export default function MoreOptionBottomList({
           </TouchableOpacity>
           <TouchableOpacity style={styles.bottomOptionButton}>
             {/* delete */}
-            <MaterialIcons name="delete" size={24} color="black" />
+            <MaterialIcons name="delete" size={24} color="black" onPress={onDeleteBlog}/>
             <Text style={styles.bottomOptionText}>Delete blog</Text>
           </TouchableOpacity>
         </BottomSheetView>

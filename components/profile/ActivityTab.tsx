@@ -69,6 +69,7 @@ export default function ActivityTab() {
 
   const [listData, setListData] = useState<(string | BlogActionHistory)[]>([])
   const [chartData, setChartData] = useState<ChartType[]>([])
+  const [timeSumText, setTimeSumText] = useState("0m")
 
   useEffect(() => {
     dispatch(getUserActivity()).then((res) => {
@@ -137,6 +138,25 @@ export default function ActivityTab() {
         listData.push(displayAct)
       })
 
+      // Calculate average time spent
+      let timeSum = monSum + tueSum + wedSum + thuSum + friSum + satSum + sunSum
+      let hours = Math.floor(timeSum / 60)
+      let minutes = timeSum % 60
+      let days = 0
+      let avg = ""
+
+      if (hours < 24) {
+        days = Math.floor(hours / 24)
+        hours = hours % 24
+      }
+
+      if (days != 0)
+        avg += `${days}d `
+      if (hours != 0)
+        avg += `${hours}h `
+      avg += `${minutes}m`
+      setTimeSumText(avg)
+
       // Set bar chart data
       const chartData: ChartType[] = [
         { value: monSum, label: "Mon" },
@@ -163,7 +183,7 @@ export default function ActivityTab() {
           style={styles.background}
         />
         <ThemedText style={styles.label}>Average time spent</ThemedText>
-        <ThemedText style={styles.averageTime}>4h 35m</ThemedText>
+        <ThemedText style={styles.averageTime}>{timeSumText}</ThemedText>
         <Divider
           orientation="vertical"
           style={{ width: "100%", borderColor: "#fff", borderWidth: 1 }}

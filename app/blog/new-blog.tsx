@@ -128,6 +128,7 @@ export default function NewBlog() {
   useEffect(() => {
     if (chosenGroup) {
       setFoundTags(chosenGroup?.Tags)
+      setChosenTags([])
     }
   }, [chosenGroup])
 
@@ -193,6 +194,7 @@ export default function NewBlog() {
     formData.append("title", title.current)
     formData.append("description", description.current)
     formData.append("content", content.current)
+    formData.append("viewType", "In Group")
 
     dispatch(createBlog(formData)).then((res) => {
       if (typeof res.payload === "boolean" && res.payload == true) {

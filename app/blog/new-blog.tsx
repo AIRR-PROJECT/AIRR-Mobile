@@ -28,7 +28,12 @@ import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
 import { getGroupInfo, getPreviewGroups } from "@/redux/slices/groupSlice";
-import { Group, GroupDetailInfo, GroupTag, PopularGroups } from "@/interfaces/groupInterface";
+import {
+  Group,
+  GroupDetailInfo,
+  GroupTag,
+  PopularGroups,
+} from "@/interfaces/groupInterface";
 import { useAppDispatch } from "@/redux/hook";
 import { ImageSource } from "expo-image";
 import { CreateBlog } from "@/interfaces/blogInterface";
@@ -42,14 +47,14 @@ const mockGroup: Group = {
   Owner: {
     _id: "",
     Username: "",
-    AvatarURL: ""
+    AvatarURL: "",
   },
   NumberOfMembers: 0,
   FieldName: "",
   CoverURL: "https://picsum.photos/300",
   Tags: [],
   members: [],
-  timestamp: ""
+  timestamp: "",
 };
 const mockGroupList = Array(25).fill(mockGroup);
 const mockTags = [
@@ -97,18 +102,18 @@ export function debounce<T extends (...args: any[]) => void>(
 
 export default function NewBlog() {
   const dispatch = useAppDispatch();
-  const { groupID } = useLocalSearchParams<{ groupID: string }>()
+  const { groupID } = useLocalSearchParams<{ groupID: string }>();
 
-  const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true)
+  const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true);
   const [chosenGroup, setChosenGroup] = useState<Group>();
   const groupSearchText = useRef("");
-  const [searchFoundGroups, setSearchFoundGroups] = useState<Group[]>([])
-  const [foundTags, setFoundTags] = useState<GroupTag[]>([])
+  const [searchFoundGroups, setSearchFoundGroups] = useState<Group[]>([]);
+  const [foundTags, setFoundTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
-  const uploadedImg = useRef<ImageSource>()
-  const title = useRef("")
-  const description = useRef("")
-  const content = useRef("")
+  const uploadedImg = useRef<ImageSource>();
+  const title = useRef("");
+  const description = useRef("");
+  const content = useRef("");
   // Bottom Sheet Refs
   const groupSheetRef = useRef<BottomSheet>(null);
   const tagsSheetRef = useRef<BottomSheet>(null);
@@ -119,17 +124,17 @@ export default function NewBlog() {
   useEffect(() => {
     if (groupID) {
       dispatch(getGroupInfo({ groupID })).then((res) => {
-        setChosenGroup(res.payload as Group)
-        setSelectGroupAllowed(false)
-      })
+        setChosenGroup(res.payload as Group);
+        setSelectGroupAllowed(false);
+      });
     }
-  }, [groupID])
+  }, [groupID]);
 
   useEffect(() => {
     if (chosenGroup) {
-      setFoundTags(chosenGroup?.Tags)
+      setFoundTags(chosenGroup?.Tags);
     }
-  }, [chosenGroup])
+  }, [chosenGroup]);
 
   // Callbacks
   const handleGroupSnapPress = useCallback((index: number) => {
@@ -145,13 +150,13 @@ export default function NewBlog() {
   }, []);
 
   const handleGroupSearchTextChange = (val: string) => {
-    groupSearchText.current = val
-  }
+    groupSearchText.current = val;
+  };
   const handleGroupSearchSubmit = () => {
     dispatch(getPreviewGroups(groupSearchText.current)).then((res) => {
-      setSearchFoundGroups(res.payload as Group[])
-    })
-  }
+      setSearchFoundGroups(res.payload as Group[]);
+    });
+  };
 
   const handleTagsSnapPress = useCallback((index: number) => {
     tagsSheetRef.current?.snapToIndex(index);
@@ -164,42 +169,49 @@ export default function NewBlog() {
   }, []);
 
   const handleTitleTextChange = (val: string) => {
-    title.current = val
-  }
+    title.current = val;
+  };
 
   const handleDescriptionTextChange = (val: string) => {
-    description.current = val
-  }
+    description.current = val;
+  };
 
   const handleContentTextChange = (val: string) => {
-    content.current = val
-  }
+    content.current = val;
+  };
 
   const handlePostBlogPress = () => {
-    if (!uploadedImg.current || !chosenGroup || !chosenTags || !title.current || !description.current || !content.current) {
-      Alert.alert("Error", "Missing field")
+    if (
+      !uploadedImg.current ||
+      !chosenGroup ||
+      !chosenTags ||
+      !title.current ||
+      !description.current ||
+      !content.current
+    ) {
+      Alert.alert("Error", "Missing field");
 
-      return
+      return;
     }
 
-    const formData = new FormData()
+    const formData = new FormData();
     formData.append("thumbnail", {
       uri: uploadedImg.current?.uri,
       name: uploadedImg.current?.fileName,
-      type: uploadedImg.current?.mimeType
-    })
-    formData.append("group", JSON.stringify(chosenGroup))
-    formData.append("tags", JSON.stringify(chosenTags))
-    formData.append("title", title.current)
-    formData.append("description", description.current)
-    formData.append("content", content.current)
+      type: uploadedImg.current?.mimeType,
+    });
+    formData.append("group", JSON.stringify(chosenGroup));
+    formData.append("tags", JSON.stringify(chosenTags));
+    formData.append("title", title.current);
+    formData.append("description", description.current);
+    formData.append("content", content.current);
 
     dispatch(createBlog(formData)).then((res) => {
       if (typeof res.payload === "boolean" && res.payload == true) {
-        router.replace("/my-feed")
+        router.replace("/my-feed");
       }
-    })
-  }
+    });
+  };
 
   // Render Item
   const renderGroupItem = useCallback(
@@ -286,16 +298,28 @@ export default function NewBlog() {
               activeOpacity={0.8}
             >
               <FontAwesome name="group" size={24} color="#fff" />
-
-              <Text style={styles.headingTitle}>
-                {chosenGroup ? chosenGroup.Name : "Select Group To Post"}
-              </Text>
-              <IconSymbol
-                name="chevron.right"
-                size={24}
-                weight="medium"
-                color={"#fff"}
-              />
+              <View>
+                <Text
+                  style={[
+                    styles.headingTitle,
+                    chosenGroup ? { marginLeft: 5 } : null
+                  ]}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
+                  {chosenGroup
+                    ? chosenGroup.Name 
+                    : "Select Group To Post"}
+                </Text>
+              </View>
+              {chosenGroup == undefined ? (
+                <IconSymbol
+                  name="chevron.right"
+                  size={24}
+                  weight="medium"
+                  color={"#fff"}
+                />
+              ) : null}
             </TouchableOpacity>
           </View>
         </View>
@@ -321,7 +345,9 @@ export default function NewBlog() {
 
               <View style={styles.tagsColumn}>
                 {chosenTags.length > 0 ? (
-                  chosenTags.map((tag) => <TagWrapper key={tag._id} tag={tag.TagName} />)
+                  chosenTags.map((tag) => (
+                    <TagWrapper key={tag._id} tag={tag.TagName} />
+                  ))
                 ) : (
                   <Text style={styles.headingTitle}>Select Tags for blog</Text>
                 )}
@@ -354,9 +380,11 @@ export default function NewBlog() {
               totally you. Let the world see your style!
             </Text>
             <View>
-              <UploadThumbnailComponent onSetImg={(imgSource) => {
-                uploadedImg.current = imgSource
-              }}/>
+              <UploadThumbnailComponent
+                onSetImg={(imgSource) => {
+                  uploadedImg.current = imgSource;
+                }}
+              />
             </View>
           </View>
         </View>
@@ -420,7 +448,10 @@ export default function NewBlog() {
           <View style={styles.divider} />
           <View style={{ flex: 1 }}>
             {/* QuillJS Here */}
-            <QuillEditor dom={{ matchContents: true }} onValueChange={handleContentTextChange} />
+            <QuillEditor
+              dom={{ matchContents: true }}
+              onValueChange={handleContentTextChange}
+            />
           </View>
         </View>
         {/* Post button */}
@@ -620,7 +651,7 @@ const styles = StyleSheet.create({
   },
   tagsColumn: {
     gap: 8,
-    alignItems: "center",
+    flexDirection: "row",
   },
   searchBar: {
     backgroundColor: "#2E3B40",

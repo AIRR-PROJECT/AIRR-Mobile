@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { Group } from "@/interfaces/groupInterface";
 
 type GroupDropdownComponentProps = {
-  groupData: Group,
+  groupData: Group;
   onPress: (data: { groupData: Group }) => void;
 };
 
@@ -27,9 +27,9 @@ export default function GroupDropdownComponent({
       {/* Group name */}
       <View style={styles.nameContainer}>
         {/* name */}
-        <Text style={styles.name}>{groupData.Name}</Text>
-        {/* id */}
-        <Text style={styles.id}>{groupData._id}</Text>
+        <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+          {groupData.Name}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
   // Group name and id
   nameContainer: {
     flexDirection: "column",
-    justifyContent: "center",
     alignItems: "flex-start",
     paddingLeft: 10,
     flex: 1,

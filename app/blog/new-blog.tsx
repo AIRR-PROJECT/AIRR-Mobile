@@ -7,6 +7,7 @@ import {
   Button,
   TouchableOpacity,
   Alert,
+  Dimensions,
 } from "react-native";
 import {
   FlatList,
@@ -99,7 +100,40 @@ export function debounce<T extends (...args: any[]) => void>(
     [callback, delay]
   );
 }
-
+const Private: Group = {
+  Name: "Private",
+  avatar: "",
+  _id: "",
+  Description: "",
+  Owner: {
+    _id: "",
+    Username: "",
+    AvatarURL: "",
+  },
+  NumberOfMembers: 0,
+  FieldName: "",
+  CoverURL: "",
+  Tags: [],
+  members: [],
+  timestamp: "",
+};
+const OnlyInMyProfile: Group = {
+  Name: "Only in my profile",
+  avatar: "",
+  _id: "",
+  Description: "",
+  Owner: {
+    _id: "",
+    Username: "",
+    AvatarURL: "",
+  },
+  NumberOfMembers: 0,
+  FieldName: "",
+  CoverURL: "",
+  Tags: [],
+  members: [],
+  timestamp: "",
+};
 export default function NewBlog() {
   const dispatch = useAppDispatch();
   const { groupID } = useLocalSearchParams<{ groupID: string }>();
@@ -107,7 +141,10 @@ export default function NewBlog() {
   const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true);
   const [chosenGroup, setChosenGroup] = useState<Group>();
   const groupSearchText = useRef("");
-  const [searchFoundGroups, setSearchFoundGroups] = useState<Group[]>([]);
+  const [searchFoundGroups, setSearchFoundGroups] = useState<Group[]>([
+    Private,
+    OnlyInMyProfile,
+  ]);
   const [foundTags, setFoundTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
   const uploadedImg = useRef<ImageSource>();
@@ -298,28 +335,28 @@ export default function NewBlog() {
               activeOpacity={0.8}
             >
               <FontAwesome name="group" size={24} color="#fff" />
-              <View>
+              <View
+                style={{
+                  width: "60%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <Text
-                  style={[
-                    styles.headingTitle,
-                    chosenGroup ? { marginLeft: 5 } : null
-                  ]}
+                  style={[styles.headingTitle]}
                   numberOfLines={2}
                   ellipsizeMode="tail"
                 >
-                  {chosenGroup
-                    ? chosenGroup.Name 
-                    : "Select Group To Post"}
+                  {chosenGroup ? chosenGroup.Name : "Select Group To Post"}
                 </Text>
               </View>
-              {chosenGroup == undefined ? (
-                <IconSymbol
-                  name="chevron.right"
-                  size={24}
-                  weight="medium"
-                  color={"#fff"}
-                />
-              ) : null}
+
+              <IconSymbol
+                name="chevron.right"
+                size={24}
+                weight="medium"
+                color={"#fff"}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -335,21 +372,58 @@ export default function NewBlog() {
         {/* Tags Selection */}
         <View style={[styles.rowContainer]}>
           <View style={styles.divider} />
+          {/* if group is "Private" or "In profile blog", disable this component */}
           <View style={{ flex: 1 }}>
             <TouchableOpacity
-              style={[styles.heading]}
+              style={[
+                styles.heading,
+                (chosenGroup?.Name === "Private" ||
+                  chosenGroup?.Name === "Only in my profile") && {
+                  opacity: 0.5,
+                },
+              ]}
               onPress={() => handleTagsSnapPress(0)}
               activeOpacity={0.8}
+              disabled={
+                chosenGroup?.Name === "Private" ||
+                chosenGroup?.Name === "Only in my profile"
+              }
             >
               <Feather name="flag" size={24} color="#fff" />
 
-              <View style={styles.tagsColumn}>
+              <View
+                style={[
+                  styles.tagsColumn,
+                  {
+                    flexDirection: chosenTags.length > 0 ? "row" : "column",
+                    flexWrap: chosenTags.length > 0 ? "wrap" : "nowrap",
+                  },
+                ]}
+              >
                 {chosenTags.length > 0 ? (
                   chosenTags.map((tag) => (
                     <TagWrapper key={tag._id} tag={tag.TagName} />
                   ))
                 ) : (
-                  <Text style={styles.headingTitle}>Select Tags for blog</Text>
+                  <Text
+                    style={[
+                      styles.headingTitle,
+                      {
+                        alignSelf: "center",
+                        color:
+                          chosenGroup?.Name === "Private" ||
+                          chosenGroup?.Name === "Only in my profile"
+                            ? "#D2AE17"
+                            : "#fff",
+                        textAlign: "justify",
+                      },
+                    ]}
+                  >
+                    {chosenGroup?.Name === "Private" ||
+                    chosenGroup?.Name === "Only in my profile"
+                      ? "Tags cannot be selected with private or only in profile blog"
+                      : "Select Tags for blog"}
+                  </Text>
                 )}
               </View>
 
@@ -556,7 +630,7 @@ const styles = StyleSheet.create({
     width: 40,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 25,
+    borderRadius: 20,
     backgroundColor: "#B9FF66",
   },
   section: {
@@ -583,7 +657,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#212531",
-    borderRadius: 90,
+    borderRadius: 25,
     padding: 20,
     flex: 1,
   },
@@ -650,8 +724,7 @@ const styles = StyleSheet.create({
     borderRadius: 9,
   },
   tagsColumn: {
-    gap: 8,
-    flexDirection: "row",
+    width: "70%",
   },
   searchBar: {
     backgroundColor: "#2E3B40",

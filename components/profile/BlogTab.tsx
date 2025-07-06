@@ -48,6 +48,8 @@ const mockBlog: UserBlog = {
     CoverURL: "https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png",
     Name: "Group's name",
     NumberOfMembers: 123,
+    _id: "",
+    Description: ""
   },
   UserInteraction: "like",
   Reaction: {

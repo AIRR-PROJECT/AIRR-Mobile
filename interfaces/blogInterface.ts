@@ -29,9 +29,11 @@ export interface UserBlogReaction {
     Comments: number;
 }
 export interface UserBlogGroup {
+    _id: string;
     CoverURL: string;
     Name: string;
     NumberOfMembers: number;
+    Description: string;
 }
 export interface UserBlogTag {
     _id: string;

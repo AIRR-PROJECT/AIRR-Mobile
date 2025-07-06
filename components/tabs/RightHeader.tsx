@@ -41,13 +41,11 @@ let selectedTags: Tag[] = [];
 let originalSuggestedTags: Tag[];
 let originalSelectedTags: Tag[];
 
-export default function RightHeader({
-  avatar,
-}: RightHeaderProps) {
+export default function RightHeader({ avatar }: RightHeaderProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
   const { user, userAvatar } = useAppSelector((state) => state.user);
-  const { notifCount } = useAppSelector(state => state.notif)
+  const { notifCount } = useAppSelector((state) => state.notif);
 
   const [suggestedTagsShow, setSuggestedTagsShow] = useState<boolean[]>([]);
   const [selectedTagsShow, setSelectedTagsShow] = useState<boolean[]>([]);
@@ -65,7 +63,7 @@ export default function RightHeader({
   useEffect(() => {
     refreshTags();
 
-    dispatch(countUnseenNotif())
+    dispatch(countUnseenNotif());
   }, []);
 
   // Handle on tags saved
@@ -206,6 +204,8 @@ export default function RightHeader({
       </ScrollView>
     );
   }
+  const [isSortDropdownVisible, setSortDropdownVisible] = useState(false);
+  const [sortOption, setSortOption] = useState("Default"); // or any default
 
   return (
     <View style={styles.container}>
@@ -226,9 +226,7 @@ export default function RightHeader({
         onPress={handleNotificationPress}
       >
         <Ionicons name="notifications-circle" size={24} color="#B9FF66" />
-        {notifCount > 0 && (
-          <Text style={styles.text}>{notifCount}</Text>
-        )}
+        {notifCount > 0 && <Text style={styles.text}>{notifCount}</Text>}
       </TouchableOpacity>
 
       <Divider orientation="vertical" width={1} />
@@ -340,10 +338,33 @@ export default function RightHeader({
                   </TouchableOpacity>
                 ))}
               </View>
-              <TouchableOpacity style={styles.modalSortButtonContainer}>
-                <ThemedText style={styles.modalSortButton}>Sort</ThemedText>
-                <Entypo name="select-arrows" size={24} color="black" />
-              </TouchableOpacity>
+              <View>
+                <TouchableOpacity
+                  style={styles.modalSortButtonContainer}
+                  onPress={() => setSortDropdownVisible((prev) => !prev)}
+                >
+                  <ThemedText style={styles.modalSortButton}>Sort</ThemedText>
+                  <Entypo name="select-arrows" size={24} color="black" />
+                </TouchableOpacity>
+
+                {isSortDropdownVisible && (
+                  <View style={styles.sortDropdown}>
+                    {["Popular", "By Date", "By Like", "By Comments"].map(
+                      (option) => (
+                        <TouchableOpacity
+                          key={option}
+                          onPress={() => {
+                            setSortOption(option);
+                            setSortDropdownVisible(false);
+                          }}
+                        >
+                          <Text style={styles.sortOption}>{option}</Text>
+                        </TouchableOpacity>
+                      )
+                    )}
+                  </View>
+                )}
+              </View>
             </View>
             <Divider
               orientation="horizontal"
@@ -506,5 +527,29 @@ const styles = StyleSheet.create({
   },
   tagsContainer: {
     flex: 1,
+  },
+  sortDropdown: {
+    minWidth: 150,
+    backgroundColor: "#2C2F36",
+    borderRadius: 8,
+    marginTop: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    position: "absolute",
+    right: 0,
+    zIndex: 999,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+
+  sortOption: {
+    color: "#fff",
+    paddingVertical: 8,
+    fontSize: 16,
+    flexWrap: "nowrap",
+    flexShrink: 1,
   },
 });

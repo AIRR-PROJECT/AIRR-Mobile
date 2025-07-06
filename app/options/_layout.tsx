@@ -40,6 +40,7 @@ export default function OptionsLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack
         screenOptions={{
+            
         }}
       >
         {/* Define the screens for the navigation stack */}

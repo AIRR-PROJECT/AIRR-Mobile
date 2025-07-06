@@ -526,9 +526,12 @@ export default function BlogScreen() {
             <View style={styles.dateAndComment}>
               <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
               <Text style={styles.smallText}>
-                {commentsDetail && commentsDetail.length > 0
-                  ? formatDistanceToNow(new Date(commentsDetail[0].createdAt), {addSuffix: true})
-                  : "No records"}
+                {/* Why this is commentDetail time, not blog createdAt time */}
+                {/* {commentsDetail && commentsDetail.length > 0
+                  ? formatDistanceToNow(new Date(commentsDetail[0].createdAt), {
+                      addSuffix: true,
+                    })
+                  : "No records"} */}
               </Text>
             </View>
             {/* Number of comment */}

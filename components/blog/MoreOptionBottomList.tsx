@@ -18,11 +18,7 @@ export default function MoreOptionBottomList({
   isUserWrittenBlog,
   blogId,
 }: MoreOptionComponentProps) {
-  const dispatch = useAppDispatch();
   const route = useRouter();
-  const onDeleteBlog = () => {
-    dispatch(deleteBlog(blogId));
-  };
   const handleHideBlog = () => {
     // Handle hiding the blog
     ToastAndroid.show("Blog hidden", ToastAndroid.SHORT);
@@ -36,11 +32,15 @@ export default function MoreOptionBottomList({
   };
   const handleEditBlog = () => {
     // Handle editing the blog
+    route.push("/blog/edit-blog");
+    // Pass the blogId to the edit blog screen
   };
   const handleDeleteBlog = () => {
     // Handle deleting the blog
     ToastAndroid.show("Blog deleted", ToastAndroid.SHORT);
+    // Dispatch the deleteBlog action with the blogId
   };
+  isUserWrittenBlog = true; // For testing purposes, set this to true
   return (
     <BottomSheet
       ref={sheetRef}
@@ -80,7 +80,7 @@ export default function MoreOptionBottomList({
               name="delete"
               size={24}
               color="black"
-              onPress={onDeleteBlog}
+              onPress={handleDeleteBlog}
             />
             <Text style={styles.bottomOptionText}>Delete blog</Text>
           </TouchableOpacity>
@@ -98,7 +98,7 @@ export default function MoreOptionBottomList({
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.bottomOptionButton}
-            onPress={handleReportBlog}
+            onPress={handleHideBlog}
             activeOpacity={0.8}
           >
             {/* Report */}

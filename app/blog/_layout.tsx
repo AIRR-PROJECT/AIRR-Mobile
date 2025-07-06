@@ -54,6 +54,18 @@ export default function BlogLayout() {
           }}
         />
         <Stack.Screen
+          name="edit-blog"
+          options={{
+            headerShown: true,
+            title: "Edit Blog",
+            headerStyle: {
+              backgroundColor: "#1E1E1E",
+            },
+            headerTintColor: "#fff",
+            headerTitleStyle: {},
+          }}
+        />
+        <Stack.Screen
           name="ai-blog"
           options={{
             headerShown: false,

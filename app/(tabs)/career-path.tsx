@@ -1,25 +1,22 @@
 import VerticalFlow from "@/components/dom-components/ReactFlow/ReactFlow";
 import { ExternalLink } from "@/components/ExternalLink";
-import { useAppDispatch } from "@/redux/hook";
-import { testStream } from "@/redux/slices/careerPathSlice";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { Link } from "expo-router";
 
-const webUrl = process.env.CAREER_PATH_WEB_URL || "";
 export default function CareerPath() {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(testStream());
-  }, []);
+  const webUrl = "https://github.com/SystemErrorWang/White-box-Cartoonization";
+  const linkRef = useRef(null);
 
   return (
     <View style={styles.container}>
       {/* <VerticalFlow dom={{ matchContents: true }} /> */}
       {/* This workflow is on web only */}
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={styles.text}>Career Path is currently only available on web.</Text>
-        <ExternalLink href={webUrl}>
+        <Text style={styles.text}>
+          Career Path is currently only available on web.
+        </Text>
+        <ExternalLink href={webUrl} ref={linkRef}>
           <Text style={styles.link}>
             Open in browser to view the career path workflow.
           </Text>

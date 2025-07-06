@@ -289,7 +289,6 @@ export default function MyFeed() {
                   >
                     User Blogs
                   </GradientText>
-                  <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
                 </View>
               </View>
             }

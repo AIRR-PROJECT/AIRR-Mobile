@@ -99,6 +99,8 @@ export default function NotificationsItem({
         break;
       default:
         const otherData = data as OtherNotification
+        route.push(`/profile?userID=${otherData.request_owner._id}`)
+
         break
     }
   };
@@ -167,13 +169,13 @@ export default function NotificationsItem({
           </View>
 
           <View style={{ marginLeft: 4 }}>
-            {type === NotificationType.OTHER && (
+            {/* {type === NotificationType.OTHER && (
               <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.7}>
                   <Text style={styles.buttonText}>Follow</Text>
                 </TouchableOpacity>
               </View>
-            )}
+            )} */}
             {type !== NotificationType.OTHER && (
               <View>
                 <Image

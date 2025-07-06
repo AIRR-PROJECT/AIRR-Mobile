@@ -12,11 +12,13 @@ type MoreOptionComponentProps = {
   sheetRef: React.RefObject<BottomSheet>;
   isUserWrittenBlog: boolean;
   blogId: string;
+  isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
 };
 export default function MoreOptionBottomList({
   sheetRef,
   isUserWrittenBlog,
   blogId,
+  isFromFeed = false, // Default to false if not provided
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const handleHideBlog = () => {
@@ -40,12 +42,11 @@ export default function MoreOptionBottomList({
     ToastAndroid.show("Blog deleted", ToastAndroid.SHORT);
     // Dispatch the deleteBlog action with the blogId
   };
-  isUserWrittenBlog = true; // For testing purposes, set this to true
   return (
     <BottomSheet
       ref={sheetRef}
       index={-1} // Start closed
-      snapPoints={["40%"]}
+      enableDynamicSizing
       enablePanDownToClose={true}
       backgroundStyle={{ backgroundColor: "#1E1E1E" }}
       handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
@@ -96,15 +97,17 @@ export default function MoreOptionBottomList({
             <Entypo name="circle-with-minus" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Hide blog</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.bottomOptionButton}
-            onPress={handleHideBlog}
-            activeOpacity={0.8}
-          >
-            {/* Report */}
-            <MaterialIcons name="report" size={24} color="black" />
-            <Text style={styles.bottomOptionText}>Report blog</Text>
-          </TouchableOpacity>
+          {isFromFeed && (
+            <TouchableOpacity
+              style={styles.bottomOptionButton}
+              onPress={handleHideBlog}
+              activeOpacity={0.8}
+            >
+              {/* Report */}
+              <MaterialIcons name="report" size={24} color="black" />
+              <Text style={styles.bottomOptionText}>Report blog</Text>
+            </TouchableOpacity>
+          )}
         </BottomSheetView>
       )}
     </BottomSheet>

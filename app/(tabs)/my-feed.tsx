@@ -295,7 +295,7 @@ export default function MyFeed() {
           />
         </View>
       )}
-      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog={isUserWrittenBlog} blogId={moreOptionBlogId}/>
+      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog={isUserWrittenBlog} blogId={moreOptionBlogId} isFromFeed={true}/>
     </GestureHandlerRootView>
   );
 }

@@ -56,6 +56,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
+import { formatDistanceToNow } from "date-fns";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -526,7 +527,7 @@ export default function BlogScreen() {
               <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
               <Text style={styles.smallText}>
                 {commentsDetail && commentsDetail.length > 0
-                  ? new Date(commentsDetail[0].createdAt).toDateString()
+                  ? formatDistanceToNow(new Date(commentsDetail[0].createdAt), {addSuffix: true})
                   : "No records"}
               </Text>
             </View>

@@ -1,5 +1,5 @@
 import { MaterialTopTabs } from "@/components/MaterialTopTabs";
-export default function DashboardTabLayout() {
+export default function FeedTabLayout() {
   return (
     <MaterialTopTabs
       style={{ flex: 1 }}

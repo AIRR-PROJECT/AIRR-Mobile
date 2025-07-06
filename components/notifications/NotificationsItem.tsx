@@ -132,7 +132,7 @@ export default function NotificationsItem({
           placeholderContentFit="cover"
         />
         <View style={styles.innerContainer}>
-          <View>
+          <View style={{ width: "75%" }}>
             <Text style={[styles.name, { color: seen ? "#000" : "#fff" }]}>
               {/* {from.firstName} {from.lastName} */}
               {from.username}

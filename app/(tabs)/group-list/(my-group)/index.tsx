@@ -7,6 +7,7 @@ import {
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Text,
@@ -37,48 +38,27 @@ export default function MyGroupTab() {
   // }, [popularFields]);
 
   useEffect(() => {
-    console.log(selectedId)
+    console.log(selectedId);
   }, [selectedId]);
-
+  const route = useRouter();
   console.log("selectedId", selectedId);
-
+  const handleCreateButtonPress = () => {
+    // Handle create group button press
+    console.log("Create Group button pressed");
+    route.push("/group/create-group");
+  };
   return (
     <View style={styles.container}>
-      {/* list tags */}
-      {/* <View style={styles.rowWrapper}>
-        <FlatList
-          data={fields}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.tabItem,
-                selectedId === item._id && styles.tabItemActive,
-              ]}
-              onPress={() => {
-                setSelectedId(item._id);
-              }}
-            >
-              <Text
-                style={{
-                  color: selectedId === item._id ? "#fff" : "#8A94AC",
-                  fontWeight: "bold",
-                }}
-              >
-                {item.FieldName}
-              </Text>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-        />
-        <FontAwesome name="caret-right" size={30} color="white" />
-      </View> */}
-      {/* Content based on selected tabs */}
-     
-      <GroupTab type="my"/>
-     
+      {/* Create Group Button */}
+      <TouchableOpacity
+        style={styles.createGroupButton}
+        onPress={handleCreateButtonPress}
+        activeOpacity={0.7}
+      >
+        <FontAwesome name="plus" size={24} color="#000" />
+        <Text style={styles.createGroupButtonText}>Create Group</Text>
+      </TouchableOpacity>
+      <GroupTab type="my" />
     </View>
   );
 }
@@ -118,5 +98,20 @@ const styles = StyleSheet.create({
   content: {
     color: "#fff",
     fontSize: 18,
+  },
+  createGroupButton: {
+    backgroundColor: "#B9FF66",
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+    justifyContent: "center",
+    marginHorizontal: 20,
+  },
+  createGroupButtonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

@@ -321,7 +321,7 @@ export default function NewBlog() {
     setRequestedTags(tags);
   };
   const handleRequestedTagPress = () => {
-    route.push("/add-tag-screen")
+    route.push("/request-tag-screen")
   }
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

@@ -23,11 +23,11 @@ type AddTagsComponentProps = {
   isCreate?: boolean; // Optional prop to indicate if it's for creating a new tag
 };
 const mockTags: string[] = ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6"];
-export default function AddTagsScreen({
+export default function CreateTagsScreen({
   isCreate = false, // Default to false if not provided
 }: AddTagsComponentProps) {
   // State to hold the new tag input by user
-  const [newTagToRequest, setNewTag] = useState<string>("");
+  const [newTagToCreate, setNewTag] = useState<string>("");
 
   // Const state to hold valid tag
   const [validTag, setValidTag] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export default function AddTagsScreen({
   const [selectableTags, setSelectableTags] = useState<string[]>([]);
 
   // Created/Requested Tag that user can deselect
-  const [requestedTags, setRequestedTags] = useState<string[]>([]);
+  const [createdTags, setCreatedTags] = useState<string[]>([]);
 
   const onChangeText = (text: string) => {
     setNewTag(text);
@@ -64,15 +64,14 @@ export default function AddTagsScreen({
     if (selectableTags.length > 0) {
       // Create a GroupTag object for each selected tag with incrementing _id
       // TODO: CHECK THE API FOR THE _ID HERE, I NOW JUST GENERATE A RANDOM ONE
-      const newTags: GroupTag[] = requestedTags.map((tag) => ({
+      const newTags: GroupTag[] = createdTags.map((tag) => ({
         _id: Math.random().toString(36).substring(2, 15), // Generate a random _id
         TagName: tag,
       }));
       setNewTag("");
       setValidTag(null);
       setSelectableTags([]);
-      //Go Back and send the new tags to the parent component
-      
+      //Go Back and send the new tags to thapp/request-tag-screen.tsxe parent component
     }
   };
   return (
@@ -101,14 +100,14 @@ export default function AddTagsScreen({
           onPress={() => {
             // Handle tag checking logic here
             // For now, just call onPress with a dummy tag
-            handleCheckTag(newTagToRequest);
+            handleCheckTag(newTagToCreate);
           }}
         >
           <Text style={styles.buttonText}>Check existing</Text>
         </TouchableOpacity>
       </View>
       {/* Select tag to add or deselect */}
-      <View style={[{flex: 1, gap: 10, marginBottom: 10},]}>
+      <View style={[{ flex: 1, gap: 10, marginBottom: 10 }]}>
         <View style={styles.selectTagBox}>
           <Text style={styles.selectTagText}>
             Your Tag match, please select:
@@ -128,7 +127,6 @@ export default function AddTagsScreen({
                 >
                   <Text style={styles.selectTagButtonText}>{tag}</Text>
                   <FontAwesome name="plus" size={20} color="#fff" />
-                  
                 </TouchableOpacity>
               ))}
             </View>
@@ -190,9 +188,11 @@ export default function AddTagsScreen({
             disabled={validTag === null}
           >
             {/* If user create a new tag that already existing, makje this component appear */}
-            {<Text style={styles.errorText}>
-              This tag is already existing!
-            </Text>}
+            {
+              <Text style={styles.errorText}>
+                This tag is already existing!
+              </Text>
+            }
           </TouchableOpacity>
         </View>
       </View>
@@ -231,6 +231,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    flex: 1,
   },
   searchBar: {
     backgroundColor: "#2E3B40",
@@ -238,6 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 20,
+    flex: 1,
   },
   selectTagBox: {
     backgroundColor: "#fff",
@@ -253,7 +255,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
-    gap: 5
+    gap: 5,
   },
   selectTagText: {
     color: "#000",
@@ -280,7 +282,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
-    gap: 5
+    gap: 5,
   },
   deselectTagText: {
     color: "#fff",
@@ -321,5 +323,5 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#FF6666",
     fontSize: 16,
-  }
+  },
 });

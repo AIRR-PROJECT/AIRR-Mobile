@@ -38,10 +38,7 @@ export default function BlogLayout() {
   // Render the app layout with theme provider and navigation stack
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack
-        screenOptions={{
-        }}
-      >
+      <Stack screenOptions={{}}>
         {/* Define the screens for the navigation stack */}
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen
@@ -62,13 +59,16 @@ export default function BlogLayout() {
             headerShown: false,
           }}
         />
-        <Stack.Screen name="comment-page" options={{ 
-          headerTitle: "Comments",
-          headerTintColor: "#fff",
-          headerStyle: {
-            backgroundColor: "#1E1E1E",
-          }
-          }} />
+        <Stack.Screen
+          name="comment-page"
+          options={{
+            headerTitle: "Comments",
+            headerTintColor: "#fff",
+            headerStyle: {
+              backgroundColor: "#1E1E1E",
+            },
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

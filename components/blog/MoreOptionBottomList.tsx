@@ -5,24 +5,42 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { TouchableOpacity, StyleSheet, Text } from "react-native";
+import { useRouter } from "expo-router";
+import { TouchableOpacity, StyleSheet, Text, ToastAndroid } from "react-native";
 
 type MoreOptionComponentProps = {
   sheetRef: React.RefObject<BottomSheet>;
   isUserWrittenBlog: boolean;
-  blogId: string
+  blogId: string;
 };
 export default function MoreOptionBottomList({
   sheetRef,
   isUserWrittenBlog,
-  blogId
+  blogId,
 }: MoreOptionComponentProps) {
-  const dispatch = useAppDispatch()
-
+  const dispatch = useAppDispatch();
+  const route = useRouter();
   const onDeleteBlog = () => {
-    dispatch(deleteBlog(blogId))
-  }
-
+    dispatch(deleteBlog(blogId));
+  };
+  const handleHideBlog = () => {
+    // Handle hiding the blog
+    ToastAndroid.show("Blog hidden", ToastAndroid.SHORT);
+  };
+  const handleReportBlog = () => {
+    // Handle reporting the blog
+    route.push("/options/report-blog");
+    // Check if user check any option in report blog screen
+    // If yes, then report the blog
+    ToastAndroid.show("Blog reported", ToastAndroid.SHORT);
+  };
+  const handleEditBlog = () => {
+    // Handle editing the blog
+  };
+  const handleDeleteBlog = () => {
+    // Handle deleting the blog
+    ToastAndroid.show("Blog deleted", ToastAndroid.SHORT);
+  };
   return (
     <BottomSheet
       ref={sheetRef}
@@ -43,25 +61,46 @@ export default function MoreOptionBottomList({
     >
       {isUserWrittenBlog ? (
         <BottomSheetView style={styles.contentContainer}>
-          <TouchableOpacity style={styles.bottomOptionButton}>
+          <TouchableOpacity
+            style={styles.bottomOptionButton}
+            onPress={handleEditBlog}
+            activeOpacity={0.8}
+          >
             {/* Edit */}
             <FontAwesome name="edit" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Edit blog</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomOptionButton}>
+          <TouchableOpacity
+            style={styles.bottomOptionButton}
+            onPress={handleHideBlog}
+            activeOpacity={0.8}
+          >
             {/* delete */}
-            <MaterialIcons name="delete" size={24} color="black" onPress={onDeleteBlog}/>
+            <MaterialIcons
+              name="delete"
+              size={24}
+              color="black"
+              onPress={onDeleteBlog}
+            />
             <Text style={styles.bottomOptionText}>Delete blog</Text>
           </TouchableOpacity>
         </BottomSheetView>
       ) : (
         <BottomSheetView style={styles.contentContainer}>
-          <TouchableOpacity style={styles.bottomOptionButton}>
+          <TouchableOpacity
+            style={styles.bottomOptionButton}
+            onPress={handleReportBlog}
+            activeOpacity={0.8}
+          >
             {/* Hide */}
             <Entypo name="circle-with-minus" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Hide blog</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomOptionButton}>
+          <TouchableOpacity
+            style={styles.bottomOptionButton}
+            onPress={handleReportBlog}
+            activeOpacity={0.8}
+          >
             {/* Report */}
             <MaterialIcons name="report" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Report blog</Text>

@@ -125,6 +125,15 @@ export default function RootLayout() {
                   headerShown: false,
                 }}
               />
+              <Stack.Screen
+                name="options"
+                options={{
+                  headerTitle: "Options",
+                   headerStyle: {
+                    backgroundColor: "#1E1E1E",
+                  },
+                }}
+              />
             </Stack>
             {userLoggedIn ? (
               <Redirect href="/(tabs)/dashboard" />

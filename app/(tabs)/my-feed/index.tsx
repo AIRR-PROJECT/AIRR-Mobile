@@ -236,11 +236,11 @@ export default function MyFeed() {
                   >
                     AI-Recommended Blogs
                   </GradientText>
-                  <Ionicons
+                  {/* <Ionicons
                     name="play-forward-circle-outline"
                     size={30}
                     color="#fff"
-                  />
+                  /> */}
                 </View>
 
                 {/* Change to carousel for better ux*/}

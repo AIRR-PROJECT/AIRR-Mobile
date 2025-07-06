@@ -23,7 +23,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Feather, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome } from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
 import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -39,7 +39,7 @@ import { useAppDispatch } from "@/redux/hook";
 import { ImageSource } from "expo-image";
 import { CreateBlog } from "@/interfaces/blogInterface";
 import { createBlog } from "@/redux/slices/blogSlice";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useRouter } from "expo-router";
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -137,7 +137,7 @@ const OnlyInMyProfile: Group = {
 export default function NewBlog() {
   const dispatch = useAppDispatch();
   const { groupID } = useLocalSearchParams<{ groupID: string }>();
-
+  const route = useRouter();
   const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true);
   const [chosenGroup, setChosenGroup] = useState<Group>();
   const groupSearchText = useRef("");
@@ -311,6 +311,18 @@ export default function NewBlog() {
       </BottomSheetFooter>
     );
   }, []);
+  // TODO: Check user role in selected group
+  // if user is admin/owner, don't allow to create tags
+  // if user is member, allow to create tags
+  const [isUserMember, setIsUserMember] = useState(true);
+  // Call backs for requested tags data
+  const [requestedTags, setRequestedTags] = useState<GroupTag[]>([]);
+  const handleRequestedTag = (tags: GroupTag[]) => {
+    setRequestedTags(tags);
+  };
+  const handleRequestedTagPress = () => {
+    route.push("/add-tag-screen")
+  }
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -434,6 +446,50 @@ export default function NewBlog() {
                 color={"#fff"}
               />
             </TouchableOpacity>
+            {/* Request tags component */}
+            {isUserMember && (
+              <View style={{ flex: 1, marginTop: 10 }}>
+                <TouchableOpacity
+                  style={[
+                    styles.heading,
+                    {
+                      justifyContent: "flex-start",
+                    },
+                  ]}
+                  onPress={handleRequestedTagPress}
+                  activeOpacity={0.8}
+                >
+                  <AntDesign
+                    name="pluscircleo"
+                    size={24}
+                    color="#B9FF66"
+                    style={{}}
+                  />
+                  {requestedTags.length > 0 ? (
+                    requestedTags.map((tag) => (
+                      // TODO: Check the API for the what should the _id be before request it
+                      <TagWrapper key={tag._id} tag={tag.TagName} />
+                    ))
+                  ) : (
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={[
+                          styles.headingTitle,
+                          {
+                            alignSelf: "center",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            textAlign: "justify",
+                          },
+                        ]}
+                      >
+                        Request new Tags
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
 
@@ -596,6 +652,8 @@ export default function NewBlog() {
       >
         <TagDropdownComponent tags={foundTags} onPress={onPressTag} />
       </BottomSheet>
+    
+      
     </GestureHandlerRootView>
   );
 }

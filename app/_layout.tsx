@@ -119,6 +119,12 @@ export default function RootLayout() {
                   headerShown: false,
                 }}
               />
+              <Stack.Screen
+                name="add-tag-screen"
+                options={{
+                  headerShown: false,
+                }}
+              />
             </Stack>
             {userLoggedIn ? (
               <Redirect href="/(tabs)/dashboard" />

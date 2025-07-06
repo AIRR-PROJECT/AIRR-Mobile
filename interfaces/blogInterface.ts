@@ -144,3 +144,15 @@ export interface ReplyToBlogComment {
     ReplyToCommentID: string;
     RootCommentID: string
 }
+
+export interface CreateReportBlog {
+    BlogID: string
+    GroupID: string
+    ReportType: string
+    Details: string
+}
+
+export interface UpdateHideBlog {
+    BlogID: string
+    Action: string
+}

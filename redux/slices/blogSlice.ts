@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { AIBlogDetail, CreateBlog, PostComment, ReplyToBlogComment, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
+import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
 
 const initialState = {
     currentAIBlog: null as unknown as AIBlogDetail,
@@ -369,6 +369,67 @@ export const deleteBlog = createAsyncThunk(
     async (blogId: string, thunkAPI) => {
         try {
             const res = await api.delete(`blogs/delete-blog?blogId=${blogId}`) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const createReportBlog = createAsyncThunk(
+    'blog/createReportBlog',
+    async (data: CreateReportBlog, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/create-report`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const updateHideBlog = createAsyncThunk(
+    'blog/updateHideBlog',
+    async (data: UpdateHideBlog, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/update-hide-blog`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const updateBlog = createAsyncThunk(
+    'blog/updateBlog',
+    async (data: FormData, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/update-blog`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }) as AxiosResponse
 
             if (res.data.success) {
                 return true

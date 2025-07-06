@@ -37,7 +37,7 @@ export interface PartialUser {
     avatarURL: string;
     firstName: string;
     lastName: string;
-    joinDate: Date;
+    dateOfBirth: string;
     profile: UserProfile;
 }
 

@@ -290,6 +290,7 @@ export const getPartialUserInfo = createAsyncThunk(
     async (user_id: string, thunkAPI) => {
         try {
             const res = await api.get(`users/partial-info-by-user-id?userID=${user_id}`)
+            console.log(res.data)
 
             if (res.data.success) {
                 return res.data.data.user as PartialUser
@@ -385,7 +386,7 @@ export const changeCurrentPassword = createAsyncThunk<void, ChangeCurrentPasswor
 )
 
 export const getUserActivity = createAsyncThunk(
-    'auth/getUserLikeActivity', 
+    'auth/getUserActivity', 
     async (_, thunkAPI) => {
         try {
             const res = await api.get(`users/get-activity-all`)

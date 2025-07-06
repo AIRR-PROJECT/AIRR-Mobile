@@ -4,10 +4,11 @@ import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "../tabs/feed/FeedBlogPreview";
 import { View } from "react-native";
 import queryClient from "@/redux/api/queryClient";
-import { fetchPersonalBlogs, fetchUserBlogs } from "@/redux/slices/feedSlice";
+import { fetchOtherPersonalBlogs, fetchPersonalBlogs, fetchUserBlogs } from "@/redux/slices/feedSlice";
 import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
 import { useAppDispatch } from "@/redux/hook";
 import { useState } from "react";
+import { useLocalSearchParams } from "expo-router";
 const mockBlog: UserBlog = {
   _id: "123",
   Title: "How to fix clipboard if it isn’t working",
@@ -69,24 +70,38 @@ const Data = [
 ];
 
 export default function BlogTab() {
+  const { userID } = useLocalSearchParams<{ userID: string }>()
+
   const dispatch = useAppDispatch();
   const [personalPage, setPersonalPage] = useState(1);
   const personalBlogsQuery = useQuery({
     queryKey: ["feed-personal"],
     queryFn: async () => {
-      const fetchedBlogs = await dispatch(fetchPersonalBlogs(personalPage));
-
-      console.log(fetchedBlogs.payload.blogList.blogs);
-      return fetchedBlogs.payload.blogList.blogs as UserBlog[];
+      if (!userID) {
+        const fetchedBlogs = await dispatch(fetchPersonalBlogs(personalPage));
+  
+        return fetchedBlogs.payload.blogList.blogs as UserBlog[];
+      }
+      else {
+        const fetchedBlogs = await dispatch(fetchOtherPersonalBlogs({ otherUserID: userID, page: personalPage }));
+  
+        return fetchedBlogs.payload.blogList.blogs as UserBlog[];
+      }
     },
     placeholderData: keepPreviousData,
   });
   const personalBlogsMutation = useMutation({
     mutationFn: async (page: number) => {
-      const moreFetchedBlogs = await dispatch(fetchPersonalBlogs(page));
+      if (!userID) {
+        const moreFetchedBlogs = await dispatch(fetchPersonalBlogs(page));
 
-      // console.log(moreFetchedBlogs.payload.blogList.blogs)
-      return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
+        return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
+      }
+      else {
+        const moreFetchedBlogs = await dispatch(fetchOtherPersonalBlogs({ otherUserID: userID, page: personalPage }));
+  
+        return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
+      }
     },
     onSuccess: (data: any) => {
       queryClient.setQueryData(["feed-personal"], (oldData: any) => {

@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, SectionList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SectionList,
+  Touchable,
+  TouchableOpacity,
+} from "react-native";
 import PopularGroupCardComponent from "./PopularGroupCardComponent";
 import GroupCardComponent from "./GroupCardComponent";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -21,7 +28,7 @@ const mockPopularGroup: Group = {
   Owner: {
     _id: "1",
     Username: "Owner",
-    AvatarURL: "https://picsum.photos/300"
+    AvatarURL: "https://picsum.photos/300",
   },
   NumberOfMembers: 350,
   _id: "Group IDasdasdsadsadsadsa",
@@ -30,17 +37,18 @@ const mockPopularGroup: Group = {
     "https://picsum.photos/350",
     "https://picsum.photos/350",
   ],
-  Description: "This group is for React developers of all levels to share knowledge, ask questions, and discuss best practices. Stay updated on the latest features, libraries, and trends in the React ecosystem. Happy coding... Happy coding...Happy coding...Happy coding...Happy coding...",
+  Description:
+    "This group is for React developers of all levels to share knowledge, ask questions, and discuss best practices. Stay updated on the latest features, libraries, and trends in the React ecosystem. Happy coding... Happy coding...Happy coding...Happy coding...Happy coding...",
   FieldName: "",
   CoverURL: "",
   Tags: [],
   avatar: "",
   members: [],
-  timestamp: ""
+  timestamp: "",
 };
 const mockGroupList = Array(10).fill(mockPopularGroup);
-const mockPaginationList = Array(10).fill(""); 
-const MOCKDATA: { title: string, data: Group[] }[] = [
+const mockPaginationList = Array(10).fill("");
+const MOCKDATA: { title: string; data: Group[] }[] = [
   {
     title: "Web",
     data: [
@@ -51,7 +59,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -59,7 +67,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -68,7 +76,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -76,7 +84,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -85,7 +93,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -93,7 +101,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -102,7 +110,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -110,7 +118,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -119,7 +127,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -127,7 +135,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
     ],
   },
@@ -141,7 +149,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -149,7 +157,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -158,7 +166,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -166,7 +174,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -175,7 +183,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -183,7 +191,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -192,7 +200,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -200,7 +208,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -209,7 +217,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -217,7 +225,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
     ],
   },
@@ -231,7 +239,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -239,7 +247,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -248,7 +256,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -256,7 +264,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -265,7 +273,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -273,7 +281,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -282,7 +290,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -290,7 +298,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -299,7 +307,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -307,7 +315,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
     ],
   },
@@ -321,7 +329,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -329,7 +337,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -338,7 +346,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -346,7 +354,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -355,7 +363,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -363,7 +371,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -372,7 +380,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -380,7 +388,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
       {
         _id: "group name",
@@ -389,7 +397,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Owner: {
           _id: "owner",
           Username: "Owner",
-          AvatarURL: "https://picsum.photos/320"
+          AvatarURL: "https://picsum.photos/320",
         },
         NumberOfMembers: 350,
         FieldName: "",
@@ -397,7 +405,7 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
         Tags: [],
         avatar: "",
         members: [],
-        timestamp: ""
+        timestamp: "",
       },
     ],
   },
@@ -410,9 +418,16 @@ const MOCKDATA: { title: string, data: Group[] }[] = [
 //   "#F5D399",
 //   "#F1F1F1",
 // ];
-export default function PopularGroupTab() {
-  const dispatch = useAppDispatch()
-  const { popularGroupsHorizontal, popularGroupsVertical } = useAppSelector(state => state.group)
+type PopularGroupTabProps = {
+  onPressSectionHeader?: (title: string) => void;
+};
+export default function PopularGroupTab({
+  onPressSectionHeader,
+}: PopularGroupTabProps) {
+  const dispatch = useAppDispatch();
+  const { popularGroupsHorizontal, popularGroupsVertical } = useAppSelector(
+    (state) => state.group
+  );
   const progress = useSharedValue(0);
 
   const carouselRef = useRef<ICarouselInstance>(null);
@@ -428,30 +443,38 @@ export default function PopularGroupTab() {
     });
   };
 
-  const [groupData, setGroupData] = useState<{ title: string, data: Group[] }[]>([])
-  
+  const [groupData, setGroupData] = useState<
+    { title: string; data: Group[] }[]
+  >([]);
+
   useEffect(() => {
-    dispatch(getPopularGroups())
-  }, [])
-  
+    dispatch(getPopularGroups());
+  }, []);
+
   useEffect(() => {
     // console.log(popularGroupsVertical)
     if (popularGroupsVertical) {
-      let data: SetStateAction<{ title: string; data: Group[]; }[]> = []
+      let data: SetStateAction<{ title: string; data: Group[] }[]> = [];
       popularGroupsVertical.map((fieldData) => {
         data.push({
           title: fieldData.fieldName,
-          data: fieldData.groups
-        })
-      })
-      setGroupData(data)
+          data: fieldData.groups,
+        });
+      });
+      setGroupData(data);
     }
-  }, [popularGroupsVertical])
+  }, [popularGroupsVertical]);
 
   useEffect(() => {
     // console.log(popularGroupsHorizontal)
-  }, [popularGroupsHorizontal])
-
+  }, [popularGroupsHorizontal]);
+  const handlePressSectionHeader = (title: string) => {
+    // Handle section header press
+    console.log(`Section header pressed: ${title}`);
+    if (onPressSectionHeader) {
+      onPressSectionHeader(title);
+    }
+  };
   return (
     // Container for the Popular Group Screen
     <View style={styles.container}>
@@ -494,73 +517,27 @@ export default function PopularGroupTab() {
                 />
               )}
             />
-            {/* <Pagination.Custom<{ color: string }>
-              progress={progress}
-              data={mockPaginationList}
-              size={20}
-              dotStyle={{
-                borderRadius: 16,
-                backgroundColor: "#262626",
-              }}
-              activeDotStyle={{
-                borderRadius: 8,
-                width: 40,
-                height: 30,
-                overflow: "hidden",
-                backgroundColor: "#f1f1f1",
-              }}
-              containerStyle={{
-                gap: 5,
-                marginBottom: 10,
-                alignItems: "center",
-                height: 10,
-              }}
-              horizontal
-              onPress={onPressPagination}
-              customReanimatedStyle={(progress, index, length) => {
-                let val = Math.abs(progress - index);
-                if (index === 0 && progress > length - 1) {
-                  val = Math.abs(progress - length);
-                }
-
-                return {
-                  transform: [
-                    {
-                      translateY: interpolate(
-                        val,
-                        [0, 1],
-                        [0, 0],
-                        Extrapolation.CLAMP
-                      ),
-                    },
-                  ],
-                };
-              }}
-              // renderItem={(item) => (
-              //   <View
-              //     style={{
-              //       backgroundColor: item.color,
-              //       flex: 1,
-              //     }}
-              //   />
-              // )}
-            /> */}
           </View>
         )}
         sections={groupData ?? MOCKDATA}
         keyExtractor={(item, index) => item._id + index}
         renderSectionHeader={({ section: { title } }) => (
-          <View style={[styles.rowContainer, { padding: 20 }]}>
-            <Text style={styles.title}>{title}</Text>
-            <View style={styles.iconContainer}>
-              <MaterialIcons
-                name="keyboard-double-arrow-right"
-                size={20}
-                color="white"
-                style={{ right: -1 }}
-              />
+          <TouchableOpacity
+            activeOpacity={0.6}
+            onPress={() => handlePressSectionHeader(title)}
+          >
+            <View style={[styles.rowContainer, { padding: 20 }]}>
+              <Text style={styles.title}>{title}</Text>
+              <View style={styles.iconContainer}>
+                <MaterialIcons
+                  name="keyboard-double-arrow-right"
+                  size={20}
+                  color="white"
+                  style={{ right: -1 }}
+                />
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         renderItem={({ item }) => (
           <GroupCardComponent
@@ -570,9 +547,11 @@ export default function PopularGroupTab() {
             members={item.NumberOfMembers}
             style={{
               paddingHorizontal: 20,
-            }} isJoined={false}          />
+            }}
+            isJoined={false}
+          />
         )}
-        style={{marginBottom: 20}}
+        style={{ marginBottom: 20 }}
         stickySectionHeadersEnabled={false}
         ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
       />

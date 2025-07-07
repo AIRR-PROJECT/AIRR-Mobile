@@ -25,9 +25,13 @@ export default function PopularGroupCardComponent({
     // Handle group press
     console.log(`Group pressed: ${name}`);
     route.push(`/group?groupId=${id}`);
-  }
+  };
   return (
-    <TouchableOpacity style={styles.container} activeOpacity={0.6} onPress={handleGroupPress}>
+    <TouchableOpacity
+      style={styles.container}
+      activeOpacity={0.6}
+      onPress={handleGroupPress}
+    >
       {/* Group image */}
       <View style={styles.bgTop} />
       <Image style={styles.image} source={avatar} />
@@ -35,13 +39,13 @@ export default function PopularGroupCardComponent({
       <View style={styles.rowContainer}>
         <View style={styles.nameAndId}>
           {/* name */}
-          <Text style={styles.name}>
-            {name.length > 15 ? `${name.slice(0, 12)}...` : name}
+          <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+            {name}
           </Text>
 
           {/* Group id  */}
-          <Text style={styles.groupId}>
-            @{id.length > 15 ? `${id.slice(0, 12)}...` : id}
+          <Text style={styles.groupId} numberOfLines={1} ellipsizeMode="tail">
+            @{id}
           </Text>
         </View>
         {/* member */}
@@ -64,10 +68,8 @@ export default function PopularGroupCardComponent({
         </View> */}
       </View>
       {/* Description */}
-      <Text style={styles.description}>
-        {description.length > 250
-          ? `${description.slice(0, 247)}...`
-          : description}
+      <Text style={styles.description} numberOfLines={4} ellipsizeMode="tail">
+        {description}
       </Text>
     </TouchableOpacity>
   );

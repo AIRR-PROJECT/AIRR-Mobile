@@ -63,11 +63,11 @@ export default function GroupCardComponent({
         </View>
       </View>
       {/* Join button */}
-      {!isJoined ?
+      {/* {!isJoined ?
         <TouchableOpacity style={styles.joinButton} onPress={handleJoinPress}>
           <Text style={styles.joinButtonText}>Join</Text>
         </TouchableOpacity>
-      : null}
+      : null} */}
     </TouchableOpacity>
   );
 }

@@ -17,10 +17,6 @@ import {
   Modal,
 } from "react-native";
 
-let fields: GroupField[] = [
-  { _id: "1", FieldName: "Popular" }, // Popular is the default selected tab with id "1"
-];
-
 export default function GroupPopularTab() {
   const dispatch = useAppDispatch();
   const { popularFields } = useAppSelector((state) => state.group);
@@ -31,34 +27,54 @@ export default function GroupPopularTab() {
     dispatch(getGroupPopularFields());
   }, []);
 
+  const [fields, setFields] = useState<GroupField[]>([
+    { _id: "1", FieldName: "Popular" },
+  ]);
+
   useEffect(() => {
     if (popularFields) {
-      // console.log(popularFields)
-      fields.push(...popularFields);
+      setFields([{ _id: "1", FieldName: "Popular" }, ...popularFields]);
     }
   }, [popularFields]);
 
   useEffect(() => {
+    console.log("selectedId", selectedId);
     if (selectedId === "1") {
       dispatch(getPopularGroups());
     }
   }, [selectedId]);
 
-  console.log("selectedId", selectedId);
-  const [currentOffset, setCurrentOffset] = useState(0);
+  const currentOffset = useRef(0);
+
   const handleArrowPress = () => {
-    // scroll the FlatList to the right
     refFields?.current?.scrollToOffset({
-      offset: currentOffset + 300, // Adjust the offset as needed
+      offset: currentOffset.current + 300, // Adjust as needed
       animated: true,
     });
   };
-  // Track scroll position
-const handleScroll = (event: { nativeEvent: { contentOffset: { x: any; }; }; }) => {
-  const offsetX = event.nativeEvent.contentOffset.x;
-  setCurrentOffset(offsetX);
-};
+
+  // Track scroll position without causing re-render
+  const handleScroll = ({ nativeEvent }: any) => {
+    const offsetX = nativeEvent.contentOffset.x;
+    if (Math.abs(currentOffset.current - offsetX) > 10) {
+      currentOffset.current = offsetX;
+    }
+  };
+
   const refFields = useRef<FlatList>(null);
+  const handlePressSectionHeader = (title: string) => {
+    // Handle section header press
+    // find fields with title, and index of it
+    const field = fields.find((field) => field.FieldName === title);
+    const index = fields.findIndex((field) => field.FieldName === title);
+    if (field) {
+      setSelectedId(field._id);
+      refFields.current?.scrollToIndex({
+        index: index,
+        animated: true,
+      });
+    }
+  }
   return (
     <View style={styles.container}>
       {/* list tags */}
@@ -99,7 +115,7 @@ const handleScroll = (event: { nativeEvent: { contentOffset: { x: any; }; }; }) 
       </View>
       {/* Content based on selected tabs */}
       {selectedId === "1" ? (
-        <PopularGroupTab />
+        <PopularGroupTab onPressSectionHeader={handlePressSectionHeader} />
       ) : (
         <GroupTab fieldID={selectedId} type="all" />
       )}

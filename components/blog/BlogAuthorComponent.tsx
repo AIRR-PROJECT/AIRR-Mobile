@@ -1,8 +1,10 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 type Author = {
+  _id: string
   Name: string;
   AvatarURL: string;
   Username: string;
@@ -11,26 +13,29 @@ type Author = {
 
 // later change this component to take a user prop
 export default function BlogAuthorComponent({
+  _id,
   Name,
   AvatarURL,
   Username,
   // streak,
 }: Author) {
-  // TODO: ADD AUTHOR NAME
+  const handleOnPress = () => {
+    router.push(`/profile?userID=${_id}`)
+  }
+  
   return (
-
-    <View style={styles.rowContainer}>
+    <TouchableOpacity style={styles.rowContainer} onPress={handleOnPress}>
       {/* User avatar */}
       <Image style={styles.authorImage} source={{ uri: AvatarURL }} />
       <View>
         <View style={[styles.rowContainer, {gap: 5}]}>
           
-          <Text style={styles.authorName}>{Name}</Text> 
+          <Text style={styles.authorName}>{Name.trim().length == 0 ? "No name" : Name}</Text> 
           {/* <Text style={styles.authorName}>{streak}</Text> */}
         </View>
         <Text style={styles.authorUsername}>@{Username}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

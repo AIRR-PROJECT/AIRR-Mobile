@@ -40,6 +40,7 @@ export const getUserBlogDetail = createAsyncThunk<UserBlogDetail, string>(
     async (blog_id: string, thunkAPI) => {
         try {
             const res = await api.get(`blogs/user-blog-detail?blogId=${blog_id}`) as AxiosResponse
+            console.log(res.data)
 
             if (res.data.success) {
                 return res.data.data.blogDetail as UserBlogDetail

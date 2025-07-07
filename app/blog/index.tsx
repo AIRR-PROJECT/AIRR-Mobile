@@ -8,7 +8,7 @@ import {
   Button,
 } from "react-native";
 import { Image } from "expo-image";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AntDesign,
@@ -43,6 +43,7 @@ import {
   AIBlogSection,
   PostComment,
   UserBlogComment,
+  UserBlogGroup,
   UserBlogTag,
 } from "@/interfaces/blogInterface";
 import {
@@ -62,22 +63,28 @@ const mockHtml = `
 sada
 </pre><p>ádasdadab</p>
 `;
-const mockGroup = {
-  name: "Group Name",
-  image: "https://picsum.photos/200",
+const mockGroup: UserBlogGroup = {
+  _id: "",
+  CoverURL: "https://picsum.photos/200",
+  Name: "Group Name",
+  NumberOfMembers: 0,
+  Description: "",
 };
 
 type Author = {
-  // name: string;
+  _id: string;
+  Name: string;
   AvatarURL: string;
   Username: string;
+  CreateDate: string
   // streak: number;
 };
 const mockAuthor: Author = {
-  // name: "FullName",
+  _id: "",
+  Name: "FullName",
   AvatarURL: "https://picsum.photos/200",
   Username: "user_name",
-  // streak: 120,
+  CreateDate: "",
 };
 const mockTags: UserBlogTag[] = [
   { TagName: "Frontend", _id: "1" },
@@ -276,6 +283,7 @@ export default function BlogScreen() {
   // User blog properties
   const [author, setAuthor] = useState(mockAuthor);
   const [tags, setTags] = useState(mockTags);
+  const [group, setGroup] = useState(mockGroup);
   const reactTimeout = 500;
   const [likes, setLikes] = useState(123);
   const [dislikes, setDislikes] = useState(123);
@@ -289,8 +297,6 @@ export default function BlogScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    console.log("searchParams: ");
-    console.log(searchParams);
     if (searchParams.aiBlogId) {
       dispatch(getAIBlogDetail(searchParams.aiBlogId));
     } else {
@@ -328,6 +334,7 @@ export default function BlogScreen() {
       setTitle(currentUserBlog.Title);
       setDescription(currentUserBlog.Description);
       setThumbnail(currentUserBlog.BackgroundURL);
+      setGroup(currentUserBlog.Group)
       setTags(currentUserBlog.Tags);
       setAuthor(currentUserBlog.Author);
       setLikes(currentUserBlog.Reaction.Likes);
@@ -472,6 +479,10 @@ export default function BlogScreen() {
     handleBookmark();
   }, 0.5);
 
+  const handleOnPressGroup = () => {
+    router.push(`/group?groupId=${currentUserBlog.Group._id}`)
+  }
+
   useEffect(() => {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
   }, [isCurrentBlogSaved]);
@@ -517,13 +528,12 @@ export default function BlogScreen() {
         />
         <View style={styles.scrollViewContent}>
           {/* Group Component */}
-          {!searchParams.aiBlogId && (
-            <View style={styles.groupContainer}>
-              <Image source={mockGroup.image} style={styles.groupImage} />
-              <Text style={styles.groupName}>{mockGroup.name}</Text>
-            </View>
-          )}
-
+          {searchParams.userBlogId &&
+            <TouchableOpacity style={styles.groupContainer} onPress={handleOnPressGroup}>
+              <Image source={group.CoverURL} style={styles.groupImage} />
+              <Text style={styles.groupName}>{group.Name}</Text>
+            </TouchableOpacity>
+          }
           {/* User Component */}
           {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
           {/* Title */}
@@ -540,6 +550,7 @@ export default function BlogScreen() {
                       addSuffix: true,
                     })
                   : "No records"} */}
+                {new Date(author.CreateDate).toDateString()}
               </Text>
             </View>
             {/* Number of comment */}
@@ -571,13 +582,13 @@ export default function BlogScreen() {
             </View>
           </View>
           {/* List of tags */}
-          {/* {searchParams.userBlogId && (
+          {searchParams.userBlogId && (
             <View style={styles.tagsContainer}>
               {tags.map((tag, index) => (
                 <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
               ))}
             </View>
-          )} */}
+          )}
 
           {/* Thumbnail */}
           {searchParams.userBlogId && (

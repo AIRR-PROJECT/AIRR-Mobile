@@ -37,11 +37,23 @@ import {
 } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ImageSource } from "expo-image";
-import { CreateBlog, CreateBlogTag, UserBlogDetail, UserBlogDetailForUpdate } from "@/interfaces/blogInterface";
-import { createBlog, getUserBlogDetailForUpdate, setCreateBlogCurrentTags, setCreateBlogRequestedTags, updateBlog } from "@/redux/slices/blogSlice";
+import {
+  CreateBlog,
+  CreateBlogTag,
+  UserBlogDetail,
+  UserBlogDetailForUpdate,
+} from "@/interfaces/blogInterface";
+import {
+  createBlog,
+  getUserBlogDetailForUpdate,
+  setCreateBlogCurrentTags,
+  setCreateBlogRequestedTags,
+  updateBlog,
+} from "@/redux/slices/blogSlice";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { Image } from "react-native";
+import { set } from "lodash";
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -59,7 +71,7 @@ const mockGroup: Group = {
   members: [],
   timestamp: "",
   FieldID: "",
-  IsAdminOrOwner: false
+  IsAdminOrOwner: false,
 };
 const mockGroupList = Array(25).fill(mockGroup);
 const mockTags = [
@@ -121,7 +133,7 @@ const Private: Group = {
   members: [],
   timestamp: "",
   FieldID: "",
-  IsAdminOrOwner: false
+  IsAdminOrOwner: false,
 };
 const OnlyInMyProfile: Group = {
   Name: "Only in my profile",
@@ -140,27 +152,36 @@ const OnlyInMyProfile: Group = {
   members: [],
   timestamp: "",
   FieldID: "",
-  IsAdminOrOwner: false
+  IsAdminOrOwner: false,
 };
 export default function Editblog() {
   const dispatch = useAppDispatch();
-  const { groupID, blogID } = useLocalSearchParams<{ groupID: string, blogID: string }>();
+  const { groupID, blogID } = useLocalSearchParams<{
+    groupID: string;
+    blogID: string;
+  }>();
   const route = useRouter();
 
-  const { createBlogCurrentTags, createBlogRequestedTags } = useAppSelector(state => state.blog)
+  const { createBlogCurrentTags, createBlogRequestedTags } = useAppSelector(
+    (state) => state.blog
+  );
 
   const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true);
   const [chosenGroup, setChosenGroup] = useState<Group | GroupDetailInfo>();
   const groupSearchText = useRef("");
-  const defaultSearchGroups: Group[] = [Private, OnlyInMyProfile]
-  const [searchFoundGroups, setSearchFoundGroups] = useState<Group[]>(defaultSearchGroups);
+  const defaultSearchGroups: Group[] = [Private, OnlyInMyProfile];
+  const [searchFoundGroups, setSearchFoundGroups] =
+    useState<Group[]>(defaultSearchGroups);
   const [foundTags, setFoundTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
-  const [chosenGroupTags, setChosenGroupTags] = useState<string[]>([])
+  const [chosenGroupTags, setChosenGroupTags] = useState<string[]>([]);
   const uploadedImg = useRef<ImageSource>();
   const title = useRef("");
   const description = useRef("");
   const content = useRef("");
+  // State for checking length of title and description
+  const [titleText, setTitleText] = useState("");
+  const [descriptionText, setDescriptionText] = useState("");
   // Bottom Sheet Refs
   const groupSheetRef = useRef<BottomSheet>(null);
   const tagsSheetRef = useRef<BottomSheet>(null);
@@ -169,49 +190,55 @@ export default function Editblog() {
   const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
 
   useEffect(() => {
-    dispatch(setCreateBlogCurrentTags([]))
-    dispatch(setCreateBlogRequestedTags([]))
-  }, [])
+    dispatch(setCreateBlogCurrentTags([]));
+    dispatch(setCreateBlogRequestedTags([]));
+  }, []);
 
   useEffect(() => {
     if (groupID) {
       dispatch(getGroupInfo({ groupID })).then((res) => {
-        const chosenGroup = res.payload as GroupDetailInfo
+        const chosenGroup = res.payload as GroupDetailInfo;
         setChosenGroup(chosenGroup);
         setSelectGroupAllowed(false);
-        setIsUserMember(chosenGroup.Role == GroupRole.Member)
+        setIsUserMember(chosenGroup.Role == GroupRole.Member);
 
-        let chosenGroupTagsString: string[] = []
+        let chosenGroupTagsString: string[] = [];
         chosenGroup.Tags.forEach((t) => {
-          chosenGroupTagsString.push(t.TagName)
-        })
-        setChosenGroupTags(chosenGroupTagsString)
-        dispatch(setCreateBlogCurrentTags(chosenGroupTagsString))
+          chosenGroupTagsString.push(t.TagName);
+        });
+        setChosenGroupTags(chosenGroupTagsString);
+        dispatch(setCreateBlogCurrentTags(chosenGroupTagsString));
       });
     }
   }, [groupID]);
-  
+
   useEffect(() => {
     if (blogID) {
       dispatch(getUserBlogDetailForUpdate(blogID)).then((res) => {
-        const data = res.payload as UserBlogDetailForUpdate
-        
+        const data = res.payload as UserBlogDetailForUpdate;
+
         switch (data.ViewType) {
           case "Private":
-            setChosenGroup(Private)
-            break
+            setChosenGroup(Private);
+            break;
           case "In Profile Page":
-            setChosenGroup(OnlyInMyProfile)
-            break
+            setChosenGroup(OnlyInMyProfile);
+            break;
         }
 
-        setChosenTags(data.Tags)
-        dispatch(setCreateBlogRequestedTags(data.PendingTags))
+        setChosenTags(data.Tags);
+        dispatch(setCreateBlogRequestedTags(data.PendingTags));
 
-        uploadedImg.current = Image.resolveAssetSource({ uri: data.BackgroundURL, fileName: "background.jpg", mimeType: "image/jpeg" })
-        title.current = data.Title
-        description.current = data.Description
-        content.current = data.Content
+        uploadedImg.current = Image.resolveAssetSource({
+          uri: data.BackgroundURL,
+          fileName: "background.jpg",
+          mimeType: "image/jpeg",
+        });
+        title.current = data.Title;
+        description.current = data.Description;
+        content.current = data.Content;
+        setTitleText(data.Title);
+        setDescriptionText(data.Description);
       });
     }
   }, [blogID]);
@@ -219,25 +246,29 @@ export default function Editblog() {
   useEffect(() => {
     if (chosenGroup) {
       setFoundTags(chosenGroup?.Tags);
-      setChosenTags([])
+      setChosenTags([]);
     }
   }, [chosenGroup]);
 
   useEffect(() => {
     if (chosenTags.length != 0) {
-      let chosenTagsString: string[] = []
+      let chosenTagsString: string[] = [];
       chosenTags.forEach((t) => {
         // Collect name of all the chosen tags and put them in a single array
         if (!createBlogCurrentTags.includes(t.TagName))
-          chosenTagsString.push(t.TagName)
-      })
-      dispatch(setCreateBlogCurrentTags([...chosenGroupTags, ...chosenTagsString]))
+          chosenTagsString.push(t.TagName);
+      });
+      dispatch(
+        setCreateBlogCurrentTags([...chosenGroupTags, ...chosenTagsString])
+      );
     }
-  }, [chosenTags])
+  }, [chosenTags]);
 
   useEffect(() => {
-    console.log(`createBlogRequestedTags: ${JSON.stringify(createBlogRequestedTags)}`)
-  }, [createBlogRequestedTags])
+    console.log(
+      `createBlogRequestedTags: ${JSON.stringify(createBlogRequestedTags)}`
+    );
+  }, [createBlogRequestedTags]);
 
   // Callbacks
   const handleGroupSnapPress = useCallback((index: number) => {
@@ -258,10 +289,11 @@ export default function Editblog() {
   const handleGroupSearchSubmit = () => {
     if (groupSearchText.current.length != 0) {
       dispatch(getPreviewGroups(groupSearchText.current)).then((res) => {
-        setSearchFoundGroups(defaultSearchGroups.concat(res.payload as Group[]));
+        setSearchFoundGroups(
+          defaultSearchGroups.concat(res.payload as Group[])
+        );
       });
-    }
-    else {
+    } else {
       setSearchFoundGroups(defaultSearchGroups);
     }
   };
@@ -277,10 +309,12 @@ export default function Editblog() {
   }, []);
 
   const handleTitleTextChange = (val: string) => {
+    setTitleText(val);
     title.current = val;
   };
 
   const handleDescriptionTextChange = (val: string) => {
+    setDescriptionText(val);
     description.current = val;
   };
 
@@ -303,30 +337,56 @@ export default function Editblog() {
     }
 
     const formData = new FormData();
-    console.log(uploadedImg.current)
+    console.log(uploadedImg.current);
     formData.append("thumbnail", {
       uri: uploadedImg.current?.uri,
       name: uploadedImg.current?.fileName,
-      type: uploadedImg.current?.mimeType
-    })
-    formData.append("blogID", blogID)
-    formData.append("group", chosenGroup.Name != Private.Name && chosenGroup.Name && OnlyInMyProfile.Name ? JSON.stringify(chosenGroup) : null)
+      type: uploadedImg.current?.mimeType,
+    });
+    formData.append("blogID", blogID);
+    formData.append(
+      "group",
+      chosenGroup.Name != Private.Name &&
+        chosenGroup.Name &&
+        OnlyInMyProfile.Name
+        ? JSON.stringify(chosenGroup)
+        : null
+    );
 
-    const chosenTagsReformatted: CreateBlogTag[] = JSON.parse(JSON.stringify(chosenTags)) as CreateBlogTag[]
+    const chosenTagsReformatted: CreateBlogTag[] = JSON.parse(
+      JSON.stringify(chosenTags)
+    ) as CreateBlogTag[];
     chosenTagsReformatted.forEach((t) => {
-      t.OperationType = "tag-in-group"
-    })
-    const requestedTagsReformatted: CreateBlogTag[] = JSON.parse(JSON.stringify(createBlogRequestedTags)) as CreateBlogTag[]
+      t.OperationType = "tag-in-group";
+    });
+    const requestedTagsReformatted: CreateBlogTag[] = JSON.parse(
+      JSON.stringify(createBlogRequestedTags)
+    ) as CreateBlogTag[];
     requestedTagsReformatted.forEach((t) => {
-      t.OperationType = "pending-tag-in-group"
-    })
-    formData.append("tags", chosenGroup.Name != Private.Name && chosenGroup.Name && OnlyInMyProfile.Name ? JSON.stringify([...chosenTagsReformatted, ...requestedTagsReformatted]) : null)
-    
-    formData.append("title", title.current)
-    formData.append("description", description.current)
-    formData.append("content", content.current)
-    let viewType = chosenGroup.Name == "Private" ? "Private" : (chosenGroup.Name == "Only in my profile" ? "In Profile Page" : "In Group")
-    formData.append("viewType", viewType)
+      t.OperationType = "pending-tag-in-group";
+    });
+    formData.append(
+      "tags",
+      chosenGroup.Name != Private.Name &&
+        chosenGroup.Name &&
+        OnlyInMyProfile.Name
+        ? JSON.stringify([
+            ...chosenTagsReformatted,
+            ...requestedTagsReformatted,
+          ])
+        : null
+    );
+
+    formData.append("title", title.current);
+    formData.append("description", description.current);
+    formData.append("content", content.current);
+    let viewType =
+      chosenGroup.Name == "Private"
+        ? "Private"
+        : chosenGroup.Name == "Only in my profile"
+        ? "In Profile Page"
+        : "In Group";
+    formData.append("viewType", viewType);
 
     dispatch(updateBlog(formData)).then((res) => {
       if (typeof res.payload === "boolean" && res.payload == true) {
@@ -342,14 +402,14 @@ export default function Editblog() {
         groupData={item}
         onPress={(data) => {
           setChosenGroup(data.groupData);
-          setIsUserMember(!data.groupData.IsAdminOrOwner)
+          setIsUserMember(!data.groupData.IsAdminOrOwner);
 
-          let chosenGroupTagsString: string[] = []
+          let chosenGroupTagsString: string[] = [];
           data.groupData.Tags.forEach((t) => {
-            chosenGroupTagsString.push(t.TagName)
-          })
-          setChosenGroupTags(chosenGroupTagsString)
-          dispatch(setCreateBlogCurrentTags(chosenGroupTagsString))
+            chosenGroupTagsString.push(t.TagName);
+          });
+          setChosenGroupTags(chosenGroupTagsString);
+          dispatch(setCreateBlogCurrentTags(chosenGroupTagsString));
 
           handleGroupSnapClose();
         }}
@@ -358,9 +418,9 @@ export default function Editblog() {
     []
   );
   const onPressTag = (listTags: GroupTag[]) => {
-      console.log("List tags selected:", listTags);
-      setChosenTags(listTags);
-    }
+    console.log("List tags selected:", listTags);
+    setChosenTags(listTags);
+  };
   const handleCreateGroup = () => {
     // Handle create group logic here
     console.log("Create Group Pressed");
@@ -411,8 +471,12 @@ export default function Editblog() {
     setRequestedTags(tags);
   };
   const handleRequestedTagPress = (fieldID: string) => {
-    route.push(`/request-tag-screen?fieldID=${fieldID}&groupID=${groupID ?? chosenGroup?._id}`)
-  }
+    route.push(
+      `/request-tag-screen?fieldID=${fieldID}&groupID=${
+        groupID ?? chosenGroup?._id
+      }`
+    );
+  };
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -537,20 +601,27 @@ export default function Editblog() {
               />
             </TouchableOpacity>
             {/* Request tags component */}
-            {isUserMember && ((chosenGroup?.Name !== "Private" &&
-                          chosenGroup?.Name !== "Only in my profile") && chosenGroup !== undefined) && (
-              <View style={{ flex: 1, marginTop: 10 }}>
-                <TouchableOpacity
-                  style={[
-                    styles.heading,
-                    {
-                      justifyContent: "flex-start",
-                    },
-                  ]}
-                  onPress={() => {handleRequestedTagPress((chosenGroup as Group)?.FieldID ?? (chosenGroup as GroupDetailInfo).Field?._id!)}}
-                  activeOpacity={0.8}
-                >
-                  <View
+            {isUserMember &&
+              chosenGroup?.Name !== "Private" &&
+              chosenGroup?.Name !== "Only in my profile" &&
+              chosenGroup !== undefined && (
+                <View style={{ flex: 1, marginTop: 10 }}>
+                  <TouchableOpacity
+                    style={[
+                      styles.heading,
+                      {
+                        justifyContent: "flex-start",
+                      },
+                    ]}
+                    onPress={() => {
+                      handleRequestedTagPress(
+                        (chosenGroup as Group)?.FieldID ??
+                          (chosenGroup as GroupDetailInfo).Field?._id!
+                      );
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <View
                     // style={[
                     //   styles.tagsColumn,
                     //   {
@@ -558,45 +629,44 @@ export default function Editblog() {
                     //     flexWrap: createBlogRequestedTags.length > 0 ? "wrap" : "nowrap",
                     //   },
                     // ]}
-                  >
-                    {createBlogRequestedTags.length > 0 && (
-                      createBlogRequestedTags.map((tag) => (
-                        <TagWrapper key={tag._id} tag={tag.TagName} />
-                      ))
-                    )}
+                    >
+                      {createBlogRequestedTags.length > 0 &&
+                        createBlogRequestedTags.map((tag) => (
+                          <TagWrapper key={tag._id} tag={tag.TagName} />
+                        ))}
 
-                    <AntDesign
-                      name="pluscircleo"
-                      size={24}
-                      color="#B9FF66"
-                      style={{}}
-                    />
-                    {requestedTags.length > 0 ? (
-                      requestedTags.map((tag) => (
-                        // TODO: Check the API for the what should the _id be before request it
-                        <TagWrapper key={tag._id} tag={tag.TagName} />
-                      ))
-                    ) : (
-                      <View style={{ flex: 1 }}>
-                        <Text
-                          style={[
-                            styles.headingTitle,
-                            {
-                              alignSelf: "center",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              textAlign: "justify",
-                            },
-                          ]}
-                        >
-                          Request new Tags
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              </View>
-            )}
+                      <AntDesign
+                        name="pluscircleo"
+                        size={24}
+                        color="#B9FF66"
+                        style={{}}
+                      />
+                      {requestedTags.length > 0 ? (
+                        requestedTags.map((tag) => (
+                          // TODO: Check the API for the what should the _id be before request it
+                          <TagWrapper key={tag._id} tag={tag.TagName} />
+                        ))
+                      ) : (
+                        <View style={{ flex: 1 }}>
+                          <Text
+                            style={[
+                              styles.headingTitle,
+                              {
+                                alignSelf: "center",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                textAlign: "justify",
+                              },
+                            ]}
+                          >
+                            Request new Tags
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )}
           </View>
         </View>
 
@@ -647,7 +717,17 @@ export default function Editblog() {
               numberOfLines={3}
               defaultValue={title.current}
               onChangeText={handleTitleTextChange}
+              maxLength={150}
             />
+            <Text
+              style={{
+                color: "#A2B5A5",
+                alignSelf: "flex-end",
+                marginRight: 10,
+              }}
+            >
+              {titleText.length}/150
+            </Text>
           </View>
         </View>
 
@@ -671,7 +751,17 @@ export default function Editblog() {
               numberOfLines={3}
               defaultValue={description.current}
               onChangeText={handleDescriptionTextChange}
+              maxLength={250}
             />
+            <Text
+              style={{
+                color: "#A2B5A5",
+                alignSelf: "flex-end",
+                marginRight: 10,
+              }}
+            >
+              {descriptionText.length}/250
+            </Text>
           </View>
         </View>
 
@@ -763,8 +853,6 @@ export default function Editblog() {
       >
         <TagDropdownComponent tags={foundTags} onPress={onPressTag} />
       </BottomSheet>
-    
-      
     </GestureHandlerRootView>
   );
 }

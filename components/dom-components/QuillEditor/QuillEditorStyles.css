@@ -8,6 +8,9 @@
     border-radius: 20px;            /* Rounded corners */
     color: white;                   /* Default text color */
     padding: 1rem;                 /* Internal spacing */
+    height: auto;                /* Full height of the parent */
+    min-height: 300px;          /* Minimum height for the editor */
+    overflow: auto;
 }
 
 /* ===================== */
@@ -18,7 +21,9 @@
     font-family: inherit;          /* Inherit font from parent */
     line-height: 1.5;              /* Comfortable line spacing */
     padding: 12px 15px;            /* Internal padding */
-    height: 350px;                
+    height: auto !important;            
+    min-height: 300px;          /* Minimum height for content */
+    overflow-y: auto;              /* Enable vertical scrolling */    
 }
 
 /* Heading styles for the editor content */
@@ -62,8 +67,10 @@
     border-color: #4b5563 !important;  /* Matching dark gray border */
     border-radius: 0 0 8px 8px;    /* Rounded bottom corners */
     background-color: #1f2937;     /* Slightly darker background */
-    min-height: 200px;             /* Minimum editor height */
+    min-height: 300px;             /* Minimum editor height */
     font-size: 16px;               /* Base font size */
+    /* Expaand height */
+    height: 100%;                  /* Full height of the container */
 }
 
 /* ===================== */

@@ -14,18 +14,26 @@ type NotificationItemProps = {
   from: Pick<User, "_id" | "username" | "avatarURL">;
   type: NotificationType;
   blogImage?: string;
-  data: BlogInteractNotification | PermissionNotification | OtherNotification,
+  data: BlogInteractNotification | PermissionNotification | OtherNotification;
   onMarkAsRead: (id: string) => void;
 };
 
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { formatUnixDate } from "@/utils/dateConvert";
-import { InteractType, NotificationType, RequestType } from "@/enums/notif_type.enum";
+import {
+  InteractType,
+  NotificationType,
+  RequestType,
+} from "@/enums/notif_type.enum";
 import { useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { decreaseNotifCount, updateSeenNotif } from "@/redux/slices/notifSlice";
-import { BlogInteractNotification, PermissionNotification, OtherNotification } from "@/interfaces/notifInterface";
+import {
+  BlogInteractNotification,
+  PermissionNotification,
+  OtherNotification,
+} from "@/interfaces/notifInterface";
 import { formatDistance } from "date-fns";
 // based on type of notification, handle move to different screen
 // if notification is user like the blog, move to the post screen
@@ -47,82 +55,90 @@ export default function NotificationsItem({
   onMarkAsRead,
 }: NotificationItemProps) {
   const route = useRouter();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const [seen, setSeen] = useState(isRead)
+  const [seen, setSeen] = useState(isRead);
 
   const handlePress = () => {
     if (!seen) {
-      dispatch(updateSeenNotif({
-        notif_id: id
-      })).then((res) => {
+      dispatch(
+        updateSeenNotif({
+          notif_id: id,
+        })
+      ).then((res) => {
         if (res.payload) {
           onMarkAsRead(id);
-          setSeen(true)
+          setSeen(true);
 
-          dispatch(decreaseNotifCount())
+          dispatch(decreaseNotifCount());
         }
-      })
+      });
     }
 
     switch (type) {
       case NotificationType.PERMISSION:
-        const permissionData = data as PermissionNotification
-        
+        const permissionData = data as PermissionNotification;
+
         switch (permissionData.request_type) {
           case RequestType.REQUEST_REPORT_BLOG:
-            // TODO: route to report page  
+            // TODO: route to report page
             break;
           case RequestType.REQUEST_POST_BLOG:
-            route.push(`/group/approvals/blogs?groupID=${permissionData.group_id}&blogID=${permissionData.blog_id}`)
+            route.push(
+              `/group/approvals/blogs?groupID=${permissionData.group_id}&blogID=${permissionData.blog_id}`
+            );
 
             break;
           case RequestType.REQUEST_JOIN_GROUP:
-            route.push(`/group/approvals/members?groupID=${permissionData.group_id}&memberID=${permissionData.request_owner._id}`)
+            route.push(
+              `/group/approvals/members?groupID=${permissionData.group_id}&memberID=${permissionData.request_owner._id}`
+            );
 
             break;
           case RequestType.REQUEST_NEW_TAG:
-            route.push(`/group/approvals/tags?groupID=${permissionData.group_id}&tagID=${permissionData.request_tag_id}`)
+            route.push(
+              `/group/approvals/tags?groupID=${permissionData.group_id}&tagID=${permissionData.request_tag_id}`
+            );
 
             break;
         }
         break;
       case NotificationType.INTERACTION:
-        const interactionData = data as BlogInteractNotification
+        const interactionData = data as BlogInteractNotification;
 
         if (interactionData.interact_type === InteractType.Comment) {
-          route.push(`/blog?userBlogId=${interactionData.blog_id}&userBlogCommentId=${interactionData.comment_id}`)
-        }
-        else {
-          route.push(`/blog?userBlogId=${interactionData.blog_id}`)
+          route.push(
+            `/blog?userBlogId=${interactionData.blog_id}&userBlogCommentId=${interactionData.comment_id}`
+          );
+        } else {
+          route.push(`/blog?userBlogId=${interactionData.blog_id}`);
         }
         break;
       default:
-        const otherData = data as OtherNotification
-        route.push(`/profile?userID=${otherData.request_owner._id}`)
+        const otherData = data as OtherNotification;
+        route.push(`/profile?userID=${otherData.request_owner._id}`);
 
-        break
+        break;
     }
   };
   const handleFollow = () => {
     if (!seen) {
-      dispatch(updateSeenNotif({
-        notif_id: id
-      })).then((res) => {
+      dispatch(
+        updateSeenNotif({
+          notif_id: id,
+        })
+      ).then((res) => {
         if (res.payload) {
           onMarkAsRead(id);
-          setSeen(true)
+          setSeen(true);
         }
-      })
+      });
     }
   };
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
       <View
-        style={[
-          styles.container,
-          { backgroundColor: seen ? "#fff" : "#000" },
-        ]}
+        style={[styles.container, { backgroundColor: seen ? "#fff" : "#000" }]}
       >
         {/* Image from user noti */}
         <Image
@@ -134,24 +150,21 @@ export default function NotificationsItem({
           placeholderContentFit="cover"
         />
         <View style={styles.innerContainer}>
-          <View style={{ width: "75%" }}>
+          <View style={{ 
+            // TODO: make this dynamic based on type of notification
+            width: type !== NotificationType.OTHER ? "75%" : "100%",
+             }}>
             <Text style={[styles.name, { color: seen ? "#000" : "#fff" }]}>
               {/* {from.firstName} {from.lastName} */}
               {from.username}
             </Text>
             <View style={styles.rowContainer}>
               <Text
-                style={[
-                  styles.description,
-                  { color: seen ? "#000" : "#fff" },
-                ]}
+                style={[styles.description, { color: seen ? "#000" : "#fff" }]}
               >
                 {description}.
                 <Text
-                  style={[
-                    styles.date,
-                    { color: seen ? "#9E9E9E" : "#9E9E9E" },
-                  ]}
+                  style={[styles.date, { color: seen ? "#9E9E9E" : "#9E9E9E" }]}
                 >
                   {" "}
                   {new Date(date).toDateString()}
@@ -168,15 +181,16 @@ export default function NotificationsItem({
             </Text>
           </View>
 
-          <View style={{ marginLeft: 4 }}>
-            {/* {type === NotificationType.OTHER && (
+          {type !== NotificationType.OTHER && (
+            <View style={{ marginLeft: 4 }}>
+              {/* {type === NotificationType.OTHER && (
               <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.7}>
                   <Text style={styles.buttonText}>Follow</Text>
                 </TouchableOpacity>
               </View>
             )} */}
-            {type !== NotificationType.OTHER && (
+
               <View>
                 <Image
                   source={blogImage}
@@ -187,8 +201,8 @@ export default function NotificationsItem({
                   placeholderContentFit="cover"
                 />
               </View>
-            )}
-          </View>
+            </View>
+          )}
         </View>
       </View>
     </TouchableOpacity>

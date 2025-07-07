@@ -230,11 +230,16 @@ const mockUserBlogCommentList = [
   mockUserBlogComment,
   mockUserBlogComment,
 ];
-
+// TODO: CONSIDER MOVE THIS TO A SEPARATE FILE OR USER ALREADY EXISTING ENUM
+enum BlogStatus {
+  IN_GROUP = "In Group",
+  PRIVATE = "Private",
+  IN_PROFILE = "In Profile",
+}
 export function debounce<T extends (...args: any[]) => void>(
   callback: T,
   delay: number
-): (...args: Parameters<T>) => void {
+): (...args: Parameters<T>) => void { 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   return useCallback(
@@ -498,13 +503,14 @@ export default function BlogScreen() {
     console.log(`Blog ID: ${searchParams.userBlogId}`);
   }, [searchParams.userBlogId]);
 
-  // TODO: check if the blog is written by the user
   const refMoreSheet = useRef<BottomSheet>(null);
   // callbacks
   const handleSnapPress = useCallback((index: any) => {
     refMoreSheet.current?.snapToIndex(index);
   }, []);
 
+  // TODO: get blog status, If it’s a in profile/ private blog → show “In profile” / “Private”, and hide group component
+  const blogStatus = BlogStatus.IN_GROUP; // This should be dynamically set based on the blog's status
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -528,12 +534,13 @@ export default function BlogScreen() {
         />
         <View style={styles.scrollViewContent}>
           {/* Group Component */}
-          {searchParams.userBlogId &&
+          {blogStatus == BlogStatus.IN_GROUP && searchParams.userBlogId && 
             <TouchableOpacity style={styles.groupContainer} onPress={handleOnPressGroup}>
               <Image source={group.CoverURL} style={styles.groupImage} />
               <Text style={styles.groupName}>{group.Name}</Text>
             </TouchableOpacity>
           }
+          <View style={{paddingTop : 20}}/>
           {/* User Component */}
           {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
           {/* Title */}
@@ -752,7 +759,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "flex-start",
     gap: 10,
-    paddingVertical: 20,
+    paddingTop: 20,
   },
   scrollViewContent: {
     width: "100%",

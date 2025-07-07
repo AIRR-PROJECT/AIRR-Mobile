@@ -289,6 +289,8 @@ export default function BlogScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
+    console.log("searchParams: ")
+    console.log(searchParams)
     if (searchParams.aiBlogId) {
       dispatch(getAIBlogDetail(searchParams.aiBlogId));
     } else {
@@ -564,13 +566,13 @@ export default function BlogScreen() {
             </View>
           </View>
           {/* List of tags */}
-          {searchParams.userBlogId && (
+          {/* {searchParams.userBlogId && (
             <View style={styles.tagsContainer}>
               {tags.map((tag, index) => (
                 <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
               ))}
             </View>
-          )}
+          )} */}
 
           {/* Thumbnail */}
           {searchParams.userBlogId && (
@@ -684,9 +686,10 @@ export default function BlogScreen() {
         {/* Write comment button */}
       </ScrollView>
       {/* Bottom sheet for more button */}
-      {searchParams.userBlogId && <MoreOptionBottomList
+      {searchParams.userBlogId && currentUserBlog && <MoreOptionBottomList
         sheetRef={refMoreSheet}
-        isUserWrittenBlog={isUserWrittenBlog} blogId={currentUserBlog._id}/>}
+        isUserWrittenBlog={isUserWrittenBlog} blogId={currentUserBlog._id} 
+        groupId={currentUserBlog.Group ? currentUserBlog.Group._id : undefined}/>}
     </GestureHandlerRootView>
   );
 }

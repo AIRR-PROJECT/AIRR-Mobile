@@ -75,6 +75,19 @@ export interface UserBlogDetail {
     ViewType: string
     Group: UserBlogGroup;
 }
+export interface UserBlogDetailForUpdate {
+    _id: string;
+    Title: string;
+    Description: string;
+    BackgroundURL: string;
+    Content: string;
+    Author: UserBlogAuthor;
+    Tags: UserBlogTag[];
+    PendingTags: UserBlogTag[];
+    Status: string
+    ViewType: string
+    Group: UserBlogGroup;
+}
 
 export interface UserBlogComment {
     _id: string;

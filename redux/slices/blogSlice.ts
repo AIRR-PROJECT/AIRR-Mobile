@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
+import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail, UserBlogDetailForUpdate } from "@/interfaces/blogInterface"
 import { ResponseFailcode } from "@/enums/failcode.enum"
 
 const initialState = {
@@ -54,14 +54,14 @@ export const getUserBlogDetail = createAsyncThunk<UserBlogDetail, string>(
     }
 )
 
-export const getUserBlogDetailForUpdate = createAsyncThunk<UserBlogDetail, string>(
-    "blog/getUserBlogDetail",
+export const getUserBlogDetailForUpdate = createAsyncThunk<UserBlogDetailForUpdate, string>(
+    "blog/getUserBlogDetailForUpdate",
     async (blog_id: string, thunkAPI) => {
         try {
             const res = await api.get(`blogs/user-blog-detail-for-update?blogId=${blog_id}`) as AxiosResponse
             console.log(res.data)
             if (res.data.success) {
-                return res.data.data.blogDetail as UserBlogDetail
+                return res.data.data.blogDetail as UserBlogDetailForUpdate
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)
@@ -348,6 +348,29 @@ export const createBlog = createAsyncThunk(
     }
 )
 
+export const updateBlog = createAsyncThunk(
+    'blog/updateBlog',
+    async (data: FormData, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/update-blog`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 export const commentOnBlog = createAsyncThunk(
     'blog/commentOnBlog',
     async (data: PostComment, thunkAPI) => {
@@ -429,29 +452,6 @@ export const updateHideBlog = createAsyncThunk(
     async (data: UpdateHideBlog, thunkAPI) => {
         try {
             const res = await api.post(`blogs/update-hide-blog`, data) as AxiosResponse
-
-            if (res.data.success) {
-                return true
-            }
-            else {
-                return false
-            }
-        }
-        catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
-        }
-    }
-)
-
-export const updateBlog = createAsyncThunk(
-    'blog/updateBlog',
-    async (data: FormData, thunkAPI) => {
-        try {
-            const res = await api.post(`blogs/update-blog`, data, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            }) as AxiosResponse
 
             if (res.data.success) {
                 return true

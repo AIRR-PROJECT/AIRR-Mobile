@@ -7,7 +7,7 @@ import "@enzedonline/quill-blot-formatter2";
 import BlotFormatter2 from "@enzedonline/quill-blot-formatter2";
 import "./QuillEditorStyles.css";
 
-export default function QuillEditor({ onValueChange }: { dom: import("expo/dom").DOMProps, onValueChange: (val: string) => void }) {
+export default function QuillEditor({ defaultValue, onValueChange }: { dom: import("expo/dom").DOMProps, defaultValue?: string, onValueChange: (val: string) => void }) {
   const [value, setValue] = useState("");
   const reactQuillRef = useRef<ReactQuill>(null);
   const [editorReady, setEditorReady] = useState(false);
@@ -96,6 +96,10 @@ export default function QuillEditor({ onValueChange }: { dom: import("expo/dom")
     Quill.register("modules/blotFormatter2", BlotFormatter2);
     setEditorReady(true);
   }, []);
+
+  useEffect(() => {
+    setValue(defaultValue ?? "")
+  }, [defaultValue])
 
   return (
     <div className="quill-editor-container" style={{ width: "95%",  }}>

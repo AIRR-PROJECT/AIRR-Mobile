@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 type Author = {
-  // name: string;
+  Name: string;
   AvatarURL: string;
   Username: string;
   // streak: number;
@@ -11,7 +11,7 @@ type Author = {
 
 // later change this component to take a user prop
 export default function BlogAuthorComponent({
-  // name,
+  Name,
   AvatarURL,
   Username,
   // streak,
@@ -25,7 +25,7 @@ export default function BlogAuthorComponent({
       <View>
         <View style={[styles.rowContainer, {gap: 5}]}>
           
-          {/* <Text style={styles.authorName}>{name}</Text> */} 
+          <Text style={styles.authorName}>{Name}</Text> 
           {/* <Text style={styles.authorName}>{streak}</Text> */}
         </View>
         <Text style={styles.authorUsername}>@{Username}</Text>

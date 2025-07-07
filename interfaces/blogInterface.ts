@@ -69,6 +69,10 @@ export interface UserBlogDetail {
     Content: string;
     Author: UserBlogAuthor;
     Tags: UserBlogTag[];
+    PendingTags: UserBlogTag[];
+    IsSavedByUser: boolean
+    Status: string
+    ViewType: string
     Group: UserBlogGroup;
 }
 
@@ -157,4 +161,10 @@ export interface CreateReportBlog {
 export interface UpdateHideBlog {
     BlogID: string
     Action: string
+}
+
+export interface CreateBlogTag {
+    _id: string
+    TagName: string
+    OperationType: string
 }

@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
+import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail } from "@/interfaces/blogInterface"
+import { ResponseFailcode } from "@/enums/failcode.enum"
 
 const initialState = {
     currentAIBlog: null as unknown as AIBlogDetail,
@@ -10,7 +11,9 @@ const initialState = {
     isCurrentBlogLiked: false,
     isCurrentBlogDisliked: false,
     isCurrentBlogSaved: false,
-    commentAdded: false
+    commentAdded: false,
+    createBlogCurrentTags: [] as string[],
+    createBlogRequestedTags: [] as CreateBlogTag[]
 }
 
 export const getAIBlogDetail = createAsyncThunk<AIBlogDetail, string>(
@@ -38,6 +41,25 @@ export const getUserBlogDetail = createAsyncThunk<UserBlogDetail, string>(
         try {
             const res = await api.get(`blogs/user-blog-detail?blogId=${blog_id}`) as AxiosResponse
 
+            if (res.data.success) {
+                return res.data.data.blogDetail as UserBlogDetail
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getUserBlogDetailForUpdate = createAsyncThunk<UserBlogDetail, string>(
+    "blog/getUserBlogDetail",
+    async (blog_id: string, thunkAPI) => {
+        try {
+            const res = await api.get(`blogs/user-blog-detail-for-update?blogId=${blog_id}`) as AxiosResponse
+            console.log(res.data)
             if (res.data.success) {
                 return res.data.data.blogDetail as UserBlogDetail
             }
@@ -444,6 +466,29 @@ export const updateBlog = createAsyncThunk(
     }
 )
 
+export const searchTagCreateBlog = createAsyncThunk(
+    'blog/searchTagCreateBlog',
+    async (data: { keyword: string, fieldID: string, groupID: string }, thunkAPI) => {
+        try {
+            const res = await api.get(`tag/search-tag-create-blog?keyword=${data.keyword}&fieldID=${data.fieldID}&groupID=${data.groupID}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.tagList as CreateBlogTag[]
+            }
+            else {
+                return []
+            }
+        }
+        catch (error: any) {
+            if (error.response.data.failcode == ResponseFailcode.TAG_NOT_FOUND) {
+                return []
+            }
+            
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 const blogSlice = createSlice({
     name: 'blog',
     initialState,
@@ -464,6 +509,14 @@ const blogSlice = createSlice({
             state.commentAdded = action.payload
         },
 
+        setCreateBlogCurrentTags(state, action) {
+            state.createBlogCurrentTags = action.payload as string[]
+        },
+
+        setCreateBlogRequestedTags(state, action) {
+            state.createBlogRequestedTags = action.payload as CreateBlogTag[]
+        },
+
         reset(state) {
             state.currentAIBlog = null as unknown as AIBlogDetail
             state.currentUserBlog = null as unknown as UserBlogDetail
@@ -472,6 +525,8 @@ const blogSlice = createSlice({
             state.isCurrentBlogDisliked = false
             state.isCurrentBlogSaved = false
             state.commentAdded = false
+            state.createBlogCurrentTags = [] as string[],
+            state.createBlogRequestedTags = [] as CreateBlogTag[]
         }
     },
     extraReducers: (builder) => {
@@ -549,5 +604,5 @@ const blogSlice = createSlice({
     }
 })
 
-export const { reset, setCurrentBlogLiked, setCurrentBlogDisliked, setCurrentBlogSaved, setCommentAdded } = blogSlice.actions
+export const { reset, setCurrentBlogLiked, setCurrentBlogDisliked, setCurrentBlogSaved, setCommentAdded, setCreateBlogCurrentTags, setCreateBlogRequestedTags } = blogSlice.actions
 export default blogSlice.reducer

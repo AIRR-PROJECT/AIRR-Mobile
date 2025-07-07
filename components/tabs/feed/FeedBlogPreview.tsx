@@ -228,21 +228,23 @@ export default function FeedBlogPreview({
           </Text>
         </View>
         {/* 5th Part: Group Info */}
-        <View style={styles.rowContainer}>
-          <View style={styles.groupSection}>
-            <GroupPreviewInfo
-              group={{
-                Name: blog.Group.Name,
-                CoverURL: blog.Group.CoverURL,
-                NumberOfMembers: blog.Group.NumberOfMembers,
-              }}
+        {blog.Group &&
+          <View style={styles.rowContainer}>
+            <View style={styles.groupSection}>
+              <GroupPreviewInfo
+                group={{
+                  Name: blog.Group.Name,
+                  CoverURL: blog.Group.CoverURL,
+                  NumberOfMembers: blog.Group.NumberOfMembers,
+                }}
+              />
+            </View>
+            <BottomLeftArrowIcon
+              style={{ backgroundColor: "black", position: "static" }}
+              color="#B9FF66"
             />
           </View>
-          <BottomLeftArrowIcon
-            style={{ backgroundColor: "black", position: "static" }}
-            color="#B9FF66"
-          />
-        </View>
+        }
 
         {/* Divider */}
         <View

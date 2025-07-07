@@ -327,7 +327,7 @@ export default function AIBlogScreen() {
             <TouchableOpacity onPress={handleBack}>
               <Entypo name="chevron-small-left" size={30} color="white" />
             </TouchableOpacity>
-            <Fontisto name="more-v-a" size={30} color="white" />
+         
           </View>
           <Divider
             orientation="vertical"

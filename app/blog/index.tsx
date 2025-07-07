@@ -341,7 +341,7 @@ export default function BlogScreen() {
       setDislikes(currentUserBlog.Reaction.Dislikes);
       setComments(currentUserBlog.Reaction.Comments);
       setHtml(currentUserBlog.Content);
-      setIsUserWrittenBlog(user._id == currentUserBlog.Author._id)
+      setIsUserWrittenBlog(user._id == currentUserBlog.Author._id);
     }
   }, [currentUserBlog]);
 
@@ -506,7 +506,7 @@ export default function BlogScreen() {
   }, []);
 
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Back button */}
         <View
@@ -515,9 +515,11 @@ export default function BlogScreen() {
           <TouchableOpacity onPress={handleBack}>
             <Entypo name="chevron-small-left" size={30} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleSnapPress(0)}>
-            <Fontisto name="more-v-a" size={30} color="white" />
-          </TouchableOpacity>
+          {!searchParams.aiBlogId && (
+            <TouchableOpacity onPress={() => handleSnapPress(0)}>
+              <Fontisto name="more-v-a" size={30} color="white" />
+            </TouchableOpacity>
+          )}
         </View>
         <Divider
           orientation="vertical"
@@ -700,10 +702,16 @@ export default function BlogScreen() {
         {/* Write comment button */}
       </ScrollView>
       {/* Bottom sheet for more button */}
-      {searchParams.userBlogId && currentUserBlog && <MoreOptionBottomList
-        sheetRef={refMoreSheet}
-        isUserWrittenBlog={isUserWrittenBlog} blogId={currentUserBlog._id} 
-        groupId={currentUserBlog.Group ? currentUserBlog.Group._id : undefined}/>}
+      {searchParams.userBlogId && currentUserBlog && (
+        <MoreOptionBottomList
+          sheetRef={refMoreSheet}
+          isUserWrittenBlog={isUserWrittenBlog}
+          blogId={currentUserBlog._id}
+          groupId={
+            currentUserBlog.Group ? currentUserBlog.Group._id : undefined
+          }
+        />
+      )}
     </GestureHandlerRootView>
   );
 }

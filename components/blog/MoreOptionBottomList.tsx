@@ -12,7 +12,7 @@ type MoreOptionComponentProps = {
   sheetRef: React.RefObject<BottomSheet>;
   isUserWrittenBlog: boolean;
   blogId: string;
-  groupId?: string
+  groupId?: string;
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
 };
 export default function MoreOptionBottomList({
@@ -26,17 +26,19 @@ export default function MoreOptionBottomList({
   const dispatch = useAppDispatch();
 
   const handleHideBlog = () => {
-    dispatch(updateHideBlog({
-      BlogID: blogId,
-      Action: "add"
-    })).then((res) => {
-      const result = res.payload as boolean
+    dispatch(
+      updateHideBlog({
+        BlogID: blogId,
+        Action: "add",
+      })
+    ).then((res) => {
+      const result = res.payload as boolean;
 
       if (result == true) {
         ToastAndroid.show("Blog hidden", ToastAndroid.SHORT);
-        sheetRef.current?.close()
+        sheetRef.current?.close();
       }
-    })
+    });
   };
   const handleReportBlog = () => {
     // Handle reporting the blog
@@ -49,14 +51,15 @@ export default function MoreOptionBottomList({
   };
   const handleDeleteBlog = () => {
     dispatch(deleteBlog(blogId)).then((res) => {
-      const result = res.payload as boolean
+      const result = res.payload as boolean;
 
       if (result == true) {
         ToastAndroid.show("Blog deleted", ToastAndroid.SHORT);
-        sheetRef.current?.close()
+        sheetRef.current?.close();
       }
-    })
+    });
   };
+  console.log("isFromFeed", isFromFeed);
   return (
     <BottomSheet
       ref={sheetRef}
@@ -92,11 +95,7 @@ export default function MoreOptionBottomList({
             activeOpacity={0.8}
           >
             {/* delete */}
-            <MaterialIcons
-              name="delete"
-              size={24}
-              color="black"
-            />
+            <MaterialIcons name="delete" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Delete blog</Text>
           </TouchableOpacity>
         </BottomSheetView>
@@ -111,15 +110,17 @@ export default function MoreOptionBottomList({
             <Entypo name="circle-with-minus" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Hide blog</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.bottomOptionButton}
-            onPress={handleReportBlog}
-            activeOpacity={0.8}
-          >
-            {/* Report */}
-            <MaterialIcons name="report" size={24} color="black" />
-            <Text style={styles.bottomOptionText}>Report blog</Text>
-          </TouchableOpacity>
+          {!isFromFeed && (
+            <TouchableOpacity
+              style={styles.bottomOptionButton}
+              onPress={handleReportBlog}
+              activeOpacity={0.8}
+            >
+              {/* Report */}
+              <MaterialIcons name="report" size={24} color="black" />
+              <Text style={styles.bottomOptionText}>Report blog</Text>
+            </TouchableOpacity>
+          )}
         </BottomSheetView>
       )}
     </BottomSheet>

@@ -1,5 +1,5 @@
 import { useAppDispatch } from "@/redux/hook";
-import { deleteBlog } from "@/redux/slices/blogSlice";
+import { deleteBlog, updateHideBlog } from "@/redux/slices/blogSlice";
 import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -26,8 +26,17 @@ export default function MoreOptionBottomList({
   const dispatch = useAppDispatch();
 
   const handleHideBlog = () => {
-    // Handle hiding the blog
-    ToastAndroid.show("Blog hidden", ToastAndroid.SHORT);
+    dispatch(updateHideBlog({
+      BlogID: blogId,
+      Action: "add"
+    })).then((res) => {
+      const result = res.payload as boolean
+
+      if (result == true) {
+        ToastAndroid.show("Blog hidden", ToastAndroid.SHORT);
+        sheetRef.current?.close()
+      }
+    })
   };
   const handleReportBlog = () => {
     // Handle reporting the blog

@@ -35,7 +35,7 @@ export default function MoreOptionBottomList({
   };
   const handleEditBlog = () => {
     // Handle editing the blog
-    route.push(`/blog/edit-blog?blogID=${blogId}`);
+    route.push(`/blog/edit-blog?blogID=${blogId}&groupID=${groupId}`);
     // Pass the blogId to the edit blog screen
   };
   const handleDeleteBlog = () => {

@@ -282,13 +282,13 @@ export default function NewBlog() {
       name: uploadedImg.current?.fileName,
       type: uploadedImg.current?.mimeType
     })
-    formData.append("group", chosenGroup.Name == "In Group" ? JSON.stringify(chosenGroup) : null)
+    formData.append("group", chosenGroup.Name != Private.Name && chosenGroup.Name && OnlyInMyProfile.Name ? JSON.stringify(chosenGroup) : null)
 
     const chosenTagsReformatted: CreateBlogTag[] = JSON.parse(JSON.stringify(chosenTags)) as CreateBlogTag[]
     chosenTagsReformatted.forEach((t) => {
       t.OperationType = "tag-in-group"
     })
-    formData.append("tags", chosenGroup.Name == "In Group" ? JSON.stringify([...chosenTagsReformatted, ...createBlogRequestedTags]) : null)
+    formData.append("tags", chosenGroup.Name != Private.Name && chosenGroup.Name && OnlyInMyProfile.Name ? JSON.stringify([...chosenTagsReformatted, ...createBlogRequestedTags]) : null)
     
     formData.append("title", title.current)
     formData.append("description", description.current)

@@ -2,7 +2,7 @@ import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import ImageViewer from "@/components/ImageViewer";
 import * as ImagePicker from "expo-image-picker";
 import { type ImageSource } from "expo-image";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Entypo, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 
@@ -27,6 +27,10 @@ export default function UploadThumbnailComponent({ imgSource, onSetImg }: imageP
       onSetImg(result.assets[0])
     }
   };
+
+  useEffect(() => {
+    setImage(imgSource ?? null)
+  }, [imgSource])
 
   return (
     <TouchableOpacity style={styles.container} onPress={pickImage}>

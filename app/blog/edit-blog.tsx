@@ -37,10 +37,11 @@ import {
 } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ImageSource } from "expo-image";
-import { CreateBlog, CreateBlogTag } from "@/interfaces/blogInterface";
-import { createBlog, setCreateBlogCurrentTags, setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
+import { CreateBlog, CreateBlogTag, UserBlogDetail, UserBlogDetailForUpdate } from "@/interfaces/blogInterface";
+import { createBlog, getUserBlogDetailForUpdate, setCreateBlogCurrentTags, setCreateBlogRequestedTags, updateBlog } from "@/redux/slices/blogSlice";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
+import { Image } from "react-native";
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -143,7 +144,7 @@ const OnlyInMyProfile: Group = {
 };
 export default function Editblog() {
   const dispatch = useAppDispatch();
-  const { groupID } = useLocalSearchParams<{ groupID: string }>();
+  const { groupID, blogID } = useLocalSearchParams<{ groupID: string, blogID: string }>();
   const route = useRouter();
 
   const { createBlogCurrentTags, createBlogRequestedTags } = useAppSelector(state => state.blog)
@@ -189,6 +190,31 @@ export default function Editblog() {
       });
     }
   }, [groupID]);
+  
+  useEffect(() => {
+    if (blogID) {
+      dispatch(getUserBlogDetailForUpdate(blogID)).then((res) => {
+        const data = res.payload as UserBlogDetailForUpdate
+        
+        switch (data.ViewType) {
+          case "Private":
+            setChosenGroup(Private)
+            break
+          case "In Profile Page":
+            setChosenGroup(OnlyInMyProfile)
+            break
+        }
+
+        setChosenTags(data.Tags)
+        dispatch(setCreateBlogRequestedTags(data.PendingTags))
+
+        uploadedImg.current = Image.resolveAssetSource({ uri: data.BackgroundURL, fileName: "background.jpg", mimeType: "image/jpeg" })
+        title.current = data.Title
+        description.current = data.Description
+        content.current = data.Content
+      });
+    }
+  }, [blogID]);
 
   useEffect(() => {
     if (chosenGroup) {
@@ -277,18 +303,24 @@ export default function Editblog() {
     }
 
     const formData = new FormData();
+    console.log(uploadedImg.current)
     formData.append("thumbnail", {
       uri: uploadedImg.current?.uri,
       name: uploadedImg.current?.fileName,
       type: uploadedImg.current?.mimeType
     })
-    formData.append("group", chosenGroup.Name == "In Group" ? JSON.stringify(chosenGroup) : null)
+    formData.append("blogID", blogID)
+    formData.append("group", chosenGroup.Name != Private.Name && chosenGroup.Name && OnlyInMyProfile.Name ? JSON.stringify(chosenGroup) : null)
 
     const chosenTagsReformatted: CreateBlogTag[] = JSON.parse(JSON.stringify(chosenTags)) as CreateBlogTag[]
     chosenTagsReformatted.forEach((t) => {
       t.OperationType = "tag-in-group"
     })
-    formData.append("tags", chosenGroup.Name == "In Group" ? JSON.stringify([...chosenTagsReformatted, ...createBlogRequestedTags]) : null)
+    const requestedTagsReformatted: CreateBlogTag[] = JSON.parse(JSON.stringify(createBlogRequestedTags)) as CreateBlogTag[]
+    requestedTagsReformatted.forEach((t) => {
+      t.OperationType = "pending-tag-in-group"
+    })
+    formData.append("tags", chosenGroup.Name != Private.Name && chosenGroup.Name && OnlyInMyProfile.Name ? JSON.stringify([...chosenTagsReformatted, ...requestedTagsReformatted]) : null)
     
     formData.append("title", title.current)
     formData.append("description", description.current)
@@ -296,7 +328,7 @@ export default function Editblog() {
     let viewType = chosenGroup.Name == "Private" ? "Private" : (chosenGroup.Name == "Only in my profile" ? "In Profile Page" : "In Group")
     formData.append("viewType", viewType)
 
-    dispatch(createBlog(formData)).then((res) => {
+    dispatch(updateBlog(formData)).then((res) => {
       if (typeof res.payload === "boolean" && res.payload == true) {
         router.replace("/my-feed");
       }
@@ -586,6 +618,7 @@ export default function Editblog() {
             </Text>
             <View>
               <UploadThumbnailComponent
+                imgSource={uploadedImg.current}
                 onSetImg={(imgSource) => {
                   uploadedImg.current = imgSource;
                 }}
@@ -612,6 +645,7 @@ export default function Editblog() {
               style={styles.titleInput}
               multiline={true}
               numberOfLines={3}
+              defaultValue={title.current}
               onChangeText={handleTitleTextChange}
             />
           </View>
@@ -635,6 +669,7 @@ export default function Editblog() {
               style={styles.titleInput}
               multiline={true}
               numberOfLines={3}
+              defaultValue={description.current}
               onChangeText={handleDescriptionTextChange}
             />
           </View>
@@ -655,6 +690,7 @@ export default function Editblog() {
             {/* QuillJS Here */}
             <QuillEditor
               dom={{ matchContents: true }}
+              defaultValue={content.current}
               onValueChange={handleContentTextChange}
             />
           </View>

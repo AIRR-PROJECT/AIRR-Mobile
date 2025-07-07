@@ -1,4 +1,4 @@
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
 import ImageViewer from "@/components/ImageViewer";
 import * as ImagePicker from "expo-image-picker";
 import { type ImageSource } from "expo-image";
@@ -8,34 +8,57 @@ import { useNavigation } from "expo-router";
 
 type imageProps = {
   imgSource?: ImageSource;
-  onSetImg: (imgSource: ImageSource) => void
+  onSetImg: (imgSource: ImageSource) => void;
 };
 
-export default function UploadThumbnailComponent({ imgSource, onSetImg }: imageProps) {
+export default function UploadThumbnailComponent({
+  imgSource,
+  onSetImg,
+}: imageProps) {
   // Image picker
   const [image, setImage] = useState<ImageSource | null>(imgSource || null);
   console.log(image);
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      quality: 1,
-    });
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ["images"],
+    quality: 1,
+  });
 
-    if (!result.canceled) {
-      setImage({ uri: result.assets[0].uri });
-      onSetImg(result.assets[0])
+  if (!result.canceled) {
+    const asset = result.assets[0];
+    // asset.fileSize is available in some environments, otherwise fetch it
+    let fileSize = asset.fileSize;
+    if (fileSize === undefined && asset.uri) {
+      // Try to get file size using fetch (works on Expo Go)
+      try {
+        const response = await fetch(asset.uri);
+        const blob = await response.blob();
+        fileSize = blob.size;
+      } catch (e) {
+        fileSize = 0;
+      }
     }
-  };
+    if (fileSize && fileSize > 500 * 1024) {
+      Alert.alert("Image too large", "Please select an image smaller than 500KB.");
+      return;
+    }
+    setImage({ uri: asset.uri });
+    onSetImg(asset);
+  }
+};
 
   useEffect(() => {
-    setImage(imgSource ?? null)
-  }, [imgSource])
+    setImage(imgSource ?? null);
+  }, [imgSource]);
 
   return (
     <TouchableOpacity style={styles.container} onPress={pickImage}>
       {image != null ? (
-        <ImageViewer imgSource={image} style={styles.image} contentFit="cover"/>
+        <ImageViewer
+          imgSource={image}
+          style={styles.image}
+          contentFit="cover"
+        />
       ) : (
         <View style={styles.placeholder}>
           <SimpleLineIcons name="cloud-upload" size={50} color="#8D98AA" />
@@ -67,7 +90,7 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   tooltip: {
-    color: "#8D98AA"
+    color: "#8D98AA",
   },
   placeholder: {
     width: 100,
@@ -81,5 +104,5 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     padding: 20,
     marginRight: 10,
-  }
+  },
 });

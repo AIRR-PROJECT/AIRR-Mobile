@@ -2,9 +2,12 @@ import GroupTab from "@/components/group/GroupTab";
 import PopularGroupTab from "@/components/group/PopularGroupTab";
 import { GroupField } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { getGroupPopularFields, getPopularGroups } from "@/redux/slices/groupSlice";
-import {  FontAwesome } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import {
+  getGroupPopularFields,
+  getPopularGroups,
+} from "@/redux/slices/groupSlice";
+import { FontAwesome } from "@expo/vector-icons";
+import { useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -19,36 +22,52 @@ let fields: GroupField[] = [
 ];
 
 export default function GroupPopularTab() {
-  const dispatch = useAppDispatch()
-  const { popularFields } = useAppSelector(state => state.group)
+  const dispatch = useAppDispatch();
+  const { popularFields } = useAppSelector((state) => state.group);
 
   const [selectedId, setSelectedId] = useState("1");
 
   useEffect(() => {
-    dispatch(getGroupPopularFields())
-  }, [])
+    dispatch(getGroupPopularFields());
+  }, []);
 
   useEffect(() => {
     if (popularFields) {
       // console.log(popularFields)
-      fields.push(...popularFields)
+      fields.push(...popularFields);
     }
-  }, [popularFields])
+  }, [popularFields]);
 
   useEffect(() => {
     if (selectedId === "1") {
-      dispatch(getPopularGroups())
+      dispatch(getPopularGroups());
     }
-  }, [selectedId])
+  }, [selectedId]);
 
   console.log("selectedId", selectedId);
- 
+  const [currentOffset, setCurrentOffset] = useState(0);
+  const handleArrowPress = () => {
+    // scroll the FlatList to the right
+    refFields?.current?.scrollToOffset({
+      offset: currentOffset + 300, // Adjust the offset as needed
+      animated: true,
+    });
+  };
+  // Track scroll position
+const handleScroll = (event: { nativeEvent: { contentOffset: { x: any; }; }; }) => {
+  const offsetX = event.nativeEvent.contentOffset.x;
+  setCurrentOffset(offsetX);
+};
+  const refFields = useRef<FlatList>(null);
   return (
     <View style={styles.container}>
       {/* list tags */}
       <View style={styles.rowWrapper}>
         <FlatList
           data={fields}
+          ref={refFields}
+          onScroll={handleScroll}
+          scrollEventThrottle={16} // Adjust as needed for smoother scrolling
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
@@ -74,10 +93,16 @@ export default function GroupPopularTab() {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
         />
-        <FontAwesome name="caret-right" size={30} color="white" />
+        <TouchableOpacity onPress={handleArrowPress} activeOpacity={0.8}>
+          <FontAwesome name="caret-right" size={30} color="white" />
+        </TouchableOpacity>
       </View>
       {/* Content based on selected tabs */}
-      {selectedId === "1" ? <PopularGroupTab /> : <GroupTab fieldID={selectedId} type="all"/>}
+      {selectedId === "1" ? (
+        <PopularGroupTab />
+      ) : (
+        <GroupTab fieldID={selectedId} type="all" />
+      )}
     </View>
   );
 }
@@ -118,5 +143,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
   },
- 
 });

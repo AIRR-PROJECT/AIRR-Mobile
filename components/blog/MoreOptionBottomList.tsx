@@ -12,13 +12,15 @@ type MoreOptionComponentProps = {
   sheetRef: React.RefObject<BottomSheet>;
   isUserWrittenBlog: boolean;
   blogId: string;
-  groupId: string
+  groupId?: string
+  isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
 };
 export default function MoreOptionBottomList({
   sheetRef,
   isUserWrittenBlog,
   blogId,
-  groupId
+  groupId,
+  isFromFeed = false, // Default to false if not provided
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
@@ -46,12 +48,11 @@ export default function MoreOptionBottomList({
       }
     })
   };
-  // isUserWrittenBlog = true; // For testing purposes, set this to true
   return (
     <BottomSheet
       ref={sheetRef}
       index={-1} // Start closed
-      snapPoints={["40%"]}
+      enableDynamicSizing
       enablePanDownToClose={true}
       backgroundStyle={{ backgroundColor: "#1E1E1E" }}
       handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}

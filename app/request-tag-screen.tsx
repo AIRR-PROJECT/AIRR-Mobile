@@ -28,7 +28,7 @@ type AddTagsComponentProps = {
   isCreate?: boolean; // Optional prop to indicate if it's for creating a new tag
 };
 const mockTags: string[] = ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6"];
-export default function AddTagsScreen({
+export default function RequestTagScreen({
   isCreate = false, // Default to false if not provided
 }: AddTagsComponentProps) {
   const dispatch = useAppDispatch()

@@ -379,7 +379,7 @@ export default function NewBlog() {
     setRequestedTags(tags);
   };
   const handleRequestedTagPress = (fieldID: string) => {
-    route.push(`/add-tag-screen?fieldID=${fieldID}&groupID=${groupID ?? chosenGroup?._id}`)
+    route.push(`/request-tag-screen?fieldID=${fieldID}&groupID=${groupID ?? chosenGroup?._id}`)
   }
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -872,5 +872,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    flex: 1,
   },
 });

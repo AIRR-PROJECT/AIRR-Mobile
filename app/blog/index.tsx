@@ -56,6 +56,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
+import { formatDistanceToNow } from "date-fns";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -331,6 +332,7 @@ export default function BlogScreen() {
       setDislikes(currentUserBlog.Reaction.Dislikes);
       setComments(currentUserBlog.Reaction.Comments);
       setHtml(currentUserBlog.Content);
+      setIsUserWrittenBlog(user._id == currentUserBlog.Author._id)
     }
   }, [currentUserBlog]);
 
@@ -473,6 +475,7 @@ export default function BlogScreen() {
   }, [isCurrentBlogSaved]);
 
   const [isWriteComment, setIsWriteComment] = useState(false);
+  const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
 
   const handleCommentPress = () => {
     route.push(`/blog/comment-page?blogId=${searchParams.userBlogId}`);
@@ -483,7 +486,6 @@ export default function BlogScreen() {
   }, [searchParams.userBlogId]);
 
   // TODO: check if the blog is written by the user
-  const isUserWrittenBlog = false;
   const refMoreSheet = useRef<BottomSheet>(null);
   // callbacks
   const handleSnapPress = useCallback((index: any) => {
@@ -525,9 +527,12 @@ export default function BlogScreen() {
             <View style={styles.dateAndComment}>
               <FontAwesome6 name="clock" size={24} color="#C2C2C2" />
               <Text style={styles.smallText}>
-                {commentsDetail && commentsDetail.length > 0
-                  ? new Date(commentsDetail[0].createdAt).toDateString()
-                  : "No records"}
+                {/* Why this is commentDetail time, not blog createdAt time */}
+                {/* {commentsDetail && commentsDetail.length > 0
+                  ? formatDistanceToNow(new Date(commentsDetail[0].createdAt), {
+                      addSuffix: true,
+                    })
+                  : "No records"} */}
               </Text>
             </View>
             {/* Number of comment */}
@@ -679,10 +684,9 @@ export default function BlogScreen() {
         {/* Write comment button */}
       </ScrollView>
       {/* Bottom sheet for more button */}
-      <MoreOptionBottomList
+      {searchParams.userBlogId && <MoreOptionBottomList
         sheetRef={refMoreSheet}
-        isUserWrittenBlog={isUserWrittenBlog}
-      />
+        isUserWrittenBlog={isUserWrittenBlog} blogId={currentUserBlog._id}/>}
     </GestureHandlerRootView>
   );
 }

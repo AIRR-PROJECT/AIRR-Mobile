@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { Image, ImageSource } from "expo-image";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import UploadGroupAvatarComponent from "@/components/group/UploadGroupAvatarComponent";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet, {
@@ -19,9 +19,20 @@ import BottomSheet, {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { createGroup, searchFields, setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
-import { GroupRule, GroupTag, SearchedField, SearchFieldResult } from "@/interfaces/groupInterface";
-import { router } from "expo-router";
+import {
+  createGroup,
+  searchFields,
+  setCreateGroupSubmitted,
+} from "@/redux/slices/groupSlice";
+import {
+  GroupRule,
+  GroupTag,
+  SearchedField,
+  SearchFieldResult,
+} from "@/interfaces/groupInterface";
+import { router, useRouter } from "expo-router";
+import GroupRuleComponent from "@/components/group/GroupRuleComponent";
+import { set } from "lodash";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 // temporary use this cause figma not provide the image
@@ -43,64 +54,73 @@ const mockFieldList = [
 
 export default function CreateGroup() {
   const dispatch = useAppDispatch();
-  const { createGroupSubmitted } = useAppSelector(state => state.group);
+  const { createGroupSubmitted } = useAppSelector((state) => state.group);
 
-  const uploadedImg = useRef<ImageSource>()
+  const uploadedImg = useRef<ImageSource>();
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
-  const [groupRules, setGroupRules] = useState("");
+  const [groupRules, setGroupRules] = useState<GroupRule[]>();
   const [groupField, setGroupField] = useState<SearchedField>();
-  const [groupFields, setGroupFields] = useState<SearchedField[]>([])
-  const [groupTags, setGroupTags] = useState<GroupTag[]>([])
+  const [groupFields, setGroupFields] = useState<SearchedField[]>([]);
+  const [groupTags, setGroupTags] = useState<GroupTag[]>([]);
   const fieldRef = useRef<BottomSheet>(null);
-  const fieldSnapPoints = useMemo(() => ["30%", "50%"], []);
+  const fieldSnapPoints = useMemo(() => ["100%"], []);
 
   useEffect(() => {
     dispatch(searchFields("Development")).then((res) => {
-      setGroupFields((res.payload as SearchFieldResult).Fields)
-      console.log((res.payload as SearchFieldResult).Fields)
-    })
-  }, [])
+      setGroupFields((res.payload as SearchFieldResult).Fields);
+      console.log((res.payload as SearchFieldResult).Fields);
+    });
+  }, []);
 
   useEffect(() => {
-    console.log(groupFields)
-  }, [groupFields])
+    console.log(groupFields);
+  }, [groupFields]);
 
   useEffect(() => {
     if (createGroupSubmitted) {
-      dispatch(setCreateGroupSubmitted(false))
+      dispatch(setCreateGroupSubmitted(false));
 
-      if (!uploadedImg.current || !groupName || !groupTags || !groupField || !groupDescription || !groupRules) {
-        Alert.alert("Error", "Missing field")
-  
-        return
+      if (
+        !uploadedImg.current ||
+        !groupName ||
+        !groupTags ||
+        !groupField ||
+        !groupDescription ||
+        !groupRules
+      ) {
+        Alert.alert("Error", "Missing field");
+
+        return;
       }
 
-      const formData = new FormData()
+      const formData = new FormData();
       formData.append("coverImage", {
         uri: uploadedImg.current?.uri,
         name: uploadedImg.current?.fileName,
-        type: uploadedImg.current?.mimeType
-      })
-      formData.append("Name", groupName)
-      formData.append("Tags", JSON.stringify(groupTags))
-      formData.append("GroupField", JSON.stringify(groupField))
-      formData.append("Description", groupDescription)
-      let rulesObject: GroupRule[] = [{
-        _id: "rule1",
-        RuleName: "Rule 1",
-        RuleDescription: groupRules
-      }]
-      formData.append("GroupRules", JSON.stringify(rulesObject))
-  
+        type: uploadedImg.current?.mimeType,
+      });
+      formData.append("Name", groupName);
+      formData.append("Tags", JSON.stringify(groupTags));
+      formData.append("GroupField", JSON.stringify(groupField));
+      formData.append("Description", groupDescription);
+      let rulesObject: GroupRule[] = [
+        {
+          _id: "rule1",
+          RuleName: "Rule 1",
+          RuleDescription: groupRules,
+        },
+      ];
+      formData.append("GroupRules", JSON.stringify(rulesObject));
+
       dispatch(createGroup(formData)).then((res) => {
         if (res.payload) {
-          router.dismiss()
+          router.dismiss();
         }
-      })
+      });
     }
-  }, [createGroupSubmitted])
-  
+  }, [createGroupSubmitted]);
+
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
   }, []);
@@ -110,10 +130,24 @@ export default function CreateGroup() {
   const handleGroupFieldPress = useCallback((field: SearchedField) => {
     console.log("Group field: ", field.FieldName);
     setGroupField(field);
-    setGroupTags(field.DefaultTags)
+    setGroupTags(field.DefaultTags);
     fieldRef.current?.close();
   }, []);
-
+  const [createdTags, setCreatedTags] = useState<GroupTag[]>([]);
+  const route = useRouter();
+  const handleCreateTagPress = () => {
+    route.push("/create-tag-screen");
+  };
+  const handleAddNewRulePress = () => {
+    setGroupRules((prevRules) => {
+      const newRule: GroupRule = {
+        _id: `rule${prevRules ? prevRules.length + 1 : 1}`,
+        RuleName: "",
+        RuleDescription: "",
+      };
+      return [...(prevRules || []), newRule];
+    });
+  };
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -147,68 +181,119 @@ export default function CreateGroup() {
         >
           Group Avatar
         </Text>
-        <UploadGroupAvatarComponent onSetImg={(imgSource) => {
-          uploadedImg.current = imgSource
-        }}/>
-        {/* Group Detail */}
-        <Text
-          style={[
-            styles.title,
-            { alignSelf: "flex-start", paddingBottom: 10, paddingTop: 20 },
-          ]}
-        >
-          Group Details
-        </Text>
+        <UploadGroupAvatarComponent
+          onSetImg={(imgSource) => {
+            uploadedImg.current = imgSource;
+          }}
+        />
+
         {/* Group Name Input + Character Counter */}
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            value={groupName}
-            onChangeText={(text) => {
-              if (text.length <= 30) {
-                setGroupName(text);
-                // handleGroupNameTextChange(text)
-              }
-            }}
-            placeholder="Enter Group Name *"
-            placeholderTextColor="#888"
-          />
-          <Text style={styles.counter}>{groupName.length}/30</Text>
+        <View style={{ marginTop: 20 }}>
+          <Text style={[styles.smallTitle, { paddingBottom: 10 }]}>
+            Group Name
+          </Text>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              value={groupName}
+              onChangeText={(text) => {
+                if (text.length <= 30) {
+                  setGroupName(text);
+                  // handleGroupNameTextChange(text)
+                }
+              }}
+              placeholder="Enter Group Name *"
+              placeholderTextColor="#888"
+            />
+            <Text style={styles.counter}>{groupName.length}/30</Text>
+          </View>
         </View>
         {/* Select Group Field */}
 
-        <TouchableOpacity
-          onPress={() => handleFieldSnapPress(0)}
-          activeOpacity={0.8}
-          style={styles.heading}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              {
-                color: groupField ? "#fff" : "#888",
-              },
-            ]}
-          >
-            {!groupField ? "Select Group's Field *" : groupField.FieldName}
+        <View>
+          <Text style={[styles.smallTitle, { paddingBottom: 10 }]}>
+            Group Field and Tags
           </Text>
-          {!groupField ? null : (
-            <IconSymbol
-              name="chevron.right"
-              size={24}
-              weight="medium"
-              color={"#fff"}
-              style={{ marginRight: 20 }}
-            />
-          )}
-        </TouchableOpacity>
+          {/* Field */}
+          <TouchableOpacity
+            onPress={() => handleFieldSnapPress(0)}
+            activeOpacity={0.8}
+            style={styles.heading}
+          >
+            <Text
+              style={[
+                styles.buttonText,
+                {
+                  color: groupField ? "#fff" : "#888",
+                },
+              ]}
+            >
+              {!groupField ? "Select Group's Field *" : groupField.FieldName}
+            </Text>
+            {!groupField ? null : (
+              <IconSymbol
+                name="chevron.right"
+                size={24}
+                weight="medium"
+                color={"#fff"}
+                style={{ marginRight: 20 }}
+              />
+            )}
+          </TouchableOpacity>
+          {/* Tags */}
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={[
+                styles.heading,
+                {
+                  justifyContent: "flex-start",
+                  flexWrap: "wrap",
+                },
+              ]}
+              onPress={handleCreateTagPress}
+              activeOpacity={0.8}
+            >
+              <AntDesign
+                name="pluscircleo"
+                size={24}
+                color="#B9FF66"
+                style={{
+                  paddingLeft: 40,
+                }}
+              />
+              {createdTags.length > 0 ? (
+                createdTags.map((tag) => (
+                  // TODO: Check the API for the what should the _id be before request it
+                  <TagWrapper key={tag._id} tag={tag.TagName} />
+                ))
+              ) : (
+                <View style={{}}>
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      {
+                        paddingLeft: 10,
+                      },
+                    ]}
+                  >
+                    Request new Tags
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Group Description Input + Character Counter */}
         <View style={styles.inputWrapper}>
+          <Text style={[styles.smallTitle, { paddingBottom: 10 }]}>
+            Group Description
+          </Text>
           <TextInput
             style={[styles.multilineInput]}
             value={groupDescription}
             onChangeText={(text) => {
-              if (text.length <= 100) {
+              if (text.length <= 250) {
                 setGroupDescription(text);
                 // handleGroupDescriptionTextChange(text);
               }
@@ -217,28 +302,103 @@ export default function CreateGroup() {
             placeholder="Enter Group Description *"
             placeholderTextColor="#888"
           />
-          <Text style={styles.counter}>{groupDescription.length}/100</Text>
+          <Text style={styles.counter}>{groupDescription.length}/250</Text>
         </View>
         {/* Group Rules Input + Character Counter */}
         <View style={[styles.inputWrapper, { marginBottom: 40 }]}>
-          <TextInput
-            style={[styles.multilineInput]}
-            value={groupRules}
-            onChangeText={(text) => {
-              if (text.length <= 100) {
-                setGroupRules(text)
-                // handleGroupRulesTextChange([{
-                //   _id: "rule1",
-                //   RuleName: "Rule #1",
-                //   RuleDescription: text
-                // }])  
-              };
-            }}
-            multiline={true}
-            placeholder="Enter Group Rules *"
-            placeholderTextColor="#888"
-          />
-          <Text style={styles.counter}>{groupRules.length}/100</Text>
+          <Text style={[styles.smallTitle, { paddingBottom: 10 }]}>
+            Group Rules
+          </Text>
+          {/* Rules Container */}
+
+          {groupRules?.map((rule, index) => (
+            <View key={index} style={styles.ruleOuterContainer}>
+              <View
+                style={[
+                  styles.rowContainer,
+                  { justifyContent: "space-between", marginBottom: 20 },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.headingTitle,
+                    {
+                      color: "#B9FF66",
+                      fontSize: 16,
+                    },
+                  ]}
+                >
+                  Rule {index + 1}
+                </Text>
+                {/* Delete button */}
+                <TouchableOpacity
+                  onPress={() => {
+                    setGroupRules((prevRules) =>
+                      prevRules?.filter((_, i) => i !== index)
+                    );
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <AntDesign name="delete" size={24} color="#B9FF66" />
+                </TouchableOpacity>
+              </View>
+              <View
+                style={[
+                  styles.container,
+                  {
+                    backgroundColor: "transparent",
+                    padding: 0,
+                  },
+                ]}
+              >
+                {/* Rule name */}
+                <View style={styles.ruleContainer}>
+                  {/* Input for rule name */}
+                  <TextInput
+                    style={styles.ruleText}
+                    placeholder="Enter rule name..."
+                    placeholderTextColor="#B0B0B0"
+                    multiline
+                  />
+                </View>
+                {/* Rule description */}
+                <View style={styles.ruleContainer}>
+                  {/* Input for rule description */}
+                  <TextInput
+                    style={styles.ruleText}
+                    placeholder="Enter rule description..."
+                    placeholderTextColor="#B0B0B0"
+                    multiline
+                  />
+                </View>
+                {/* Add more rules as needed */}
+              </View>
+            </View>
+          ))}
+
+          {/* New Rule button */}
+          <TouchableOpacity
+            style={[
+              styles.heading,
+              {
+                backgroundColor: "#fff",
+              },
+            ]}
+            onPress={handleAddNewRulePress}
+            activeOpacity={0.8}
+          >
+            <AntDesign
+              name="pluscircleo"
+              size={24}
+              color="#000"
+              style={{ paddingLeft: 40 }}
+            />
+            <Text
+              style={[styles.buttonText, { paddingLeft: 10, color: "#000" }]}
+            >
+              New Rule
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Group Selection Bottom Sheet */}
@@ -268,7 +428,6 @@ export default function CreateGroup() {
               if dynamic, use api to get the list of field
               and use it to render the list of field with flatlist
               else use the static list of field to render the list of field
-
             */}
           <BottomSheetScrollView
             contentContainerStyle={styles.groupListContent}
@@ -289,7 +448,20 @@ export default function CreateGroup() {
                 onPress={() => handleGroupFieldPress(item)}
                 style={styles.heading}
               >
-                <Text style={[styles.buttonText, { color: "#fff" }]}>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    {
+                      color: "#fff",
+                      borderWidth: 1,
+                      borderColor: "#B9FF66",
+                      borderRadius: 20,
+                      paddingHorizontal: 15,
+                    },
+                  ]}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
                   {item.FieldName}
                 </Text>
               </Pressable>
@@ -300,9 +472,16 @@ export default function CreateGroup() {
     </GestureHandlerRootView>
   );
 }
+function TagWrapper({ tag }: { tag: string }) {
+  return (
+    <View style={styles.tagWrapper}>
+      <Text style={styles.tag}># {tag}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
     padding: 20,
     backgroundColor: "#1E1E1E",
   },
@@ -322,6 +501,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#fff",
+  },
+  smallTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
     color: "#fff",
   },
   input: {
@@ -350,7 +534,7 @@ const styles = StyleSheet.create({
     color: "#888",
     fontSize: 16,
     paddingVertical: 15,
-    paddingLeft: 40,
+    paddingHorizontal: 40,
     flex: 1,
   },
   description: {
@@ -381,5 +565,38 @@ const styles = StyleSheet.create({
     backgroundColor: "#212531",
     borderRadius: 20,
     marginBottom: 15,
+  },
+  tag: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  tagWrapper: {
+    backgroundColor: "#2E3B40",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginHorizontal: 10,
+    borderRadius: 9,
+  },
+  headingTitle: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  ruleContainer: {
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#2E3B40",
+  },
+  ruleText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  ruleOuterContainer: {
+    backgroundColor: "#212531",
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 10,
   },
 });

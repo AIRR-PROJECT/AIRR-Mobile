@@ -120,9 +120,23 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen
-                name="add-tag-screen"
+                name="request-tag-screen"
                 options={{
-                  headerShown: false,
+                  headerShown: true,
+                  headerStyle: {
+                    backgroundColor: "#1E1E1E",
+                  },
+                  headerTitle: "Request Tag",
+                }}
+              />
+              <Stack.Screen
+                name="create-tag-screen"
+                options={{
+                  headerShown: true,
+                  headerStyle: {
+                    backgroundColor: "#1E1E1E",
+                  },
+                  headerTitle: "Create Tag",
                 }}
               />
               <Stack.Screen

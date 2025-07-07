@@ -38,7 +38,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ImageSource } from "expo-image";
 import { CreateBlog, CreateBlogTag } from "@/interfaces/blogInterface";
-import { createBlog, getUserBlogDetailForUpdate, setCreateBlogCurrentTags, setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
+import { createBlog, setCreateBlogCurrentTags, setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 const mockGroup: Group = {
@@ -143,7 +143,7 @@ const OnlyInMyProfile: Group = {
 };
 export default function Editblog() {
   const dispatch = useAppDispatch();
-  const { groupID, blogID } = useLocalSearchParams<{ groupID: string, blogID: string }>();
+  const { groupID } = useLocalSearchParams<{ groupID: string }>();
   const route = useRouter();
 
   const { createBlogCurrentTags, createBlogRequestedTags } = useAppSelector(state => state.blog)
@@ -177,7 +177,6 @@ export default function Editblog() {
       dispatch(getGroupInfo({ groupID })).then((res) => {
         const chosenGroup = res.payload as GroupDetailInfo
         setChosenGroup(chosenGroup);
-        // If editing a blog in group
         setSelectGroupAllowed(false);
         setIsUserMember(chosenGroup.Role == GroupRole.Member)
 
@@ -190,14 +189,6 @@ export default function Editblog() {
       });
     }
   }, [groupID]);
-
-  useEffect(() => {
-    if (blogID) {
-      dispatch(getUserBlogDetailForUpdate(blogID)).then((res) => {
-        
-      });
-    }
-  }, [blogID]);
 
   useEffect(() => {
     if (chosenGroup) {
@@ -388,7 +379,7 @@ export default function Editblog() {
     setRequestedTags(tags);
   };
   const handleRequestedTagPress = (fieldID: string) => {
-    route.push(`/add-tag-screen?fieldID=${fieldID}&groupID=${groupID ?? chosenGroup?._id}`)
+    route.push(`/request-tag-screen?fieldID=${fieldID}&groupID=${groupID ?? chosenGroup?._id}`)
   }
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -881,5 +872,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    flex: 1,
   },
 });

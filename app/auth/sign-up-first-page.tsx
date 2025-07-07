@@ -178,10 +178,8 @@ export default function SignUpFirstPage() {
           Or
         </ThemedText>
         {/* Or Google or Facebook */}
-        <View style={[styles.section, { justifyContent: "space-between" }]}>
+        <View style={[styles.section, { justifyContent: "space-between", marginTop: 10 }]}>
           <AuthButtonTransparent label="Google" style={styles.otherButton} />
-
-          <AuthButtonTransparent label="Facebook" style={styles.otherButton} />
         </View>
 
         {/* Sign In Link*/}
@@ -280,7 +278,7 @@ const styles = StyleSheet.create({
   },
 
   otherButton: {
-    width: "45%",
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
   },

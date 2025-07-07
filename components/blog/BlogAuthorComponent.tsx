@@ -16,14 +16,16 @@ export default function BlogAuthorComponent({
   Username,
   // streak,
 }: Author) {
+  // TODO: ADD AUTHOR NAME
   return (
+
     <View style={styles.rowContainer}>
       {/* User avatar */}
       <Image style={styles.authorImage} source={{ uri: AvatarURL }} />
       <View>
         <View style={[styles.rowContainer, {gap: 5}]}>
-          {/* <Text style={styles.authorName}>{name}</Text> */}
-          <FontAwesome5 name="fire-alt" size={20} color="#B9FF66" />
+          
+          {/* <Text style={styles.authorName}>{name}</Text> */} 
           {/* <Text style={styles.authorName}>{streak}</Text> */}
         </View>
         <Text style={styles.authorUsername}>@{Username}</Text>

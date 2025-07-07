@@ -11,49 +11,6 @@ export default function QuillEditor({ onValueChange }: { dom: import("expo/dom")
   const [value, setValue] = useState("");
   const reactQuillRef = useRef<ReactQuill>(null);
   const [editorReady, setEditorReady] = useState(false);
-
-  // const uploadToCloudinary = async (file: File): Promise<string> => {
-  //   try {
-  //     // Get environment variables
-  //     const CLOUDINARY_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET;
-  //     const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-
-  //     // Image compression options
-  //     const options = {
-  //       maxSizeMB: 1, // Reduce file size
-  //       maxWidthOrHeight: 1024, // Resize for faster uploads
-  //       useWebWorker: true, // Use web worker for efficiency
-  //     };
-
-  //     // Compress image before uploading
-  //     const compressedFile = await imageCompression(file, options);
-
-  //     // Prepare FormData
-  //     const formData = new FormData();
-  //     formData.append("file", compressedFile);
-  //     formData.append("upload_preset", CLOUDINARY_PRESET);
-
-  //     // Upload to Cloudinary
-  //     const res = await fetch(
-  //       `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,
-  //       { method: "POST", body: formData }
-  //     );
-
-  //     const data = await res.json();
-  //     if (!data.secure_url) throw new Error("Upload failed");
-
-  //     // Apply Cloudinary transformations (automatic optimization)
-  //     const optimizedUrl = data.secure_url.replace(
-  //       "/upload/",
-  //       "/upload/q_auto,f_auto/"
-  //     );
-
-  //     return optimizedUrl;
-  //   } catch (error) {
-  //     console.error("Image upload failed:", error);
-  //     throw error;
-  //   }
-  // };
   
   const imageHandler = useCallback(() => {
     const input = document.createElement("input");

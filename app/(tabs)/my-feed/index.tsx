@@ -238,11 +238,11 @@ export default function MyFeed() {
                   >
                     AI-Recommended Blogs
                   </GradientText>
-                  <Ionicons
+                  {/* <Ionicons
                     name="play-forward-circle-outline"
                     size={30}
                     color="#fff"
-                  />
+                  /> */}
                 </View>
 
                 {/* Change to carousel for better ux*/}
@@ -291,14 +291,13 @@ export default function MyFeed() {
                   >
                     User Blogs
                   </GradientText>
-                  <FontAwesome6 name="up-down" size={24} color="#B9FF66" />
                 </View>
               </View>
             }
           />
         </View>
       )}
-      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog={isUserWrittenBlog} blogId={moreOptionBlogId} groupId={moreOptionGroupId}/>
+      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog={isUserWrittenBlog} blogId={moreOptionBlogId} groupId={moreOptionGroupId} isFromFeed={true}/>
     </GestureHandlerRootView>
   );
 }

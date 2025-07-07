@@ -1,9 +1,5 @@
 import { MaterialTopTabs } from "@/components/MaterialTopTabs";
-import { Image } from "expo-image";
-import { Text, View } from "react-native";
-import { useEffect, useState } from "react";
-export default function MyFeedTabLayout() {
-  const [swipeEnabled, setSwipeEnabled] = useState(true);
+export default function FeedTabLayout() {
   return (
     <MaterialTopTabs
       style={{ flex: 1 }}
@@ -11,17 +7,15 @@ export default function MyFeedTabLayout() {
         tabBarStyle: { height: "auto", backgroundColor: "#1E1E1E" }, // Adjust the height of the tab bar
         tabBarLabelStyle: { fontSize: 12 }, // Adjust the font size of tab labels
         tabBarIndicatorStyle: { height: 2 }, // Change the indicator thickness
-        tabBarItemStyle: { width: "auto" }, // Adjust the width of the tab bar items
-        swipeEnabled: false, // Disable swipe
       }}
     >
-      <MaterialTopTabs.Screen name="index" options={{ title: "Popular" }} />
-      <MaterialTopTabs.Screen name="byDate" options={{ title: "By Date" }} />
-      <MaterialTopTabs.Screen name="byLike" options={{ title: "By Like" }} />
+      <MaterialTopTabs.Screen name="index" options={{ title: "Home" }} />
+
       <MaterialTopTabs.Screen
-        name="byComments"
-        options={{ title: "By Comments" }}
+        name="favorite-blogs"
+        options={{ title: "Favorite Blogs" }}
       />
+      <MaterialTopTabs.Screen name="history" options={{ title: "History" }} />
     </MaterialTopTabs>
   );
 }

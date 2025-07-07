@@ -128,6 +128,12 @@ export default function BlogCommenter({
     childScrollViewRef.current?.scrollToEnd({ animated: true });
     // print the childscrollview content
   };
+  const handleMorePress = () => {
+    // Handle more options here
+    console.log("More options pressed");
+    // You can open a modal or bottom sheet with more options
+  };
+  const isUserWrittenComment = User._id === user._id;
   return (
     <View style={styles.container}>
       <View style={{ padding: 20, gap: 10 }}>
@@ -148,7 +154,11 @@ export default function BlogCommenter({
             </View>
           </View>
           {/* More button */}
-          <Feather name="more-horizontal" size={24} color="white" />
+          {isUserWrittenComment ?? (
+            <TouchableOpacity onPress={handleMorePress} activeOpacity={0.8}>
+              <Feather name="more-horizontal" size={24} color="white" />
+            </TouchableOpacity>
+          )}
         </View>
         {/* Actual Comment */}
         <Text style={styles.comment}>{Content}</Text>
@@ -214,7 +224,6 @@ export default function BlogCommenter({
         style={styles.otherReplyContainer}
         contentContainerStyle={{ gap: 10 }}
         ref={childScrollViewRef}
-        
       >
         {(replies ?? []).map((comment, index) => (
           <BlogCommenterChild
@@ -229,6 +238,7 @@ export default function BlogCommenter({
           />
         ))}
       </ScrollView>
+      {/* More option for comment */}
     </View>
   );
 }
@@ -319,9 +329,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   otherReplyContainer: {
-    marginLeft: 10, // Indent nested comments
-    borderLeftWidth: 1,
-    borderLeftColor: "#565656",
     paddingHorizontal: 10,
     marginVertical: 10,
     gap: 20,

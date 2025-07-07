@@ -59,7 +59,7 @@ export default function MoreOptionBottomList({
       }
     });
   };
-  console.log("isFromFeed", isFromFeed);
+  // console.log("isFromFeed", isFromFeed);
   return (
     <BottomSheet
       ref={sheetRef}

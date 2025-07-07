@@ -15,7 +15,6 @@ export default function FeedTabLayout() {
         name="favorite-blogs"
         options={{ title: "Favorite Blogs" }}
       />
-      <MaterialTopTabs.Screen name="history" options={{ title: "History" }} />
     </MaterialTopTabs>
   );
 }

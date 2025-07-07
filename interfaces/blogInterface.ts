@@ -43,6 +43,7 @@ export interface UserBlogAuthor {
     _id: string;
     AvatarURL: string;
     Username: string;
+    Name: string
     CreateDate: string;
 }
 export interface UserBlog {

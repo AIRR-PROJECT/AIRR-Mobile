@@ -12,16 +12,24 @@ import {
 import { Image } from "expo-image";
 import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
-import { ReplyToBlogComment, UserBlogComment } from "@/interfaces/blogInterface";
+import {
+  ReplyToBlogComment,
+  UserBlogComment,
+} from "@/interfaces/blogInterface";
 import { useState, useRef, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { replyToBlogComment, getBlogComment, setCommentAdded } from "@/redux/slices/blogSlice";
+import {
+  replyToBlogComment,
+  getBlogComment,
+  setCommentAdded,
+} from "@/redux/slices/blogSlice";
 // reply to là tên của người mà user reply lại trong content
 // nó có thể khác với parent comment
 type BlogCommenterChildProps = UserBlogComment & {
   replyTo: string;
   onReturnContentPress: (childCommentContent: string) => void;
-} & { rootCommentID: string }
+  onMorePress?: (isUserWrittenComment: boolean) => void;
+} & { rootCommentID: string };
 
 export default function BlogCommenterChild({
   User,
@@ -31,16 +39,15 @@ export default function BlogCommenterChild({
   _id,
   rootCommentID,
   onReturnContentPress: returnContentPress,
+  onMorePress = () => {},
 }: BlogCommenterChildProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const textInputRef = useRef<TextInput>(null);
-  
+
   const dispatch = useAppDispatch();
-  const {
-    currentUserBlog,
-  } = useAppSelector((state) => state.blog);
-  const { user } = useAppSelector((state) => state.user)
+  const { currentUserBlog } = useAppSelector((state) => state.blog);
+  const { user } = useAppSelector((state) => state.user);
 
   // // Handle keyboard events
   // useEffect(() => {
@@ -75,11 +82,11 @@ export default function BlogCommenterChild({
     const comment: ReplyToBlogComment = {
       UserID: user._id,
       BlogID: currentUserBlog._id,
-      Content: replyText.split(' ').slice(1).join(''),
+      Content: replyText.split(" ").slice(1).join(""),
       Method: "Reply",
       ReplyToCommentID: commentID,
-      RootCommentID: rootCommentID
-    }
+      RootCommentID: rootCommentID,
+    };
     dispatch(replyToBlogComment(comment)).then((res) => {
       if (res.payload === true) {
         dispatch(getBlogComment(currentUserBlog._id));
@@ -90,10 +97,10 @@ export default function BlogCommenterChild({
         setIsReplying(false);
         setReplyText("");
         Keyboard.dismiss();
-        
-        dispatch(setCommentAdded(true))
+
+        dispatch(setCommentAdded(true));
       }
-    })
+    });
   };
 
   const handleCloseReply = () => {
@@ -101,11 +108,14 @@ export default function BlogCommenterChild({
     setReplyText("");
     Keyboard.dismiss();
   };
-
+  const isUserWrittenComment = User._id === user._id;
+  const handleMorePress = () => {
+    if (onMorePress) {
+      onMorePress(isUserWrittenComment);
+    }
+  };
   return (
-    <View
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <View style={{ padding: 20, gap: 10 }}>
         <View
           style={[styles.rowContainer, { justifyContent: "space-between" }]}
@@ -124,7 +134,11 @@ export default function BlogCommenterChild({
             </View>
           </View>
           {/* More button */}
-          <Feather name="more-horizontal" size={24} color="white" />
+          {isUserWrittenComment && (
+            <TouchableOpacity onPress={handleMorePress} activeOpacity={0.8}>
+              <Feather name="more-horizontal" size={24} color="white" />
+            </TouchableOpacity>
+          )}
         </View>
         {/* Actual Comment */}
         <Text style={styles.comment}>

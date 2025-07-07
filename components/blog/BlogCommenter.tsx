@@ -27,6 +27,7 @@ import {
   replyToBlogComment,
   setCommentAdded,
 } from "@/redux/slices/blogSlice";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 const mockUser = {
   _id: "testUserId",
@@ -61,6 +62,8 @@ const mockUserBlogCommentList = [
 type BlogCommenterProps = UserBlogComment & {
   replies: UserBlogChildComment[];
   onReplyPosted: () => void;
+  onMorePress?: (isUserWrittenComment: boolean) => void;
+  sheetRef: React.RefObject<BottomSheet>; 
 };
 export default function BlogCommenter({
   User,
@@ -69,6 +72,8 @@ export default function BlogCommenter({
   _id,
   replies,
   onReplyPosted,
+  onMorePress,
+  sheetRef, 
 }: BlogCommenterProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -129,11 +134,14 @@ export default function BlogCommenter({
     // print the childscrollview content
   };
   const handleMorePress = () => {
-    // Handle more options here
-    console.log("More options pressed");
-    // You can open a modal or bottom sheet with more options
+    if (onMorePress) {
+      onMorePress(isUserWrittenComment);
+    }
   };
   const isUserWrittenComment = User._id === user._id;
+  console.log("isUserWrittenComment", isUserWrittenComment);
+  console.log("User", User._id);
+  console.log("Current user", user._id);
   return (
     <View style={styles.container}>
       <View style={{ padding: 20, gap: 10 }}>
@@ -154,7 +162,7 @@ export default function BlogCommenter({
             </View>
           </View>
           {/* More button */}
-          {isUserWrittenComment ?? (
+          {isUserWrittenComment && (
             <TouchableOpacity onPress={handleMorePress} activeOpacity={0.8}>
               <Feather name="more-horizontal" size={24} color="white" />
             </TouchableOpacity>
@@ -235,6 +243,7 @@ export default function BlogCommenter({
             onReturnContentPress={handleReturnContentPress}
             _id={comment._id}
             rootCommentID={_id}
+            onMorePress={onMorePress}
           />
         ))}
       </ScrollView>

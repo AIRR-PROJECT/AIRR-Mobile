@@ -40,7 +40,7 @@ export default function CommentMoreOptionBottomList({
         />
       )}
     >
-      {isUserWrittenComment ?? (
+      {isUserWrittenComment && (
         <BottomSheetView style={styles.contentContainer}>
           <TouchableOpacity
             style={styles.bottomOptionButton}

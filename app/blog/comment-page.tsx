@@ -40,6 +40,10 @@ import {
 import { Image } from "expo-image";
 import { AntDesign } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
+import CommentMoreOptionBottomList from "@/components/blog/CommentMoreOptionBottomList";
+import { Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { set } from "lodash";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -235,15 +239,21 @@ export default function CommentBlogScreen() {
   }, []);
 
   useEffect(() => {
-    if (currentBlogComments != null && currentBlogComments != undefined && currentBlogComments.length != 0 && searchParams.commentId != undefined && searchParams.commentId != "") {
+    if (
+      currentBlogComments != null &&
+      currentBlogComments != undefined &&
+      currentBlogComments.length != 0 &&
+      searchParams.commentId != undefined &&
+      searchParams.commentId != ""
+    ) {
       currentBlogComments.forEach((value, index) => {
         if (value._id == searchParams.commentId) {
-          flatListRef.current?.scrollToIndex({ animated: true, index: index })
-          return
+          flatListRef.current?.scrollToIndex({ animated: true, index: index });
+          return;
         }
-      })
+      });
     }
-  }, [currentBlogComments, searchParams.commentId])
+  }, [currentBlogComments, searchParams.commentId]);
 
   // // Handle keyboard events
   // useEffect(() => {
@@ -300,12 +310,21 @@ export default function CommentBlogScreen() {
   }, [isCurrentBlogSaved]);
 
   const [isWriteComment, setIsWriteComment] = useState(false);
-
+  const sheetRef = useRef<BottomSheet>(null);
+  const [isUserWrittenComment, setIsUserWrittenComment] = useState(false);
+  const handleMorePress = (isUserWrittenComment: boolean) => {
+    setIsUserWrittenComment(isUserWrittenComment);
+    if (sheetRef.current) {
+      if (isUserWrittenComment) {
+        sheetRef.current.snapToIndex(0);
+      }
+    }
+  }
   return (
-    <View
+    <GestureHandlerRootView
       // behavior={Platform.OS === "ios" ? "padding" : "height"}
       // keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0} // Add this line
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: "#1E1E1E" }}
     >
       <View style={[styles.container]}>
         {/* Other user comments */}
@@ -378,6 +397,8 @@ export default function CommentBlogScreen() {
               {...item}
               replies={item.ChildrenComments}
               onReplyPosted={handleReplyPosted}
+              sheetRef={sheetRef}
+              onMorePress={handleMorePress}
             />
           )}
           style={[styles.flatListContainer]}
@@ -386,16 +407,25 @@ export default function CommentBlogScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          initialNumToRender={currentBlogComments ? currentBlogComments.length : 100}
-          onScrollToIndexFailed={info => {
-            const wait = new Promise(resolve => setTimeout(resolve, 500));
+          initialNumToRender={
+            currentBlogComments ? currentBlogComments.length : 100
+          }
+          onScrollToIndexFailed={(info) => {
+            const wait = new Promise((resolve) => setTimeout(resolve, 500));
             wait.then(() => {
-              flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+              flatListRef.current?.scrollToIndex({
+                index: info.index,
+                animated: true,
+              });
             });
           }}
         />
       </View>
-    </View>
+      <CommentMoreOptionBottomList
+        sheetRef={sheetRef}
+        isUserWrittenComment={isUserWrittenComment}
+      />
+    </GestureHandlerRootView>
   );
 }
 

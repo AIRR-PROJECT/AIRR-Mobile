@@ -7,9 +7,11 @@ export interface Group {
     Description: string;
     Owner: GroupOwner;
     NumberOfMembers: number;
+    FieldID: string
     FieldName: string;
     CoverURL: string;
     Tags: GroupTag[];
+    IsAdminOrOwner: boolean
     avatar: string;
     members: string[];
     timestamp: string;

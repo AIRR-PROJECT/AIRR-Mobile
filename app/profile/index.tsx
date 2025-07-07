@@ -56,7 +56,7 @@ import { signOut } from "@react-native-firebase/auth";
 
 type UserInfo = Pick<
   User,
-  "username" | "avatarURL" | "firstName" | "lastName" | "joinDate"
+  "username" | "avatarURL" | "firstName" | "lastName" | "dateOfBirth"
 >;
 type StudentInfo = Pick<User, "profile">;
 
@@ -79,8 +79,8 @@ const Data = [
 export default function ProfileScreen() {
   const { userID } = useLocalSearchParams<{ userID: string }>();
 
-  const selectedTabs = ["Readme", "Blog", "Activity"];
-  const [selectedTab, setSelectedTab] = useState(selectedTabs[0]);
+  const [selectedTabs, setSelectedTabs] = useState<string[]>([])
+  const [selectedTab, setSelectedTab] = useState("");
 
   const { user, userGroups } = useAppSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState<UserInfo>(user!);
@@ -109,7 +109,13 @@ export default function ProfileScreen() {
   }, [userGroups]);
 
   useEffect(() => {
-    console.log(isOwnProfile);
+    if (isOwnProfile) {
+      setSelectedTabs(["Readme", "Blog", "Activity"])
+    }
+    else {
+      setSelectedTabs(["Readme", "Blog"])
+    }
+    setSelectedTab("Readme")
   }, [isOwnProfile]);
 
   return (
@@ -149,7 +155,7 @@ export default function ProfileScreen() {
 
         {/* Readme , Blog, Activity */}
         <View style={styles.rowContainer}>
-          {selectedTabs.map((tab) => {
+          {selectedTabs.length != 0 && selectedTabs.map((tab) => {
             return (
               <TouchableOpacity
                 key={tab}

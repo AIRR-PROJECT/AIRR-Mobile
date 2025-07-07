@@ -29,9 +29,11 @@ export interface UserBlogReaction {
     Comments: number;
 }
 export interface UserBlogGroup {
+    _id: string;
     CoverURL: string;
     Name: string;
     NumberOfMembers: number;
+    Description: string;
 }
 export interface UserBlogTag {
     _id: string;
@@ -67,6 +69,10 @@ export interface UserBlogDetail {
     Content: string;
     Author: UserBlogAuthor;
     Tags: UserBlogTag[];
+    PendingTags: UserBlogTag[];
+    IsSavedByUser: boolean
+    Status: string
+    ViewType: string
     Group: UserBlogGroup;
 }
 
@@ -143,4 +149,22 @@ export interface ReplyToBlogComment {
     Method: string;
     ReplyToCommentID: string;
     RootCommentID: string
+}
+
+export interface CreateReportBlog {
+    BlogID: string
+    GroupID: string
+    ReportType: string
+    Details: string
+}
+
+export interface UpdateHideBlog {
+    BlogID: string
+    Action: string
+}
+
+export interface CreateBlogTag {
+    _id: string
+    TagName: string
+    OperationType: string
 }

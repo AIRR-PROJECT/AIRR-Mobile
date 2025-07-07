@@ -1,10 +1,10 @@
 import { FontAwesome6 } from "@expo/vector-icons";
-import { View, Text, FlatList, StyleSheet, TextInput } from "react-native";
+import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { useEffect, useRef, useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { getMemberList } from "@/redux/slices/groupSlice";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { GroupMember } from "@/interfaces/groupInterface";
 const mockModerator = {
   name: "John Doe",
@@ -84,6 +84,10 @@ export default function GroupMemberList() {
     }
   }
 
+  const onHandlePress = (userID: string) => {
+    router.push(`/profile?userID=${userID}`)
+  }
+
   return (
     <View style={styles.container}>
       {/* Search bar */}
@@ -102,7 +106,7 @@ export default function GroupMemberList() {
       <FlatList
         data={filteredGroupMembers}
         renderItem={({ item }) => (
-          <View
+          <TouchableOpacity
             style={[
               styles.memberContainer,
               item.Role === "Admin"
@@ -111,6 +115,7 @@ export default function GroupMemberList() {
                 ? { borderColor: colors.owner }
                 : { borderColor: colors.member },
             ]}
+            onPress={() => onHandlePress(item.MemberInfo._id)}
           >
             <Image source={item.MemberInfo.AvatarURL} style={styles.avatar} />
             <View>
@@ -141,7 +146,7 @@ export default function GroupMemberList() {
                 />
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         keyExtractor={(item, index) => index.toString()}
         showsVerticalScrollIndicator={false}

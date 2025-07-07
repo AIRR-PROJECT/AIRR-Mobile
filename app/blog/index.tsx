@@ -332,6 +332,7 @@ export default function BlogScreen() {
       setDislikes(currentUserBlog.Reaction.Dislikes);
       setComments(currentUserBlog.Reaction.Comments);
       setHtml(currentUserBlog.Content);
+      setIsUserWrittenBlog(user._id == currentUserBlog.Author._id)
     }
   }, [currentUserBlog]);
 
@@ -474,6 +475,7 @@ export default function BlogScreen() {
   }, [isCurrentBlogSaved]);
 
   const [isWriteComment, setIsWriteComment] = useState(false);
+  const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
 
   const handleCommentPress = () => {
     route.push(`/blog/comment-page?blogId=${searchParams.userBlogId}`);
@@ -484,7 +486,6 @@ export default function BlogScreen() {
   }, [searchParams.userBlogId]);
 
   // TODO: check if the blog is written by the user
-  const isUserWrittenBlog = false;
   const refMoreSheet = useRef<BottomSheet>(null);
   // callbacks
   const handleSnapPress = useCallback((index: any) => {
@@ -683,10 +684,9 @@ export default function BlogScreen() {
         {/* Write comment button */}
       </ScrollView>
       {/* Bottom sheet for more button */}
-      <MoreOptionBottomList
+      {searchParams.userBlogId && <MoreOptionBottomList
         sheetRef={refMoreSheet}
-        isUserWrittenBlog={isUserWrittenBlog}
-      />
+        isUserWrittenBlog={isUserWrittenBlog} blogId={currentUserBlog._id}/>}
     </GestureHandlerRootView>
   );
 }

@@ -12,35 +12,41 @@ type MoreOptionComponentProps = {
   sheetRef: React.RefObject<BottomSheet>;
   isUserWrittenBlog: boolean;
   blogId: string;
+  groupId?: string
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
 };
 export default function MoreOptionBottomList({
   sheetRef,
   isUserWrittenBlog,
   blogId,
+  groupId,
   isFromFeed = false, // Default to false if not provided
 }: MoreOptionComponentProps) {
   const route = useRouter();
+  const dispatch = useAppDispatch();
+
   const handleHideBlog = () => {
     // Handle hiding the blog
     ToastAndroid.show("Blog hidden", ToastAndroid.SHORT);
   };
   const handleReportBlog = () => {
     // Handle reporting the blog
-    route.push("/options/report-blog");
-    // Check if user check any option in report blog screen
-    // If yes, then report the blog
-    ToastAndroid.show("Blog reported", ToastAndroid.SHORT);
+    route.push(`/options/report-blog?blogID=${blogId}&groupID=${groupId}`);
   };
   const handleEditBlog = () => {
     // Handle editing the blog
-    route.push("/blog/edit-blog");
+    route.push(`/blog/edit-blog?blogID=${blogId}`);
     // Pass the blogId to the edit blog screen
   };
   const handleDeleteBlog = () => {
-    // Handle deleting the blog
-    ToastAndroid.show("Blog deleted", ToastAndroid.SHORT);
-    // Dispatch the deleteBlog action with the blogId
+    dispatch(deleteBlog(blogId)).then((res) => {
+      const result = res.payload as boolean
+
+      if (result == true) {
+        ToastAndroid.show("Blog deleted", ToastAndroid.SHORT);
+        sheetRef.current?.close()
+      }
+    })
   };
   return (
     <BottomSheet
@@ -73,7 +79,7 @@ export default function MoreOptionBottomList({
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.bottomOptionButton}
-            onPress={handleHideBlog}
+            onPress={handleDeleteBlog}
             activeOpacity={0.8}
           >
             {/* delete */}
@@ -81,7 +87,6 @@ export default function MoreOptionBottomList({
               name="delete"
               size={24}
               color="black"
-              onPress={handleDeleteBlog}
             />
             <Text style={styles.bottomOptionText}>Delete blog</Text>
           </TouchableOpacity>
@@ -90,24 +95,22 @@ export default function MoreOptionBottomList({
         <BottomSheetView style={styles.contentContainer}>
           <TouchableOpacity
             style={styles.bottomOptionButton}
-            onPress={handleReportBlog}
+            onPress={handleHideBlog}
             activeOpacity={0.8}
           >
             {/* Hide */}
             <Entypo name="circle-with-minus" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Hide blog</Text>
           </TouchableOpacity>
-          {isFromFeed && (
-            <TouchableOpacity
-              style={styles.bottomOptionButton}
-              onPress={handleHideBlog}
-              activeOpacity={0.8}
-            >
-              {/* Report */}
-              <MaterialIcons name="report" size={24} color="black" />
-              <Text style={styles.bottomOptionText}>Report blog</Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={styles.bottomOptionButton}
+            onPress={handleReportBlog}
+            activeOpacity={0.8}
+          >
+            {/* Report */}
+            <MaterialIcons name="report" size={24} color="black" />
+            <Text style={styles.bottomOptionText}>Report blog</Text>
+          </TouchableOpacity>
         </BottomSheetView>
       )}
     </BottomSheet>

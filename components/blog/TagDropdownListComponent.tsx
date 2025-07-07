@@ -1,7 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TextInput, FlatList } from "react-native";
 import Checkbox from "expo-checkbox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BottomSheetFlatList, BottomSheetView } from "@gorhom/bottom-sheet";
 import { GroupTag } from "@/interfaces/groupInterface";
 type TagDropdownComponentProps = {
@@ -25,6 +25,11 @@ export default function TagDropdownComponent({
       onPress(updated); // Optional: inform parent that tag was selected
     }
   };
+
+  // Reset selected tags on tags changed
+  useEffect(() => {
+    setSelectedTags([])
+  }, [tags])
 
   return (
     <View style={styles.container}>

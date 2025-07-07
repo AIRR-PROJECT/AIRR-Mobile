@@ -74,7 +74,7 @@ export default function GroupPopularTab() {
         animated: true,
       });
     }
-  }
+  };
   return (
     <View style={styles.container}>
       {/* list tags */}
@@ -83,7 +83,7 @@ export default function GroupPopularTab() {
           data={fields}
           ref={refFields}
           onScroll={handleScroll}
-          scrollEventThrottle={16} // Adjust as needed for smoother scrolling
+          scrollEventThrottle={20} // Adjust as needed for smoother scrolling
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[

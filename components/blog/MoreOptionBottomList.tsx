@@ -1,6 +1,11 @@
 import { useAppDispatch } from "@/redux/hook";
 import { deleteBlog, updateHideBlog } from "@/redux/slices/blogSlice";
-import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import {
+  Entypo,
+  FontAwesome,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -14,6 +19,7 @@ type MoreOptionComponentProps = {
   blogId: string;
   groupId?: string;
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
+  isFromFavourites?: boolean; // Optional prop to indicate if the blog is from favourites
 };
 export default function MoreOptionBottomList({
   sheetRef,
@@ -21,6 +27,7 @@ export default function MoreOptionBottomList({
   blogId,
   groupId,
   isFromFeed = false, // Default to false if not provided
+  isFromFavourites = false, // Default to false if not provided
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
@@ -60,6 +67,9 @@ export default function MoreOptionBottomList({
     });
   };
   // console.log("isFromFeed", isFromFeed);
+  const hanleRemoveFromFavourites = () => {
+    // Handle removing the blog from favourites
+  };
   return (
     <BottomSheet
       ref={sheetRef}
@@ -80,6 +90,23 @@ export default function MoreOptionBottomList({
     >
       {isUserWrittenBlog ? (
         <BottomSheetView style={styles.contentContainer}>
+          {isFromFavourites && (
+            <TouchableOpacity
+              style={styles.bottomOptionButton}
+              onPress={hanleRemoveFromFavourites}
+              activeOpacity={0.8}
+            >
+              {/* Remove from favorites */}
+              <MaterialCommunityIcons
+                name="bookmark-remove"
+                size={24}
+                color="black"
+              />
+              <Text style={styles.bottomOptionText}>
+                Remove from favourites
+              </Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={styles.bottomOptionButton}
             onPress={handleEditBlog}
@@ -101,6 +128,23 @@ export default function MoreOptionBottomList({
         </BottomSheetView>
       ) : (
         <BottomSheetView style={styles.contentContainer}>
+          {isFromFavourites && (
+            <TouchableOpacity
+              style={styles.bottomOptionButton}
+              onPress={hanleRemoveFromFavourites}
+              activeOpacity={0.8}
+            >
+              {/* Remove from favorites */}
+              <MaterialCommunityIcons
+                name="bookmark-remove"
+                size={24}
+                color="black"
+              />
+              <Text style={styles.bottomOptionText}>
+                Remove from favourites
+              </Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={styles.bottomOptionButton}
             onPress={handleHideBlog}

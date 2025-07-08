@@ -53,7 +53,6 @@ import {
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { Image } from "react-native";
-import { set } from "lodash";
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -633,7 +632,8 @@ export default function Editblog() {
                       {createBlogRequestedTags.length > 0 &&
                         createBlogRequestedTags.map((tag) => (
                           <TagWrapper key={tag._id} tag={tag.TagName} />
-                        ))}
+                        ))
+                      }
 
                       <AntDesign
                         name="pluscircleo"

@@ -22,6 +22,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   createGroup,
   searchFields,
+  setCreateGroupCurrentTags,
   setCreateGroupSubmitted,
 } from "@/redux/slices/groupSlice";
 import {
@@ -54,7 +55,7 @@ const mockFieldList = [
 
 export default function CreateGroup() {
   const dispatch = useAppDispatch();
-  const { createGroupSubmitted } = useAppSelector((state) => state.group);
+  const { createGroupSubmitted, createGroupCurrentTags, createGroupCreatedTags } = useAppSelector((state) => state.group);
 
   const uploadedImg = useRef<ImageSource>();
   const [groupName, setGroupName] = useState("");
@@ -76,6 +77,10 @@ export default function CreateGroup() {
   useEffect(() => {
     console.log(groupFields);
   }, [groupFields]);
+
+  useEffect(() => {
+    console.log(groupRules)
+  }, [groupRules])
 
   useEffect(() => {
     if (createGroupSubmitted) {
@@ -101,20 +106,13 @@ export default function CreateGroup() {
         type: uploadedImg.current?.mimeType,
       });
       formData.append("Name", groupName);
-      formData.append("Tags", JSON.stringify(groupTags));
+      formData.append("Tags", JSON.stringify([...groupTags, ...createGroupCreatedTags]));
       formData.append("GroupField", JSON.stringify(groupField));
       formData.append("Description", groupDescription);
-      let rulesObject: GroupRule[] = [
-        {
-          _id: "rule1",
-          RuleName: "Rule 1",
-          RuleDescription: groupRules,
-        },
-      ];
-      formData.append("GroupRules", JSON.stringify(rulesObject));
+      formData.append("GroupRules", JSON.stringify(groupRules));
 
       dispatch(createGroup(formData)).then((res) => {
-        if (res.payload) {
+        if ((res.payload as boolean) == true) {
           router.dismiss();
         }
       });
@@ -130,18 +128,26 @@ export default function CreateGroup() {
   const handleGroupFieldPress = useCallback((field: SearchedField) => {
     console.log("Group field: ", field.FieldName);
     setGroupField(field);
+
     setGroupTags(field.DefaultTags);
+    let currentTagsString: string[] = []
+    field.DefaultTags.forEach((t) => {
+      currentTagsString.push(t.TagName)
+    })
+    dispatch(setCreateGroupCurrentTags(currentTagsString))
+
     fieldRef.current?.close();
   }, []);
   const [createdTags, setCreatedTags] = useState<GroupTag[]>([]);
   const route = useRouter();
   const handleCreateTagPress = () => {
-    route.push("/create-tag-screen");
+    route.push(`/create-tag-screen?fieldID=${groupField?._id}`);
   };
   const handleAddNewRulePress = () => {
     setGroupRules((prevRules) => {
       const newRule: GroupRule = {
-        _id: `rule${prevRules ? prevRules.length + 1 : 1}`,
+        // _id: `rule${prevRules ? prevRules.length + 1 : 1}`,
+        _id: "",
         RuleName: "",
         RuleDescription: "",
       };
@@ -242,7 +248,22 @@ export default function CreateGroup() {
           </TouchableOpacity>
           {/* Tags */}
           <View style={{ flex: 1 }}>
-            <TouchableOpacity
+            <View
+              style={[
+                styles.heading,
+                {
+                  justifyContent: "flex-start",
+                  flexWrap: "wrap",
+                },
+              ]}
+            >
+              {groupTags.length > 0 &&
+                groupTags.map((tag) => (
+                  <TagWrapper key={tag._id} tag={tag.TagName} />
+                ))
+              }
+            </View>
+            {groupField && <TouchableOpacity
               style={[
                 styles.heading,
                 {
@@ -261,8 +282,8 @@ export default function CreateGroup() {
                   paddingLeft: 40,
                 }}
               />
-              {createdTags.length > 0 ? (
-                createdTags.map((tag) => (
+              {createGroupCreatedTags.length > 0 ? (
+                createGroupCreatedTags.map((tag) => (
                   // TODO: Check the API for the what should the _id be before request it
                   <TagWrapper key={tag._id} tag={tag.TagName} />
                 ))
@@ -276,11 +297,11 @@ export default function CreateGroup() {
                       },
                     ]}
                   >
-                    Request new Tags
+                    Create New Tags
                   </Text>
                 </View>
               )}
-            </TouchableOpacity>
+            </TouchableOpacity>}
           </View>
         </View>
 
@@ -358,6 +379,11 @@ export default function CreateGroup() {
                     style={styles.ruleText}
                     placeholder="Enter rule name..."
                     placeholderTextColor="#B0B0B0"
+                    onChangeText={(text) => {
+                      let groupRulesClone = JSON.parse(JSON.stringify(groupRules)) as GroupRule[]
+                      groupRulesClone[index].RuleName = text
+                      setGroupRules(groupRulesClone)
+                    }}
                     multiline
                   />
                 </View>
@@ -368,6 +394,11 @@ export default function CreateGroup() {
                     style={styles.ruleText}
                     placeholder="Enter rule description..."
                     placeholderTextColor="#B0B0B0"
+                    onChangeText={(text) => {
+                      let groupRulesClone = JSON.parse(JSON.stringify(groupRules)) as GroupRule[]
+                      groupRulesClone[index].RuleDescription = text
+                      setGroupRules(groupRulesClone)
+                    }}
                     multiline
                   />
                 </View>

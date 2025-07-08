@@ -82,13 +82,6 @@ export interface GroupRule {
     RuleDescription: string;
 }
 
-export interface CreateGroupTag {
-    TagName: string,
-    FieldID: string,
-    NumberOfBlogUse: number,
-    IsDefaultTag: boolean
-}
-
 export interface PendingMemberRequest {
     _id: string,
     Owner: {
@@ -146,3 +139,9 @@ export interface GroupMember {
 //     Description: string;
 //     GroupField: 
 // }
+
+export interface CreateGroupTag {
+    _id: string
+    TagName: string
+    OperationType: string
+}

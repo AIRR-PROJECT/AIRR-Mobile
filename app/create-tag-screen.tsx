@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   Dimensions,
+  ToastAndroid,
 } from "react-native";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -13,10 +14,12 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import { useState } from "react";
-import { set } from "lodash";
-import { createTag } from "@/redux/slices/groupSlice";
-import { GroupTag } from "@/interfaces/groupInterface";
+import { useEffect, useState } from "react";
+import { createTag, searchTagCreateGroup, setCreateGroupCreatedTags } from "@/redux/slices/groupSlice";
+import { CreateGroupTag, GroupTag } from "@/interfaces/groupInterface";
+import { router, useLocalSearchParams } from "expo-router";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { searchTagCreateBlog, setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 type AddTagsComponentProps = {
@@ -26,54 +29,86 @@ const mockTags: string[] = ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6"];
 export default function CreateTagsScreen({
   isCreate = false, // Default to false if not provided
 }: AddTagsComponentProps) {
+  const dispatch = useAppDispatch()
+  const { fieldID } = useLocalSearchParams<{ fieldID: string }>()
+  const { createGroupCurrentTags } = useAppSelector(state => state.group)
+
   // State to hold the new tag input by user
-  const [newTagToCreate, setNewTag] = useState<string>("");
+  const [newTagToRequest, setNewTag] = useState<string>("");
 
   // Const state to hold valid tag
   const [validTag, setValidTag] = useState<string | null>(null);
 
   // List of valid tags that user created/requested
-  const [selectableTags, setSelectableTags] = useState<string[]>([]);
+  const [selectableTags, setSelectableTags] = useState<CreateGroupTag[]>([]);
 
   // Created/Requested Tag that user can deselect
-  const [createdTags, setCreatedTags] = useState<string[]>([]);
+  const [createdTags, setCreatedTags] = useState<CreateGroupTag[]>([]);
+
+  // Error if the tag selected already chosen for the blog
+  const [showError, setShowError] = useState(false)
 
   const onChangeText = (text: string) => {
     setNewTag(text);
   };
 
   const handleCheckTag = async (tag: string) => {
+    setShowError(false)
+    console.log(fieldID)
     // Simulate API call to check tag validity
     if (tag.length > 0 && tag.length <= 20) {
-      const isValid = await checkTagWithAPI(tag); // Replace with your API
-      if (isValid) {
-        setValidTag(tag);
-      } else {
-        setValidTag(null);
-      }
+      dispatch(searchTagCreateGroup({ keyword: tag, fieldID: fieldID })).then((res) => {
+        const tags = res.payload as CreateGroupTag[]
+        setSelectableTags(tags)
+
+        const isValid = checkTagValidity(tag, tags)
+
+        if (isValid) {
+          setValidTag(tag);
+          setShowError(false)
+        } else {
+          setValidTag(null);
+          setShowError(true)
+        }
+      })
+      // const isValid = await checkTagWithAPI(tag); // Replace with your API
+      // if (isValid) {
+      //   setValidTag(tag);
+      // } else {
+      //   setValidTag(null);
+      // }
     }
   };
 
   // Dummy API function for illustration
-  async function checkTagWithAPI(tag: string): Promise<boolean> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return tag !== "taken";
+  function checkTagValidity(tag: string, foundTags: CreateGroupTag[]): boolean {
+    if (foundTags.length == 0) return true
+
+    for (let foundTag of foundTags) {
+      if (tag == foundTag.TagName) return false
+    }
+
+    return true
   }
-  selectableTags.push(...mockTags); // Add mock tags to selectableTags for testing
+  // selectableTags.push(...mockTags); // Add mock tags to selectableTags for testing
   const handleSubmit = () => {
-    if (selectableTags.length > 0) {
+    if (createdTags.length > 0) {
       // Create a GroupTag object for each selected tag with incrementing _id
       // TODO: CHECK THE API FOR THE _ID HERE, I NOW JUST GENERATE A RANDOM ONE
-      const newTags: GroupTag[] = createdTags.map((tag) => ({
+      const newTags: CreateGroupTag[] = createdTags.map((tag) => ({
         _id: Math.random().toString(36).substring(2, 15), // Generate a random _id
-        TagName: tag,
+        TagName: tag.TagName,
+        OperationType: tag.OperationType
       }));
       setNewTag("");
       setValidTag(null);
       setSelectableTags([]);
-      //Go Back and send the new tags to thapp/request-tag-screen.tsxe parent component
+      //Go Back and send the new tags to the parent component
+      dispatch(setCreateGroupCreatedTags(newTags))
+      router.back()
     }
   };
+
   return (
     <View style={styles.contentContainer}>
       <View style={styles.rowContainer}>
@@ -100,14 +135,14 @@ export default function CreateTagsScreen({
           onPress={() => {
             // Handle tag checking logic here
             // For now, just call onPress with a dummy tag
-            handleCheckTag(newTagToCreate);
+            handleCheckTag(newTagToRequest);
           }}
         >
           <Text style={styles.buttonText}>Check existing</Text>
         </TouchableOpacity>
       </View>
       {/* Select tag to add or deselect */}
-      <View style={[{ flex: 1, gap: 10, marginBottom: 10 }]}>
+      <View style={[{flex: 1, gap: 10, marginBottom: 10},]}>
         <View style={styles.selectTagBox}>
           <Text style={styles.selectTagText}>
             Your Tag match, please select:
@@ -117,16 +152,24 @@ export default function CreateTagsScreen({
             contentContainerStyle={{}}
           >
             <View style={styles.tagsContainer}>
-              {selectableTags.map((tag, index) => (
+              {selectableTags.length != 0 && selectableTags.map((tag, index) => (
                 <TouchableOpacity
                   key={index}
                   style={styles.selectTagButton}
                   onPress={() => {
-                    setSelectableTags((prev) => prev.filter((t) => t !== tag));
+                    if (!createGroupCurrentTags.includes(tag.TagName)) {
+                      setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
+                      setCreatedTags(() => [tag, ...createdTags])
+                      setShowError(false)
+                    }
+                    else {
+                      setShowError(true)
+                    }
                   }}
                 >
-                  <Text style={styles.selectTagButtonText}>{tag}</Text>
+                  <Text style={styles.selectTagButtonText}>{tag.TagName}</Text>
                   <FontAwesome name="plus" size={20} color="#fff" />
+                  
                 </TouchableOpacity>
               ))}
             </View>
@@ -138,7 +181,7 @@ export default function CreateTagsScreen({
             onPress={() => {
               // Handle tag creation logic here
               if (validTag) {
-                setSelectableTags((prev) => [...prev, validTag]);
+                setCreatedTags((prev) => [...prev, { _id: "", TagName: validTag, OperationType: "new-tag" }]);
 
                 setValidTag(null);
                 setNewTag("");
@@ -146,27 +189,30 @@ export default function CreateTagsScreen({
             }}
             disabled={validTag === null}
           >
-            <AntDesign name="pluscircle" size={24} color="#B9FF66" />
-            <Text style={styles.selectTagText}>
+            <AntDesign name="pluscircle" size={24} color={validTag ? "#B9FF66" : "grey"} />
+            <Text style={validTag ? styles.selectTagText : styles.selectTagTextDisabled}>
               Create {validTag === null ? "new" : validTag} Tag
             </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.deselectTagBox}>
+          <Text style={styles.deselectTagText}>
+            Requested Tags:
+          </Text>
           <ScrollView
             style={styles.listTagsScrollView}
             contentContainerStyle={{}}
           >
             <View style={styles.tagsContainer}>
-              {selectableTags.map((tag, index) => (
+              {createdTags.map((tag, index) => (
                 <TouchableOpacity
                   key={index}
                   style={styles.deselectTagButton}
                   onPress={() => {
-                    setSelectableTags((prev) => prev.filter((t) => t !== tag));
+                    setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
                   }}
                 >
-                  <Text style={styles.deselectTagButtonText}>{tag}</Text>
+                  <Text style={styles.deselectTagButtonText}>{tag.TagName}</Text>
                   <FontAwesome name="times" size={20} color="#000" />
                 </TouchableOpacity>
               ))}
@@ -174,31 +220,15 @@ export default function CreateTagsScreen({
           </ScrollView>
           {/* Create new Tag button */}
 
-          <TouchableOpacity
-            style={styles.createTagButton}
-            onPress={() => {
-              // Handle tag creation logic here
-              if (validTag) {
-                setSelectableTags((prev) => [...prev, validTag]);
-
-                setValidTag(null);
-                setNewTag("");
-              }
-            }}
-            disabled={validTag === null}
-          >
-            {/* If user create a new tag that already existing, makje this component appear */}
-            {
-              <Text style={styles.errorText}>
-                This tag is already existing!
-              </Text>
-            }
-          </TouchableOpacity>
+          {/* If user create a new tag that already existing, makje this component appear */}
+          {showError && <Text style={styles.errorText}>
+            This tag is already existing!
+          </Text>}
         </View>
       </View>
       {/* Done button */}
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={[styles.buttonText, { fontWeight: "bold" }]}>Finish</Text>
+      <TouchableOpacity style={createdTags.length != 0 ? styles.button : styles.buttonDisabled} disabled={createdTags.length == 0} onPress={handleSubmit}>
+        <Text style={createdTags.length != 0 ? [styles.buttonText, { fontWeight: "bold" }] : [styles.buttonDisabledText, { fontWeight: "bold" }]}>Finish</Text>
       </TouchableOpacity>
     </View>
   );
@@ -220,6 +250,16 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 16,
   },
+  buttonDisabled: {
+    backgroundColor: "grey",
+    padding: 10,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  buttonDisabledText: {
+    color: "#fff",
+    fontSize: 16,
+  },
   rowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -231,7 +271,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    flex: 1,
   },
   searchBar: {
     backgroundColor: "#2E3B40",
@@ -239,7 +278,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 20,
-    flex: 1,
   },
   selectTagBox: {
     backgroundColor: "#fff",
@@ -255,10 +293,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
-    gap: 5,
+    gap: 5
   },
   selectTagText: {
     color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+  selectTagTextDisabled: {
+    color: "grey",
     fontSize: 16,
     fontWeight: "bold",
     marginLeft: 10,
@@ -282,7 +326,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
-    gap: 5,
+    gap: 5
   },
   deselectTagText: {
     color: "#fff",
@@ -323,5 +367,5 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#FF6666",
     fontSize: 16,
-  },
+  }
 });

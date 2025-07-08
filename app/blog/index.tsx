@@ -13,6 +13,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AntDesign,
   Entypo,
+  Feather,
   FontAwesome,
   FontAwesome6,
   Fontisto,
@@ -58,6 +59,8 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { formatDistanceToNow } from "date-fns";
+import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
+import { green } from "react-native-reanimated/lib/typescript/Colors";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -231,11 +234,6 @@ const mockUserBlogCommentList = [
   mockUserBlogComment,
 ];
 // TODO: CONSIDER MOVE THIS TO A SEPARATE FILE OR USER ALREADY EXISTING ENUM
-enum BlogStatus {
-  IN_GROUP = "In Group",
-  PRIVATE = "Private",
-  IN_PROFILE = "In Profile",
-}
 export function debounce<T extends (...args: any[]) => void>(
   callback: T,
   delay: number
@@ -336,6 +334,7 @@ export default function BlogScreen() {
 
   useEffect(() => {
     if (currentUserBlog) {
+      console.log(currentUserBlog)
       setTitle(currentUserBlog.Title);
       setDescription(currentUserBlog.Description);
       setThumbnail(currentUserBlog.BackgroundURL);
@@ -510,7 +509,7 @@ export default function BlogScreen() {
   }, []);
 
   // TODO: get blog status, If it’s a in profile/ private blog → show “In profile” / “Private”, and hide group component
-  const blogStatus = BlogStatus.IN_GROUP; // This should be dynamically set based on the blog's status
+  const blogStatus = BlogViewType.IN_GROUP; // This should be dynamically set based on the blog's status
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -534,7 +533,7 @@ export default function BlogScreen() {
         />
         <View style={styles.scrollViewContent}>
           {/* Group Component */}
-          {blogStatus == BlogStatus.IN_GROUP && searchParams.userBlogId && 
+          {blogStatus == BlogViewType.IN_GROUP && searchParams.userBlogId && 
             <TouchableOpacity style={styles.groupContainer} onPress={handleOnPressGroup}>
               <Image source={group.CoverURL} style={styles.groupImage} />
               <Text style={styles.groupName}>{group.Name}</Text>
@@ -545,6 +544,19 @@ export default function BlogScreen() {
           {searchParams.userBlogId && <BlogAuthorComponent {...author} />}
           {/* Title */}
           <Text style={styles.title}>{title}</Text>
+          {/* Status */}
+          {searchParams.userBlogId && currentUserBlog && currentUserBlog.ViewType === BlogViewType.IN_GROUP &&
+            <View style={[styles.statusContainer, { 
+              backgroundColor: currentUserBlog.Status === BlogStatus.ACTIVE ? "#dcfce7" : "#fcdcdc"
+            }]}>
+              {currentUserBlog.Status === BlogStatus.ACTIVE ? 
+                <Feather name="check-circle" size={24} color="green" />
+                : <Feather name="x-circle" size={24} color="red" />
+              }
+              <Text style={{ color: currentUserBlog.Status === BlogStatus.ACTIVE ? "green" : "red" }}>{currentUserBlog.Status}</Text>
+            </View>
+          }
+          <View style={{paddingTop : 20}}/>
           {/* Date and number of comment */}
           <View style={styles.additionalInfo}>
             {/* Date */}
@@ -774,6 +786,13 @@ const styles = StyleSheet.create({
   smallText: {
     fontSize: 12,
     color: "#C2C2C2",
+  },
+  statusContainer: {
+    borderRadius: 25,
+    flexDirection: "row",
+    alignSelf: 'flex-start',
+    paddingVertical: 5,
+    paddingHorizontal: 15
   },
   dateAndComment: {
     flexDirection: "row",

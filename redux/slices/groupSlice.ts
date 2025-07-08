@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
 import { AxiosResponse } from "axios";
 import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupTag, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
-import { UserBlog } from "@/interfaces/blogInterface";
+import { CreateBlogTag, UserBlog } from "@/interfaces/blogInterface";
+import { ResponseFailcode } from "@/enums/failcode.enum";
 
 const initialState = {
     popularFields: null as any as GroupField[],
@@ -11,6 +12,8 @@ const initialState = {
     createGroupSubmitted: false,
     groupBlogsSearchText: "",
     groupTagsSearchText: "",
+    createGroupCurrentTags: [] as string[],
+    createGroupCreatedTags: [] as CreateBlogTag[]
 };
 
 export const getGroupPopularFields = createAsyncThunk(
@@ -466,6 +469,29 @@ export const rejectTag = createAsyncThunk(
     }
 )
 
+export const searchTagCreateGroup = createAsyncThunk(
+    'blog/searchTagCreateGroup',
+    async (data: { keyword: string, fieldID: string }, thunkAPI) => {
+        try {
+            const res = await api.get(`tag/search-tag-create-group?keyword=${data.keyword}&fieldID=${data.fieldID}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.tagList as CreateGroupTag[]
+            }
+            else {
+                return []
+            }
+        }
+        catch (error: any) {
+            if (error.response.data.failcode == ResponseFailcode.TAG_NOT_FOUND) {
+                return []
+            }
+            
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 const groupSlice = createSlice({
     name: "group",
     initialState,
@@ -482,12 +508,22 @@ const groupSlice = createSlice({
             state.createGroupSubmitted = action.payload
         },
 
+        setCreateGroupCurrentTags(state, action) {
+            state.createGroupCurrentTags = action.payload as string[]
+        },
+
+        setCreateGroupCreatedTags(state, action) {
+            state.createGroupCreatedTags = action.payload as CreateGroupTag[]
+        },
+
         reset(state) {
             state.popularFields = null as any as GroupField[]
             state.popularGroupsHorizontal = null as any as Group[]
             state.popularGroupsVertical = null as any as PopularGroupsByField[]
             state.createGroupSubmitted = false
             state.groupBlogsSearchText = ""
+            state.createGroupCurrentTags = [] as string[],
+            state.createGroupCreatedTags = [] as CreateGroupTag[]
         },
     
     },
@@ -516,5 +552,5 @@ const groupSlice = createSlice({
 
 });
 
-export const { setGroupBlogsSearchText, setGroupTagsSearchText, setCreateGroupSubmitted, reset } = groupSlice.actions;
+export const { setGroupBlogsSearchText, setGroupTagsSearchText, setCreateGroupSubmitted, setCreateGroupCurrentTags, setCreateGroupCreatedTags, reset } = groupSlice.actions;
 export default groupSlice.reducer;

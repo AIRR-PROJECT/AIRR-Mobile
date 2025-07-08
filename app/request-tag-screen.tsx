@@ -28,7 +28,7 @@ type AddTagsComponentProps = {
   isCreate?: boolean; // Optional prop to indicate if it's for creating a new tag
 };
 const mockTags: string[] = ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6"];
-export default function RequestTagScreen({
+export default function RequestTagsScreen({
   isCreate = false, // Default to false if not provided
 }: AddTagsComponentProps) {
   const dispatch = useAppDispatch()
@@ -56,8 +56,6 @@ export default function RequestTagScreen({
 
   const handleCheckTag = async (tag: string) => {
     setShowError(false)
-    console.log(fieldID)
-    console.log(groupID)
     // Simulate API call to check tag validity
     if (tag.length > 0 && tag.length <= 20) {
       dispatch(searchTagCreateBlog({ keyword: tag, fieldID: fieldID, groupID: groupID })).then((res) => {

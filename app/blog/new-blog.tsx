@@ -45,7 +45,6 @@ import {
 } from "@/redux/slices/blogSlice";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
-import { set } from "lodash";
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",

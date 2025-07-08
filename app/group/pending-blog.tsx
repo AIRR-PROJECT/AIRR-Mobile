@@ -1,7 +1,7 @@
 // This blog is in group only (it in pending state : (approved or rejected))
 import { AntDesign, Entypo, FontAwesome6, Fontisto } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
-import { useRouter } from "expo-router";
+import { router, useLocalSearchParams, useRouter } from "expo-router";
 import {
   View,
   StyleSheet,
@@ -10,34 +10,42 @@ import {
   Text,
 } from "react-native";
 import { Image } from "expo-image";
-import { AIBlogSection, UserBlogTag } from "@/interfaces/blogInterface";
+import { AIBlogSection, UserBlogDetail, UserBlogGroup, UserBlogTag } from "@/interfaces/blogInterface";
 import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
 import BlogTagButton from "@/components/blog/BlogTagButton";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getUserBlogDetail } from "@/redux/slices/blogSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { approveBlog, rejectBlog } from "@/redux/slices/groupSlice";
 
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
 </pre><p>ádasdadab</p>
 `;
-const mockGroup = {
-  name: "Group Name",
-  image: "https://picsum.photos/200",
+const mockGroup: UserBlogGroup = {
+  _id: "",
+  CoverURL: "",
+  Name: "",
+  NumberOfMembers: 0,
+  Description: ""
 };
 
 type Author = {
-  // name: string;
+  _id: string;
+  Name: string;
   AvatarURL: string;
   Username: string;
-  // streak: number;
+  CreateDate: string
 };
 const mockAuthor: Author = {
   // name: "FullName",
   AvatarURL: "https://picsum.photos/200",
   Username: "user_name",
-  // streak: 120,
+  _id: "",
+  Name: "",
+  CreateDate: ""
 };
 const mockTags: UserBlogTag[] = [
   { TagName: "Frontend", _id: "1" },
@@ -155,21 +163,52 @@ const mockContent =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 const mockCreatedAt = new Date();
 
-export default function PendingBlogInGroup({ blogID }: { blogID: string }) {
+export default function PendingBlogInGroup() {
+  const dispatch = useAppDispatch()
+  const { blogID } = useLocalSearchParams<{ blogID: string }>()
+
+  const [title, setTitle] = useState("Mock description");
+  const [description, setDescription] = useState("Mock description");
+  const [thumbnail, setThumbnail] = useState(mockThumbnail);
+  const [author, setAuthor] = useState(mockAuthor);
+  const [tags, setTags] = useState(mockTags);
+  const [group, setGroup] = useState(mockGroup);
+  const [html, setHtml] = useState(mockHtml);
+
   const route = useRouter();
   const handleBack = () => {
     route.back();
   };
   const handleApprove = () => {
-    console.log("Approve blog");
+    dispatch(approveBlog({ groupID: group._id, blogIDToApprove: blogID, blogOwnerID: author._id })).then(res => {
+      if (res.payload === true) {
+        console.log("Approve blog");
+        router.dismiss()
+      }
+    })
   };
   const handleReject = () => {
-    console.log("Reject blog");
+    dispatch(rejectBlog({ groupID: group._id, blogIDToReject: blogID, blogOwnerID: author._id })).then(res => {
+      if (res.payload === true) {
+        console.log("Reject blog");
+        router.dismiss()
+      }
+    })
   };
 
   useEffect(() => {
     if (blogID) {
-      getUserBlogDetail(blogID)
+      dispatch(getUserBlogDetail(blogID)).then((res) => {
+        const data = res.payload as UserBlogDetail
+
+        setTitle(data.Title)
+        setDescription(data.Description)
+        setThumbnail(data.BackgroundURL)
+        setAuthor(data.Author)
+        setTags(data.Tags)
+        setGroup(data.Group)
+        setHtml(data.Content)
+      })
     }
   }, [blogID])
 
@@ -207,14 +246,14 @@ export default function PendingBlogInGroup({ blogID }: { blogID: string }) {
       <View style={styles.scrollViewContent}>
         {/* Group Component */}
         <View style={styles.groupContainer}>
-          <Image source={mockGroup.image} style={styles.groupImage} />
-          <Text style={styles.groupName}>{mockGroup.name}</Text>
+          <Image source={group.CoverURL} style={styles.groupImage} />
+          <Text style={styles.groupName}>{group.Name}</Text>
         </View>
         {/* User Component */}
-        {<BlogAuthorComponent {...mockAuthor} />}
+        {<BlogAuthorComponent  {...author} />}
         {/* Title */}
         <Text style={styles.title}>
-          How to fix clipboard if it isn't working
+          {title}
         </Text>
 
         {/* Blog in need of approval has no  */}
@@ -236,14 +275,14 @@ export default function PendingBlogInGroup({ blogID }: { blogID: string }) {
               >
                 Description:{" "}
               </Text>
-              {mockContent}
+              {description}
             </Text>
           </View>
         </View>
         {/* List of tags */}
 
         <View style={styles.tagsContainer}>
-          {mockTags.map((tag, index) => (
+          {tags.map((tag, index) => (
             <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
           ))}
         </View>
@@ -251,14 +290,14 @@ export default function PendingBlogInGroup({ blogID }: { blogID: string }) {
         {/* Thumbnail */}
 
         <Image
-          source={mockThumbnail}
+          source={thumbnail}
           style={{ width: "100%", height: 200, borderRadius: 20 }}
           contentFit="cover"
           transition={1000}
         />
 
         {/* Blog content (render from html) */}
-        <QuillRenderer dom={{ matchContents: true }} content={mockHtml} />
+        <QuillRenderer dom={{ matchContents: true }} content={html} />
 
         {/* <Divider
           orientation="vertical"

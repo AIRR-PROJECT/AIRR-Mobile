@@ -349,12 +349,12 @@ export default function CommentBlogScreen() {
               <View style={styles.rowContainer}>
                 <Image
                   style={styles.avatar}
-                  source={{ uri: mockUser.AvatarURL }}
+                  source={{ uri: user.avatarURL }}
                 />
                 {/* name and date */}
                 <View>
                   <View>
-                    <Text style={styles.name}>Username</Text>
+                    <Text style={styles.name}>{user.username}</Text>
                     <Text style={styles.date}>{new Date().toDateString()}</Text>
                   </View>
                 </View>

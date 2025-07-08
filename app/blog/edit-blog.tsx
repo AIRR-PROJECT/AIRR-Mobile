@@ -53,6 +53,7 @@ import {
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { Image } from "react-native";
+import { BlogViewType } from "@/enums/blog_properties.enum";
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -388,10 +389,10 @@ export default function Editblog() {
     formData.append("content", content.current);
     let viewType =
       chosenGroup.Name == "Private"
-        ? "Private"
+        ? BlogViewType.PRIVATE
         : chosenGroup.Name == "Only in my profile"
-        ? "In Profile Page"
-        : "In Group";
+        ? BlogViewType.IN_PROFILE_PAGE
+        : BlogViewType.IN_GROUP;
     formData.append("viewType", viewType);
 
     dispatch(updateBlog(formData)).then((res) => {

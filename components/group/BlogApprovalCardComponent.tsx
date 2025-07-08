@@ -62,7 +62,7 @@ export default function BlogApprovalCardComponent({
   const route = useRouter();
   const handlePress = () => {
     console.log("Press blog with id: ", BlogID);
-    route.push('/group/pending-blog');
+    route.push(`/group/pending-blog?blogID=${BlogID}`);
   }
   return (
     <ReanimatedSwipeable

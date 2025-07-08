@@ -28,7 +28,7 @@ import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent
 import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
-import { getGroupInfo, getPreviewGroups } from "@/redux/slices/groupSlice";
+import { getGroupInfo, getPreviewGroups, searchGroupsForCreateUpdateBlog } from "@/redux/slices/groupSlice";
 import {
   Group,
   GroupDetailInfo,
@@ -226,6 +226,13 @@ export default function NewBlog() {
 
   // Callbacks
   const handleGroupSnapPress = useCallback((index: number) => {
+    // Fetch default groups (COMMENTED TILL HAVE API)
+    // dispatch(searchGroupsForCreateUpdateBlog("")).then((res) => {
+    //   const data = res.payload as Group[]
+
+    //   setSearchFoundGroups(defaultSearchGroups.concat(data))
+    // })
+
     groupSheetRef.current?.snapToIndex(index);
   }, []);
 
@@ -242,7 +249,7 @@ export default function NewBlog() {
   };
   const handleGroupSearchSubmit = () => {
     if (groupSearchText.current.length != 0) {
-      dispatch(getPreviewGroups(groupSearchText.current)).then((res) => {
+      dispatch(searchGroupsForCreateUpdateBlog(groupSearchText.current)).then((res) => {
         setSearchFoundGroups(
           defaultSearchGroups.concat(res.payload as Group[])
         );

@@ -31,7 +31,7 @@ export default function CreateTagsScreen({
 }: AddTagsComponentProps) {
   const dispatch = useAppDispatch()
   const { fieldID } = useLocalSearchParams<{ fieldID: string }>()
-  const { createGroupCurrentTags } = useAppSelector(state => state.group)
+  const { createGroupCurrentTags, createGroupCreatedTags } = useAppSelector(state => state.group)
 
   // State to hold the new tag input by user
   const [newTagToRequest, setNewTag] = useState<string>("");
@@ -43,7 +43,7 @@ export default function CreateTagsScreen({
   const [selectableTags, setSelectableTags] = useState<CreateGroupTag[]>([]);
 
   // Created/Requested Tag that user can deselect
-  const [createdTags, setCreatedTags] = useState<CreateGroupTag[]>([]);
+  const [createdTags, setCreatedTags] = useState<CreateGroupTag[]>(createGroupCreatedTags);
 
   // Error if the tag selected already chosen for the blog
   const [showError, setShowError] = useState(false)

@@ -54,6 +54,11 @@ export default function GroupTab(props: {type: string, fieldID?: string}) {
         })
         break
       case "joined":
+        if (props.fieldID) {
+          dispatch(getFieldDetail(props.fieldID)).then((val) => {
+            setGroups(val.payload as Group[])
+          })
+        }
         break
     }
   }, [props.fieldID])

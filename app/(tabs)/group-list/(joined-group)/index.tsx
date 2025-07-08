@@ -3,7 +3,9 @@ import PopularGroupTab from "@/components/group/PopularGroupTab";
 import { GroupField } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
+  getFieldDetail,
   getGroupPopularFields,
+  getJoinedFields,
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
@@ -17,39 +19,34 @@ import {
   Modal,
 } from "react-native";
 
-let fields: GroupField[] = [];
 // Change the impletation to group that user joined
 export default function JoinedGroupTab() {
   const dispatch = useAppDispatch();
-  const { popularFields } = useAppSelector((state) => state.group);
 
   const [selectedId, setSelectedId] = useState("1");
-
-  // useEffect(() => {
-  //   dispatch(getGroupPopularFields());
-  // }, []);
-
-  // useEffect(() => {
-  //   if (popularFields) {
-  //     // console.log(popularFields)
-  //     fields.push(...popularFields);
-  //   }
-  // }, [popularFields]);
+  const [joinedFields, setJoinedFields] = useState<GroupField[]>([]);
 
   useEffect(() => {
-    if (selectedId === "1") {
-      dispatch(getPopularGroups());
+    dispatch(getJoinedFields()).then((res) => {
+      const data = res.payload as GroupField[]
+
+      setJoinedFields(data)
+      if (data.length != 0) setSelectedId(data[0]._id)
+    })
+  }, []);
+
+  useEffect(() => {
+    if (selectedId) {
+
     }
   }, [selectedId]);
-
-  console.log("selectedId", selectedId);
 
   return (
     <View style={styles.container}>
       {/* list tags */}
       <View style={styles.rowWrapper}>
         <FlatList
-          data={fields}
+          data={joinedFields}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
@@ -79,7 +76,7 @@ export default function JoinedGroupTab() {
       </View>
       {/* Content based on selected tabs */}
      
-      <GroupTab fieldID={selectedId} />
+      {selectedId != "1" && <GroupTab fieldID={selectedId} type="joined"/>}
      
     </View>
   );

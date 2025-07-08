@@ -54,6 +54,25 @@ export const getPopularGroups = createAsyncThunk(
     }
 )
 
+export const getJoinedFields = createAsyncThunk(
+    'group/getJoinedFields',
+    async (_, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/joined-fields`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.fields as GroupField[]
+            }
+            else {
+                return []
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 export const getPreviewGroups = createAsyncThunk(
     'group/getPreviewGroups',
     async (keyword: string, thunkAPI) => {
@@ -558,7 +577,10 @@ const groupSlice = createSlice({
             })
             .addCase(getGroupPopularFields.rejected, (state, action) => {
                 console.log(action.error)
-            }) 
+            })
+            .addCase(getJoinedFields.rejected, (state, action) => {
+                console.log(action.error)
+            })
             .addCase(getPopularGroups.fulfilled, (state, action) => {
                 state.popularGroupsHorizontal = action.payload.topList
                 state.popularGroupsVertical = action.payload.fieldData

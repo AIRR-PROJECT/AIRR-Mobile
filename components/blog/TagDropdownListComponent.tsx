@@ -6,10 +6,12 @@ import { BottomSheetFlatList, BottomSheetView } from "@gorhom/bottom-sheet";
 import { GroupTag } from "@/interfaces/groupInterface";
 type TagDropdownComponentProps = {
   tags: GroupTag[];
+  preSelectedTags?: GroupTag[],
   onPress: (tags: GroupTag[]) => void;
 };
 export default function TagDropdownComponent({
   tags,
+  preSelectedTags,
   onPress,
 }: TagDropdownComponentProps) {
   const [selectedTags, setSelectedTags] = useState<GroupTag[]>([]);
@@ -28,8 +30,13 @@ export default function TagDropdownComponent({
 
   // Reset selected tags on tags changed
   useEffect(() => {
-    setSelectedTags([])
-  }, [tags])
+    if (preSelectedTags) {
+      setSelectedTags(preSelectedTags)
+    }
+    else {
+      setSelectedTags([])
+    }
+  }, [tags, preSelectedTags])
 
   return (
     <View style={styles.container}>

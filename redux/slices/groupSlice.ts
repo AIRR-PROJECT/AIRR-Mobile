@@ -492,6 +492,30 @@ export const searchTagCreateGroup = createAsyncThunk(
     }
 )
 
+export const searchGroupsForCreateUpdateBlog = createAsyncThunk(
+    'blog/searchTagCreateBlog',
+    async (keyword: string, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/search-groups-for-create-update-blog?keyword=${keyword}`) as AxiosResponse
+            console.log(res.data.data.groups)
+
+            if (res.data.success) {
+                return res.data.data.groups as Group[]
+            }
+            else {
+                return []
+            }
+        }
+        catch (error: any) {
+            if (error.response.data.failcode == ResponseFailcode.GROUP_NOT_FOUND) {
+                return []
+            }
+            
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 const groupSlice = createSlice({
     name: "group",
     initialState,

@@ -640,7 +640,7 @@ GroupPageProps) {
           </TouchableOpacity>
         </View>
       </View>
-       {/* Bar for members */}
+      {/* Bar for members */}
       <View style={styles.rowWrapper}>
         <View style={styles.tabList}>
           <TouchableOpacity
@@ -670,20 +670,19 @@ GroupPageProps) {
           </TouchableOpacity>
         </View>
         <TouchableOpacity
-            style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
+          style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
+        >
+          <Text
+            style={{
+              color: selectedId === 2 ? "#fff" : "#8A94AC",
+              fontWeight: "bold",
+            }}
           >
-            <Text
-              style={{
-                color: selectedId === 2 ? "#fff" : "#8A94AC",
-                fontWeight: "bold",
-              }}
-            >
-              Banned
-            </Text>
-          </TouchableOpacity>
+            Banned
+          </Text>
+        </TouchableOpacity>
       </View>
-   
-     
+
       {/* <View style={styles.rowWrapper}>
    
         <View style={styles.tabList}>

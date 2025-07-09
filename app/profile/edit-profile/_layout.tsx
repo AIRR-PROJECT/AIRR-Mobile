@@ -13,10 +13,6 @@ export default function EditProfileTabLayout() {
     >
       <MaterialTopTabs.Screen name="index" options={{ title: "My Profile" }} />
       <MaterialTopTabs.Screen
-        name="notifications"
-        options={{ title: "Notification" }}
-      />
-      <MaterialTopTabs.Screen
         name="change-password"
         options={{ title: "Change Password" }}
       />

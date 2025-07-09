@@ -7,7 +7,7 @@ import queryClient from "@/redux/api/queryClient";
 import { fetchOtherPersonalBlogs, fetchPersonalBlogs, fetchUserBlogs } from "@/redux/slices/feedSlice";
 import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
 import { useAppDispatch } from "@/redux/hook";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 const mockBlog: UserBlog = {
   _id: "123",
@@ -72,7 +72,7 @@ const Data = [
 ];
 
 export default function BlogTab() {
-  const { userID } = useLocalSearchParams<{ userID: string }>()
+  const { userID, blogIdToRemove } = useLocalSearchParams<{ userID: string, blogIdToRemove: string }>()
 
   const dispatch = useAppDispatch();
   const [personalPage, setPersonalPage] = useState(1);
@@ -111,11 +111,31 @@ export default function BlogTab() {
       });
     },
   });
+  const personalBlogsReset = useMutation({
+    mutationFn: async () => {
+      const refetchedBlog = await dispatch(fetchPersonalBlogs(1));
+
+      return refetchedBlog.payload.blogList.blogs as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-personal"], (oldData: any) => {
+        return [...data] as UserBlog[];
+      });
+      setPersonalPage(1)
+    },
+  });
   const handleOnUserBlogListEndReached = () => {
     console.log("End reached")
     setPersonalPage(personalPage + 1);
     personalBlogsMutation.mutate(personalPage + 1);
   };
+  
+  // Handle hiding or deleting blog while viewing that blog
+  useEffect(() => {
+    if (blogIdToRemove) {
+      personalBlogsReset.mutateAsync();
+    }
+  }, [blogIdToRemove])
 
   return (
     <FlashList

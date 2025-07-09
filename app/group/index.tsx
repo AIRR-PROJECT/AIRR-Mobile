@@ -85,7 +85,7 @@ const mockTags = [
 export default function GroupPage() {
   const dispatch = useAppDispatch();
 
-  const { groupId } = useLocalSearchParams<{ groupId: string }>()
+  const { groupId, blogIdToRemove } = useLocalSearchParams<{ groupId: string, blogIdToRemove: string }>()
   const { user, userCurrentGroupRole } = useAppSelector(state => state.user)
   const { groupBlogsSearchText, groupTagsSearchText } = useAppSelector(state => state.group)
 
@@ -211,6 +211,29 @@ export default function GroupPage() {
       });
     },
   });
+  const groupBlogsReset = useMutation({
+    mutationFn: async () => {
+      const refetchedBlog = await dispatch(
+        getGroupBlogsByID({
+          groupID: groupId,
+          userID: user._id,
+          page: 1,
+        })
+      );
+
+      return refetchedBlog.payload as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-group-blogs"], (oldData: any) => {
+        return [...data] as UserBlog[];
+      });
+      setBlogPage(1)
+    },
+  });
+  const handleBlogListEndReached = () => {
+    setBlogPage(blogPage + 1);
+    groupBlogsMutation.mutate(blogPage + 1);
+  };
 
   useEffect(() => {
     setDisplayBlogs(groupBlogsQuery.data as UserBlog[])
@@ -219,11 +242,14 @@ export default function GroupPage() {
   useEffect(() => {
     setDisplayTags(tags)
   }, [tags])
-
-  const handleBlogListEndReached = () => {
-    setBlogPage(blogPage + 1);
-    groupBlogsMutation.mutate(blogPage + 1);
-  };
+  
+  // Handle hiding or deleting blog while viewing that blog
+  useEffect(() => {
+    if (blogIdToRemove) {
+      console.log(`blogIdToRemove: ${blogIdToRemove}`)
+      groupBlogsReset.mutateAsync();
+    }
+  }, [blogIdToRemove])
   // const getFilteredBlogs = () => {
   //   // TODO: Implement filtering logic based on selectedBlogFilter
   //   // TODO: then change flatlist data to filteredBlogs

@@ -20,6 +20,8 @@ type MoreOptionComponentProps = {
   groupId?: string;
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
   isFromFavourites?: boolean; // Optional prop to indicate if the blog is from favourites
+  handleHideThisBlog: () => void
+  handleDeleteThisBlog: () => void
 };
 export default function MoreOptionBottomList({
   sheetRef,
@@ -28,6 +30,8 @@ export default function MoreOptionBottomList({
   groupId,
   isFromFeed = false, // Default to false if not provided
   isFromFavourites = false, // Default to false if not provided
+  handleHideThisBlog,
+  handleDeleteThisBlog
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
@@ -43,6 +47,7 @@ export default function MoreOptionBottomList({
 
       if (result == true) {
         ToastAndroid.show("Blog hidden", ToastAndroid.SHORT);
+        handleHideThisBlog()
         sheetRef.current?.close();
       }
     });
@@ -62,6 +67,7 @@ export default function MoreOptionBottomList({
 
       if (result == true) {
         ToastAndroid.show("Blog deleted", ToastAndroid.SHORT);
+        handleDeleteThisBlog()
         sheetRef.current?.close();
       }
     });

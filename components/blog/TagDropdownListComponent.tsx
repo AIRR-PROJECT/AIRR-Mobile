@@ -30,6 +30,8 @@ export default function TagDropdownComponent({
 
   // Reset selected tags on tags changed
   useEffect(() => {
+    console.log("preSelectedTags")
+    console.log(preSelectedTags)
     if (preSelectedTags) {
       setSelectedTags(preSelectedTags)
     }
@@ -41,7 +43,7 @@ export default function TagDropdownComponent({
   return (
     <View style={styles.container}>
       <BottomSheetFlatList
-        data={tags}
+        data={selectedTags}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <TagItem

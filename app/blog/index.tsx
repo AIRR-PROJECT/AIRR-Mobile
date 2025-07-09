@@ -287,6 +287,7 @@ export default function BlogScreen() {
   const [author, setAuthor] = useState(mockAuthor);
   const [tags, setTags] = useState(mockTags);
   const [group, setGroup] = useState(mockGroup);
+  const [viewType, setViewType] = useState<string>(BlogViewType.IN_GROUP)
   const reactTimeout = 500;
   const [likes, setLikes] = useState(123);
   const [dislikes, setDislikes] = useState(123);
@@ -341,6 +342,7 @@ export default function BlogScreen() {
       setGroup(currentUserBlog.Group)
       setTags(currentUserBlog.Tags);
       setAuthor(currentUserBlog.Author);
+      setViewType(currentUserBlog.ViewType)
       setLikes(currentUserBlog.Reaction.Likes);
       setDislikes(currentUserBlog.Reaction.Dislikes);
       setComments(currentUserBlog.Reaction.Comments);
@@ -521,8 +523,6 @@ export default function BlogScreen() {
     })
   }
 
-  // TODO: get blog status, If it’s a in profile/ private blog → show “In profile” / “Private”, and hide group component
-  const blogStatus = BlogViewType.IN_GROUP; // This should be dynamically set based on the blog's status
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -546,7 +546,7 @@ export default function BlogScreen() {
         />
         <View style={styles.scrollViewContent}>
           {/* Group Component */}
-          {blogStatus == BlogViewType.IN_GROUP && searchParams.userBlogId && 
+          {viewType == BlogViewType.IN_GROUP && group && searchParams.userBlogId && 
             <TouchableOpacity style={styles.groupContainer} onPress={handleOnPressGroup}>
               <Image source={group.CoverURL} style={styles.groupImage} />
               <Text style={styles.groupName}>{group.Name}</Text>

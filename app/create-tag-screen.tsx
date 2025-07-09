@@ -96,7 +96,7 @@ export default function CreateTagsScreen({
       // Create a GroupTag object for each selected tag with incrementing _id
       // TODO: CHECK THE API FOR THE _ID HERE, I NOW JUST GENERATE A RANDOM ONE
       const newTags: CreateGroupTag[] = createdTags.map((tag) => ({
-        _id: Math.random().toString(36).substring(2, 15), // Generate a random _id
+        _id: tag._id ?? "", // Generate a random _id
         TagName: tag.TagName,
         OperationType: tag.OperationType
       }));
@@ -157,7 +157,7 @@ export default function CreateTagsScreen({
                   key={index}
                   style={styles.selectTagButton}
                   onPress={() => {
-                    if (!createGroupCurrentTags.includes(tag.TagName)) {
+                    if (!createGroupCurrentTags.includes(tag.TagName) && !createGroupCreatedTags.find((t) => t.TagName == tag.TagName)) {
                       setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
                       setCreatedTags(() => [tag, ...createdTags])
                       setShowError(false)

@@ -97,7 +97,7 @@ export default function RequestTagsScreen({
       // Create a GroupTag object for each selected tag with incrementing _id
       // TODO: CHECK THE API FOR THE _ID HERE, I NOW JUST GENERATE A RANDOM ONE
       const newTags: CreateBlogTag[] = requestedTags.map((tag) => ({
-        _id: Math.random().toString(36).substring(2, 15), // Generate a random _id
+        _id: tag._id ?? "", // Generate a random _id
         TagName: tag.TagName,
         OperationType: tag.OperationType
       }));
@@ -158,7 +158,7 @@ export default function RequestTagsScreen({
                   key={index}
                   style={styles.selectTagButton}
                   onPress={() => {
-                    if (!createBlogCurrentTags.includes(tag.TagName)) {
+                    if (!createBlogCurrentTags.includes(tag.TagName) && !createBlogRequestedTags.find((t) => t.TagName == tag.TagName)) {
                       setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
                       setRequestedTags(() => [tag, ...requestedTags])
                       setShowError(false)

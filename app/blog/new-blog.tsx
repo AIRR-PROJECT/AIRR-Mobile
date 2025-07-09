@@ -320,6 +320,7 @@ export default function NewBlog() {
     chosenTagsReformatted.forEach((t) => {
       t.OperationType = "tag-in-group";
     });
+    console.log([createBlogRequestedTags])
     formData.append(
       "tags",
       chosenGroup.Name != Private.Name &&

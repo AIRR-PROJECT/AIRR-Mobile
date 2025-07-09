@@ -209,7 +209,7 @@ export default function CreateTagsScreen({
                   key={index}
                   style={styles.deselectTagButton}
                   onPress={() => {
-                    setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
+                    setCreatedTags((prev) => prev.filter((t) => t._id !== tag._id));
                   }}
                 >
                   <Text style={styles.deselectTagButtonText}>{tag.TagName}</Text>

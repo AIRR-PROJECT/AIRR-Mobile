@@ -421,11 +421,13 @@ export const getUserBlogLikeActivities = createAsyncThunk(
                 }
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                thunkAPI.dispatch(setCurrentBlogSaved(false))
+                return false
             }
         }
         catch (err: any) {
-            return thunkAPI.rejectWithValue(err.response)
+            thunkAPI.dispatch(setCurrentBlogSaved(false))
+            return false
         }
     }   
 )
@@ -447,11 +449,13 @@ export const getUserBlogDislikeActivities = createAsyncThunk(
                 }
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                thunkAPI.dispatch(setCurrentBlogSaved(false))
+                return false
             }
         }
         catch (err: any) {
-            return thunkAPI.rejectWithValue(err.response)
+            thunkAPI.dispatch(setCurrentBlogSaved(false))
+            return false
         }
     }   
 )
@@ -473,11 +477,13 @@ export const getUserBlogSaveActivities = createAsyncThunk(
                 }
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                thunkAPI.dispatch(setCurrentBlogSaved(false))
+                return false
             }
         }
         catch (err: any) {
-            return thunkAPI.rejectWithValue(err.response)
+            thunkAPI.dispatch(setCurrentBlogSaved(false))
+            return false
         }
     }   
 )

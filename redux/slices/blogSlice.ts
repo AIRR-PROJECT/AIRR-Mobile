@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail, UserBlogDetailForUpdate, DeleteComment, EditComment } from "@/interfaces/blogInterface"
+import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail, UserBlogDetailForUpdate, DeleteComment, EditComment, CreateBlogResult } from "@/interfaces/blogInterface"
 import { ResponseFailcode } from "@/enums/failcode.enum"
 
 const initialState = {
@@ -84,7 +84,7 @@ export const getBlogComment = createAsyncThunk<UserBlogComment[], string>(
                 return res.data.data.blogComment as UserBlogComment[]
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                return []
             }
         }
         catch (error: any) {
@@ -337,10 +337,10 @@ export const createBlog = createAsyncThunk(
             }) as AxiosResponse
 
             if (res.data.success) {
-                return true
+                return res.data.data as CreateBlogResult
             }
             else {
-                return false
+                return ""
             }
         }
         catch (error: any) {

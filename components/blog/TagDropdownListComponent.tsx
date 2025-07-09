@@ -30,8 +30,6 @@ export default function TagDropdownComponent({
 
   // Reset selected tags on tags changed
   useEffect(() => {
-    console.log("preSelectedTags")
-    console.log(preSelectedTags)
     if (preSelectedTags) {
       setSelectedTags(preSelectedTags)
     }
@@ -43,12 +41,12 @@ export default function TagDropdownComponent({
   return (
     <View style={styles.container}>
       <BottomSheetFlatList
-        data={selectedTags}
+        data={tags}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <TagItem
             tag={item.TagName}
-            isChecked={selectedTags.includes(item)}
+            isChecked={selectedTags.find((t) => t._id == item._id) !== undefined}
             onToggle={() => handleTagToggle(item)}
           />
         )}

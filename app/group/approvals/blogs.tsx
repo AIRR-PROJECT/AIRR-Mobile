@@ -34,7 +34,7 @@ export default function BlogsApprovalsPage() {
   // TODO: Khoa: Change to what you want
   const dispatch = useAppDispatch()
   const flatlistRef = useRef<any>()
-  const { groupID, blogID } = useLocalSearchParams<{ groupID: string, blogID: string }>()
+  const { groupID, blogID, blogIDToRemove } = useLocalSearchParams<{ groupID: string, blogID: string, blogIDToRemove: string }>()
   
   const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
 
@@ -56,6 +56,15 @@ export default function BlogsApprovalsPage() {
       })
     }
   }, [blogs, blogID])
+
+  useEffect(() => {
+    if (blogIDToRemove) {
+      dispatch(getPendingBlogList(groupID)).then(res => {
+        const list = res.payload as PendingBlogRequest[]
+        setBlogs(list)
+      })
+    }
+  }, [blogIDToRemove])
 
   const onApprove = (id: string, blogOwnerId: string) => {
     dispatch(approveBlog({ groupID: groupID, blogIDToApprove: id, blogOwnerID: blogOwnerId })).then(res => {

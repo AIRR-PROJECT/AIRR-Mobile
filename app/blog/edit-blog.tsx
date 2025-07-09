@@ -397,7 +397,7 @@ export default function Editblog() {
 
     dispatch(updateBlog(formData)).then((res) => {
       if (typeof res.payload === "boolean" && res.payload == true) {
-        router.replace("/my-feed");
+        router.replace(`/blog?userBlogId=${blogID}`);
       }
     });
   };

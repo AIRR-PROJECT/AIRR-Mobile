@@ -37,7 +37,7 @@ import {
 } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ImageSource } from "expo-image";
-import { CreateBlog, CreateBlogTag } from "@/interfaces/blogInterface";
+import { CreateBlog, CreateBlogResult, CreateBlogTag } from "@/interfaces/blogInterface";
 import {
   createBlog,
   setCreateBlogCurrentTags,
@@ -342,9 +342,8 @@ export default function NewBlog() {
     formData.append("viewType", viewType);
 
     dispatch(createBlog(formData)).then((res) => {
-      if (typeof res.payload === "boolean" && res.payload == true) {
-        router.replace("/my-feed");
-      }
+      const data = res.payload as CreateBlogResult
+      router.replace(`/blog?userBlogId=${data.blogID}`);
     });
   };
 

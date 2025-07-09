@@ -12,7 +12,7 @@ export default function GroupPreviewInfo({ group, style }: BlogInGroupProps) {
   return (
     <View style={[styles.container, style]}>
       <Image source={{ uri: group.CoverURL }} style={styles.image} />
-      <Text style={styles.name}>{group.Name}</Text>
+      <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">{group.Name}</Text>
     </View>
   );
 }
@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-evenly",
     columnGap: 10,
+    flex: 1,
   },
   image: {
     width: 40,
@@ -38,6 +39,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 16,
     fontWeight: "bold",
+    flex: 1,
   },
   memberCount: {
     flexWrap: "wrap",

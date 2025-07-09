@@ -229,8 +229,8 @@ export default function FeedBlogPreview({
         </View>
         {/* 5th Part: Group Info */}
         {blog.Group &&
-          <View style={styles.rowContainer}>
-            <View style={styles.groupSection}>
+          <View style={[styles.rowContainer, {flex: 1}]}>
+            <View style={[styles.groupSection, {width: "80%"}]}>
               <GroupPreviewInfo
                 group={{
                   Name: blog.Group.Name,

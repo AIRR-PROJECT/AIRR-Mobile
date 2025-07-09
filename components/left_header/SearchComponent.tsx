@@ -1,7 +1,7 @@
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { SearchBarBlog } from "@/interfaces/blogInterface";
-import { SearchBarGroup } from "@/interfaces/groupInterface";
+import { SearchBarBlog, UserBlog } from "@/interfaces/blogInterface";
+import { Group, SearchBarGroup } from "@/interfaces/groupInterface";
 import { router } from "expo-router";
 
 // Change the view to touchable component to make it clickable
@@ -14,8 +14,8 @@ function SearchBlogComponent({
   _id,
   Title,
   Description,
-  Owner
-}: SearchBarBlog) {
+  BackgroundURL
+}: UserBlog) {
   const handlePress = () => {
     router.push(`/blog?userBlogId=${_id}`)
   }
@@ -23,7 +23,7 @@ function SearchBlogComponent({
   return (
     <TouchableOpacity style={styles.container} onPress={handlePress}>
       {/* thumbnail */}
-      <Image source={Owner.AvatarURL} style={styles.image} />
+      <Image source={BackgroundURL} style={styles.image} />
       <View style={styles.contentContainer}>
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
           {Title}
@@ -48,7 +48,7 @@ function SearchGroupComponent({
   Name,
   Description,
   CoverURL
-}: SearchBarGroup) {
+}: Group) {
   const handlePress = () => {
     router.push(`/group?groupId=${_id}`)
   }

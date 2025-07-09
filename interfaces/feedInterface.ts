@@ -1,7 +1,7 @@
-import { SearchBarBlog } from "./blogInterface"
-import { SearchBarGroup } from "./groupInterface"
+import { SearchBarBlog, UserBlog } from "./blogInterface"
+import { Group, SearchBarGroup } from "./groupInterface"
 
 export interface SearchBarResult {
-    searchGroups: SearchBarGroup[]
-    searchBlogs: SearchBarBlog[]
+    searchGroups: Group[]
+    searchBlogs: UserBlog[]
 }

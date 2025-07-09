@@ -75,6 +75,7 @@ export interface UserBlogDetail {
     Status: string
     ViewType: string
     Group: UserBlogGroup;
+    UserGroupStatus: string
 }
 export interface UserBlogDetailForUpdate {
     _id: string;
@@ -147,6 +148,9 @@ export interface CreateBlog {
     Title: string;
     Description: string;
     Content: string;
+}
+export interface CreateBlogResult {
+    blogID: string
 }
 
 export interface PostComment {

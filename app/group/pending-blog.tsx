@@ -184,6 +184,9 @@ export default function PendingBlogInGroup() {
       if (res.payload === true) {
         console.log("Approve blog");
         router.dismiss()
+        router.setParams({
+          blogIDToRemove: blogID
+        })
       }
     })
   };
@@ -192,6 +195,9 @@ export default function PendingBlogInGroup() {
       if (res.payload === true) {
         console.log("Reject blog");
         router.dismiss()
+        router.setParams({
+          blogIDToRemove: blogID
+        })
       }
     })
   };

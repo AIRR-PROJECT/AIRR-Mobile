@@ -15,7 +15,6 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { set } from "lodash";
 import { createTag } from "@/redux/slices/groupSlice";
 import { GroupTag } from "@/interfaces/groupInterface";
 import { router, useLocalSearchParams } from "expo-router";

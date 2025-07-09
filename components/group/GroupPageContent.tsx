@@ -208,7 +208,7 @@ GroupPageProps) {
       <View>
         <DetailGroupCardComponent
           {...(groupInfo
-            ? { ...groupInfo, posts: 1, views: 1 }
+            ? { ...groupInfo }
             : mockGroupDetail)}
         />
       </View>
@@ -238,7 +238,7 @@ GroupPageProps) {
             />
           </View>
           {/* Number of member */}
-          <Text style={styles.member}>+{groupInfo.NumberOfMembers}</Text>
+          <Text style={styles.member}>+{groupInfo.NumberOfMembers - 1}</Text>
         </TouchableOpacity>
         {/* render based on user is in group or not */}
         {userCurrentGroupMembershipStage != GroupMembershipStage.JOINED && (
@@ -256,7 +256,7 @@ GroupPageProps) {
             onPress={handlePressJoinGroup}
           />
         )}
-        {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED && (
+        {/* {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED && (
           <TouchableOpacity>
             <MaterialCommunityIcons
               name="dots-horizontal-circle-outline"
@@ -264,7 +264,7 @@ GroupPageProps) {
               color="white"
             />
           </TouchableOpacity>
-        )}
+        )} */}
       </View>
       <Divider color="#242630" width={1} style={{ paddingTop: 20 }} />
       <View style={styles.rowWrapper}>

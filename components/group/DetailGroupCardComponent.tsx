@@ -2,22 +2,18 @@ import { View, Text } from "react-native";
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
-type DetailGroupCardComponentProps = GroupDetailInfo & {
-  posts: number,
-  views: number
-};
 
 export default function DetailGroupCardComponent({
   Name,
   _id,
   CoverURL,
   Field,
-  posts,
-  views,
   TotalNumberOfBlogsLikes,
-}: DetailGroupCardComponentProps) {
+  NumberOfMembers,
+  NumberOfTag
+}: GroupDetailInfo) {
   return (
     <LinearGradient
       colors={["#3E7D7B", "#110F0F"]}
@@ -42,17 +38,20 @@ export default function DetailGroupCardComponent({
         </View>
         <View style={styles.rowContainer}>
           <View style={styles.detailContainer}>
-            <Text style={styles.number}>{posts}</Text>
-            <Text style={styles.detail}>Posts</Text>
+            <AntDesign name="tago" size={12} color="#c8fd7c" />
+            <Text style={styles.number}>{NumberOfTag}</Text>
+            <Text style={styles.detail}>Tags  </Text>
           </View>
-            <View style={styles.detailContainer}>
-                <Text style={styles.number}>{views}</Text>
-                <Text style={styles.detail}>Views</Text>
-            </View>
-            <View style={styles.detailContainer}>
-                <Text style={styles.number}>{TotalNumberOfBlogsLikes}</Text>
-                <Text style={styles.detail}>Likes</Text>
-            </View>
+          <View style={styles.detailContainer}>
+            <AntDesign name="team" size={12} color="#c8fd7c" />
+            <Text style={styles.number}>{NumberOfMembers}</Text>
+            <Text style={styles.detail}>Members  </Text>
+          </View>
+          <View style={styles.detailContainer}>
+            <AntDesign name="hearto" size={12} color="#c8fd7c" />
+            <Text style={styles.number}>{TotalNumberOfBlogsLikes}</Text>
+            <Text style={styles.detail}>Likes</Text>
+          </View>
         </View>
       </View>
     </LinearGradient>
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
   },
   number: {
     fontSize: 14,
-    color: "#fff",
+    color: "#c8fd7c",
     fontWeight: "bold",
   },
   detail: {

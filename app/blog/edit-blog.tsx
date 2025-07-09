@@ -575,7 +575,7 @@ export default function Editblog() {
               >
                 {chosenTags.length > 0 ? (
                   chosenTags.map((tag) => (
-                    <TagWrapper key={tag._id} tag={tag.TagName} />
+                    <TagWrapper key={tag._id} tag={tag} />
                   ))
                 ) : (
                   <Text
@@ -639,7 +639,7 @@ export default function Editblog() {
                     >
                       {createBlogRequestedTags.length > 0 &&
                         createBlogRequestedTags.map((tag) => (
-                          <TagWrapper key={tag._id} tag={tag.TagName} />
+                          <TagWrapper key={tag._id} tag={tag} />
                         ))
                       }
 
@@ -652,7 +652,7 @@ export default function Editblog() {
                       {requestedTags.length > 0 ? (
                         requestedTags.map((tag) => (
                           // TODO: Check the API for the what should the _id be before request it
-                          <TagWrapper key={tag._id} tag={tag.TagName} />
+                          <TagWrapper key={tag._id} tag={tag} />
                         ))
                       ) : (
                         <View style={{ flex: 1 }}>
@@ -864,10 +864,10 @@ export default function Editblog() {
     </GestureHandlerRootView>
   );
 }
-function TagWrapper({ tag }: { tag: string }) {
+function TagWrapper({ tag }: { tag: GroupTag }) {
   return (
     <View style={styles.tagWrapper}>
-      <Text style={styles.tag}># {tag}</Text>
+      <Text style={styles.tag}># {tag.TagName}</Text>
     </View>
   );
 }

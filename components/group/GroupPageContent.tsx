@@ -38,6 +38,7 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GroupMembershipStage, GroupRole } from "@/enums/group.enum";
 import Scroll from "quill/blots/scroll";
+import BlogMoreOptionBottomList from "./BlogMoreOptionBottomList";
 type GroupDetailProps = {
   name: string;
   id: string;
@@ -76,6 +77,8 @@ type GroupPageProps = {
   selectedId: number;
   setSelectedId: (id: number) => void;
   groupID: string;
+  sheetRef: React.RefObject<BottomSheet>;
+  
   // selectedBlogFilter: string;
   // setSelectedBlogFilter: (filter: string) => void;
   // selectedTagFilter: string;
@@ -89,6 +92,7 @@ export default function GroupPageContent({
   selectedId,
   setSelectedId,
   groupID,
+  sheetRef,
 }: // selectedBlogFilter,
 // setSelectedBlogFilter,
 // selectedTagFilter,
@@ -97,7 +101,7 @@ export default function GroupPageContent({
 GroupPageProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
-  const { userCurrentGroupMembershipStage } = useAppSelector(
+  const { userCurrentGroupMembershipStage, userCurrentGroupRole  } = useAppSelector(
     (state) => state.user
   );
 
@@ -202,14 +206,18 @@ GroupPageProps) {
       }
     });
   };
-
+  const handleMoreOptionPress = useCallback((index: number) => {
+    sheetRef.current?.snapToIndex(index);
+  }, []);
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       <View>
         <DetailGroupCardComponent
           {...(groupInfo
             ? { ...groupInfo }
             : mockGroupDetail)}
+          moreOptionPress={() => handleMoreOptionPress(0)}
+          userRole={userCurrentGroupRole}
         />
       </View>
       {/* Description */}
@@ -223,22 +231,10 @@ GroupPageProps) {
           onPress={handlePressGroupMemberList}
         >
           {/* Three example user images */}
-          <View style={styles.imageContainer}>
-            <Image
-              source={mockGroupDetail.threeUserAvatar[0]}
-              style={[styles.memberImage, { marginLeft: 0 }]}
-            />
-            <Image
-              source={mockGroupDetail.threeUserAvatar[1]}
-              style={[styles.memberImage, { marginLeft: -5 }]}
-            />
-            <Image
-              source={mockGroupDetail.threeUserAvatar[2]}
-              style={[styles.memberImage, { marginLeft: -5 }]}
-            />
-          </View>
-          {/* Number of member */}
-          <Text style={styles.member}>+{groupInfo.NumberOfMembers - 1}</Text>
+          <Text style={styles.memberContainer}>
+            List of members
+          </Text>
+          
         </TouchableOpacity>
         {/* render based on user is in group or not */}
         {userCurrentGroupMembershipStage != GroupMembershipStage.JOINED && (
@@ -493,7 +489,8 @@ GroupPageProps) {
           </View>
         </Pressable>
       </Modal> */}
-    </View>
+      
+    </GestureHandlerRootView>
   );
 }
 
@@ -536,9 +533,11 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     marginHorizontal: 20,
   },
-  imageContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  memberContainer: {
+    fontSize: 16,
+    color: "#B9FF66",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   infoContainer: {
     borderWidth: 1,

@@ -47,6 +47,9 @@ export default function GroupLayout() {
   const handleCreateGroup = () => {
     dispatch(setCreateGroupSubmitted(true))
   }
+  const handleEditGroup = () => {
+    console.log("Nút này ở group layout");
+  }
   // Render the app layout with theme provider and navigation stack
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
@@ -59,7 +62,7 @@ export default function GroupLayout() {
         }}
       >
         {/* Define the screens for the navigation stack */}
-        <Stack.Screen name="index" options={{ headerTitle: "" }} />
+        <Stack.Screen name="index" options={{ headerTitle: "Group" }} />
         <Stack.Screen
           name="create-group"
           options={{
@@ -112,6 +115,30 @@ export default function GroupLayout() {
           name="create-tag"
           options={{
             headerTitle: "Create New Group Tag",
+          }}
+        />
+        <Stack.Screen
+          name="edit-group"
+          options={{
+            headerTitle: "",
+            headerLeft: () => (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                activeOpacity={0.7}
+                onPress={handleGoBack}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            ),
+            headerRight: () => (
+              <TouchableOpacity
+                style={styles.createButton}
+                activeOpacity={0.7}
+                onPress={handleEditGroup}
+              >
+                <Text style={styles.createButtonText}>Edit Group</Text>
+              </TouchableOpacity>
+            ),
           }}
         />
       </Stack>

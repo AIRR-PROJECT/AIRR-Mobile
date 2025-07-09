@@ -11,9 +11,11 @@ import {
   ToastAndroid,
 } from "react-native";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import ButtonGradient from "@/components/ButtonGradient";
 import {
   Entypo,
+  Feather,
   FontAwesome,
   FontAwesome5,
   FontAwesome6,
@@ -106,8 +108,13 @@ GroupPageProps) {
   const dispatch = useAppDispatch();
   const { userCurrentGroupMembershipStage, userCurrentGroupRole } =
     useAppSelector((state) => state.user);
-
+  const [isShowRules, setIsShowRules] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState("Join Group");
   const [isGroupJoinModalVisible, setIsGroupJoinModalVisible] = useState(false);
+  const [isCancelRequestModalVisible, setIsCancelRequestModalVisible] =
+    useState(false);
+  const [isLeaveGroupModalVisible, setIsLeaveGroupModalVisible] =
+    useState(false);
   const searchText = useRef("");
   let textInputRef: TextInput;
   const [isBlogsFilterModalVisible, setIsBlogsFilterModalVisible] =
@@ -135,16 +142,38 @@ GroupPageProps) {
       dispatch(setUserMembershipStageInCurrentGroup(membershipStage));
       dispatch(setUserRoleInCurrentGroup(groupInfo.Role));
     });
+    if (userCurrentGroupMembershipStage === GroupMembershipStage.JOINED) {
+      setButtonLabel("Leave Group");
+    } else if (
+      userCurrentGroupMembershipStage === GroupMembershipStage.REQUESTED
+    ) {
+      setButtonLabel("Cancel Request");
+    } else {
+      setButtonLabel("Join Group");
+    }
   }, [groupID]);
 
+  
   const handleGroupJoinConfirmCancel = () => {
     setIsGroupJoinModalVisible(false);
   };
-  const handleBlogFilterCancel = () => {
-    setIsBlogsFilterModalVisible(false);
+  const handlePressCancelRequest = () => {
+    setIsCancelRequestModalVisible(true);
   };
-  const handleTagFilterCancel = () => {
-    setIsTagsFilterModalVisible(false);
+  const handlePressLeaveGroup = () => {
+    setIsLeaveGroupModalVisible(true);
+  };
+
+  const handlePressButton = () => {
+    if (userCurrentGroupMembershipStage === GroupMembershipStage.JOINED) {
+      handlePressLeaveGroup();
+    } else if (
+      userCurrentGroupMembershipStage === GroupMembershipStage.REQUESTED
+    ) {
+      handlePressCancelRequest();
+    } else {
+      handlePressJoinGroup();
+    }
   };
   const handlePressGroupMemberList = () => {
     // Handle the press event for the group member list
@@ -208,9 +237,15 @@ GroupPageProps) {
       }
     });
   };
+  //  TODO: Handle Here
+  const handleCancelRequestConfirm = () => {
+  };
+  const handleLeaveGroupConfirm = () => {
+  };
   const handleMoreOptionPress = useCallback((index: number) => {
     sheetRef.current?.snapToIndex(index);
   }, []);
+  // Delete this after the group rules are fetched from the server
   const groupRules: GroupRule[] = [
     {
       _id: "rule1",
@@ -231,23 +266,9 @@ GroupPageProps) {
         "Please keep discussions relevant to the group's theme and purpose.",
     },
   ];
-  const [isShowRules, setIsShowRules] = useState(false);
-  useEffect(() => {
-    // Wait for userCurrentGroupRole to be available before showing toast
-    if (
-      userCurrentGroupMembershipStage != GroupMembershipStage.JOINED &&
-      userCurrentGroupMembershipStage != GroupMembershipStage.BANNED
-    ) {
-      console.log(
-        "userCurrentGroupMembershipStage",
-        userCurrentGroupMembershipStage
-      );
-    } else if (userCurrentGroupMembershipStage == GroupMembershipStage.BANNED) {
-      ToastAndroid.show("You are banned from this group.", ToastAndroid.SHORT);
-    } else if (userCurrentGroupRole) {
-      ToastAndroid.show(`Welcome ${userCurrentGroupRole}!`, ToastAndroid.SHORT);
-    }
-  }, [userCurrentGroupRole]);
+  const handleContentButtonPress = () => {
+    route.push('/group/(group-contents)');
+  }
   return (
     <View style={styles.container}>
       <View>
@@ -257,6 +278,114 @@ GroupPageProps) {
           userRole={userCurrentGroupRole}
         />
       </View>
+      <View style={{ marginTop: 20 }} />
+      {/* There should only one of this appear on the screen, if multiple of this appear, then database is wrong */}
+      {userCurrentGroupRole == GroupRole.Owner && (
+        <TouchableOpacity style={styles.welcomContainer} activeOpacity={0.8}>
+          <LinearGradient
+            colors={["#1327", "#111A1A"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderRadius: 20,
+              gap: 10,
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={styles.welcomeName}>
+              Welcome, <Text style={{ fontWeight: "bold" }}>Boss!</Text>
+            </Text>
+            <FontAwesome5 name="fire" size={24} color="#B9FF66" />
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
+      {userCurrentGroupRole == GroupRole.Member && (
+        <TouchableOpacity style={styles.moderatorContainer} activeOpacity={0.8}>
+          <LinearGradient
+            colors={["#1327", "#111A1A"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderRadius: 20,
+              gap: 10,
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={styles.welcomeName}>
+              Welcome, <Text style={{ fontWeight: "bold" }}>Member!</Text>
+            </Text>
+            <FontAwesome5 name="fire" size={24} color="#B9FF66" />
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
+      {userCurrentGroupRole == GroupRole.Admin && (
+        <TouchableOpacity style={styles.moderatorContainer} activeOpacity={0.8}>
+          <LinearGradient
+            colors={["#1327", "#111A1A"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderRadius: 20,
+              gap: 10,
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={styles.welcomeName}>
+              Welcome, <Text style={{ fontWeight: "bold" }}>Admin!</Text>
+            </Text>
+            <FontAwesome5 name="fire" size={24} color="#B9FF66" />
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
+      {userCurrentGroupMembershipStage == GroupMembershipStage.REQUESTED && (
+        <TouchableOpacity style={styles.moderatorContainer} activeOpacity={0.8}>
+          <LinearGradient
+            colors={["#ffe259", "#ffa751"]} // Yellow gradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderRadius: 20,
+              gap: 10,
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={[styles.welcomeName, { color: "#000" }]}>
+              Pending Approval!
+            </Text>
+            <Feather name="clock" size={24} color="#000" />
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
+      {userCurrentGroupMembershipStage == GroupMembershipStage.BANNED && (
+        <TouchableOpacity style={styles.moderatorContainer} activeOpacity={0.8}>
+          <LinearGradient
+            colors={["#ffe259", "#ffa751"]} // Yellow gradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderRadius: 20,
+              gap: 10,
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={[styles.welcomeName, { color: "#000" }]}>
+              You're banned!
+            </Text>
+            <FontAwesome name="ban" size={24} color="#000" />
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
+
       {/* Description */}
       <View style={styles.descriptionContainer}>
         <View
@@ -313,7 +442,7 @@ GroupPageProps) {
                 <View
                   style={[
                     styles.rowContainer,
-                    { marginBottom: 5, justifyContent: "flex-start" },
+                    { marginBottom: 5, justifyContent: "flex-start", gap: 10 },
                   ]}
                 >
                   <View
@@ -326,7 +455,9 @@ GroupPageProps) {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={[styles.headingTitle, {}]}>{index + 1}</Text>
+                    <Text style={[styles.headingTitle, {}]} numberOfLines={2}>
+                      {index + 1}
+                    </Text>
                   </View>
                   <Text
                     style={{
@@ -352,54 +483,95 @@ GroupPageProps) {
                     {/* Input for rule description */}
                     <Text style={styles.ruleText}>{rule.RuleDescription}</Text>
                   </View>
-                  {/* Add more rules as needed */}
                 </View>
               </View>
             ))}
           </View>
         )}
       </View>
-
+      <View style={{ paddingBottom: 20 }}>
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 16,
+            fontWeight: "bold",
+            paddingHorizontal: 20,
+          }}
+        >
+          Moderated by
+        </Text>
+        {/* Go to moderator profile */}
+        <View
+          style={[
+            styles.rowContainer,
+            {
+              marginTop: 10,
+              paddingHorizontal: 20,
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "space-between",
+              alignSelf: "center",
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={styles.moderatorContainer}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#1327", "#111A1A"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                borderRadius: 20,
+                gap: 10,
+              }}
+            >
+              <Image
+                source={{ uri: "https://picsum.photos/200" }}
+                style={styles.moderatorImage}
+              />
+              <Text style={styles.moderatorName}>@John Doe</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+            <ButtonGradient
+              label={buttonLabel}
+              labelStyle={styles.tabButtonText}
+              style={styles.tabButton}
+              onPress={handlePressButton}
+            />
+          
+        </View>
+      </View>
       <View style={styles.rowContainer}>
         <TouchableOpacity
           style={styles.infoContainer}
           activeOpacity={0.8}
           onPress={handlePressGroupMemberList}
-        >
-          {/* Three example user images */}
-          <Text style={styles.memberContainer}>List of members</Text>
-        </TouchableOpacity>
-        {/* render based on user is in group or not */}
-        {userCurrentGroupMembershipStage != GroupMembershipStage.JOINED && (
-          <ButtonGradient
-            disabled={
-              userCurrentGroupMembershipStage == GroupMembershipStage.REQUESTED
-            }
-            label={
-              userCurrentGroupMembershipStage == GroupMembershipStage.NOT_JOINED
-                ? "Join Group"
-                : "Request sent"
-            }
-            labelStyle={styles.tabButtonText}
-            style={styles.tabButton}
-            onPress={handlePressJoinGroup}
-          />
-        )}
-        {/* {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED && (
-          <TouchableOpacity>
-            <MaterialCommunityIcons
-              name="dots-horizontal-circle-outline"
-              size={55}
-              color="white"
-            />
-          </TouchableOpacity>
-        )} */}
+        ></TouchableOpacity>
       </View>
       <Divider color="#242630" width={1} style={{ paddingTop: 20 }} />
-      <View style={styles.rowWrapper}>
-        {/* Tabs */}
+      {/* Button to go to tab for Content */}
+      <TouchableOpacity
+        style={styles.contentButton}
+        onPress={handleContentButtonPress}
+      >
+        <Text
+          style={{
+            color: selectedId === 0 ? "#fff" : "#8A94AC",
+            fontWeight: "bold",
+          }}
+        >
+          See Group Content
+        </Text>
+      </TouchableOpacity>
+      {/* <View style={styles.rowWrapper}>
+   
         <View style={styles.tabList}>
-          {/* Blogs Tab */}
+
           <TouchableOpacity
             style={[styles.tabItem, selectedId === 1 && styles.tabItemActive]}
             onPress={() => {
@@ -416,7 +588,7 @@ GroupPageProps) {
               Blogs
             </Text>
           </TouchableOpacity>
-          {/* Tags Tab */}
+     
           <TouchableOpacity
             style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
             onPress={() => {
@@ -433,7 +605,7 @@ GroupPageProps) {
               Tags
             </Text>
           </TouchableOpacity>
-          {/* Approval Tab */}
+        
           {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED &&
           (groupInfo.Role == GroupRole.Admin ||
             groupInfo.Role == GroupRole.Owner) ? (
@@ -457,12 +629,11 @@ GroupPageProps) {
                   Approvals
                 </Text>
               </TouchableOpacity>
-              {/* New Blog Button */}
+              
             </View>
           ) : null}
         </View>
 
-        {/* Create Post */}
         {userCurrentGroupMembershipStage == GroupMembershipStage.JOINED ? (
           selectedId === 1 ? (
             <CreatePost onPress={handleNewPostPress} />
@@ -470,10 +641,10 @@ GroupPageProps) {
             <CreateTags onPress={handleNewTagPress} />
           )
         ) : null}
-      </View>
+      </View> */}
       <Divider color="#242630" width={1} style={{ paddingTop: 0 }} />
       {/* Search Bar */}
-      <View style={styles.textInputContainer}>
+      {/* <View style={styles.textInputContainer}>
         <View style={styles.textInputWrapper}>
           <FontAwesome6 name="magnifying-glass" size={24} color="#fff" />
           <TextInput
@@ -487,26 +658,7 @@ GroupPageProps) {
             multiline={false}
           />
         </View>
-
-        {/* {<View style={{ flex: 0.3 }}>
-          <TouchableOpacity
-            style={[styles.filterButton]}
-            activeOpacity={0.8}
-            onPress={() => {
-              if (selectedId === 1) {
-                setIsBlogsFilterModalVisible(true);
-              } else {
-                setIsTagsFilterModalVisible(true);
-              }
-            }}
-          >
-            <FontAwesome6 name="filter" size={24} color="#B9FF66" />
-            <Text style={styles.filterButtonText}>
-              {selectedId === 1 ? selectedBlogFilter : selectedTagFilter}
-            </Text>
-          </TouchableOpacity>
-        </View>} */}
-      </View>
+      </View> */}
 
       {/* Modal for group join */}
       <Modal
@@ -540,7 +692,7 @@ GroupPageProps) {
                   style={styles.joinCancelButton}
                 >
                   <Text style={styles.joinCancelButtonText}>
-                    LET ME RETHINK
+                    Let Me Rethink
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -551,77 +703,114 @@ GroupPageProps) {
                   }}
                   style={styles.joinConfirmButton}
                 >
-                  <Text style={styles.joinConfirmButtonText}>COUNT ME IN</Text>
+                  <Text style={styles.joinConfirmButtonText}>Count Me In!</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </Pressable>
       </Modal>
-      {/* Modal for blogs filter
-      <Modal
-        transparent={true}
-        visible={isBlogsFilterModalVisible}
-        animationType="fade"
-        onRequestClose={() => {}}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={(event) => {
-            if (event.target === event.currentTarget) {
-              handleBlogFilterCancel();
-            }
-          }}
+      {userCurrentGroupMembershipStage === GroupMembershipStage.REQUESTED && (
+        <Modal
+          transparent={true}
+          visible={isCancelRequestModalVisible}
+          animationType="fade"
+          onRequestClose={() => setIsCancelRequestModalVisible(false)}
         >
-          <View style={styles.filterContentContainer}>
-            {blogsFilters.map((filter, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.filterOptionsButton}
-                onPress={() => {
-                  setSelectedBlogFilter(filter);
-                  console.log("Selected blog filter:", filter);
-                  handleBlogFilterCancel();
-                }}
-              >
-                <Text style={styles.filterOptionsButtonText}>{filter}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Pressable>
-      </Modal>
-      {/* Modal for Tags Filter */}
-      {/*
-      <Modal
-        transparent={true}
-        visible={isTagsFilterModalVisible}
-        animationType="fade"
-        onRequestClose={() => {}}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={(event) => {
-            if (event.target === event.currentTarget) {
-              handleTagFilterCancel();
-            }
-          }}
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={(event) => {
+              if (event.target === event.currentTarget) {
+                setIsCancelRequestModalVisible(false);
+              }
+            }}
+          >
+            <View style={styles.modalContentContainer}>
+              <Image style={styles.joinConfirmImage} source={joinConfirmImage} />
+              <View style={{ flex: 1 }}>
+              <View style={{}}>
+                <Text style={styles.joinModalTitle}>
+                  Cancel Request to Join Group?
+                </Text>
+              </View>
+              <View style={styles.rowContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsCancelRequestModalVisible(false);
+                  }}
+                  style={styles.joinCancelButton}
+                >
+                  <Text style={styles.joinCancelButtonText}>
+                    Let Me Rethink
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleCancelRequestConfirm();
+
+                    setIsCancelRequestModalVisible(false);
+                  }}
+                  style={styles.joinConfirmButton}
+                >
+                  <Text style={styles.joinConfirmButtonText}>Yes, Cancel it!</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            </View>
+          </Pressable>
+        </Modal>
+      )}
+
+      {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED  && (
+        <Modal
+          transparent={true}
+          visible={isLeaveGroupModalVisible}
+          animationType="fade"
+          onRequestClose={() => setIsLeaveGroupModalVisible(false)}
         >
-          <View style={styles.filterContentContainer}>
-            {tagsFilters.map((filter, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.filterOptionsButton}
-                onPress={() => {
-                  setSelectedTagFilter(filter);
-                  handleTagFilterCancel();
-                }}
-              >
-                <Text style={styles.filterOptionsButtonText}>{filter}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Pressable>
-      </Modal> */}
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={(event) => {
+              if (event.target === event.currentTarget) {
+                setIsLeaveGroupModalVisible(false);
+              }
+            }}
+          >
+            <View style={styles.modalContentContainer}>
+              <Image style={styles.joinConfirmImage} source={joinConfirmImage} />
+            <View style={{ flex: 1 }}>
+              <View style={{}}>
+                <Text style={styles.joinModalTitle}>
+                  Are You Sure You Want to Leave the Group?
+                </Text>
+              </View>
+              <View style={styles.rowContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsLeaveGroupModalVisible(false);
+                  }}
+                  style={styles.joinCancelButton}
+                >
+                  <Text style={styles.joinCancelButtonText}>
+                    Let Me Rethink
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleLeaveGroupConfirm();
+
+                    setIsLeaveGroupModalVisible(false);
+                  }}
+                  style={styles.joinConfirmButton}
+                >
+                  <Text style={styles.joinConfirmButtonText}>Sure, I'm Out!</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            </View>
+          </Pressable>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -694,7 +883,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
   },
   tabButton: {
     width: 110,
@@ -886,4 +1074,40 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     paddingBottom: 20,
   },
+  moderatorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  moderatorImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  moderatorName: {
+    color: "#B9FF66",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginRight: 20,
+  },
+  welcomContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  welcomeName: {
+    color: "#B9FF66",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+     marginRight: 10,
+  },
+  contentButton: {
+    backgroundColor: "#B9FF66",
+    padding: 15,
+    paddingBlock: 10,
+    borderRadius: 20,
+    marginTop: 20,
+    alignItems: "center",
+  }
 });

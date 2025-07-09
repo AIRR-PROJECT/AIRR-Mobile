@@ -145,3 +145,10 @@ export interface CreateGroupTag {
     TagName: string
     OperationType: string
 }
+
+export interface SearchBarGroup {
+    _id: string;
+    Name: string;
+    Description: string;
+    CoverURL: string;
+}

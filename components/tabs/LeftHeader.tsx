@@ -17,21 +17,21 @@ import {
   SearchUserComponent,
 } from "../left_header/SearchComponent";
 import { loremIpsum } from "lorem-ipsum";
+import { SearchBarBlog } from "@/interfaces/blogInterface";
+import { SearchBarGroup } from "@/interfaces/groupInterface";
+import { useAppDispatch } from "@/redux/hook";
+import { searchFromSearchBar } from "@/redux/slices/feedSlice";
+import { SearchBarResult } from "@/interfaces/feedInterface";
 
 // 1. Define types
 type BlogItem = {
   type: "blog";
-  thumbnail: string;
-  title: string;
-  description: string;
+  blogItem: SearchBarBlog
 };
 
 type GroupItem = {
   type: "group";
-  image: string;
-  name: string;
-  description: string;
-  numberOfMembers: number;
+  groupItem: SearchBarGroup
 };
 
 type UserItem = {
@@ -40,7 +40,7 @@ type UserItem = {
   name: string;
 };
 
-type SearchItem = BlogItem | GroupItem | UserItem;
+type SearchItem = BlogItem | GroupItem;
 
 type Section = {
   title: string;
@@ -77,6 +77,8 @@ function SearchScreen({
   visible: boolean;
   onClose: () => void;
 }) {
+  const dispatch = useAppDispatch()
+
   const [searchText, setSearchText] = useState("");
   const [items, setItems] = useState<SearchItem[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
@@ -88,46 +90,106 @@ function SearchScreen({
       const response: SearchItem[] = [
         {
           type: "blog",
-          thumbnail: "https://picsum.photos/200/300",
-          title: "AirTech One",
-          description: loremIpsum({ count: 100 }),
+          blogItem: {
+            _id: "",
+            Title: "AirTech One",
+            Description: loremIpsum({ count: 100 }),
+            Owner: {
+              _id: "",
+              AvatarURL: "https://picsum.photos/200/300",
+              Username: "",
+              Name: "",
+              CreateDate: ""
+            }
+          } 
+          // thumbnail: "https://picsum.photos/200/300",
+          // title: "AirTech One",
+          // description: loremIpsum({ count: 100 }),
         },
         {
           type: "group",
-          image: "https://picsum.photos/200/500",
-          name: "AirTech Group",
-          description: "This is a group about AirTech",
-          numberOfMembers: 100,
+          groupItem: {
+            _id: "",
+            Name: "AirTech Group",
+            Description: "This is a group about AirTech",
+            CoverURL: "https://picsum.photos/200/500"
+          }
+          // image: "https://picsum.photos/200/500",
+          // name: "AirTech Group",
+          // description: "This is a group about AirTech",
+          // numberOfMembers: 100,
         },
-        {
-          type: "user",
-          avatar: "https://picsum.photos/200/400",
-          name: "John Doe",
-        },
+        // {
+        //   type: "user",
+        //   avatar: "https://picsum.photos/200/400",
+        //   name: "John Doe",
+        // },
         {
           type: "blog",
-          thumbnail: "https://picsum.photos/300/300",
-          title: "DevLog",
-          description: "Development journey",
+          blogItem: {
+            _id: "",
+            Title: "DevLog",
+            Description: "Development journey",
+            Owner: {
+              _id: "",
+              AvatarURL: "https://picsum.photos/300/300",
+              Username: "",
+              Name: "",
+              CreateDate: ""
+            }
+          } 
+          // thumbnail: "https://picsum.photos/300/300",
+          // title: "DevLog",
+          // description: "Development journey",
         },
         {
           type: "group",
-          image: "https://picsum.photos/300/500",
-          name: "Tech Enthusiasts",
-          description: loremIpsum({ count: 50 }),
-          numberOfMembers: 200,
+          groupItem: {
+            _id: "",
+            Name: "Tech Enthusiasts",
+            Description: loremIpsum({ count: 50 }),
+            CoverURL: "https://picsum.photos/300/500"
+          }
+          // image: "https://picsum.photos/300/500",
+          // name: "Tech Enthusiasts",
+          // description: loremIpsum({ count: 50 }),
+          // numberOfMembers: 200,
         },
-        {
-          type: "user",
-          avatar: "https://picsum.photos/400/400",
-          name: "Jane Smith",
-        },
+        // {
+        //   type: "user",
+        //   avatar: "https://picsum.photos/400/400",
+        //   name: "Jane Smith",
+        // },
       ];
-      setItems(response);
+
+      // setItems(response);
     };
 
     fetchData();
   }, []);
+
+  const handleSearchSubmit  = () => {
+    if (searchText.length > 0) {
+      dispatch(searchFromSearchBar(searchText)).then((res) => {
+        const data = res.payload as SearchBarResult
+
+        let result: SearchItem[] = []
+        data.searchBlogs.forEach((i) => {
+          result.push({
+            type: "blog",
+            blogItem: i
+          })
+        })
+        data.searchGroups.forEach((i) => {
+          result.push({
+            type: "group",
+            groupItem: i
+          })
+        })
+        setItems(result)
+      })
+    }
+  }
 
   // 3. Group into sections when items or searchText changes
   // Change the search logic to filter based on searchText
@@ -145,7 +207,7 @@ function SearchScreen({
     filtered.forEach((item) => {
       if (item.type === "blog") grouped["Blogs"].push(item);
       else if (item.type === "group") grouped["Groups"].push(item);
-      else if (item.type === "user") grouped["Users"].push(item);
+      // else if (item.type === "user") grouped["Users"].push(item);
     });
 
     const result: Section[] = Object.entries(grouped)
@@ -158,11 +220,11 @@ function SearchScreen({
   const renderItem = ({ item }: { item: SearchItem }) => {
     switch (item.type) {
       case "blog":
-        return <SearchBlogComponent {...item} />;
+        return <SearchBlogComponent {...item.blogItem} />;
       case "group":
-        return <SearchGroupComponent {...item} />;
-      case "user":
-        return <SearchUserComponent {...item} />;
+        return <SearchGroupComponent {...item.groupItem} />;
+      // case "user":
+      //   return <SearchUserComponent {...item} />;
     }
   };
 
@@ -179,6 +241,7 @@ function SearchScreen({
             placeholderTextColor="#999"
             value={searchText}
             onChangeText={setSearchText}
+            onSubmitEditing={handleSearchSubmit}
             autoFocus
           />
         </View>

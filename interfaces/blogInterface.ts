@@ -193,3 +193,10 @@ export interface CreateBlogTag {
     TagName: string
     OperationType: string
 }
+
+export interface SearchBarBlog {
+    _id: string;
+    Title: string;
+    Description: string;
+    Owner: UserBlogAuthor;
+}

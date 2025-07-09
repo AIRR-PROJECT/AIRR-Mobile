@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
 import { SurveyTags } from "@/interfaces/userInterface"
+import { SearchBarResult } from "@/interfaces/feedInterface"
 
 const initialState = {
     recommendedBlogs: null,
@@ -96,6 +97,26 @@ export const saveTags = createAsyncThunk(
 
             if (res.data.success) {
                 return res.data.data
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const searchFromSearchBar = createAsyncThunk(
+    'feed/searchFromSearchBar',
+    async (keyword: string, thunkAPI) => {
+        try {
+            const res = await api.get(`util/search-keyword?keyword=${keyword}`) as AxiosResponse
+
+            if (res.data.success) {
+                console.log(res.data.data)
+                return res.data.data as SearchBarResult
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)

@@ -1,5 +1,8 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
+import { SearchBarBlog } from "@/interfaces/blogInterface";
+import { SearchBarGroup } from "@/interfaces/groupInterface";
+import { router } from "expo-router";
 
 // Change the view to touchable component to make it clickable
 type SearchBlogComponentProps = {
@@ -8,23 +11,28 @@ type SearchBlogComponentProps = {
   description: string;
 };
 function SearchBlogComponent({
-  thumbnail,
-  title,
-  description,
-}: SearchBlogComponentProps) {
+  _id,
+  Title,
+  Description,
+  Owner
+}: SearchBarBlog) {
+  const handlePress = () => {
+    router.push(`/blog?userBlogId=${_id}`)
+  }
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={handlePress}>
       {/* thumbnail */}
-      <Image source={thumbnail} style={styles.image} />
+      <Image source={Owner.AvatarURL} style={styles.image} />
       <View style={styles.contentContainer}>
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          {title}
+          {Title}
         </Text>
         <Text numberOfLines={1} ellipsizeMode="tail">
-          {description}
+          {Description}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -36,27 +44,31 @@ type SearchGroupComponentProps = {
 };
 
 function SearchGroupComponent({
-  image,
-  name,
-  description,
-  numberOfMembers,
-}: SearchGroupComponentProps) {
+  _id,
+  Name,
+  Description,
+  CoverURL
+}: SearchBarGroup) {
+  const handlePress = () => {
+    router.push(`/group?groupId=${_id}`)
+  }
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={handlePress}>
       {/* image */}
-      <Image source={image} style={styles.image} />
+      <Image source={CoverURL} style={styles.image} />
       <View style={styles.contentContainer}>
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          {name}
+          {Name}
         </Text>
         <Text numberOfLines={2} ellipsizeMode="tail" style={{ color: "#666" }}>
-          {description}
+          {Description}
         </Text>
       </View>
-      <View style={styles.memberContainer}>
+      {/* <View style={styles.memberContainer}>
         <Text>{numberOfMembers} members</Text>
-      </View>
-    </View>
+      </View> */}
+    </TouchableOpacity>
   );
 }
 

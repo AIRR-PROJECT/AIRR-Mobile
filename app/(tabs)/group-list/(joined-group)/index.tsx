@@ -9,7 +9,7 @@ import {
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -25,6 +25,23 @@ export default function JoinedGroupTab() {
 
   const [selectedId, setSelectedId] = useState("1");
   const [joinedFields, setJoinedFields] = useState<GroupField[]>([]);
+  const refFields = useRef<FlatList>(null);
+  const currentOffset = useRef(0);
+
+  const handleArrowPress = () => {
+    refFields?.current?.scrollToOffset({
+      offset: currentOffset.current + 300, // Adjust as needed
+      animated: true,
+    });
+  };
+
+  // Track scroll position without causing re-render
+  const handleScroll = ({ nativeEvent }: any) => {
+    const offsetX = nativeEvent.contentOffset.x;
+    if (Math.abs(currentOffset.current - offsetX) > 10) {
+      currentOffset.current = offsetX;
+    }
+  };
 
   useEffect(() => {
     dispatch(getJoinedFields()).then((res) => {
@@ -47,6 +64,8 @@ export default function JoinedGroupTab() {
       <View style={styles.rowWrapper}>
         <FlatList
           data={joinedFields}
+          ref={refFields}
+          onScroll={handleScroll}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
@@ -72,7 +91,9 @@ export default function JoinedGroupTab() {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
         />
-        <FontAwesome name="caret-right" size={30} color="white" />
+        <TouchableOpacity onPress={handleArrowPress} activeOpacity={0.8}>
+          <FontAwesome name="caret-right" size={30} color="white" />
+        </TouchableOpacity>
       </View>
       {/* Content based on selected tabs */}
      

@@ -508,6 +508,19 @@ export default function BlogScreen() {
     refMoreSheet.current?.snapToIndex(index);
   }, []);
 
+  const handleHideBlog = () => {
+    router.back()
+    router.setParams({
+      blogIdToRemove: currentUserBlog._id
+    })
+  }
+  const handleDeleteBlog = () => {
+    router.back()
+    router.setParams({
+      blogIdToRemove: currentUserBlog._id
+    })
+  }
+
   // TODO: get blog status, If it’s a in profile/ private blog → show “In profile” / “Private”, and hide group component
   const blogStatus = BlogViewType.IN_GROUP; // This should be dynamically set based on the blog's status
   return (
@@ -729,6 +742,8 @@ export default function BlogScreen() {
           groupId={
             currentUserBlog.Group ? currentUserBlog.Group._id : undefined
           }
+          handleHideThisBlog={handleHideBlog}
+          handleDeleteThisBlog={handleDeleteBlog}
         />
       )}
     </GestureHandlerRootView>

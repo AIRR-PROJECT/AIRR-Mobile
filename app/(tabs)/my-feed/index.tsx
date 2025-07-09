@@ -49,7 +49,7 @@ import queryClient from "@/redux/api/queryClient";
 import { FlashList } from "@shopify/flash-list";
 import AIBlogPreviewSkeleton from "@/components/tabs/feed/AIBlogPreviewSkeleton";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
-import { useSegments } from "expo-router";
+import { useLocalSearchParams, useSegments } from "expo-router";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, {
   ICarouselInstance,
@@ -58,8 +58,10 @@ import Carousel, {
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
+import { string } from "zod";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
+  const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>()
   const [recommendedPage, setRecommendedPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
   const [isRecommendedBlogReset, setRecommendedBlogReset] = useState(false);
@@ -102,6 +104,7 @@ export default function MyFeed() {
       queryClient.setQueryData(["feed-recommended"], (oldData: any) => {
         return [...data] as AIBlog[];
       });
+      setRecommendedPage(1)
     },
   });
   const handleOnRecommendedBlogListEndReached = () => {
@@ -129,6 +132,7 @@ export default function MyFeed() {
       queryClient.setQueryData(["feed-user"], (oldData: any) => {
         return [...oldData, ...data] as UserBlog[];
       });
+      setUserPage(1)
     },
   });
   const userBlogsReset = useMutation({
@@ -183,6 +187,7 @@ export default function MyFeed() {
       userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
     }
   }, [user]);
+
   const progress = useSharedValue(0);
 
   const carouselRef = useRef<ICarouselInstance>(null);
@@ -200,6 +205,19 @@ export default function MyFeed() {
     }
     // console.log("More option pressed", isUserWritten)
   };
+  const handleHideBlog = () => {
+    userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
+  }
+  const handleDeleteBlog = () => {
+    userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
+  }
+  // Handle hiding or deleting blog while viewing that blog
+  useEffect(() => {
+    if (blogIdToRemove) {
+      userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
+    }
+  }, [blogIdToRemove])
+
   return (
     <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
@@ -297,7 +315,14 @@ export default function MyFeed() {
           />
         </View>
       )}
-      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog={isUserWrittenBlog} blogId={moreOptionBlogId} groupId={moreOptionGroupId} isFromFeed={true}/>
+      <MoreOptionBottomList
+        sheetRef={moreOptionRef}
+        isUserWrittenBlog={isUserWrittenBlog}
+        blogId={moreOptionBlogId}
+        groupId={moreOptionGroupId}
+        isFromFeed={true}
+        handleHideThisBlog={handleHideBlog}
+        handleDeleteThisBlog={handleDeleteBlog}      />
     </GestureHandlerRootView>
   );
 }

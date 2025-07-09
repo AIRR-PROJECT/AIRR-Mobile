@@ -218,13 +218,13 @@ export default function FeedBlogPreview({
       <View style={{ padding: 20 }}>
         {/* 3nd Part: Title */}
         <View style={styles.titleSection}>
-          <Text style={styles.title}>{blog.Title}</Text>
+          <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">{blog.Title}</Text>
         </View>
 
         {/* 4th Part: Preview of Content */}
         <View style={styles.contentSection}>
-          <Text style={styles.description}>
-            {blog.Description.slice(0, 115)}...
+          <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">
+            {blog.Description}
           </Text>
         </View>
         {/* 5th Part: Group Info */}

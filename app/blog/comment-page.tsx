@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  ToastAndroid,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useLocalSearchParams } from "expo-router";
@@ -21,6 +22,8 @@ import BlogCommenter from "@/components/blog/BlogCommenter";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   commentOnBlog,
+  deleteComment,
+  editComment,
   getAIBlogDetail,
   getBlogComment,
   getUserBlogDetail,
@@ -43,7 +46,6 @@ import { Divider } from "@rneui/base";
 import CommentMoreOptionBottomList from "@/components/blog/CommentMoreOptionBottomList";
 import { Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { set } from "lodash";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -225,9 +227,13 @@ export default function CommentBlogScreen() {
     isCurrentBlogSaved,
   } = useAppSelector((state) => state.blog);
   const { user } = useAppSelector((state) => state.user);
+  const [blogComments, setBlogComments] = useState(currentBlogComments)
   // Post comment
-  const [postComment, setPostComment] = useState("");
+  const [postCommentContent, setPostCommentContent] = useState("");
   const [commentText, setCommentText] = useState("");
+  // Comment options
+  const [editCommentContent, setEditCommentContent] = useState("");
+  const [chosenComment, setChosenComment] = useState<UserBlogComment>()
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -239,14 +245,20 @@ export default function CommentBlogScreen() {
   }, []);
 
   useEffect(() => {
+    if (currentBlogComments) {
+      setBlogComments(currentBlogComments)
+    }
+  }, [currentBlogComments]);
+
+  useEffect(() => {
     if (
-      currentBlogComments != null &&
-      currentBlogComments != undefined &&
-      currentBlogComments.length != 0 &&
+      blogComments != null &&
+      blogComments != undefined &&
+      blogComments.length != 0 &&
       searchParams.commentId != undefined &&
       searchParams.commentId != ""
     ) {
-      currentBlogComments.forEach((value, index) => {
+      blogComments.forEach((value, index) => {
         if (value._id == searchParams.commentId) {
           flatListRef.current?.scrollToIndex({ animated: true, index: index });
           return;
@@ -280,21 +292,21 @@ export default function CommentBlogScreen() {
     dispatch(getBlogComment(searchParams.blogId));
   };
 
-  const handleInputUserComment = (val: string) => {
-    setPostComment(val);
+  const handleInputUserPostComment = (val: string) => {
+    setPostCommentContent(val);
   };
   const handlePostUserComment = () => {
     const comment: PostComment = {
       UserID: user._id,
       BlogID: currentUserBlog._id,
-      Content: postComment,
+      Content: postCommentContent,
       Method: "Post",
     };
     dispatch(commentOnBlog(comment)).then((res) => {
       if (res.payload === true) {
         dispatch(getBlogComment(searchParams.blogId));
 
-        setPostComment("");
+        setPostCommentContent("");
         setIsWriteComment(false);
 
         dispatch(setCommentAdded(true));
@@ -305,17 +317,68 @@ export default function CommentBlogScreen() {
     console.log("Reply posted");
     // dispatch(getBlogComment(searchParams.blogId));
   };
+  const handleInputUserEditComment = (val: string) => {
+    setEditCommentContent(val);
+  };
+  const handleEditCommentPress = () => {
+    if (chosenComment) {
+      sheetRef.current?.close()
+      setIsEditingComment(true)
+    }
+  }
+  const handleEditCommentSubmit = () => {
+    if (chosenComment) {
+      dispatch(editComment({
+        BlogID: searchParams.blogId,
+        Content: editCommentContent,
+        CommentID: chosenComment._id
+      })).then((res) => {
+        const result = res.payload as boolean
+
+        if (result === true) {
+          ToastAndroid.showWithGravity("Comment edited", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+
+          setIsEditingComment(false)
+
+          let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as any[]
+          const index = blogCommentsClone.findIndex((c) => c._id == chosenComment._id)
+          if (index != -1) {
+            blogCommentsClone[index].Content = editCommentContent
+            setBlogComments(blogCommentsClone)
+          }
+        }
+      })
+    }
+  }
+  const handleDeleteComment = () => {
+    if (chosenComment) {
+      dispatch(deleteComment({
+        BlogID: searchParams.blogId,
+        CommentID: chosenComment._id
+      })).then((res) => {
+        const result = res.payload as boolean
+
+        if (result === true) {
+          ToastAndroid.showWithGravity("Comment deleted", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+          setBlogComments(blogComments.filter((c) => c._id != chosenComment._id))
+          sheetRef.current?.close()
+        }
+      })
+    }
+  }
   useEffect(() => {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
   }, [isCurrentBlogSaved]);
 
   const [isWriteComment, setIsWriteComment] = useState(false);
+  const [isEditingComment, setIsEditingComment] = useState(false);
   const sheetRef = useRef<BottomSheet>(null);
   const [isUserWrittenComment, setIsUserWrittenComment] = useState(false);
-  const handleMorePress = (isUserWrittenComment: boolean) => {
+  const handleMorePress = (isUserWrittenComment: boolean, chosenComment: UserBlogComment) => {
     setIsUserWrittenComment(isUserWrittenComment);
     if (sheetRef.current) {
       if (isUserWrittenComment) {
+        setChosenComment(chosenComment)
         sheetRef.current.snapToIndex(0);
       }
     }
@@ -370,7 +433,7 @@ export default function CommentBlogScreen() {
               placeholderTextColor="#565656"
               multiline
               numberOfLines={4}
-              onChangeText={handleInputUserComment}
+              onChangeText={handleInputUserPostComment}
               textAlignVertical="top"
             />
             <Divider />
@@ -383,6 +446,49 @@ export default function CommentBlogScreen() {
             </TouchableOpacity>
           </View>
         )}
+        {/* Edit Comment */}
+        {isEditingComment && (
+          <View style={styles.commentWriteContainer}>
+            <View style={[styles.rowContainer, { alignItems: "center" }]}>
+              {/* User avatar */}
+              <View style={styles.rowContainer}>
+                <Image
+                  style={styles.avatar}
+                  source={{ uri: user.avatarURL }}
+                />
+                {/* name and date */}
+                <View>
+                  <View>
+                    <Text style={styles.name}>{user.username}</Text>
+                    <Text style={styles.date}>{new Date().toDateString()}</Text>
+                  </View>
+                </View>
+              </View>
+              <TouchableOpacity onPress={() => setIsEditingComment(false)}>
+                <AntDesign name="close" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+            {/* Input */}
+            <TextInput
+              style={styles.replyTextInput}
+              placeholder="Write a reply..."
+              placeholderTextColor="#565656"
+              multiline
+              numberOfLines={4}
+              defaultValue={chosenComment?.Content}
+              onChangeText={handleInputUserEditComment}
+              textAlignVertical="top"
+            />
+            <Divider />
+            {/* Comment Button */}
+            <TouchableOpacity
+              style={styles.commentWriteButtonContainer}
+              onPress={handleEditCommentSubmit}
+            >
+              <Text style={styles.commentWriteButtonText}>Comment</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
       <View style={{ flex: 1, backgroundColor: "#1E1E1E", position: "fixed" }}>
         <FlatList
@@ -390,7 +496,7 @@ export default function CommentBlogScreen() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
-          data={currentBlogComments}
+          data={blogComments}
           keyExtractor={(item, index) => item._id + index}
           renderItem={({ item }) => (
             <BlogCommenter
@@ -398,7 +504,7 @@ export default function CommentBlogScreen() {
               replies={item.ChildrenComments}
               onReplyPosted={handleReplyPosted}
               sheetRef={sheetRef}
-              onMorePress={handleMorePress}
+              onMorePress={() => handleMorePress(user._id == (item as UserBlogComment).User._id, item)}
             />
           )}
           style={[styles.flatListContainer]}
@@ -408,7 +514,7 @@ export default function CommentBlogScreen() {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           initialNumToRender={
-            currentBlogComments ? currentBlogComments.length : 100
+            blogComments ? blogComments.length : 100
           }
           onScrollToIndexFailed={(info) => {
             const wait = new Promise((resolve) => setTimeout(resolve, 500));
@@ -424,6 +530,8 @@ export default function CommentBlogScreen() {
       <CommentMoreOptionBottomList
         sheetRef={sheetRef}
         isUserWrittenComment={isUserWrittenComment}
+        handleEditPressThisComment={handleEditCommentPress}
+        handleDeleteThisComment={handleDeleteComment}
       />
     </GestureHandlerRootView>
   );

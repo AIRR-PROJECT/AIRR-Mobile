@@ -165,6 +165,17 @@ export interface ReplyToBlogComment {
     RootCommentID: string
 }
 
+export interface EditComment {
+    BlogID: string;
+    Content: string
+    CommentID: string
+}
+
+export interface DeleteComment {
+    BlogID: string;
+    CommentID: string
+}
+
 export interface CreateReportBlog {
     BlogID: string
     GroupID: string

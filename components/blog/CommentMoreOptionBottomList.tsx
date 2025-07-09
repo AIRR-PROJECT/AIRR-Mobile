@@ -11,16 +11,20 @@ import { TouchableOpacity, StyleSheet, Text, ToastAndroid } from "react-native";
 type MoreOptionComponentProps = {
   sheetRef: React.RefObject<BottomSheet>;
   isUserWrittenComment?: boolean;
+  handleEditPressThisComment: () => void
+  handleDeleteThisComment: () => void
 };
 export default function CommentMoreOptionBottomList({
   sheetRef,
   isUserWrittenComment = true,
+  handleEditPressThisComment,
+  handleDeleteThisComment,
 }: MoreOptionComponentProps) {
   const handleEditPress = () => {
-    // Handle edit action
+    handleEditPressThisComment()
   };
-  const handleDeleteBlog = () => {
-    // Handle delete action
+  const handleDelete = () => {
+    handleDeleteThisComment()
   };
   return (
     <BottomSheet
@@ -53,7 +57,7 @@ export default function CommentMoreOptionBottomList({
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.bottomOptionButton}
-            onPress={handleDeleteBlog}
+            onPress={handleDelete}
             activeOpacity={0.8}
           >
             {/* delete */}

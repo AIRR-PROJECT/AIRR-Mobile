@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail, UserBlogDetailForUpdate } from "@/interfaces/blogInterface"
+import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail, UserBlogDetailForUpdate, DeleteComment, EditComment } from "@/interfaces/blogInterface"
 import { ResponseFailcode } from "@/enums/failcode.enum"
 
 const initialState = {
@@ -402,6 +402,44 @@ export const replyToBlogComment = createAsyncThunk(
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const editComment = createAsyncThunk(
+    'blog/editComment',
+    async (data: EditComment, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/update-comment`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const deleteComment = createAsyncThunk(
+    'blog/deleteComment',
+    async (data: DeleteComment, thunkAPI) => {
+        try {
+            const res = await api.post(`blogs/delete-comment`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
             }
         }
         catch (error: any) {

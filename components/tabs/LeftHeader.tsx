@@ -17,8 +17,8 @@ import {
   SearchUserComponent,
 } from "../left_header/SearchComponent";
 import { loremIpsum } from "lorem-ipsum";
-import { SearchBarBlog } from "@/interfaces/blogInterface";
-import { SearchBarGroup } from "@/interfaces/groupInterface";
+import { SearchBarBlog, UserBlog } from "@/interfaces/blogInterface";
+import { Group, SearchBarGroup } from "@/interfaces/groupInterface";
 import { useAppDispatch } from "@/redux/hook";
 import { searchFromSearchBar } from "@/redux/slices/feedSlice";
 import { SearchBarResult } from "@/interfaces/feedInterface";
@@ -26,12 +26,12 @@ import { SearchBarResult } from "@/interfaces/feedInterface";
 // 1. Define types
 type BlogItem = {
   type: "blog";
-  blogItem: SearchBarBlog
+  blogItem: UserBlog
 };
 
 type GroupItem = {
   type: "group";
-  groupItem: SearchBarGroup
+  groupItem: Group
 };
 
 type UserItem = {
@@ -86,81 +86,81 @@ function SearchScreen({
   // 2. Simulate fetching mixed data
   useEffect(() => {
     const fetchData = async () => {
-      // Simulated API response
-      const response: SearchItem[] = [
-        {
-          type: "blog",
-          blogItem: {
-            _id: "",
-            Title: "AirTech One",
-            Description: loremIpsum({ count: 100 }),
-            Owner: {
-              _id: "",
-              AvatarURL: "https://picsum.photos/200/300",
-              Username: "",
-              Name: "",
-              CreateDate: ""
-            }
-          } 
-          // thumbnail: "https://picsum.photos/200/300",
-          // title: "AirTech One",
-          // description: loremIpsum({ count: 100 }),
-        },
-        {
-          type: "group",
-          groupItem: {
-            _id: "",
-            Name: "AirTech Group",
-            Description: "This is a group about AirTech",
-            CoverURL: "https://picsum.photos/200/500"
-          }
-          // image: "https://picsum.photos/200/500",
-          // name: "AirTech Group",
-          // description: "This is a group about AirTech",
-          // numberOfMembers: 100,
-        },
-        // {
-        //   type: "user",
-        //   avatar: "https://picsum.photos/200/400",
-        //   name: "John Doe",
-        // },
-        {
-          type: "blog",
-          blogItem: {
-            _id: "",
-            Title: "DevLog",
-            Description: "Development journey",
-            Owner: {
-              _id: "",
-              AvatarURL: "https://picsum.photos/300/300",
-              Username: "",
-              Name: "",
-              CreateDate: ""
-            }
-          } 
-          // thumbnail: "https://picsum.photos/300/300",
-          // title: "DevLog",
-          // description: "Development journey",
-        },
-        {
-          type: "group",
-          groupItem: {
-            _id: "",
-            Name: "Tech Enthusiasts",
-            Description: loremIpsum({ count: 50 }),
-            CoverURL: "https://picsum.photos/300/500"
-          }
-          // image: "https://picsum.photos/300/500",
-          // name: "Tech Enthusiasts",
-          // description: loremIpsum({ count: 50 }),
-          // numberOfMembers: 200,
-        },
-        // {
-        //   type: "user",
-        //   avatar: "https://picsum.photos/400/400",
-        //   name: "Jane Smith",
-        // },
-      ];
+      // // Simulated API response
+      // const response: SearchItem[] = [
+      //   {
+      //     type: "blog",
+      //     blogItem: {
+      //       _id: "",
+      //       Title: "AirTech One",
+      //       Description: loremIpsum({ count: 100 }),
+      //       Owner: {
+      //         _id: "",
+      //         AvatarURL: "https://picsum.photos/200/300",
+      //         Username: "",
+      //         Name: "",
+      //         CreateDate: ""
+      //       }
+      //     } 
+      //     // thumbnail: "https://picsum.photos/200/300",
+      //     // title: "AirTech One",
+      //     // description: loremIpsum({ count: 100 }),
+      //   },
+      //   {
+      //     type: "group",
+      //     groupItem: {
+      //       _id: "",
+      //       Name: "AirTech Group",
+      //       Description: "This is a group about AirTech",
+      //       CoverURL: "https://picsum.photos/200/500"
+      //     }
+      //     // image: "https://picsum.photos/200/500",
+      //     // name: "AirTech Group",
+      //     // description: "This is a group about AirTech",
+      //     // numberOfMembers: 100,
+      //   },
+      //   // {
+      //   //   type: "user",
+      //   //   avatar: "https://picsum.photos/200/400",
+      //   //   name: "John Doe",
+      //   // },
+      //   {
+      //     type: "blog",
+      //     blogItem: {
+      //       _id: "",
+      //       Title: "DevLog",
+      //       Description: "Development journey",
+      //       Owner: {
+      //         _id: "",
+      //         AvatarURL: "https://picsum.photos/300/300",
+      //         Username: "",
+      //         Name: "",
+      //         CreateDate: ""
+      //       }
+      //     } 
+      //     // thumbnail: "https://picsum.photos/300/300",
+      //     // title: "DevLog",
+      //     // description: "Development journey",
+      //   },
+      //   {
+      //     type: "group",
+      //     groupItem: {
+      //       _id: "",
+      //       Name: "Tech Enthusiasts",
+      //       Description: loremIpsum({ count: 50 }),
+      //       CoverURL: "https://picsum.photos/300/500"
+      //     }
+      //     // image: "https://picsum.photos/300/500",
+      //     // name: "Tech Enthusiasts",
+      //     // description: loremIpsum({ count: 50 }),
+      //     // numberOfMembers: 200,
+      //   },
+      //   // {
+      //   //   type: "user",
+      //   //   avatar: "https://picsum.photos/400/400",
+      //   //   name: "Jane Smith",
+      //   // },
+      // ];
 
       // setItems(response);
     };

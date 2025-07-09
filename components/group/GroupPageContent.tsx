@@ -153,7 +153,6 @@ GroupPageProps) {
     }
   }, [groupID]);
 
-  
   const handleGroupJoinConfirmCancel = () => {
     setIsGroupJoinModalVisible(false);
   };
@@ -238,10 +237,8 @@ GroupPageProps) {
     });
   };
   //  TODO: Handle Here
-  const handleCancelRequestConfirm = () => {
-  };
-  const handleLeaveGroupConfirm = () => {
-  };
+  const handleCancelRequestConfirm = () => {};
+  const handleLeaveGroupConfirm = () => {};
   const handleMoreOptionPress = useCallback((index: number) => {
     sheetRef.current?.snapToIndex(index);
   }, []);
@@ -267,8 +264,8 @@ GroupPageProps) {
     },
   ];
   const handleContentButtonPress = () => {
-    route.push('/group/(group-contents)');
-  }
+    route.push(`/group/group-contents?groupID=${groupID}`);
+  };
   return (
     <View style={styles.container}>
       <View>
@@ -536,14 +533,13 @@ GroupPageProps) {
               <Text style={styles.moderatorName}>@John Doe</Text>
             </LinearGradient>
           </TouchableOpacity>
-          
-            <ButtonGradient
-              label={buttonLabel}
-              labelStyle={styles.tabButtonText}
-              style={styles.tabButton}
-              onPress={handlePressButton}
-            />
-          
+
+          <ButtonGradient
+            label={buttonLabel}
+            labelStyle={styles.tabButtonText}
+            style={styles.tabButton}
+            onPress={handlePressButton}
+          />
         </View>
       </View>
       <View style={styles.rowContainer}>
@@ -568,6 +564,126 @@ GroupPageProps) {
           See Group Content
         </Text>
       </TouchableOpacity>
+      {/* Bar for blogs */}
+      <View style={styles.rowWrapper}>
+        <View style={styles.tabList}>
+          <TouchableOpacity
+            style={[styles.tabItem, selectedId === 1 && styles.tabItemActive]}
+          >
+            <Text
+              style={{
+                color: selectedId === 1 ? "#fff" : "#8A94AC",
+                fontWeight: "bold",
+              }}
+            >
+              All Published Blogs
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
+          >
+            <Text
+              style={{
+                color: selectedId === 2 ? "#fff" : "#8A94AC",
+                fontWeight: "bold",
+              }}
+            >
+              Tags
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.rowContainer}>
+            <TouchableOpacity
+              style={[styles.tabItem, selectedId === 3 && styles.tabItemActive]}
+              activeOpacity={0.8}
+            >
+              <Text
+                style={{
+                  color: selectedId === 3 ? "#fff" : "#8A94AC",
+                  fontWeight: "bold",
+                }}
+              >
+                Need Approval
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+      {/* Bar for tags */}
+      <View style={styles.rowWrapper}>
+        <View style={styles.tabList}>
+          <TouchableOpacity
+            style={[styles.tabItem, selectedId === 1 && styles.tabItemActive]}
+          >
+            <Text
+              style={{
+                color: selectedId === 1 ? "#fff" : "#8A94AC",
+                fontWeight: "bold",
+              }}
+            >
+              All Tags
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
+          >
+            <Text
+              style={{
+                color: selectedId === 2 ? "#fff" : "#8A94AC",
+                fontWeight: "bold",
+              }}
+            >
+              Need Approval
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+       {/* Bar for members */}
+      <View style={styles.rowWrapper}>
+        <View style={styles.tabList}>
+          <TouchableOpacity
+            style={[styles.tabItem, selectedId === 1 && styles.tabItemActive]}
+          >
+            <Text
+              style={{
+                color: selectedId === 1 ? "#fff" : "#8A94AC",
+                fontWeight: "bold",
+              }}
+            >
+              All
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
+          >
+            <Text
+              style={{
+                color: selectedId === 2 ? "#fff" : "#8A94AC",
+                fontWeight: "bold",
+              }}
+            >
+              Need Approval
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity
+            style={[styles.tabItem, selectedId === 2 && styles.tabItemActive]}
+          >
+            <Text
+              style={{
+                color: selectedId === 2 ? "#fff" : "#8A94AC",
+                fontWeight: "bold",
+              }}
+            >
+              Banned
+            </Text>
+          </TouchableOpacity>
+      </View>
+   
+     
       {/* <View style={styles.rowWrapper}>
    
         <View style={styles.tabList}>
@@ -642,7 +758,7 @@ GroupPageProps) {
           )
         ) : null}
       </View> */}
-      <Divider color="#242630" width={1} style={{ paddingTop: 0 }} />
+
       {/* Search Bar */}
       {/* <View style={styles.textInputContainer}>
         <View style={styles.textInputWrapper}>
@@ -726,42 +842,47 @@ GroupPageProps) {
             }}
           >
             <View style={styles.modalContentContainer}>
-              <Image style={styles.joinConfirmImage} source={joinConfirmImage} />
+              <Image
+                style={styles.joinConfirmImage}
+                source={joinConfirmImage}
+              />
               <View style={{ flex: 1 }}>
-              <View style={{}}>
-                <Text style={styles.joinModalTitle}>
-                  Cancel Request to Join Group?
-                </Text>
-              </View>
-              <View style={styles.rowContainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setIsCancelRequestModalVisible(false);
-                  }}
-                  style={styles.joinCancelButton}
-                >
-                  <Text style={styles.joinCancelButtonText}>
-                    Let Me Rethink
+                <View style={{}}>
+                  <Text style={styles.joinModalTitle}>
+                    Cancel Request to Join Group?
                   </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    handleCancelRequestConfirm();
+                </View>
+                <View style={styles.rowContainer}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setIsCancelRequestModalVisible(false);
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>
+                      Let Me Rethink
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleCancelRequestConfirm();
 
-                    setIsCancelRequestModalVisible(false);
-                  }}
-                  style={styles.joinConfirmButton}
-                >
-                  <Text style={styles.joinConfirmButtonText}>Yes, Cancel it!</Text>
-                </TouchableOpacity>
+                      setIsCancelRequestModalVisible(false);
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>
+                      Yes, Cancel it!
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
             </View>
           </Pressable>
         </Modal>
       )}
 
-      {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED  && (
+      {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED && (
         <Modal
           transparent={true}
           visible={isLeaveGroupModalVisible}
@@ -777,36 +898,41 @@ GroupPageProps) {
             }}
           >
             <View style={styles.modalContentContainer}>
-              <Image style={styles.joinConfirmImage} source={joinConfirmImage} />
-            <View style={{ flex: 1 }}>
-              <View style={{}}>
-                <Text style={styles.joinModalTitle}>
-                  Are You Sure You Want to Leave the Group?
-                </Text>
-              </View>
-              <View style={styles.rowContainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setIsLeaveGroupModalVisible(false);
-                  }}
-                  style={styles.joinCancelButton}
-                >
-                  <Text style={styles.joinCancelButtonText}>
-                    Let Me Rethink
+              <Image
+                style={styles.joinConfirmImage}
+                source={joinConfirmImage}
+              />
+              <View style={{ flex: 1 }}>
+                <View style={{}}>
+                  <Text style={styles.joinModalTitle}>
+                    Are You Sure You Want to Leave the Group?
                   </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    handleLeaveGroupConfirm();
+                </View>
+                <View style={styles.rowContainer}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setIsLeaveGroupModalVisible(false);
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>
+                      Let Me Rethink
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleLeaveGroupConfirm();
 
-                    setIsLeaveGroupModalVisible(false);
-                  }}
-                  style={styles.joinConfirmButton}
-                >
-                  <Text style={styles.joinConfirmButtonText}>Sure, I'm Out!</Text>
-                </TouchableOpacity>
+                      setIsLeaveGroupModalVisible(false);
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>
+                      Sure, I'm Out!
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
             </View>
           </Pressable>
         </Modal>
@@ -1100,7 +1226,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
-     marginRight: 10,
+    marginRight: 10,
   },
   contentButton: {
     backgroundColor: "#B9FF66",
@@ -1109,5 +1235,5 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginTop: 20,
     alignItems: "center",
-  }
+  },
 });

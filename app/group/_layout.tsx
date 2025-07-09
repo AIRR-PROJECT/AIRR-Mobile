@@ -19,8 +19,8 @@ import { setCreateGroupSubmitted } from "@/redux/slices/groupSlice";
 SplashScreen.preventAutoHideAsync();
 
 export default function GroupLayout() {
-  const dispatch = useAppDispatch()
-  useAppSelector(state => state.group)
+  const dispatch = useAppDispatch();
+  useAppSelector((state) => state.group);
 
   // Get the current color scheme (dark or light)
   const colorScheme = useColorScheme();
@@ -45,11 +45,11 @@ export default function GroupLayout() {
     route.back();
   };
   const handleCreateGroup = () => {
-    dispatch(setCreateGroupSubmitted(true))
-  }
+    dispatch(setCreateGroupSubmitted(true));
+  };
   const handleEditGroup = () => {
     console.log("Nút này ở group layout");
-  }
+  };
   // Render the app layout with theme provider and navigation stack
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

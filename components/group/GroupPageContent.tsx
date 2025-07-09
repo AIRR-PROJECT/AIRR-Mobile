@@ -8,11 +8,14 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  ToastAndroid,
 } from "react-native";
 import { Image } from "expo-image";
 import ButtonGradient from "@/components/ButtonGradient";
 import {
   Entypo,
+  FontAwesome,
+  FontAwesome5,
   FontAwesome6,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
@@ -30,7 +33,7 @@ import {
   setGroupBlogsSearchText,
   setGroupTagsSearchText,
 } from "@/redux/slices/groupSlice";
-import { GroupDetailInfo } from "@/interfaces/groupInterface";
+import { GroupDetailInfo, GroupRule } from "@/interfaces/groupInterface";
 import {
   setUserMembershipStageInCurrentGroup,
   setUserRoleInCurrentGroup,
@@ -78,7 +81,7 @@ type GroupPageProps = {
   setSelectedId: (id: number) => void;
   groupID: string;
   sheetRef: React.RefObject<BottomSheet>;
-  
+
   // selectedBlogFilter: string;
   // setSelectedBlogFilter: (filter: string) => void;
   // selectedTagFilter: string;
@@ -101,9 +104,8 @@ export default function GroupPageContent({
 GroupPageProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
-  const { userCurrentGroupMembershipStage, userCurrentGroupRole  } = useAppSelector(
-    (state) => state.user
-  );
+  const { userCurrentGroupMembershipStage, userCurrentGroupRole } =
+    useAppSelector((state) => state.user);
 
   const [isGroupJoinModalVisible, setIsGroupJoinModalVisible] = useState(false);
   const searchText = useRef("");
@@ -209,21 +211,155 @@ GroupPageProps) {
   const handleMoreOptionPress = useCallback((index: number) => {
     sheetRef.current?.snapToIndex(index);
   }, []);
+  const groupRules: GroupRule[] = [
+    {
+      _id: "rule1",
+      RuleName: "Respect all members",
+      RuleDescription:
+        "All members should be treated with respect and kindness.",
+    },
+    {
+      _id: "rule2",
+      RuleName: "No spamming",
+      RuleDescription:
+        "Spamming or posting irrelevant content is not allowed in this group.",
+    },
+    {
+      _id: "rule3",
+      RuleName: "Stay on topic",
+      RuleDescription:
+        "Please keep discussions relevant to the group's theme and purpose.",
+    },
+  ];
+  const [isShowRules, setIsShowRules] = useState(false);
+  useEffect(() => {
+    // Wait for userCurrentGroupRole to be available before showing toast
+    if (
+      userCurrentGroupMembershipStage != GroupMembershipStage.JOINED &&
+      userCurrentGroupMembershipStage != GroupMembershipStage.BANNED
+    ) {
+      console.log(
+        "userCurrentGroupMembershipStage",
+        userCurrentGroupMembershipStage
+      );
+    } else if (userCurrentGroupMembershipStage == GroupMembershipStage.BANNED) {
+      ToastAndroid.show("You are banned from this group.", ToastAndroid.SHORT);
+    } else if (userCurrentGroupRole) {
+      ToastAndroid.show(`Welcome ${userCurrentGroupRole}!`, ToastAndroid.SHORT);
+    }
+  }, [userCurrentGroupRole]);
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <View>
         <DetailGroupCardComponent
-          {...(groupInfo
-            ? { ...groupInfo }
-            : mockGroupDetail)}
+          {...(groupInfo ? { ...groupInfo } : mockGroupDetail)}
           moreOptionPress={() => handleMoreOptionPress(0)}
           userRole={userCurrentGroupRole}
         />
       </View>
       {/* Description */}
-      <Text style={styles.description}>
-        {groupInfo ? groupInfo.Description : mockGroupDetail.Description}
-      </Text>
+      <View style={styles.descriptionContainer}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            paddingHorizontal: 20,
+            paddingTop: 10,
+          }}
+        >
+          <Entypo name="info-with-circle" size={24} color="#B9FF66" />
+          <Text style={{ color: "#B9FF66", fontSize: 16, fontWeight: "bold" }}>
+            Group Description
+          </Text>
+        </View>
+        <Text style={styles.description}>
+          {groupInfo ? groupInfo.Description : mockGroupDetail.Description}
+        </Text>
+        {/* Rules */}
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            paddingHorizontal: 20,
+            paddingTop: 10,
+          }}
+          onPress={() => setIsShowRules(!isShowRules)}
+          activeOpacity={0.8}
+        >
+          <FontAwesome5 name="shield-alt" size={24} color="#B9FF66" />
+          <Text style={{ color: "#B9FF66", fontSize: 16, fontWeight: "bold" }}>
+            Group Rules
+          </Text>
+
+          {/* Use arrow icon */}
+          <Entypo
+            name={isShowRules ? "chevron-down" : "chevron-right"}
+            size={24}
+            color="#B9FF66"
+          />
+        </TouchableOpacity>
+
+        {isShowRules && (
+          <View
+            style={{
+              borderRadius: 20,
+              overflow: "hidden",
+            }}
+          >
+            {groupRules?.map((rule, index) => (
+              <View key={index} style={styles.ruleOuterContainer}>
+                <View
+                  style={[
+                    styles.rowContainer,
+                    { marginBottom: 5, justifyContent: "flex-start" },
+                  ]}
+                >
+                  <View
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 15,
+                      backgroundColor: "#B9FF66",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={[styles.headingTitle, {}]}>{index + 1}</Text>
+                  </View>
+                  <Text
+                    style={{
+                      color: "#B9FF66",
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      textAlign: "justify",
+                    }}
+                  >
+                    {rule.RuleName}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.container,
+                    {
+                      backgroundColor: "transparent",
+                      padding: 0,
+                    },
+                  ]}
+                >
+                  <View style={styles.ruleContainer}>
+                    {/* Input for rule description */}
+                    <Text style={styles.ruleText}>{rule.RuleDescription}</Text>
+                  </View>
+                  {/* Add more rules as needed */}
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+
       <View style={styles.rowContainer}>
         <TouchableOpacity
           style={styles.infoContainer}
@@ -231,10 +367,7 @@ GroupPageProps) {
           onPress={handlePressGroupMemberList}
         >
           {/* Three example user images */}
-          <Text style={styles.memberContainer}>
-            List of members
-          </Text>
-          
+          <Text style={styles.memberContainer}>List of members</Text>
         </TouchableOpacity>
         {/* render based on user is in group or not */}
         {userCurrentGroupMembershipStage != GroupMembershipStage.JOINED && (
@@ -489,8 +622,7 @@ GroupPageProps) {
           </View>
         </Pressable>
       </Modal> */}
-      
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
@@ -718,5 +850,40 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     textAlign: "center",
+  },
+  ruleOuterContainer: {
+    padding: 20,
+    paddingBottom: 0,
+    borderRadius: 20,
+  },
+  headingTitle: {
+    fontSize: 16,
+    color: "#000",
+  },
+  ruleContainer: {
+    backgroundColor: "#252525",
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 10,
+    flex: 1,
+  },
+  ruleText: {
+    color: "#fff",
+    fontSize: 14,
+    lineHeight: 20,
+    textAlignVertical: "top",
+    textAlign: "justify",
+  },
+  ruleTitle: {
+    color: "#B9FF66",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  descriptionContainer: {
+    backgroundColor: "#242630",
+    borderRadius: 20,
+    marginVertical: 20,
+    paddingBottom: 20,
   },
 });

@@ -6,7 +6,8 @@ export enum GroupRole {
 }
 
 export enum GroupMembershipStage {
-    NOT_JOINED,
-    REQUESTED,
-    JOINED
+    NOT_JOINED = 'NOT_JOINED',
+    REQUESTED = 'REQUESTED',
+    JOINED = 'JOINED',
+    BANNED = 'BANNED'
 }

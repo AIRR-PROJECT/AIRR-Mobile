@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { setUserChange } from "@/redux/slices/userSlice";
 import { router } from "expo-router";
 import { setUserChangeSaved } from "@/redux/slices/authSlice";
+import { wrap } from "lodash";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type PersonalInfoForm = {
@@ -47,11 +48,11 @@ const mockData: UnifiedForm = {
   facebook: "",
 };
 export default function EditProfileScreen() {
-  const dispatch = useAppDispatch()
-  const { isUserChangeSaved } = useAppSelector(state => state.auth)
-  const { user } = useAppSelector(state => state.user)
-  const userData = user as any as User
-  const [checkCounter, setCheckCounter] = useState(0)
+  const dispatch = useAppDispatch();
+  const { isUserChangeSaved } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.user);
+  const userData = user as any as User;
+  const [checkCounter, setCheckCounter] = useState(0);
   const defaultFormData: UnifiedForm = {
     firstName: userData.firstName ?? "",
     lastName: userData.lastName ?? "",
@@ -62,93 +63,97 @@ export default function EditProfileScreen() {
     department: userData.profile.department ?? "",
     program: userData.profile.program ?? "",
     gpa: userData.profile.gpa ?? 0,
-    startYear: userData.profile.year ? new Date().getFullYear() - userData.profile.year : 0,
-    linkedin: userData.profile.link ? (userData.profile.link.LinkedIn ?? "") : "",
-    github: userData.profile.link ? (userData.profile.link.Github ?? "") : "",
-    facebook: userData.profile.link ? (userData.profile.link.Facebook ?? "") : "",
-  }
+    startYear: userData.profile.year
+      ? new Date().getFullYear() - userData.profile.year
+      : 0,
+    linkedin: userData.profile.link ? userData.profile.link.LinkedIn ?? "" : "",
+    github: userData.profile.link ? userData.profile.link.Github ?? "" : "",
+    facebook: userData.profile.link ? userData.profile.link.Facebook ?? "" : "",
+  };
 
   const {
     control,
     watch,
     formState: { errors },
-    getValues
+    getValues,
   } = useForm<UnifiedForm>({
     mode: "onChange",
     defaultValues: defaultFormData,
   });
 
-  let userChange: User = JSON.parse(JSON.stringify(userData)) as User
+  let userChange: User = JSON.parse(JSON.stringify(userData)) as User;
 
   useEffect(() => {
     if (isUserChangeSaved) {
-      dispatch(setUserChangeSaved(false))
+      dispatch(setUserChangeSaved(false));
 
       // router.back()
     }
-  }, [isUserChangeSaved])
+  }, [isUserChangeSaved]);
 
-  const firstNameWatch = watch('firstName')
-  const lastNameWatch = watch('lastName')
-  const emailWatch = watch('email')
-  const phoneWatch = watch('phone')
-  const studentIdWatch = watch('studentId')
-  const departmentWatch = watch('department')
-  const programWatch = watch('program')
-  const gpaWatch = watch('gpa')
-  const startYearWatch = watch('startYear')
-  const linkedinWatch = watch('linkedin')
-  const githubWatch = watch('github')
-  const facebookWatch = watch('facebook')
+  const firstNameWatch = watch("firstName");
+  const lastNameWatch = watch("lastName");
+  const emailWatch = watch("email");
+  const phoneWatch = watch("phone");
+  const studentIdWatch = watch("studentId");
+  const departmentWatch = watch("department");
+  const programWatch = watch("program");
+  const gpaWatch = watch("gpa");
+  const startYearWatch = watch("startYear");
+  const linkedinWatch = watch("linkedin");
+  const githubWatch = watch("github");
+  const facebookWatch = watch("facebook");
 
   useEffect(() => {
-    userChange.firstName = firstNameWatch
-    dispatch(setUserChange(userChange))
-  }, [firstNameWatch])
+    userChange.firstName = firstNameWatch;
+    dispatch(setUserChange(userChange));
+  }, [firstNameWatch]);
   useEffect(() => {
-    userChange.lastName = lastNameWatch
-    dispatch(setUserChange(userChange))
-  }, [lastNameWatch])
+    userChange.lastName = lastNameWatch;
+    dispatch(setUserChange(userChange));
+  }, [lastNameWatch]);
   useEffect(() => {
-    userChange.email = emailWatch
-    dispatch(setUserChange(userChange))
-  }, [emailWatch])
+    userChange.email = emailWatch;
+    dispatch(setUserChange(userChange));
+  }, [emailWatch]);
   useEffect(() => {
-    userChange.phoneNumber = /^-?\d+$/.test(phoneWatch) ? Number(phoneWatch) : undefined
-    dispatch(setUserChange(userChange))
-  }, [phoneWatch])
+    userChange.phoneNumber = /^-?\d+$/.test(phoneWatch)
+      ? Number(phoneWatch)
+      : undefined;
+    dispatch(setUserChange(userChange));
+  }, [phoneWatch]);
   useEffect(() => {
-    userChange.profile.studentID = studentIdWatch
-    dispatch(setUserChange(userChange))
-  }, [studentIdWatch])
+    userChange.profile.studentID = studentIdWatch;
+    dispatch(setUserChange(userChange));
+  }, [studentIdWatch]);
   useEffect(() => {
-    userChange.profile.department = departmentWatch
-    dispatch(setUserChange(userChange))
-  }, [departmentWatch])
+    userChange.profile.department = departmentWatch;
+    dispatch(setUserChange(userChange));
+  }, [departmentWatch]);
   useEffect(() => {
-    userChange.profile.program = programWatch
-    dispatch(setUserChange(userChange))
-  }, [programWatch])
+    userChange.profile.program = programWatch;
+    dispatch(setUserChange(userChange));
+  }, [programWatch]);
   useEffect(() => {
-    userChange.profile.gpa = gpaWatch
-    dispatch(setUserChange(userChange))
-  }, [gpaWatch])
+    userChange.profile.gpa = gpaWatch;
+    dispatch(setUserChange(userChange));
+  }, [gpaWatch]);
   useEffect(() => {
-    userChange.profile.year = new Date().getFullYear() - startYearWatch
-    dispatch(setUserChange(userChange))
-  }, [startYearWatch])
+    userChange.profile.year = new Date().getFullYear() - startYearWatch;
+    dispatch(setUserChange(userChange));
+  }, [startYearWatch]);
   useEffect(() => {
-    userChange.profile.link.LinkedIn = linkedinWatch
-    dispatch(setUserChange(userChange))
-  }, [linkedinWatch])
+    userChange.profile.link.LinkedIn = linkedinWatch;
+    dispatch(setUserChange(userChange));
+  }, [linkedinWatch]);
   useEffect(() => {
-    userChange.profile.link.Github = githubWatch
-    dispatch(setUserChange(userChange))
-  }, [githubWatch])
+    userChange.profile.link.Github = githubWatch;
+    dispatch(setUserChange(userChange));
+  }, [githubWatch]);
   useEffect(() => {
-    userChange.profile.link.Facebook = facebookWatch
-    dispatch(setUserChange(userChange))
-  }, [facebookWatch])
+    userChange.profile.link.Facebook = facebookWatch;
+    dispatch(setUserChange(userChange));
+  }, [facebookWatch]);
 
   return (
     <ScrollView style={styles.container}>
@@ -246,37 +251,26 @@ export default function EditProfileScreen() {
         {errors.username && (
           <Text style={styles.errorText}>{errors.username.message}</Text>
         )}
-        {/* Email */}
+        {/* Email (disabled) */}
         <Text style={[styles.paragraph]}>Email</Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <View style={styles.viewBoxShadow}>
               <TextInput
-                style={[
-                  styles.input,
-                  errors.email && styles.errorInput,
-                  { width: "100%" },
-                ]}
+                style={[styles.input, { color: "#888" }]}
                 placeholder="Email"
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                editable={false}
+                selectTextOnFocus={false}
               />
             </View>
           )}
           name="email"
-          rules={{
-            required: "Email is required",
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Enter a valid email address",
-            },
-          }}
         />
-        {errors.email && (
-          <Text style={styles.errorText}>{errors.email.message}</Text>
-        )}
+
         {/* Phone */}
         <Text style={[styles.paragraph]}>Phone</Text>
         <Controller
@@ -459,12 +453,14 @@ export default function EditProfileScreen() {
                 style={[
                   styles.input,
                   errors.linkedin && styles.errorInput,
-                  { width: "100%" },
+                  { width: "100%", flexWrap: "wrap" },
                 ]}
                 placeholder="LinkedIn"
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                multiline={true}
+                textAlignVertical="top"
               />
             </View>
           )}
@@ -490,6 +486,8 @@ export default function EditProfileScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                multiline={true}
+                textAlignVertical="top"
               />
             </View>
           )}
@@ -514,6 +512,8 @@ export default function EditProfileScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                multiline={true}
+                textAlignVertical="top"
               />
             </View>
           )}
@@ -568,6 +568,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     color: "#000",
     backgroundColor: "#fff",
+    fontSize: 15,
   },
   errorInput: {
     borderColor: "red",

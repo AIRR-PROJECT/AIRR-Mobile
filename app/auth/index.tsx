@@ -85,11 +85,11 @@ export default function AuthScreen() {
       >
         <AuthButtonGradient label="Log In" onPress={handleLogin} />
         <AuthButton label="Sign Up" onPress={handleSignUp} />
-        <TouchableOpacity onPress={handleGuest}>
+        {/* <TouchableOpacity onPress={handleGuest}>
           <ThemedText type="link" style={{ color: "white" }}>
             Continue as guest
           </ThemedText>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ThemedView>
     </ScrollView>
   );

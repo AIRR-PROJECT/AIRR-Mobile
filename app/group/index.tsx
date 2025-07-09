@@ -385,6 +385,7 @@ const styles = StyleSheet.create({
   },
   contentStyle: {
     padding: 20,
+    paddingTop: 0,
     flex: 1,
   },
 });

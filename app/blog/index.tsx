@@ -563,8 +563,8 @@ export default function BlogScreen() {
               backgroundColor: currentUserBlog.Status === BlogStatus.ACTIVE ? "#dcfce7" : "#fcdcdc"
             }]}>
               {currentUserBlog.Status === BlogStatus.ACTIVE ? 
-                <Feather name="check-circle" size={24} color="green" />
-                : <Feather name="x-circle" size={24} color="red" />
+                <Feather name="check-circle" size={20} color="green" />
+                : <Feather name="x-circle" size={20} color="red" />
               }
               <Text style={{ color: currentUserBlog.Status === BlogStatus.ACTIVE ? "green" : "red" }}>{currentUserBlog.Status}</Text>
             </View>
@@ -807,7 +807,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: 'flex-start',
     paddingVertical: 5,
-    paddingHorizontal: 15
+    paddingHorizontal: 15,
+    gap: 5,
   },
   dateAndComment: {
     flexDirection: "row",

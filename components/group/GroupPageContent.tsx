@@ -883,8 +883,8 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   joinConfirmImage: {
-    width: 80,
-    height: 80,
+    width: 50,
+    height: 50,
     borderRadius: 20,
   },
   joinCancelButton: {

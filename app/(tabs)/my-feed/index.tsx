@@ -59,6 +59,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { string } from "zod";
+import { BlogStatus } from "@/enums/blog_properties.enum";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>()
@@ -194,10 +195,14 @@ export default function MyFeed() {
 
   const moreOptionRef = useRef<BottomSheet>(null);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
+  const [isBlogStatusPendingOrActive, setIsBlogStatusPendingOrActive] = useState(false)
+  const [isUserStatusPending, setIsUserStatusPending] = useState(false)
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, isBlogStatusPendingOrActive: boolean, isUserStatusPending: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
+    setIsBlogStatusPendingOrActive(isBlogStatusPendingOrActive)
+    setIsUserStatusPending(isUserStatusPending)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
     if (moreOptionRef.current) {
@@ -238,7 +243,10 @@ export default function MyFeed() {
             onEndReached={handleOnUserBlogListEndReached}
             renderItem={({ item }) => {
               return <FeedBlogPreview blog={item} onPressMoreButton={
-                () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id)
+                () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
+                  item.Status == BlogStatus.ACTIVE || item.Status == BlogStatus.PENDING,
+                  item.UserGroupStatus == "Pending"
+                )
               }/>;
             }}
             onEndReachedThreshold={0.5}
@@ -321,8 +329,11 @@ export default function MyFeed() {
         blogId={moreOptionBlogId}
         groupId={moreOptionGroupId}
         isFromFeed={true}
+        isFromDetail={false}
+        isBlogStatusPendingOrActive={isBlogStatusPendingOrActive}
+        isUserStatusPending={isUserStatusPending}
         handleHideThisBlog={handleHideBlog}
-        handleDeleteThisBlog={handleDeleteBlog}      />
+        handleDeleteThisBlog={handleDeleteBlog}/>
     </GestureHandlerRootView>
   );
 }

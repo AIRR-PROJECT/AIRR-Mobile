@@ -13,17 +13,21 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import TagApprovalCardComponent from "@/components/group/TagApprovalCardComponent";
 import {
+  GroupTag,
   PendingMemberRequest,
   PendingTagRequest,
 } from "@/interfaces/groupInterface";
 import {
   approveTag,
+  getGroupTagsByID,
   getPendingMemberList,
   getPendingTagList,
   rejectTag,
 } from "@/redux/slices/groupSlice";
-import { useAppDispatch } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useLocalSearchParams } from "expo-router";
+import { SectionGrid } from "react-native-super-grid";
+import { GroupRole } from "@/enums/group.enum";
 
 // Initial mock data
 const mockTag1 = {
@@ -61,57 +65,92 @@ enum TabOptions {
 }
 // later remember to add the props
 export default function TagsApprovalsPage() {
-  // const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
   const flatlistRef = useRef<any>();
+  const { userCurrentGroupRole } = useAppSelector(state => state.user)
   const { groupID, tagID } = useLocalSearchParams<{
     groupID: string;
     tagID: string;
   }>();
 
-  const [tags, setTags] = useState<PendingTagRequest[]>([]);
+  const [displayTags, setDisplayTags] = useState<
+    { id: string; data: GroupTag[] }[]
+  >([]);
+  const [tagsApproval, setTagsApproval] = useState<PendingTagRequest[]>([]);
+  const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
 
-  // useEffect(() => {
-  //   dispatch(getPendingTagList(groupID)).then(res => {
-  //     const list = res.payload as PendingTagRequest[]
-  //     setTags(list)
-  //   })
-  // }, [])
+  useEffect(() => {
+    if (selectedTab == TabOptions.All) {
+      dispatch(getGroupTagsByID({ groupID })).then(res => {
+        const list = res.payload as GroupTag[]
+
+        let categorizedTags = {};
+        let categorizedTagsList: { id: string; data: GroupTag[] }[] = [];
+        const retrievedTags = res.payload as GroupTag[];
+
+        retrievedTags.forEach((tags) => {
+          const initial = tags.TagName.charAt(0).toLowerCase();
+
+          if (Object.hasOwn(categorizedTags, initial)) {
+            (categorizedTags[initial] as GroupTag[]).push(tags);
+          } else {
+            categorizedTags[initial] = [tags];
+          }
+        });
+
+        // categorizedTagsList.sort((a, b) => a.id.localeCompare(b.id) == -1)
+        Object.entries(categorizedTags).forEach((entry) => {
+          categorizedTagsList.push({
+            id: entry[0] as string,
+            data: entry[1] as GroupTag[],
+          });
+        });
+        setDisplayTags(categorizedTagsList);
+      })
+    }
+    else {
+      dispatch(getPendingTagList(groupID)).then(res => {
+        const list = res.payload as PendingTagRequest[]
+        setTagsApproval(list)
+      })
+    }
+  }, [selectedTab])
 
   useEffect(() => {
     // Scroll to specific index
-    if (tags != undefined && tagID != "" && tagID != undefined) {
-      tags.forEach((value, index) => {
+    if (tagsApproval != undefined && tagID != "" && tagID != undefined) {
+      tagsApproval.forEach((value, index) => {
         if (value._id == tagID) {
           flatlistRef.current.scrollToIndex({ animated: true, index: index });
           return;
         }
       });
     }
-  }, [tags, tagID]);
+  }, [tagsApproval, tagID]);
 
   const onApprove = (tagId: string, blogIDs: string[]) => {
-    // dispatch(approveTag({
-    //   groupID: groupID,
-    //   tagIDToApprove: tagId,
-    //   blogIDsContainTag: blogIDs
-    // })).then(res => {
-    //   if (res.payload === true) {
-    //     console.log("Approve tag with tag-name: ", tagId);
-    //     setTags((prev) => prev.filter((b) => b._id !== tagId));
-    //   }
-    // })
+    dispatch(approveTag({
+      groupID: groupID,
+      tagIDToApprove: tagId,
+      blogIDsContainTag: blogIDs
+    })).then(res => {
+      if (res.payload === true) {
+        console.log("Approve tag with tag-name: ", tagId);
+        setTagsApproval((prev) => prev.filter((b) => b._id !== tagId));
+      }
+    })
   };
   const onReject = (tagId: string, blogIDs: string[]) => {
-    // dispatch(rejectTag({
-    //   groupID: groupID,
-    //   tagIDToReject: tagId,
-    //   blogIDsContainTag: blogIDs
-    // })).then(res => {
-    //   if (res.payload === true) {
-    //     console.log("Reject tag with tag-name: ", tagId);
-    //     setTags((prev) => prev.filter((b) => b._id !== tagId));
-    //   }
-    // })
+    dispatch(rejectTag({
+      groupID: groupID,
+      tagIDToReject: tagId,
+      blogIDsContainTag: blogIDs
+    })).then(res => {
+      if (res.payload === true) {
+        console.log("Reject tag with tag-name: ", tagId);
+        setTagsApproval((prev) => prev.filter((b) => b._id !== tagId));
+      }
+    })
   };
   // TODO: Khoa: change the any type to the correct type
   const renderItem = ({ item }: any) => (
@@ -121,8 +160,6 @@ export default function TagsApprovalsPage() {
       onReject={onReject}
     />
   );
-  const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
-  const isUserAdminOrOwner = true;
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.optionBar}>
@@ -139,7 +176,7 @@ export default function TagsApprovalsPage() {
           </Text>
         </TouchableOpacity>
         {/* TODO: ẤN nút này thì copy cái bên approval qua */}
-        {isUserAdminOrOwner && <TouchableOpacity
+        {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && <TouchableOpacity
           style={[
             styles.optionButton,
             selectedTab === TabOptions.NeedApproval &&
@@ -150,14 +187,33 @@ export default function TagsApprovalsPage() {
           <Text style={styles.optionText}>Need Approval</Text>
         </TouchableOpacity>}
       </View>
-      {/* <Animated.FlatList
-        data={tags}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.TagName}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-        itemLayoutAnimation={LinearTransition}
-      /> */}
+      
+      {selectedTab == TabOptions.All ? 
+        <SectionGrid
+          sections={displayTags}
+          itemDimension={150} // Controls column width
+          spacing={10} // Spacing between items
+          style={styles.gridView}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.tagContainer}>
+              <Text style={styles.tag}>#{item.TagName}</Text>
+            </TouchableOpacity>
+          )}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.title}>{section.id}</Text>
+          )}
+          keyExtractor={(item, index) => item.TagName + index}
+          // contentContainerStyle={styles.list}
+        />
+        : <Animated.FlatList
+          data={tagsApproval}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.TagName}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          itemLayoutAnimation={LinearTransition}
+        />
+      }
     </GestureHandlerRootView>
   );
 }
@@ -204,5 +260,27 @@ const styles = StyleSheet.create({
   optionText: {
     color: "#fff",
     fontSize: 14,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
+    textDecorationLine: "underline",
+    fontFamily: "Poppins-Regular",
+  },
+  tagContainer: {
+    padding: 10,
+    backgroundColor: "#2E3B40",
+    borderRadius: 10,
+    marginVertical: 5,
+    width: 160,
+  },
+  tag: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  gridView: {
+    flex: 1,
+    paddingBottom: 40,
   },
 });

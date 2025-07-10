@@ -21,6 +21,8 @@ type MoreOptionComponentProps = {
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
   isFromFavourites?: boolean; // Optional prop to indicate if the blog is from favourites
   isFromDetail: boolean; // Optional prop to indicate if the blog is from detail
+  isBlogStatusPendingOrActive: boolean
+  isUserStatusPending: boolean
   handleHideThisBlog: () => void;
   handleDeleteThisBlog: () => void;
 };
@@ -32,6 +34,8 @@ export default function MoreOptionBottomList({
   isFromFeed = false, // Default to false if not provided
   isFromFavourites = false, // Default to false if not provided
   isFromDetail = false, // Default to false if not provided
+  isBlogStatusPendingOrActive = false,
+  isUserStatusPending = false,
   handleHideThisBlog,
   handleDeleteThisBlog,
 }: MoreOptionComponentProps) {
@@ -125,7 +129,7 @@ export default function MoreOptionBottomList({
               </Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
+          {isBlogStatusPendingOrActive && <TouchableOpacity
             style={styles.bottomOptionButton}
             onPress={handleEditBlog}
             activeOpacity={0.8}
@@ -133,7 +137,7 @@ export default function MoreOptionBottomList({
             {/* Edit */}
             <FontAwesome name="edit" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Edit blog</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
           <TouchableOpacity
             style={styles.bottomOptionButton}
             onPress={handleDeleteBlog}
@@ -174,7 +178,7 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Hide blog</Text>
             </TouchableOpacity>
           )}
-          {!isFromFeed && (
+          {!isFromFeed && !isUserStatusPending && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={handleReportBlog}

@@ -1,4 +1,6 @@
 import { MaterialTopTabs } from "@/components/MaterialTopTabs";
+import { GroupRole } from "@/enums/group.enum";
+import { useAppSelector } from "@/redux/hook";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
@@ -8,6 +10,7 @@ export default function ContentsPageTabLayout() {
     memberID: string;
     requestID: string;
   }>();
+  const { userCurrentGroupRole } = useAppSelector(state => state.user)
   // TODO: CHECK IF USER IS NOT ADMIN OR OWNER, DISABLE REPORTS TAB
   return (
     <MaterialTopTabs
@@ -76,14 +79,14 @@ export default function ContentsPageTabLayout() {
           memberID,
         }}
       />
-      <MaterialTopTabs.Screen
+      {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && <MaterialTopTabs.Screen
         name="reports"
         options={{ title: "Reports" }}
         initialParams={{
           groupID,
           requestID,
         }}
-      />
+      />}
     </MaterialTopTabs>
   );
 }

@@ -27,18 +27,22 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   createGroup,
+  getGroupInfo,
   searchFields,
+  setCreateGroupCreatedTags,
   setCreateGroupCurrentTags,
   setCreateGroupSubmitted,
 } from "@/redux/slices/groupSlice";
 import {
+  GroupDetailInfo,
   GroupRule,
   GroupTag,
   SearchedField,
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
-import { router, useRouter } from "expo-router";
+import { router, useLocalSearchParams, useRouter } from "expo-router";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
+import { setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 export default function EditGroup() {
@@ -49,6 +53,7 @@ export default function EditGroup() {
     createGroupCurrentTags,
     createGroupCreatedTags,
   } = useAppSelector((state) => state.group);
+  const { groupID } = useLocalSearchParams<{ groupID: string }>()
 
   const uploadedImg = useRef<ImageSource>();
   const [groupName, setGroupName] = useState("");
@@ -87,6 +92,16 @@ export default function EditGroup() {
     })
     dispatch(setCreateGroupCurrentTags(currentTagsString))
   }, [chosenTags])
+
+  useEffect(() => {
+    if (groupID) {
+      dispatch(getGroupInfo({ groupID })).then((res) => {
+        const data = res.payload as GroupDetailInfo
+        
+        setGroupName(data.Name)
+      })
+    }
+  }, [groupID])
 
   useEffect(() => {
     if (createGroupSubmitted) {
@@ -148,6 +163,7 @@ export default function EditGroup() {
     setGroupField(field);
 
     setGroupTags(field.DefaultTags);
+    dispatch(setCreateGroupCreatedTags([]))
 
     fieldRef.current?.close();
   }, []);
@@ -310,7 +326,7 @@ export default function EditGroup() {
                       },
                     ]}
                   >
-                    Select Tags for blog
+                    Select Tags for group
                   </Text>
               }
             </TouchableOpacity>

@@ -11,3 +11,12 @@ export enum GroupMembershipStage {
     JOINED = 'JOINED',
     BANNED = 'BANNED'
 }
+
+export enum GroupReportType {
+    Clickbait = 'Clickbait',
+    Inappropriate_Content = 'Inappropriate Content',
+    Copyright_Violation = 'Copyright Violation',
+    Sensitive_Content = 'Sensitive Content',
+    Off_topic = 'Off-topic',
+    Other = 'Other'
+}

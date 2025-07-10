@@ -195,7 +195,8 @@ export default function Editblog() {
   }, []);
 
   useEffect(() => {
-    if (groupID) {
+    if (groupID !== undefined && groupID.length > 0) {
+      console.log(`can enter with current group ID: ${groupID !== undefined && groupID.length > 0}`)
       dispatch(getGroupInfo({ groupID })).then((res) => {
         const chosenGroup = res.payload as GroupDetailInfo;
         setChosenGroup(chosenGroup);

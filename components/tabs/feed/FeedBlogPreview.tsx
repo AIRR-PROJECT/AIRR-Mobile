@@ -215,26 +215,31 @@ export default function FeedBlogPreview({
               <Text style={styles.tag}>+{blog.Tags.length - 2} more</Text>
             )}
           </View>
-           <BlogStatusComponent status={BlogStatus.IN_PROFILE_PAGE} />
-
+          <BlogStatusComponent status={BlogStatus.IN_PROFILE_PAGE} />
         </Pressable>
       </ImageBackground>
       <View style={{ padding: 20 }}>
         {/* 3nd Part: Title */}
         <View style={styles.titleSection}>
-          <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">{blog.Title}</Text>
+          <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
+            {blog.Title}
+          </Text>
         </View>
 
         {/* 4th Part: Preview of Content */}
         <View style={styles.contentSection}>
-          <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">
+          <Text
+            style={styles.description}
+            numberOfLines={3}
+            ellipsizeMode="tail"
+          >
             {blog.Description}
           </Text>
         </View>
         {/* 5th Part: Group Info */}
-        {blog.Group &&
-          <View style={[styles.rowContainer, {flex: 1}]}>
-            <View style={[styles.groupSection, {width: "80%"}]}>
+        {blog.Group && (
+          <View style={[styles.rowContainer, { flex: 1 }]}>
+            <View style={[styles.groupSection, { width: "80%" }]}>
               <GroupPreviewInfo
                 group={{
                   Name: blog.Group.Name,
@@ -248,7 +253,7 @@ export default function FeedBlogPreview({
               color="#B9FF66"
             />
           </View>
-        }
+        )}
 
         {/* Divider */}
         <View
@@ -329,7 +334,6 @@ export default function FeedBlogPreview({
           </TouchableOpacity>
         </View>
       </View>
-    
     </TouchableOpacity>
   );
 }

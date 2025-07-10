@@ -9,11 +9,13 @@ import {
   Alert,
 } from "react-native";
 import { Image, ImageSource } from "expo-image";
-import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import UploadGroupAvatarComponent from "@/components/group/UploadGroupAvatarComponent";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet, {
   BottomSheetBackdrop,
+  BottomSheetFooter,
+  BottomSheetFooterProps,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -154,6 +156,23 @@ export default function CreateGroup() {
       return [...(prevRules || []), newRule];
     });
   };
+    const renderFieldsFooter = useCallback((props: BottomSheetFooterProps) => {
+      return (
+        <BottomSheetFooter {...props} style={styles.searchBar}>
+          <TextInput
+            style={styles.searchText}
+            placeholder="Search Fields"
+            placeholderTextColor="#888"
+          />
+          <FontAwesome
+            name="search"
+            size={24}
+            color="#fff"
+            style={{ paddingRight: 10 }}
+          />
+        </BottomSheetFooter>
+      );
+    }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -450,6 +469,7 @@ export default function CreateGroup() {
               appearsOnIndex={0}
             />
           )}
+          footerComponent={renderFieldsFooter}
         >
           {/* 
               try to use something that can store the list of field
@@ -629,5 +649,20 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     marginBottom: 10,
+  },
+    searchBar: {
+    backgroundColor: "#2E3B40",
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  searchText: {
+    paddingHorizontal: 10,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    flex: 1,
   },
 });

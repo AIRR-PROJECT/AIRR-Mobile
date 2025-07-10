@@ -28,7 +28,11 @@ import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent
 import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
-import { getGroupInfo, getPreviewGroups, searchGroupsForCreateUpdateBlog } from "@/redux/slices/groupSlice";
+import {
+  getGroupInfo,
+  getPreviewGroups,
+  searchGroupsForCreateUpdateBlog,
+} from "@/redux/slices/groupSlice";
 import {
   Group,
   GroupDetailInfo,
@@ -37,7 +41,11 @@ import {
 } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { ImageSource } from "expo-image";
-import { CreateBlog, CreateBlogResult, CreateBlogTag } from "@/interfaces/blogInterface";
+import {
+  CreateBlog,
+  CreateBlogResult,
+  CreateBlogTag,
+} from "@/interfaces/blogInterface";
 import {
   createBlog,
   setCreateBlogCurrentTags,
@@ -250,11 +258,13 @@ export default function NewBlog() {
   };
   const handleGroupSearchSubmit = () => {
     if (groupSearchText.current.length != 0) {
-      dispatch(searchGroupsForCreateUpdateBlog(groupSearchText.current)).then((res) => {
-        setSearchFoundGroups(
-          defaultSearchGroups.concat(res.payload as Group[])
-        );
-      });
+      dispatch(searchGroupsForCreateUpdateBlog(groupSearchText.current)).then(
+        (res) => {
+          setSearchFoundGroups(
+            defaultSearchGroups.concat(res.payload as Group[])
+          );
+        }
+      );
     } else {
       setSearchFoundGroups(defaultSearchGroups);
     }
@@ -320,7 +330,7 @@ export default function NewBlog() {
     chosenTagsReformatted.forEach((t) => {
       t.OperationType = "tag-in-group";
     });
-    console.log([createBlogRequestedTags])
+    console.log([createBlogRequestedTags]);
     formData.append(
       "tags",
       chosenGroup.Name != Private.Name &&
@@ -342,7 +352,7 @@ export default function NewBlog() {
     formData.append("viewType", viewType);
 
     dispatch(createBlog(formData)).then((res) => {
-      const data = res.payload as CreateBlogResult
+      const data = res.payload as CreateBlogResult;
       router.replace(`/blog?userBlogId=${data.blogID}`);
     });
   };
@@ -380,12 +390,6 @@ export default function NewBlog() {
   const renderGroupFooter = useCallback((props: BottomSheetFooterProps) => {
     return (
       <BottomSheetFooter {...props} style={styles.searchBar}>
-        <FontAwesome
-          name="search"
-          size={24}
-          color="#fff"
-          style={{ paddingLeft: 10 }}
-        />
         <TextInput
           onChangeText={handleGroupSearchTextChange}
           style={styles.searchText}
@@ -393,22 +397,30 @@ export default function NewBlog() {
           placeholderTextColor="#888"
           onSubmitEditing={handleGroupSearchSubmit}
         />
+        <TouchableOpacity onPress={handleGroupSearchSubmit}>
+          <FontAwesome
+            name="search"
+            size={24}
+            color="#fff"
+            style={{ paddingRight: 10 }}
+          />
+        </TouchableOpacity>
       </BottomSheetFooter>
     );
   }, []);
   const renderTagsFooter = useCallback((props: BottomSheetFooterProps) => {
     return (
       <BottomSheetFooter {...props} style={styles.searchBar}>
-        <FontAwesome
-          name="search"
-          size={24}
-          color="#fff"
-          style={{ paddingLeft: 10 }}
-        />
         <TextInput
           style={styles.searchText}
           placeholder="Search Tags"
           placeholderTextColor="#888"
+        />
+        <FontAwesome
+          name="search"
+          size={24}
+          color="#fff"
+          style={{ paddingRight: 10 }}
         />
       </BottomSheetFooter>
     );

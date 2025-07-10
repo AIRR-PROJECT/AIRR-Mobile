@@ -39,31 +39,31 @@ export default function BlogsApprovalsPage() {
   const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
 
   useEffect(() => {
-    dispatch(getPendingBlogList(groupID)).then(res => {
-      const list = res.payload as PendingBlogRequest[]
-      setBlogs(list)
-    })
+    // dispatch(getPendingBlogList(groupID)).then(res => {
+    //   const list = res.payload as PendingBlogRequest[]
+    //   setBlogs(list)
+    // })
   }, [])
 
   useEffect(() => {
     // Scroll to specific index
-    if (blogs != undefined && blogID != "" && blogID != undefined) {
-      blogs.forEach((value, index) => {
-        if (value.BlogID == blogID) {
-          flatlistRef.current.scrollToIndex({ animated: true, index: index })
-          return
-        }
-      })
-    }
+    // if (blogs != undefined && blogID != "" && blogID != undefined) {
+    //   blogs.forEach((value, index) => {
+    //     if (value.BlogID == blogID) {
+    //       flatlistRef.current.scrollToIndex({ animated: true, index: index })
+    //       return
+    //     }
+    //   })
+    // }
   }, [blogs, blogID])
 
   useEffect(() => {
-    if (blogIDToRemove) {
-      dispatch(getPendingBlogList(groupID)).then(res => {
-        const list = res.payload as PendingBlogRequest[]
-        setBlogs(list)
-      })
-    }
+    // if (blogIDToRemove) {
+    //   dispatch(getPendingBlogList(groupID)).then(res => {
+    //     const list = res.payload as PendingBlogRequest[]
+    //     setBlogs(list)
+    //   })
+    // }
   }, [blogIDToRemove])
 
   const onApprove = (id: string, blogOwnerId: string) => {

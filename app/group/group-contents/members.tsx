@@ -34,10 +34,10 @@ export default function MemberApprovalsPage() {
   const [members, setMembers] = useState<PendingMemberRequest[]>([]);
 
   useEffect(() => {
-    dispatch(getPendingMemberList(groupID)).then(res => {
-      const list = res.payload as PendingMemberRequest[]
-      setMembers(list)
-    })
+    // dispatch(getPendingMemberList(groupID)).then(res => {
+    //   const list = res.payload as PendingMemberRequest[]
+    //   setMembers(list)
+    // })
   }, [])
 
   useEffect(() => {

@@ -16,7 +16,7 @@ import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import { useEffect, useState } from "react";
 import TabButton from "@/components/tabs/feed/TabButton";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import ReadmeTab from "@/components/profile/ReadmeTab";
+import SocialTab from "@/components/profile/SocialTab";
 import ParallaxFlatList from "@/components/ParallaxFlatList";
 import BlogTab from "@/components/profile/BlogTab";
 import { Divider } from "@rneui/themed";
@@ -110,11 +110,11 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     if (isOwnProfile) {
-      setSelectedTabs(["Readme", "Blog", "Activity"]);
+      setSelectedTabs(["Social", "Blog", "Activity"]);
     } else {
-      setSelectedTabs(["Readme", "Blog"]);
+      setSelectedTabs(["Social", "Blog"]);
     }
-    setSelectedTab("Readme");
+    setSelectedTab("Social");
   }, [isOwnProfile]);
 
   const route = useRouter();
@@ -146,7 +146,7 @@ export default function ProfileScreen() {
           ListHeaderComponent={
             <TouchableOpacity activeOpacity={0.7} onPress={handleCreateGroup}>
               <FontAwesome
-                name="plus-circle"
+                name="plus-circle"  
                 size={50}
                 color="white"
                 style={styles.plusIcon}
@@ -158,7 +158,7 @@ export default function ProfileScreen() {
           }}
         />
 
-        {/* Readme , Blog, Activity */}
+        {/* Social , Blog, Activity */}
         <View style={styles.rowContainer}>
           {selectedTabs.length != 0 &&
             selectedTabs.map((tab) => {
@@ -199,7 +199,7 @@ export default function ProfileScreen() {
 
       {/* Readme if tab == readme */}
       <View style={{ padding: 20 }}>
-        {selectedTab === "Readme" && <ReadmeTab />}
+        {selectedTab === "Social" && <SocialTab />}
         {selectedTab === "Activity" && <ActivityTab />}
       </View>
       {selectedTab === "Blog" && <BlogTab />}

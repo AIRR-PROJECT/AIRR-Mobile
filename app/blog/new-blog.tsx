@@ -54,48 +54,6 @@ import {
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { BlogViewType } from "@/enums/blog_properties.enum";
-const mockGroup: Group = {
-  Name: "Group's name",
-  avatar: "",
-  _id: "123",
-  Description: "",
-  Owner: {
-    _id: "",
-    Username: "",
-    AvatarURL: "",
-  },
-  NumberOfMembers: 0,
-  FieldName: "",
-  CoverURL: "https://picsum.photos/300",
-  Tags: [],
-  members: [],
-  timestamp: "",
-  FieldID: "",
-  IsAdminOrOwner: false,
-};
-const mockGroupList = Array(25).fill(mockGroup);
-const mockTags = [
-  "aimachine",
-  "web3",
-  "blockchain",
-  "crypto",
-  "nft",
-  "ai",
-  "machine learning",
-  "artificial intelligence",
-  "technology",
-  "innovation",
-  "future",
-  "science",
-  "data science",
-  "big data",
-  "cloud computing",
-  "internet of things",
-  "iot",
-  "augmented reality",
-  "virtual reality",
-  "mixed reality",
-];
 
 export function debounce<T extends (...args: any[]) => void>(
   callback: T,
@@ -210,6 +168,9 @@ export default function NewBlog() {
     if (chosenGroup) {
       setFoundTags(chosenGroup?.Tags);
       setChosenTags([]);
+      
+      setRequestedTags([])
+      dispatch(setCreateBlogRequestedTags([]))
     }
   }, [chosenGroup]);
 

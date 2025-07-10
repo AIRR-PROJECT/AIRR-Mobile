@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 type PopularGroupCardProps = {
   name: string;
   id: string;
+  owner_username: string
   avatar: string;
   numberOfMembers: number;
   threeUserAvatar: string[];
@@ -15,6 +16,7 @@ type PopularGroupCardProps = {
 export default function PopularGroupCardComponent({
   name,
   id,
+  owner_username,
   avatar,
   numberOfMembers,
   threeUserAvatar,
@@ -45,7 +47,7 @@ export default function PopularGroupCardComponent({
 
           {/* Group id  */}
           <Text style={styles.groupId} numberOfLines={1} ellipsizeMode="tail">
-            @{id}
+            @{owner_username}
           </Text>
         </View>
         {/* member */}

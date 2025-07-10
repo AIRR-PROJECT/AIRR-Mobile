@@ -68,6 +68,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -85,6 +87,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -102,6 +106,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -119,6 +125,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -136,6 +144,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
     ],
   },
@@ -158,6 +168,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -175,6 +187,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -192,6 +206,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -209,6 +225,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -226,6 +244,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
     ],
   },
@@ -248,6 +268,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -265,6 +287,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -282,6 +306,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -299,6 +325,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -316,6 +344,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
     ],
   },
@@ -338,6 +368,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -355,6 +387,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -372,6 +406,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -389,6 +425,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
       {
         _id: "group name",
@@ -406,6 +444,8 @@ const MOCKDATA: { title: string; data: Group[] }[] = [
         avatar: "",
         members: [],
         timestamp: "",
+        FieldID: "",
+        IsAdminOrOwner: false
       },
     ],
   },
@@ -510,6 +550,7 @@ export default function PopularGroupTab({
                 <PopularGroupCardComponent
                   name={item.Name}
                   id={item._id}
+                  owner_username={item.Owner.Username}
                   avatar={item.Owner.AvatarURL}
                   numberOfMembers={item.NumberOfMembers}
                   threeUserAvatar={[]}

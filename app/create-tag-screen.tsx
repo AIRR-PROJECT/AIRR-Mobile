@@ -157,7 +157,7 @@ export default function CreateTagsScreen({
                   key={index}
                   style={styles.selectTagButton}
                   onPress={() => {
-                    if (!createGroupCurrentTags.includes(tag.TagName) && !createGroupCreatedTags.find((t) => t.TagName == tag.TagName)) {
+                    if (!createGroupCurrentTags.includes(tag.TagName) && !createdTags.find((t) => t.TagName == tag.TagName)) {
                       setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
                       setCreatedTags(() => [tag, ...createdTags])
                       setShowError(false)
@@ -180,11 +180,15 @@ export default function CreateTagsScreen({
             style={styles.createTagButton}
             onPress={() => {
               // Handle tag creation logic here
-              if (validTag) {
-                setCreatedTags((prev) => [...prev, { _id: "", TagName: validTag, OperationType: "new-tag" }]);
+              if (validTag && !createdTags.find((t) => t.TagName == validTag)) {
+                setCreatedTags((prev) => [...prev, { _id: Math.random().toString(36).substring(2, 15), TagName: validTag, OperationType: "new-tag"}])
 
                 setValidTag(null);
                 setNewTag("");
+                setShowError(false)
+              }
+              else {
+                setShowError(true)
               }
             }}
             disabled={validTag === null}

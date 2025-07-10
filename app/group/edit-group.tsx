@@ -4,16 +4,22 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ScrollView,
   Pressable,
   Alert,
 } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { Image, ImageSource } from "expo-image";
-import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather, FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import UploadGroupAvatarComponent from "@/components/group/UploadGroupAvatarComponent";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet, {
   BottomSheetBackdrop,
+  BottomSheetFooter,
+  BottomSheetFooterProps,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -32,30 +38,17 @@ import {
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
 import { router, useRouter } from "expo-router";
-import GroupRuleComponent from "@/components/group/GroupRuleComponent";
-import { set } from "lodash";
+import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
-
-// temporary use this cause figma not provide the image
-const mockFieldList = [
-  "Web Development",
-  "Mobile Development",
-  "Data Science",
-  "Machine Learning",
-  "Artificial Intelligence",
-  "Cloud Computing",
-  "Cyber Security",
-  "DevOps",
-  "Blockchain",
-  "Internet of Things",
-  "Game Development",
-  "UI/UX Design",
-  "Digital Marketing",
-];
 
 export default function EditGroup() {
   const dispatch = useAppDispatch();
-  const { createGroupSubmitted, createGroupCurrentTags, createGroupCreatedTags } = useAppSelector((state) => state.group);
+  const route = useRouter();
+  const {
+    createGroupSubmitted,
+    createGroupCurrentTags,
+    createGroupCreatedTags,
+  } = useAppSelector((state) => state.group);
 
   const uploadedImg = useRef<ImageSource>();
   const [groupName, setGroupName] = useState("");
@@ -64,8 +57,13 @@ export default function EditGroup() {
   const [groupField, setGroupField] = useState<SearchedField>();
   const [groupFields, setGroupFields] = useState<SearchedField[]>([]);
   const [groupTags, setGroupTags] = useState<GroupTag[]>([]);
+  const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
+  const fieldSearchText = useRef("")
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["100%"], []);
+
+  const tagsSheetRef = useRef<BottomSheet>(null);
+  const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
 
   useEffect(() => {
     dispatch(searchFields("Development")).then((res) => {
@@ -81,6 +79,14 @@ export default function EditGroup() {
   useEffect(() => {
     console.log(groupRules)
   }, [groupRules])
+
+  useEffect(() => {
+    let currentTagsString: string[] = []
+    chosenTags.forEach((t) => {
+      currentTagsString.push(t.TagName)
+    })
+    dispatch(setCreateGroupCurrentTags(currentTagsString))
+  }, [chosenTags])
 
   useEffect(() => {
     if (createGroupSubmitted) {
@@ -106,7 +112,10 @@ export default function EditGroup() {
         type: uploadedImg.current?.mimeType,
       });
       formData.append("Name", groupName);
-      formData.append("Tags", JSON.stringify([...groupTags, ...createGroupCreatedTags]));
+      formData.append(
+        "Tags",
+        JSON.stringify([...groupTags, ...createGroupCreatedTags])
+      );
       formData.append("GroupField", JSON.stringify(groupField));
       formData.append("Description", groupDescription);
       formData.append("GroupRules", JSON.stringify(groupRules));
@@ -122,6 +131,15 @@ export default function EditGroup() {
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
   }, []);
+  const handleFieldSearchChangeText = (val: string) => {
+    fieldSearchText.current = val
+  }
+  const handleFieldSearchSubmit = () => {
+    dispatch(searchFields(fieldSearchText.current)).then((res) => {
+      setGroupFields((res.payload as SearchFieldResult).Fields);
+      console.log((res.payload as SearchFieldResult).Fields);
+    });
+  }
   const handleFieldSheetChange = useCallback((index: any) => {
     console.log("handleGroupSheetChange", index);
   }, []);
@@ -130,16 +148,17 @@ export default function EditGroup() {
     setGroupField(field);
 
     setGroupTags(field.DefaultTags);
-    let currentTagsString: string[] = []
-    field.DefaultTags.forEach((t) => {
-      currentTagsString.push(t.TagName)
-    })
-    dispatch(setCreateGroupCurrentTags(currentTagsString))
 
     fieldRef.current?.close();
   }, []);
-  const [createdTags, setCreatedTags] = useState<GroupTag[]>([]);
-  const route = useRouter();
+  const handleTagsSnapPress = useCallback((index: number) => {
+    tagsSheetRef.current?.snapToIndex(index);
+  }, []);
+  
+  const onPressTag = (listTags: GroupTag[]) => {
+    console.log("List tags selected:", listTags);
+    setChosenTags(listTags);
+  };
   const handleCreateTagPress = () => {
     route.push(`/create-tag-screen?fieldID=${groupField?._id}`);
   };
@@ -154,12 +173,50 @@ export default function EditGroup() {
       return [...(prevRules || []), newRule];
     });
   };
+  // const renderFieldsFooter = useCallback((props: BottomSheetFooterProps) => {
+  //   return (
+  //     <BottomSheetFooter {...props} style={styles.searchBar}>
+  //       <TextInput
+  //         style={styles.searchText}
+  //         placeholder="Search Fields"
+  //         placeholderTextColor="#888"
+  //       />
+  //       <FontAwesome
+  //         name="search"
+  //         size={24}
+  //         color="#fff"
+  //         style={{ paddingRight: 10 }}
+  //       />
+  //     </BottomSheetFooter>
+  //   );
+  // }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
       >
+        <Image
+          source={avatar_arc}
+          style={styles.image}
+          contentFit="contain"
+          transition={1000}
+        />
+        <View style={[styles.rowContainer, { marginBottom: 10 }]}>
+          <MaterialCommunityIcons
+            name="note-plus-outline"
+            size={24}
+            color="#B9FF66"
+          />
+          <Text style={[styles.title, { paddingLeft: 5 }]}>
+            Create a New Group
+          </Text>
+        </View>
+        {/* description */}
+        <Text style={styles.description}>
+          Innovation thrives in collaboration. Create a new group and connect
+          with like-minded tech enthusiasts to shape the future together
+        </Text>
         {/* Group avatar */}
         <Text
           style={[styles.title, { alignSelf: "flex-start", paddingBottom: 10 }]}
@@ -227,7 +284,7 @@ export default function EditGroup() {
           </TouchableOpacity>
           {/* Tags */}
           <View style={{ flex: 1 }}>
-            <View
+            <TouchableOpacity
               style={[
                 styles.heading,
                 {
@@ -235,13 +292,28 @@ export default function EditGroup() {
                   flexWrap: "wrap",
                 },
               ]}
+              onPress={() => handleTagsSnapPress(0)}
             >
-              {groupTags.length > 0 &&
-                groupTags.map((tag) => (
+              <Feather name="flag" size={24} color="#fff" />
+              {chosenTags.length > 0 && groupField !== undefined ? (
+                chosenTags.map((tag) => (
                   <TagWrapper key={tag._id} tag={tag.TagName} />
                 ))
+              ) :
+                <Text
+                    style={[
+                      styles.headingTitle,
+                      {
+                        alignSelf: "center",
+                        color: "#fff",
+                        textAlign: "justify",
+                      },
+                    ]}
+                  >
+                    Select Tags for blog
+                  </Text>
               }
-            </View>
+            </TouchableOpacity>
             {groupField && <TouchableOpacity
               style={[
                 styles.heading,
@@ -359,9 +431,11 @@ export default function EditGroup() {
                     placeholder="Enter rule name..."
                     placeholderTextColor="#B0B0B0"
                     onChangeText={(text) => {
-                      let groupRulesClone = JSON.parse(JSON.stringify(groupRules)) as GroupRule[]
-                      groupRulesClone[index].RuleName = text
-                      setGroupRules(groupRulesClone)
+                      let groupRulesClone = JSON.parse(
+                        JSON.stringify(groupRules)
+                      ) as GroupRule[];
+                      groupRulesClone[index].RuleName = text;
+                      setGroupRules(groupRulesClone);
                     }}
                     multiline
                   />
@@ -374,9 +448,11 @@ export default function EditGroup() {
                     placeholder="Enter rule description..."
                     placeholderTextColor="#B0B0B0"
                     onChangeText={(text) => {
-                      let groupRulesClone = JSON.parse(JSON.stringify(groupRules)) as GroupRule[]
-                      groupRulesClone[index].RuleDescription = text
-                      setGroupRules(groupRulesClone)
+                      let groupRulesClone = JSON.parse(
+                        JSON.stringify(groupRules)
+                      ) as GroupRule[];
+                      groupRulesClone[index].RuleDescription = text;
+                      setGroupRules(groupRulesClone);
                     }}
                     multiline
                   />
@@ -439,6 +515,27 @@ export default function EditGroup() {
               and use it to render the list of field with flatlist
               else use the static list of field to render the list of field
             */}
+          <View style={styles.searchBar}>
+            <TextInput
+              style={styles.searchText}
+              placeholder="Search Fields"
+              placeholderTextColor="#888"
+              numberOfLines={1}
+              onChangeText={handleFieldSearchChangeText}
+              onSubmitEditing={handleFieldSearchSubmit}
+              // Handle search o day 
+            />
+            <TouchableOpacity activeOpacity={0.8} 
+            // Va o day
+            >
+              <FontAwesome
+                name="search"
+                size={24}
+                color="#fff"
+                style={{ paddingRight: 10 }}
+              />
+            </TouchableOpacity>
+          </View>
           <BottomSheetScrollView
             contentContainerStyle={styles.groupListContent}
             showsVerticalScrollIndicator={false}
@@ -447,12 +544,11 @@ export default function EditGroup() {
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             nestedScrollEnabled={true}
-            style={{ flexGrow: 1 }}
           >
             {/* Group List */}
             {/* Change to actual field later */}
 
-            {groupFields?.map((item, index) => (
+            {groupFields.length != 0 && groupFields.map((item, index) => (
               <Pressable
                 key={index}
                 onPress={() => handleGroupFieldPress(item)}
@@ -479,6 +575,25 @@ export default function EditGroup() {
           </BottomSheetScrollView>
         </BottomSheet>
       </ScrollView>
+      <BottomSheet
+        ref={tagsSheetRef}
+        index={-1} // Start closed
+        snapPoints={tagsSnapPoints}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: "#212531" }}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        // onChange={handleGroupSheetChange}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+      >
+        <TagDropdownComponent tags={groupTags} onPress={onPressTag}/>
+      </BottomSheet>
     </GestureHandlerRootView>
   );
 }
@@ -587,6 +702,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 9,
   },
+  tagsColumn: {
+    width: "70%",
+  },
   headingTitle: {
     fontSize: 16,
     color: "#fff",
@@ -608,5 +726,21 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     marginBottom: 10,
+  },
+  searchBar: {
+    backgroundColor: "#2E3B40",
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 20,
+    borderRadius: 10,
+    paddingBottom: 20,
+  },
+  searchText: {
+    paddingHorizontal: 10,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    flex: 1,
   },
 });

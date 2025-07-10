@@ -157,7 +157,7 @@ export default function RequestTagsScreen({
                   key={index}
                   style={styles.selectTagButton}
                   onPress={() => {
-                    if (!createBlogCurrentTags.includes(tag.TagName) && !createBlogRequestedTags.find((t) => t.TagName == tag.TagName)) {
+                    if (!createBlogCurrentTags.includes(tag.TagName) && !requestedTags.find((t) => t.TagName == tag.TagName)) {
                       setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
                       setRequestedTags(() => [tag, ...requestedTags])
                       setShowError(false)
@@ -180,11 +180,15 @@ export default function RequestTagsScreen({
             style={styles.createTagButton}
             onPress={() => {
               // Handle tag creation logic here
-              if (validTag) {
-                setRequestedTags((prev) => [...prev, { _id: "", TagName: validTag, OperationType: "new-tag" }]);
+              if (validTag && !requestedTags.find((t) => t.TagName == validTag)) {
+                setRequestedTags((prev) => [...prev, { _id: Math.random().toString(36).substring(2, 15), TagName: validTag, OperationType: "new-tag" }]);
 
                 setValidTag(null);
                 setNewTag("");
+                setShowError(false)
+              }
+              else {
+                setShowError(true)
               }
             }}
             disabled={validTag === null}

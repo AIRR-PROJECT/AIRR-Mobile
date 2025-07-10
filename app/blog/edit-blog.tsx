@@ -246,6 +246,9 @@ export default function Editblog() {
   useEffect(() => {
     if (chosenGroup) {
       setFoundTags(chosenGroup?.Tags);
+      
+      setRequestedTags([])
+      dispatch(setCreateBlogRequestedTags([]))
       // setChosenTags([]);
     }
   }, [chosenGroup]);

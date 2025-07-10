@@ -30,6 +30,7 @@ import BottomSheet, {
 import { useRouter } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
+  cancelJoinGroupRequest,
   getGroupInfo,
   requestJoinGroup,
   setGroupBlogsSearchText,
@@ -140,20 +141,26 @@ GroupPageProps) {
           ? GroupMembershipStage.REQUESTED
           : GroupMembershipStage.NOT_JOINED;
 
-      if (membershipStage === GroupMembershipStage.JOINED) {
-        setButtonLabel("Leave Group");
-      } else if (
-        membershipStage === GroupMembershipStage.REQUESTED
-      ) {
-        setButtonLabel("Cancel Request");
-      } else {
-        setButtonLabel("Join Group");
-      }
-
       dispatch(setUserMembershipStageInCurrentGroup(membershipStage));
       dispatch(setUserRoleInCurrentGroup(groupInfo.Role));
     });
   }, [groupID]);
+
+  useEffect(() => {
+    if (userCurrentGroupMembershipStage === GroupMembershipStage.JOINED) {
+      setButtonLabel("Leave Group");
+    } else if (
+      userCurrentGroupMembershipStage === GroupMembershipStage.REQUESTED
+    ) {
+      setButtonLabel("Cancel Request");
+    } else {
+      setButtonLabel("Join Group");
+    }
+  }, [userCurrentGroupMembershipStage])
+
+  useEffect(() => {
+    console.log(userCurrentGroupRole)
+  }, [userCurrentGroupRole])
 
   const handleGroupJoinConfirmCancel = () => {
     setIsGroupJoinModalVisible(false);
@@ -229,17 +236,20 @@ GroupPageProps) {
         dispatch(
           setUserMembershipStageInCurrentGroup(GroupMembershipStage.REQUESTED)
         );
-
-        setTimeout(() => {
-          dispatch(
-            setUserMembershipStageInCurrentGroup(GroupMembershipStage.JOINED)
-          );
-        }, 5000);
       }
     });
   };
   //  TODO: Handle Here
-  const handleCancelRequestConfirm = () => {};
+  const handleCancelRequestConfirm = () => {
+    dispatch(cancelJoinGroupRequest({ groupID })).then(res => {
+      const result = res.payload as boolean
+
+      if (result === true) {
+        dispatch(setUserMembershipStageInCurrentGroup(GroupMembershipStage.NOT_JOINED))
+        dispatch(setUserRoleInCurrentGroup(null))
+      }
+    })
+  };
   const handleLeaveGroupConfirm = () => {
     
   };
@@ -302,7 +312,7 @@ GroupPageProps) {
           </LinearGradient>
         </TouchableOpacity>
       )}
-      {userCurrentGroupRole == GroupRole.Member && (
+      {userCurrentGroupRole == GroupRole.Member && userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && (
         <TouchableOpacity style={styles.moderatorContainer} activeOpacity={0.8}>
           <LinearGradient
             colors={["#1327", "#111A1A"]}
@@ -550,7 +560,7 @@ GroupPageProps) {
         </View>
       </View>
       <View>
-      {(userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && userCurrentGroupMembershipStage != GroupMembershipStage.BANNED) && <TouchableOpacity
+      {(userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && userCurrentGroupMembershipStage != GroupMembershipStage.NOT_JOINED) && <TouchableOpacity
         style={styles.contentButton}
         onPress={handleNewPostPress}
       >

@@ -174,3 +174,12 @@ export interface GroupReport {
     Blog: { _id: string; Title: string; CoverURL: string };
     Reports: GroupReportBlog[];
 }
+
+export interface LeaveGroup {
+    groupID: string;
+    newOwnerID?: string
+}
+
+export interface CancelJoinGroupRequest {
+    groupID: string
+}

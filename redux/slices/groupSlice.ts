@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
 import { AxiosResponse } from "axios";
-import { CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupTag, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { CancelJoinGroupRequest, CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupTag, LeaveGroup, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
 import { CreateBlogTag, UserBlog } from "@/interfaces/blogInterface";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 
@@ -584,6 +584,44 @@ export const getReportBlogList = createAsyncThunk(
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const leaveGroup = createAsyncThunk(
+    'group/leaveGroup',
+    async (data: LeaveGroup, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/outGroup`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const cancelJoinGroupRequest = createAsyncThunk(
+    'group/cancelJoinGroupRequest',
+    async (data: CancelJoinGroupRequest, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/cancelJoinGroupRequest`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
             }
         }
         catch (error: any) {

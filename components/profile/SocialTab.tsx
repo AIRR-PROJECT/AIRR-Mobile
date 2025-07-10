@@ -23,7 +23,7 @@ import { logOut } from "@/redux/slices/authSlice";
 const tags = Array(10).fill("Frontend");
 const chunkedTags = chunkArray(tags, 5);
 const mockLink = "https://dly.to/dfdsc";
-export default function ReadmeTab() {
+export default function SocialTab() {
   const dispatch = useAppDispatch()
 
   const handleCopyLink = async () => {

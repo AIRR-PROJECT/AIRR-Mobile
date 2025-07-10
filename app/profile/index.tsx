@@ -27,7 +27,7 @@ import {
   getPartialUserInfo,
   getUserPreviewGroups,
 } from "@/redux/slices/authSlice";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { signOut } from "@react-native-firebase/auth";
 // type UserInfo = {
 //   username: string;
@@ -79,7 +79,7 @@ const Data = [
 export default function ProfileScreen() {
   const { userID } = useLocalSearchParams<{ userID: string }>();
 
-  const [selectedTabs, setSelectedTabs] = useState<string[]>([])
+  const [selectedTabs, setSelectedTabs] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState("");
 
   const { user, userGroups } = useAppSelector((state) => state.user);
@@ -110,14 +110,17 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     if (isOwnProfile) {
-      setSelectedTabs(["Readme", "Blog", "Activity"])
+      setSelectedTabs(["Readme", "Blog", "Activity"]);
+    } else {
+      setSelectedTabs(["Readme", "Blog"]);
     }
-    else {
-      setSelectedTabs(["Readme", "Blog"])
-    }
-    setSelectedTab("Readme")
+    setSelectedTab("Readme");
   }, [isOwnProfile]);
 
+  const route = useRouter();
+  const handleCreateGroup = () => {
+    route.push("/group/create-group");
+  }
   return (
     // change light color to #fff later because figma of the app is not ready
 
@@ -141,12 +144,14 @@ export default function ProfileScreen() {
           contentContainerStyle={{ columnGap: 25 }}
           showsHorizontalScrollIndicator={false}
           ListHeaderComponent={
-            <FontAwesome
-              name="plus-circle"
-              size={50}
-              color="white"
-              style={styles.plusIcon}
-            />
+            <TouchableOpacity activeOpacity={0.7} onPress={handleCreateGroup}>
+              <FontAwesome
+                name="plus-circle"
+                size={50}
+                color="white"
+                style={styles.plusIcon}
+              />
+            </TouchableOpacity>
           }
           renderItem={({ item }) => {
             return <GroupPreviewInfo group={item} />;
@@ -155,35 +160,36 @@ export default function ProfileScreen() {
 
         {/* Readme , Blog, Activity */}
         <View style={styles.rowContainer}>
-          {selectedTabs.length != 0 && selectedTabs.map((tab) => {
-            return (
-              <TouchableOpacity
-                key={tab}
-                style={[
-                  styles.tabButton,
-                  {
-                    backgroundColor:
-                      selectedTab === tab ? "#2F2F2F" : "#1E1E1E",
-                    borderRadius: 10,
-                    borderBottomWidth: selectedTab === tab ? 1 : 0,
-                    borderBottomColor: "#fff",
-                  },
-                ]}
-                onPress={() => setSelectedTab(tab)}
-              >
-                <ThemedText
+          {selectedTabs.length != 0 &&
+            selectedTabs.map((tab) => {
+              return (
+                <TouchableOpacity
+                  key={tab}
                   style={[
-                    styles.tabText,
+                    styles.tabButton,
                     {
-                      color: selectedTab === tab ? "#fff" : "#8A94AC",
+                      backgroundColor:
+                        selectedTab === tab ? "#2F2F2F" : "#1E1E1E",
+                      borderRadius: 10,
+                      borderBottomWidth: selectedTab === tab ? 1 : 0,
+                      borderBottomColor: "#fff",
                     },
                   ]}
+                  onPress={() => setSelectedTab(tab)}
                 >
-                  {tab}
-                </ThemedText>
-              </TouchableOpacity>
-            );
-          })}
+                  <ThemedText
+                    style={[
+                      styles.tabText,
+                      {
+                        color: selectedTab === tab ? "#fff" : "#8A94AC",
+                      },
+                    ]}
+                  >
+                    {tab}
+                  </ThemedText>
+                </TouchableOpacity>
+              );
+            })}
         </View>
       </View>
       <Divider
@@ -198,7 +204,6 @@ export default function ProfileScreen() {
       </View>
       {selectedTab === "Blog" && <BlogTab />}
       {/* Sign out */}
-      
     </ParallaxFlatList>
   );
 }
@@ -232,5 +237,4 @@ const styles = StyleSheet.create({
     color: "#8A94AC",
     fontWeight: "bold",
   },
-  
 });

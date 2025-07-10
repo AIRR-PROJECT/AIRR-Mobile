@@ -101,18 +101,6 @@ export default function TagsApprovalsPage() {
   );
   return (
     <GestureHandlerRootView style={styles.container}>
-      {/* Search bar */}
-      <View style={styles.textInputContainer}>
-        <View style={styles.textInputWrapper}>
-          <FontAwesome6 name="magnifying-glass" size={30} color="#fff" />
-          <TextInput
-            style={styles.textInput}
-            placeholder={"Search Tags"}
-            placeholderTextColor={"#8A94AC"}
-          />
-        </View>
-      </View>
-
       {/* Animated FlatList */}
       <Animated.FlatList
         data={tags}

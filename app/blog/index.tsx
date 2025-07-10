@@ -288,6 +288,7 @@ export default function BlogScreen() {
   const [author, setAuthor] = useState(mockAuthor);
   const [tags, setTags] = useState(mockTags);
   const [group, setGroup] = useState(mockGroup);
+  const [status, setStatus] = useState<BlogStatus>(BlogStatus.ACTIVE)
   const [viewType, setViewType] = useState<string>(BlogViewType.IN_GROUP)
   const reactTimeout = 500;
   const [likes, setLikes] = useState(123);
@@ -344,6 +345,7 @@ export default function BlogScreen() {
       setTags(currentUserBlog.Tags);
       setAuthor(currentUserBlog.Author);
       setViewType(currentUserBlog.ViewType)
+      setStatus(currentUserBlog.Status)
       setLikes(currentUserBlog.Reaction.Likes);
       setDislikes(currentUserBlog.Reaction.Dislikes);
       setComments(currentUserBlog.Reaction.Comments);
@@ -560,7 +562,7 @@ export default function BlogScreen() {
           <Text style={styles.title}>{title}</Text>
           {/* Status */}
           {/* TODO: Send status here */}
-          <BlogStatusComponent status={ BlogStatus.ACTIVE } />
+          <BlogStatusComponent status={status} />
           <View style={{paddingTop : 20}}/>
           {/* Date and number of comment */}
           <View style={styles.additionalInfo}>
@@ -731,13 +733,12 @@ export default function BlogScreen() {
           sheetRef={refMoreSheet}
           isUserWrittenBlog={isUserWrittenBlog}
           blogId={currentUserBlog._id}
-          groupId={
-            currentUserBlog.Group ? currentUserBlog.Group._id : undefined
-          }
+          groupId={currentUserBlog.Group ? currentUserBlog.Group._id : undefined}
           isFromDetail={true}
+          isBlogStatusPendingOrActive={currentUserBlog.Status == BlogStatus.ACTIVE || currentUserBlog.Status == BlogStatus.PENDING}
+          isUserStatusPending={currentUserBlog.UserGroupStatus == "Pending"}
           handleHideThisBlog={handleHideBlog}
-          handleDeleteThisBlog={handleDeleteBlog}
-        />
+          handleDeleteThisBlog={handleDeleteBlog}/>
       )}
     </GestureHandlerRootView>
   );

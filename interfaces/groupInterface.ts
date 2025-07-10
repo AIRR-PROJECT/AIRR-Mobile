@@ -1,4 +1,4 @@
-import { GroupRole } from "@/enums/group.enum";
+import { GroupReportType, GroupRole } from "@/enums/group.enum";
 import { User1 } from "./userInterface";
 
 export interface Group {
@@ -64,6 +64,10 @@ export interface GroupDetailInfo {
     Tags: GroupTag[]
     Role: GroupRole,
     UserStatus: string
+    Rules: {
+        Title: string;
+        Content: string;
+    }[];
 }
 
 export interface SearchedField {
@@ -151,4 +155,31 @@ export interface SearchBarGroup {
     Name: string;
     Description: string;
     CoverURL: string;
+}
+
+export interface GroupBannedMember {
+    _id: string;
+    Owner: GroupOwner;
+    GroupID: string;
+    BannedDate: Date;
+    BannedReason: string;
+}
+
+export interface GroupReportBlog {
+    User: { _id: string; UserName: string; AvatarURL: string };
+    ReportType: GroupReportType;
+    Details: string;
+}
+export interface GroupReport {
+    Blog: { _id: string; Title: string; CoverURL: string };
+    Reports: GroupReportBlog[];
+}
+
+export interface LeaveGroup {
+    groupID: string;
+    newOwnerID?: string
+}
+
+export interface CancelJoinGroupRequest {
+    groupID: string
 }

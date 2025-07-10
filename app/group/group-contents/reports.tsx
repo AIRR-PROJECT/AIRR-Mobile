@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import TagApprovalCardComponent from "@/components/group/TagApprovalCardComponent";
 import {
+  GroupReport,
   PendingMemberRequest,
   PendingTagRequest,
 } from "@/interfaces/groupInterface";
@@ -22,7 +23,7 @@ import {
   getPendingTagList,
   rejectTag,
 } from "@/redux/slices/groupSlice";
-import { useAppDispatch } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useLocalSearchParams } from "expo-router";
 
 function ReportUserComponent({
@@ -68,33 +69,21 @@ const initialReports = Array(10)
     user: { ...item.user, id: index.toString() },
   }));
 export default function ReportsApprovalsPage() {
-  // const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
   const flatlistRef = useRef<any>();
   const { groupID, tagID } = useLocalSearchParams<{
     groupID: string;
     tagID: string;
   }>();
 
-  const [tags, setTags] = useState<PendingTagRequest[]>([]);
-
-  // useEffect(() => {
-  //   dispatch(getPendingTagList(groupID)).then(res => {
-  //     const list = res.payload as PendingTagRequest[]f
-  //     setTags(list)
-  //   })
-  // }, [])
+  const [displayReports, setDisplayReports] = useState<GroupReport[]>([]);
 
   useEffect(() => {
-    // Scroll to specific index
-    if (tags != undefined && tagID != "" && tagID != undefined) {
-      tags.forEach((value, index) => {
-        if (value._id == tagID) {
-          flatlistRef.current.scrollToIndex({ animated: true, index: index });
-          return;
-        }
-      });
-    }
-  }, [tags, tagID]);
+    // dispatch(getPendingTagList(groupID)).then(res => {
+    //   const list = res.payload as PendingTagRequest[]
+    //   setTags(list)
+    // })
+  }, [])
 
   const onApprove = (tagId: string, blogIDs: string[]) => {
     // dispatch(approveTag({
@@ -128,8 +117,6 @@ export default function ReportsApprovalsPage() {
       //   onReject={onReject}
     />
   );
-  // Vào được tab này thì chắc chắn là user đã là admin hoặc owner của group rồi
-  const isUserAdminOrOwner = true;
   return (
     <GestureHandlerRootView style={styles.container}>
       <Animated.FlatList

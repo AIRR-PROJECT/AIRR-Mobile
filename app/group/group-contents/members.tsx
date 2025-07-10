@@ -12,15 +12,19 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import React, { useEffect, useRef, useState } from "react";
 import MemberApprovalCardComponent from "@/components/group/MemberApprovalCardComponent";
 import { RequestOwner } from "@/interfaces/notifInterface";
-import { PendingMemberRequest } from "@/interfaces/groupInterface";
-import { useAppDispatch } from "@/redux/hook";
+import { GroupBannedMember, GroupMember, PendingMemberRequest } from "@/interfaces/groupInterface";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   approveMember,
+  getBannedMemberList,
+  getMemberList,
   getPendingMemberList,
   rejectBlog,
   rejectMember,
 } from "@/redux/slices/groupSlice";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { GroupRole } from "@/enums/group.enum";
+import { Image } from "expo-image";
 
 // Initial mock data
 // const mockUser: PendingMemberRequest = {
@@ -42,51 +46,77 @@ enum TabOptions {
   Banned = "banned",
 }
 export default function MemberApprovalsPage() {
-  // const dispatch = useAppDispatch()
-  const flatlistRef = useRef<any>();
+  const dispatch = useAppDispatch()
+  const displayMembersFlatlistRef = useRef<any>();
+  const memberApprovalsFlatlistRef = useRef<any>();
+  const { userCurrentGroupRole } = useAppSelector(state => state.user)
   const { groupID, memberID } = useLocalSearchParams<{
     groupID: string;
     memberID: string;
   }>();
 
-  const [members, setMembers] = useState<PendingMemberRequest[]>([]);
+  const [displayMembers, setDisplayMembers] = useState<GroupMember[]>([]);
+  const [membersApproval, setMembersApproval] = useState<PendingMemberRequest[]>([]);
+  const [bannedMembers, setBannedMembers] = useState<GroupBannedMember[]>([]);
+  const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
 
-  // useEffect(() => {
-  //   dispatch(getPendingMemberList(groupID)).then(res => {
-  //     const list = res.payload as PendingMemberRequest[]
-  //     setMembers(list)
-  //   })
-  // }, [])
+  useEffect(() => {
+    if (selectedTab == TabOptions.All) {
+      dispatch(getMemberList({ groupID })).then((res) => {
+        let sortOrder = ["Owner", "Admin", "Member"]
+        const groupMembers = res.payload as GroupMember[]
+        const sortedGroupMembers = groupMembers.sort((a, b) => sortOrder.indexOf(a.Role) - sortOrder.indexOf(b.Role))
+
+        setDisplayMembers(sortedGroupMembers)
+      })
+    }
+    else if (selectedTab == TabOptions.NeedApproval) {
+      dispatch(getPendingMemberList(groupID)).then(res => {
+        const list = res.payload as PendingMemberRequest[]
+        setMembersApproval(list)
+      })
+    }
+    else {
+      dispatch(getBannedMemberList(groupID)).then(res => {
+        const list = res.payload as GroupBannedMember[]
+        setBannedMembers(list)
+      })
+    }
+  }, [selectedTab])
 
   useEffect(() => {
     // Scroll to specific index
-    if (members != undefined && memberID != "" && memberID != undefined) {
-      members.forEach((value, index) => {
+    if (membersApproval != undefined && memberID != "" && memberID != undefined) {
+      membersApproval.forEach((value, index) => {
         if (value.Owner._id == memberID) {
-          flatlistRef.current.scrollToIndex({ animated: true, index: index });
+          memberApprovalsFlatlistRef.current.scrollToIndex({ animated: true, index: index });
           return;
         }
       });
     }
-  }, [members, memberID]);
+  }, [membersApproval, memberID]);
 
   const onApprove = (id: string) => {
-    // dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(res => {
-    //   if (res.payload === true) {
-    //     console.log("Approve user with id: ", id);
-    //     setMembers((prev) => prev.filter((u) => u.Owner._id !== id));
-    //   }
-    // })
+    dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(res => {
+      if (res.payload === true) {
+        console.log("Approve user with id: ", id);
+        setMembersApproval((prev) => prev.filter((u) => u.Owner._id !== id));
+      }
+    })
   };
 
   const onReject = (id: string) => {
-    // dispatch(rejectMember({ groupID, userIDToReject: id })).then(res => {
-    //   if (res.payload === true) {
-    //     console.log("Reject user with id: ", id);
-    //     setMembers((prev) => prev.filter((u) => u.Owner._id !== id));
-    //   }
-    // })
+    dispatch(rejectMember({ groupID, userIDToReject: id })).then(res => {
+      if (res.payload === true) {
+        console.log("Reject user with id: ", id);
+        setMembersApproval((prev) => prev.filter((u) => u.Owner._id !== id));
+      }
+    })
   };
+
+  const handleOnDisplayMemberPress = (userID: string) => {
+    router.push(`/profile?userID=${userID}`)
+  }
 
   const renderItem = ({ item }: any) => (
     <MemberApprovalCardComponent
@@ -99,8 +129,6 @@ export default function MemberApprovalsPage() {
       onReject={onReject}
     />
   );
-  const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
-  const isUserAdminOrOwner = true;
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.optionBar}>
@@ -114,7 +142,7 @@ export default function MemberApprovalsPage() {
           <Text style={styles.optionText}>All</Text>
         </TouchableOpacity>
 
-        {isUserAdminOrOwner && (
+        {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && (
           <TouchableOpacity
             style={[
               styles.optionButton,
@@ -127,32 +155,113 @@ export default function MemberApprovalsPage() {
           </TouchableOpacity>
         )}
         {/* TODO: ẤN nút này thì copy cái bên approval qua */}
-        {isUserAdminOrOwner && (
+        {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && (
           <TouchableOpacity
             style={[
               styles.optionButton,
               selectedTab === TabOptions.Banned && styles.optionButtonActive,
             ]}
-            onPress={() => setSelectedTab(TabOptions.NeedApproval)}
+            onPress={() => setSelectedTab(TabOptions.Banned)}
           >
             <Text style={styles.optionText}>Banned</Text>
           </TouchableOpacity>
         )}
       </View>
       {/* Animated FlatList */}
-      <Animated.FlatList
-        data={members}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-        itemLayoutAnimation={LinearTransition}
-        ref={flatlistRef}
-      />
+      {selectedTab == TabOptions.All ? 
+        <FlatList
+          data={displayMembers}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.memberContainer,
+                item.Role === "Admin"
+                  ? { borderColor: colors.admin }
+                  : item.Role === "Owner"
+                  ? { borderColor: colors.owner }
+                  : { borderColor: colors.member },
+              ]}
+              onPress={() => handleOnDisplayMemberPress(item.MemberInfo._id)}
+            >
+              <Image source={item.MemberInfo.AvatarURL} style={styles.avatar} />
+              <View>
+                <Text style={styles.memberName}>{item.MemberInfo.Username}</Text>
+                <View style={styles.roleWrapper}>
+                  <Text
+                    style={[
+                      styles.role,
+                      item.Role === "Admin"
+                        ? { color: colors.admin }
+                        : item.Role === "Owner"
+                        ? { color: colors.owner }
+                        : { color: colors.member },
+                    ]}
+                  >
+                    {item.Role}
+                  </Text>
+                  <FontAwesome6
+                    name="bolt"
+                    size={24}
+                    color={
+                      item.Role === "Admin"
+                        ? colors.admin
+                        : item.Role === "Owner"
+                        ? colors.owner
+                        : colors.member
+                    }
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+        />
+      : (selectedTab == TabOptions.NeedApproval ? 
+        <Animated.FlatList
+          data={membersApproval}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          itemLayoutAnimation={LinearTransition}
+          ref={memberApprovalsFlatlistRef}
+        />
+      : <FlatList
+          data={bannedMembers}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={{ borderColor: colors.member }}
+              onPress={() => handleOnDisplayMemberPress(item.Owner._id)}
+            >
+              <Image source={item.Owner.AvatarURL} style={styles.avatar} />
+              <View>
+                <Text style={styles.memberName}>{item.Owner.Username}</Text>
+                <View style={styles.roleWrapper}>
+                  <FontAwesome6
+                    name="bolt"
+                    size={24}
+                    color={colors.member}
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+        />
+      )}
     </GestureHandlerRootView>
   );
 }
 
+const colors = {
+  admin: "#FFBA66",
+  owner: "#B9FF66",
+  member: "#66DBFF",
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -195,5 +304,32 @@ const styles = StyleSheet.create({
   optionText: {
     color: "#fff",
     fontSize: 14,
+  },
+  memberContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    borderWidth: 1,
+    borderRadius: 20,
+  },
+  memberName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  role: {
+    fontSize: 14,
+    color: "#8A94AC",
+  },
+  roleWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
   },
 });

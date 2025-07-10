@@ -6,7 +6,7 @@ import { Pressable, TouchableOpacity } from "react-native";
 import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAppDispatch } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   dislikeBlog,
   dislikeToLikeBlog,
@@ -65,6 +65,8 @@ export default function FeedBlogPreview({
   // default to mock blog for this, but later will be passed as props
   const route = useRouter();
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector(state => state.user)
+
   const handlePress = () => {
     console.log("Blog Pressed");
     route.push({
@@ -79,11 +81,13 @@ export default function FeedBlogPreview({
   const [blogLiked, setBlogLiked] = useState<boolean>(false);
   const [blogDisliked, setBlogDisliked] = useState<boolean>(false);
   const [blogSaved, setBlogSaved] = useState<boolean>(false);
+  const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
 
   useEffect(() => {
     setLikes(blog.Reaction.Likes);
     setDislikes(blog.Reaction.Dislikes);
     setComments(blog.Reaction.Comments);
+    setIsUserWrittenBlog(user._id == blog.Author._id)
 
     dispatch(getUserBlogLikeActivities(blog._id)).then((data) => {
       setBlogLiked(data.payload as boolean);
@@ -169,8 +173,6 @@ export default function FeedBlogPreview({
   const debounceHandleBookmark = debounce(() => {
     handleBookmark();
   }, 0.5);
-  // TODO: check if the blog is written by the user
-  const isUserWrittenBlog = false;
 
   return (
     <TouchableOpacity
@@ -215,7 +217,7 @@ export default function FeedBlogPreview({
               <Text style={styles.tag}>+{blog.Tags.length - 2} more</Text>
             )}
           </View>
-          <BlogStatusComponent status={BlogStatus.IN_PROFILE_PAGE} />
+          <BlogStatusComponent status={blog.Status} />
         </Pressable>
       </ImageBackground>
       <View style={{ padding: 20 }}>

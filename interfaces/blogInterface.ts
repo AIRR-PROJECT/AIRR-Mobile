@@ -1,5 +1,6 @@
 import BlogAuthor from "@/components/tabs/BlogAuthor";
 import { User1 } from "./userInterface";
+import { BlogStatus } from "@/enums/blog_properties.enum";
 
 export interface AIBlog {
     _id: string;
@@ -59,6 +60,9 @@ export interface UserBlog {
     Author: UserBlogAuthor;
     Tags: UserBlogTag[];
     Group: UserBlogGroup;
+    ViewType: string
+    UserGroupStatus: string
+    Status: BlogStatus
 }
 export interface UserBlogDetail {
     _id: string;
@@ -72,7 +76,7 @@ export interface UserBlogDetail {
     Tags: UserBlogTag[];
     PendingTags: UserBlogTag[];
     IsSavedByUser: boolean
-    Status: string
+    Status: BlogStatus
     ViewType: string
     Group: UserBlogGroup;
     UserGroupStatus: string

@@ -30,6 +30,7 @@ import BottomSheet, {
 import { useRouter } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
+  cancelJoinGroupRequest,
   getGroupInfo,
   requestJoinGroup,
   setGroupBlogsSearchText,
@@ -132,16 +133,20 @@ GroupPageProps) {
       const groupInfo = res.payload as GroupDetailInfo;
 
       setGroupInfo(groupInfo);
-
+      console.log(groupInfo)
       const membershipStage =
         groupInfo.UserStatus == "Active"
           ? GroupMembershipStage.JOINED
           : groupInfo.UserStatus == "Pending"
           ? GroupMembershipStage.REQUESTED
           : GroupMembershipStage.NOT_JOINED;
+
       dispatch(setUserMembershipStageInCurrentGroup(membershipStage));
       dispatch(setUserRoleInCurrentGroup(groupInfo.Role));
     });
+  }, [groupID]);
+
+  useEffect(() => {
     if (userCurrentGroupMembershipStage === GroupMembershipStage.JOINED) {
       setButtonLabel("Leave Group");
     } else if (
@@ -151,7 +156,11 @@ GroupPageProps) {
     } else {
       setButtonLabel("Join Group");
     }
-  }, [groupID]);
+  }, [userCurrentGroupMembershipStage])
+
+  useEffect(() => {
+    console.log(userCurrentGroupRole)
+  }, [userCurrentGroupRole])
 
   const handleGroupJoinConfirmCancel = () => {
     setIsGroupJoinModalVisible(false);
@@ -227,18 +236,23 @@ GroupPageProps) {
         dispatch(
           setUserMembershipStageInCurrentGroup(GroupMembershipStage.REQUESTED)
         );
-
-        setTimeout(() => {
-          dispatch(
-            setUserMembershipStageInCurrentGroup(GroupMembershipStage.JOINED)
-          );
-        }, 5000);
       }
     });
   };
   //  TODO: Handle Here
-  const handleCancelRequestConfirm = () => {};
-  const handleLeaveGroupConfirm = () => {};
+  const handleCancelRequestConfirm = () => {
+    dispatch(cancelJoinGroupRequest({ groupID })).then(res => {
+      const result = res.payload as boolean
+
+      if (result === true) {
+        dispatch(setUserMembershipStageInCurrentGroup(GroupMembershipStage.NOT_JOINED))
+        dispatch(setUserRoleInCurrentGroup(null))
+      }
+    })
+  };
+  const handleLeaveGroupConfirm = () => {
+    
+  };
   const handleMoreOptionPress = useCallback((index: number) => {
     sheetRef.current?.snapToIndex(index);
   }, []);
@@ -298,7 +312,7 @@ GroupPageProps) {
           </LinearGradient>
         </TouchableOpacity>
       )}
-      {userCurrentGroupRole == GroupRole.Member && (
+      {userCurrentGroupRole == GroupRole.Member && userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && (
         <TouchableOpacity style={styles.moderatorContainer} activeOpacity={0.8}>
           <LinearGradient
             colors={["#1327", "#111A1A"]}
@@ -434,7 +448,7 @@ GroupPageProps) {
               overflow: "hidden",
             }}
           >
-            {groupRules?.map((rule, index) => (
+            {groupInfo.Rules?.map((rule, index) => (
               <View key={index} style={styles.ruleOuterContainer}>
                 <View
                   style={[
@@ -464,7 +478,7 @@ GroupPageProps) {
                       textAlign: "justify",
                     }}
                   >
-                    {rule.RuleName}
+                    {rule.Title}
                   </Text>
                 </View>
                 <View
@@ -478,7 +492,7 @@ GroupPageProps) {
                 >
                   <View style={styles.ruleContainer}>
                     {/* Input for rule description */}
-                    <Text style={styles.ruleText}>{rule.RuleDescription}</Text>
+                    <Text style={styles.ruleText}>{rule.Content}</Text>
                   </View>
                 </View>
               </View>
@@ -511,9 +525,12 @@ GroupPageProps) {
             },
           ]}
         >
-          <TouchableOpacity
+          {groupInfo && groupInfo.CreatedBy && <TouchableOpacity
             style={styles.moderatorContainer}
             activeOpacity={0.8}
+            onPress={() => {
+              route.push(`/profile?userID=${groupInfo.CreatedBy._id}`)
+            }}
           >
             <LinearGradient
               colors={["#1327", "#111A1A"]}
@@ -527,12 +544,12 @@ GroupPageProps) {
               }}
             >
               <Image
-                source={{ uri: "https://picsum.photos/200" }}
+                source={{ uri: groupInfo.CreatedBy.AvatarURL }}
                 style={styles.moderatorImage}
               />
-              <Text style={styles.moderatorName}>@John Doe</Text>
+              <Text style={styles.moderatorName}>@{groupInfo.CreatedBy.Username}</Text>
             </LinearGradient>
-          </TouchableOpacity>
+          </TouchableOpacity>}
 
           <ButtonGradient
             label={buttonLabel}
@@ -543,7 +560,7 @@ GroupPageProps) {
         </View>
       </View>
       <View>
-        <TouchableOpacity
+      {(userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && userCurrentGroupMembershipStage != GroupMembershipStage.NOT_JOINED) && <TouchableOpacity
         style={styles.contentButton}
         onPress={handleNewPostPress}
       >
@@ -555,7 +572,7 @@ GroupPageProps) {
         >
           Create Blog 
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity>}
       </View>
       {/* <View style={styles.rowContainer}>
         <TouchableOpacity

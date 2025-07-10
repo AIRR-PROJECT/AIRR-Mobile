@@ -124,8 +124,8 @@ export default function ReportsApprovalsPage() {
   const renderItem = ({ item }: any) => (
     <ReportUserComponent
       {...item}
-    //   onApprove={onApprove}
-    //   onReject={onReject}
+      //   onApprove={onApprove}
+      //   onReject={onReject}
     />
   );
   // Vào được tab này thì chắc chắn là user đã là admin hoặc owner của group rồi

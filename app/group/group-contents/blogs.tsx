@@ -120,8 +120,8 @@ export default function BlogsApprovalsPage() {
   // Còn cái lựa chọn thứ 3 là cái approval blog như bên approval 
   return (
     <GestureHandlerRootView style={styles.container}>
-      {/* Make a horizontal bar that have 3 option */}
       <View style={styles.optionBar}>
+     
         <TouchableOpacity
           style={[
             styles.optionButton,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   },
   optionBar: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     marginBottom: 20,
     borderRadius: 14,
   },

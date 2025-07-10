@@ -1,5 +1,11 @@
 import { FontAwesome6 } from "@expo/vector-icons";
-import { View, TextInput, StyleSheet } from "react-native";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
 import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
@@ -8,13 +14,18 @@ import MemberApprovalCardComponent from "@/components/group/MemberApprovalCardCo
 import { RequestOwner } from "@/interfaces/notifInterface";
 import { PendingMemberRequest } from "@/interfaces/groupInterface";
 import { useAppDispatch } from "@/redux/hook";
-import { approveMember, getPendingMemberList, rejectBlog, rejectMember } from "@/redux/slices/groupSlice";
+import {
+  approveMember,
+  getPendingMemberList,
+  rejectBlog,
+  rejectMember,
+} from "@/redux/slices/groupSlice";
 import { useLocalSearchParams } from "expo-router";
 
 // Initial mock data
 // const mockUser: PendingMemberRequest = {
 //   _id: "1",
-//   Name: "John Doe", 
+//   Name: "John Doe",
 //   AvatarURL: "https://picsum.photos/200/300",
 //   Username: "johndoe",
 
@@ -25,11 +36,18 @@ import { useLocalSearchParams } from "expo-router";
 //   ...user,
 //   id: index.toString(),
 // }));
-
+enum TabOptions {
+  All = "all",
+  NeedApproval = "need-approval",
+  Banned = "banned",
+}
 export default function MemberApprovalsPage() {
   // const dispatch = useAppDispatch()
-  const flatlistRef = useRef<any>()
-  const { groupID, memberID } = useLocalSearchParams<{ groupID: string, memberID: string }>()
+  const flatlistRef = useRef<any>();
+  const { groupID, memberID } = useLocalSearchParams<{
+    groupID: string;
+    memberID: string;
+  }>();
 
   const [members, setMembers] = useState<PendingMemberRequest[]>([]);
 
@@ -45,12 +63,12 @@ export default function MemberApprovalsPage() {
     if (members != undefined && memberID != "" && memberID != undefined) {
       members.forEach((value, index) => {
         if (value.Owner._id == memberID) {
-          flatlistRef.current.scrollToIndex({ animated: true, index: index })
-          return
+          flatlistRef.current.scrollToIndex({ animated: true, index: index });
+          return;
         }
-      })
+      });
     }
-  }, [members, memberID])
+  }, [members, memberID]);
 
   const onApprove = (id: string) => {
     // dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(res => {
@@ -81,21 +99,46 @@ export default function MemberApprovalsPage() {
       onReject={onReject}
     />
   );
-
+  const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
+  const isUserAdminOrOwner = true;
   return (
     <GestureHandlerRootView style={styles.container}>
-      {/* Search Bar */}
-      <View style={styles.textInputContainer}>
-        <View style={styles.textInputWrapper}>
-          <FontAwesome6 name="magnifying-glass" size={20} color="#fff" />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Search Blogs"
-            placeholderTextColor="#8A94AC"
-          />
-        </View>
-      </View>
+      <View style={styles.optionBar}>
+        <TouchableOpacity
+          style={[
+            styles.optionButton,
+            selectedTab === TabOptions.All && styles.optionButtonActive,
+          ]}
+          onPress={() => setSelectedTab(TabOptions.All)}
+        >
+          <Text style={styles.optionText}>All</Text>
+        </TouchableOpacity>
 
+        {isUserAdminOrOwner && (
+          <TouchableOpacity
+            style={[
+              styles.optionButton,
+              selectedTab === TabOptions.NeedApproval &&
+                styles.optionButtonActive,
+            ]}
+            onPress={() => setSelectedTab(TabOptions.NeedApproval)}
+          >
+            <Text style={styles.optionText}>Need Approval</Text>
+          </TouchableOpacity>
+        )}
+        {/* TODO: ẤN nút này thì copy cái bên approval qua */}
+        {isUserAdminOrOwner && (
+          <TouchableOpacity
+            style={[
+              styles.optionButton,
+              selectedTab === TabOptions.Banned && styles.optionButtonActive,
+            ]}
+            onPress={() => setSelectedTab(TabOptions.NeedApproval)}
+          >
+            <Text style={styles.optionText}>Banned</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       {/* Animated FlatList */}
       <Animated.FlatList
         data={members}
@@ -131,5 +174,26 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "#fff",
     fontSize: 18,
+  },
+  optionBar: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginBottom: 20,
+    borderRadius: 14,
+  },
+  optionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#3B4C55",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+  },
+  optionButtonActive: {
+    backgroundColor: "#5CA0D3", // Active tab color
+  },
+  optionText: {
+    color: "#fff",
+    fontSize: 14,
   },
 });

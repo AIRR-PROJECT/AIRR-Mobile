@@ -4,16 +4,22 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ScrollView,
   Pressable,
   Alert,
 } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { Image, ImageSource } from "expo-image";
-import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather, FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import UploadGroupAvatarComponent from "@/components/group/UploadGroupAvatarComponent";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet, {
   BottomSheetBackdrop,
+  BottomSheetFooter,
+  BottomSheetFooterProps,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -21,45 +27,28 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   createGroup,
-  getGroupInfo,
   searchFields,
   setCreateGroupCurrentTags,
   setCreateGroupSubmitted,
 } from "@/redux/slices/groupSlice";
 import {
-  GroupDetailInfo,
   GroupRule,
   GroupTag,
   SearchedField,
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
-import { router, useLocalSearchParams, useRouter } from "expo-router"
+import { router, useRouter } from "expo-router";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
-import { string } from "zod";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
-
-// temporary use this cause figma not provide the image
-const mockFieldList = [
-  "Web Development",
-  "Mobile Development",
-  "Data Science",
-  "Machine Learning",
-  "Artificial Intelligence",
-  "Cloud Computing",
-  "Cyber Security",
-  "DevOps",
-  "Blockchain",
-  "Internet of Things",
-  "Game Development",
-  "UI/UX Design",
-  "Digital Marketing",
-];
 
 export default function EditGroup() {
   const dispatch = useAppDispatch();
   const route = useRouter();
-  const { createGroupSubmitted, createGroupCurrentTags, createGroupCreatedTags } = useAppSelector((state) => state.group);
-  const { groupID } = useLocalSearchParams<{ groupID: string }>()
+  const {
+    createGroupSubmitted,
+    createGroupCurrentTags,
+    createGroupCreatedTags,
+  } = useAppSelector((state) => state.group);
 
   const uploadedImg = useRef<ImageSource>();
   const [groupName, setGroupName] = useState("");
@@ -69,6 +58,7 @@ export default function EditGroup() {
   const [groupFields, setGroupFields] = useState<SearchedField[]>([]);
   const [groupTags, setGroupTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
+  const fieldSearchText = useRef("")
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["100%"], []);
 
@@ -99,17 +89,6 @@ export default function EditGroup() {
   }, [chosenTags])
 
   useEffect(() => {
-    if (groupID) {
-      dispatch(getGroupInfo({ groupID })).then((res) => {
-        const data = res.payload as GroupDetailInfo
-
-        setGroupName(data.Name)
-        setGroupField(data.Field)
-      })
-    }
-  }, [groupID])
-
-  useEffect(() => {
     if (createGroupSubmitted) {
       dispatch(setCreateGroupSubmitted(false));
 
@@ -133,7 +112,10 @@ export default function EditGroup() {
         type: uploadedImg.current?.mimeType,
       });
       formData.append("Name", groupName);
-      formData.append("Tags", JSON.stringify([...groupTags, ...createGroupCreatedTags]));
+      formData.append(
+        "Tags",
+        JSON.stringify([...groupTags, ...createGroupCreatedTags])
+      );
       formData.append("GroupField", JSON.stringify(groupField));
       formData.append("Description", groupDescription);
       formData.append("GroupRules", JSON.stringify(groupRules));
@@ -149,6 +131,15 @@ export default function EditGroup() {
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
   }, []);
+  const handleFieldSearchChangeText = (val: string) => {
+    fieldSearchText.current = val
+  }
+  const handleFieldSearchSubmit = () => {
+    dispatch(searchFields(fieldSearchText.current)).then((res) => {
+      setGroupFields((res.payload as SearchFieldResult).Fields);
+      console.log((res.payload as SearchFieldResult).Fields);
+    });
+  }
   const handleFieldSheetChange = useCallback((index: any) => {
     console.log("handleGroupSheetChange", index);
   }, []);
@@ -182,6 +173,23 @@ export default function EditGroup() {
       return [...(prevRules || []), newRule];
     });
   };
+  // const renderFieldsFooter = useCallback((props: BottomSheetFooterProps) => {
+  //   return (
+  //     <BottomSheetFooter {...props} style={styles.searchBar}>
+  //       <TextInput
+  //         style={styles.searchText}
+  //         placeholder="Search Fields"
+  //         placeholderTextColor="#888"
+  //       />
+  //       <FontAwesome
+  //         name="search"
+  //         size={24}
+  //         color="#fff"
+  //         style={{ paddingRight: 10 }}
+  //       />
+  //     </BottomSheetFooter>
+  //   );
+  // }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -423,9 +431,11 @@ export default function EditGroup() {
                     placeholder="Enter rule name..."
                     placeholderTextColor="#B0B0B0"
                     onChangeText={(text) => {
-                      let groupRulesClone = JSON.parse(JSON.stringify(groupRules)) as GroupRule[]
-                      groupRulesClone[index].RuleName = text
-                      setGroupRules(groupRulesClone)
+                      let groupRulesClone = JSON.parse(
+                        JSON.stringify(groupRules)
+                      ) as GroupRule[];
+                      groupRulesClone[index].RuleName = text;
+                      setGroupRules(groupRulesClone);
                     }}
                     multiline
                   />
@@ -438,9 +448,11 @@ export default function EditGroup() {
                     placeholder="Enter rule description..."
                     placeholderTextColor="#B0B0B0"
                     onChangeText={(text) => {
-                      let groupRulesClone = JSON.parse(JSON.stringify(groupRules)) as GroupRule[]
-                      groupRulesClone[index].RuleDescription = text
-                      setGroupRules(groupRulesClone)
+                      let groupRulesClone = JSON.parse(
+                        JSON.stringify(groupRules)
+                      ) as GroupRule[];
+                      groupRulesClone[index].RuleDescription = text;
+                      setGroupRules(groupRulesClone);
                     }}
                     multiline
                   />
@@ -503,6 +515,27 @@ export default function EditGroup() {
               and use it to render the list of field with flatlist
               else use the static list of field to render the list of field
             */}
+          <View style={styles.searchBar}>
+            <TextInput
+              style={styles.searchText}
+              placeholder="Search Fields"
+              placeholderTextColor="#888"
+              numberOfLines={1}
+              onChangeText={handleFieldSearchChangeText}
+              onSubmitEditing={handleFieldSearchSubmit}
+              // Handle search o day 
+            />
+            <TouchableOpacity activeOpacity={0.8} 
+            // Va o day
+            >
+              <FontAwesome
+                name="search"
+                size={24}
+                color="#fff"
+                style={{ paddingRight: 10 }}
+              />
+            </TouchableOpacity>
+          </View>
           <BottomSheetScrollView
             contentContainerStyle={styles.groupListContent}
             showsVerticalScrollIndicator={false}
@@ -511,12 +544,11 @@ export default function EditGroup() {
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             nestedScrollEnabled={true}
-            style={{ flexGrow: 1 }}
           >
             {/* Group List */}
             {/* Change to actual field later */}
 
-            {groupFields?.map((item, index) => (
+            {groupFields.length != 0 && groupFields.map((item, index) => (
               <Pressable
                 key={index}
                 onPress={() => handleGroupFieldPress(item)}
@@ -694,5 +726,21 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     marginBottom: 10,
+  },
+  searchBar: {
+    backgroundColor: "#2E3B40",
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 20,
+    borderRadius: 10,
+    paddingBottom: 20,
+  },
+  searchText: {
+    paddingHorizontal: 10,
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    flex: 1,
   },
 });

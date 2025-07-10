@@ -168,6 +168,9 @@ export default function NewBlog() {
     if (chosenGroup) {
       setFoundTags(chosenGroup?.Tags);
       setChosenTags([]);
+      
+      setRequestedTags([])
+      dispatch(setCreateBlogRequestedTags([]))
     }
   }, [chosenGroup]);
 

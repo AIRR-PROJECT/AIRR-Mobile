@@ -330,53 +330,26 @@ export default function CommentBlogScreen() {
   }
   const handleEditCommentSubmit = () => {
     if (chosenComment) {
-      if (!chosenChildComment) {
-        dispatch(editComment({
-          BlogID: searchParams.blogId,
-          Content: editCommentContent,
-          CommentID: chosenComment._id
-        })).then((res) => {
-          const result = res.payload as boolean
+      dispatch(editComment({
+        BlogID: searchParams.blogId,
+        Content: editCommentContent,
+        CommentID: chosenComment._id
+      })).then((res) => {
+        const result = res.payload as boolean
 
-          if (result === true) {
-            ToastAndroid.showWithGravity("Comment edited", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+        if (result === true) {
+          ToastAndroid.showWithGravity("Comment edited", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
 
-            setIsEditingComment(false)
+          setIsEditingComment(false)
 
-            let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as any[]
-            const index = blogCommentsClone.findIndex((c) => c._id == chosenComment._id)
-            if (index != -1) {
-              blogCommentsClone[index].Content = editCommentContent
-              setBlogComments(blogCommentsClone)
-            }
+          let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as any[]
+          const index = blogCommentsClone.findIndex((c) => c._id == chosenComment._id)
+          if (index != -1) {
+            blogCommentsClone[index].Content = editCommentContent
+            setBlogComments(blogCommentsClone)
           }
-        })
-      }
-      else {
-        dispatch(editComment({
-          BlogID: searchParams.blogId,
-          Content: editCommentContent,
-          CommentID: chosenChildComment._id
-        })).then((res) => {
-          const result = res.payload as boolean
-
-          if (result === true) {
-            ToastAndroid.showWithGravity("Comment edited", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-
-            setIsEditingComment(false)
-
-            let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as UserBlogComment[]
-            const index = blogCommentsClone.findIndex((c: UserBlogComment) => c._id == chosenComment._id)
-            if (index != -1) {
-              const innerIndex = blogCommentsClone[index].ChildrenComments.findIndex((c: UserBlogChildComment) => c._id == chosenChildComment._id)
-              if (innerIndex != -1) {
-                blogCommentsClone[index].ChildrenComments[innerIndex].Content = editCommentContent
-                setBlogComments(blogCommentsClone)
-              }
-            }
-          }
-        })
-      }
+        }
+      })
     }
   }
   const handleDeleteComment = () => {
@@ -404,15 +377,11 @@ export default function CommentBlogScreen() {
   
           if (result === true) {
             ToastAndroid.showWithGravity("Comment deleted", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-
             let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as UserBlogComment[]
-            let index = blogCommentsClone.findIndex((c: UserBlogComment) => c._id == chosenComment._id)
-            if (index != -1) {
-              let editedChild = blogCommentsClone[index].ChildrenComments.filter((c: UserBlogChildComment) => c._id != chosenChildComment._id)
-              blogCommentsClone[index].ChildrenComments = editedChild
-              setBlogComments(blogCommentsClone)
-            }
-
+            let index = blogCommentsClone.findIndex((c) => c._id != chosenComment._id)
+            let editedChild = blogCommentsClone[index].ChildrenComments.filter((c) => c._id != chosenChildComment._id)
+            blogCommentsClone[index] = editedChild
+            setBlogComments(blogComments.filter((c) => c._id != chosenComment._id))
             sheetRef.current?.close()
           }
         })

@@ -61,6 +61,7 @@ import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { formatDistanceToNow } from "date-fns";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 import { green } from "react-native-reanimated/lib/typescript/Colors";
+import BlogStatusComponent from "@/components/blog/BlogStatusComponent";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -569,6 +570,7 @@ export default function BlogScreen() {
               <Text style={{ color: currentUserBlog.Status === BlogStatus.ACTIVE ? "green" : "red" }}>{currentUserBlog.Status}</Text>
             </View>
           }
+          <BlogStatusComponent status={ BlogStatus.ACTIVE } />
           <View style={{paddingTop : 20}}/>
           {/* Date and number of comment */}
           <View style={styles.additionalInfo}>

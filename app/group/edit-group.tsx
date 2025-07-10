@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { Image, ImageSource } from "expo-image";
-import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import UploadGroupAvatarComponent from "@/components/group/UploadGroupAvatarComponent";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet, {
@@ -21,19 +21,21 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   createGroup,
+  getGroupInfo,
   searchFields,
   setCreateGroupCurrentTags,
   setCreateGroupSubmitted,
 } from "@/redux/slices/groupSlice";
 import {
+  GroupDetailInfo,
   GroupRule,
   GroupTag,
   SearchedField,
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
-import { router, useRouter } from "expo-router";
-import GroupRuleComponent from "@/components/group/GroupRuleComponent";
-import { set } from "lodash";
+import { router, useLocalSearchParams, useRouter } from "expo-router"
+import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
+import { string } from "zod";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 // temporary use this cause figma not provide the image
@@ -55,7 +57,9 @@ const mockFieldList = [
 
 export default function EditGroup() {
   const dispatch = useAppDispatch();
+  const route = useRouter();
   const { createGroupSubmitted, createGroupCurrentTags, createGroupCreatedTags } = useAppSelector((state) => state.group);
+  const { groupID } = useLocalSearchParams<{ groupID: string }>()
 
   const uploadedImg = useRef<ImageSource>();
   const [groupName, setGroupName] = useState("");
@@ -64,8 +68,12 @@ export default function EditGroup() {
   const [groupField, setGroupField] = useState<SearchedField>();
   const [groupFields, setGroupFields] = useState<SearchedField[]>([]);
   const [groupTags, setGroupTags] = useState<GroupTag[]>([]);
+  const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["100%"], []);
+
+  const tagsSheetRef = useRef<BottomSheet>(null);
+  const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
 
   useEffect(() => {
     dispatch(searchFields("Development")).then((res) => {
@@ -81,6 +89,25 @@ export default function EditGroup() {
   useEffect(() => {
     console.log(groupRules)
   }, [groupRules])
+
+  useEffect(() => {
+    let currentTagsString: string[] = []
+    chosenTags.forEach((t) => {
+      currentTagsString.push(t.TagName)
+    })
+    dispatch(setCreateGroupCurrentTags(currentTagsString))
+  }, [chosenTags])
+
+  useEffect(() => {
+    if (groupID) {
+      dispatch(getGroupInfo({ groupID })).then((res) => {
+        const data = res.payload as GroupDetailInfo
+
+        setGroupName(data.Name)
+        setGroupField(data.Field)
+      })
+    }
+  }, [groupID])
 
   useEffect(() => {
     if (createGroupSubmitted) {
@@ -130,16 +157,17 @@ export default function EditGroup() {
     setGroupField(field);
 
     setGroupTags(field.DefaultTags);
-    let currentTagsString: string[] = []
-    field.DefaultTags.forEach((t) => {
-      currentTagsString.push(t.TagName)
-    })
-    dispatch(setCreateGroupCurrentTags(currentTagsString))
 
     fieldRef.current?.close();
   }, []);
-  const [createdTags, setCreatedTags] = useState<GroupTag[]>([]);
-  const route = useRouter();
+  const handleTagsSnapPress = useCallback((index: number) => {
+    tagsSheetRef.current?.snapToIndex(index);
+  }, []);
+  
+  const onPressTag = (listTags: GroupTag[]) => {
+    console.log("List tags selected:", listTags);
+    setChosenTags(listTags);
+  };
   const handleCreateTagPress = () => {
     route.push(`/create-tag-screen?fieldID=${groupField?._id}`);
   };
@@ -160,6 +188,27 @@ export default function EditGroup() {
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
       >
+        <Image
+          source={avatar_arc}
+          style={styles.image}
+          contentFit="contain"
+          transition={1000}
+        />
+        <View style={[styles.rowContainer, { marginBottom: 10 }]}>
+          <MaterialCommunityIcons
+            name="note-plus-outline"
+            size={24}
+            color="#B9FF66"
+          />
+          <Text style={[styles.title, { paddingLeft: 5 }]}>
+            Create a New Group
+          </Text>
+        </View>
+        {/* description */}
+        <Text style={styles.description}>
+          Innovation thrives in collaboration. Create a new group and connect
+          with like-minded tech enthusiasts to shape the future together
+        </Text>
         {/* Group avatar */}
         <Text
           style={[styles.title, { alignSelf: "flex-start", paddingBottom: 10 }]}
@@ -227,7 +276,7 @@ export default function EditGroup() {
           </TouchableOpacity>
           {/* Tags */}
           <View style={{ flex: 1 }}>
-            <View
+            <TouchableOpacity
               style={[
                 styles.heading,
                 {
@@ -235,13 +284,28 @@ export default function EditGroup() {
                   flexWrap: "wrap",
                 },
               ]}
+              onPress={() => handleTagsSnapPress(0)}
             >
-              {groupTags.length > 0 &&
-                groupTags.map((tag) => (
+              <Feather name="flag" size={24} color="#fff" />
+              {chosenTags.length > 0 && groupField !== undefined ? (
+                chosenTags.map((tag) => (
                   <TagWrapper key={tag._id} tag={tag.TagName} />
                 ))
+              ) :
+                <Text
+                    style={[
+                      styles.headingTitle,
+                      {
+                        alignSelf: "center",
+                        color: "#fff",
+                        textAlign: "justify",
+                      },
+                    ]}
+                  >
+                    Select Tags for blog
+                  </Text>
               }
-            </View>
+            </TouchableOpacity>
             {groupField && <TouchableOpacity
               style={[
                 styles.heading,
@@ -479,6 +543,25 @@ export default function EditGroup() {
           </BottomSheetScrollView>
         </BottomSheet>
       </ScrollView>
+      <BottomSheet
+        ref={tagsSheetRef}
+        index={-1} // Start closed
+        snapPoints={tagsSnapPoints}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: "#212531" }}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        // onChange={handleGroupSheetChange}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+      >
+        <TagDropdownComponent tags={groupTags} onPress={onPressTag}/>
+      </BottomSheet>
     </GestureHandlerRootView>
   );
 }
@@ -586,6 +669,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     marginHorizontal: 10,
     borderRadius: 9,
+  },
+  tagsColumn: {
+    width: "70%",
   },
   headingTitle: {
     fontSize: 16,

@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { Image, ImageSource } from "expo-image";
-import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import UploadGroupAvatarComponent from "@/components/group/UploadGroupAvatarComponent";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BottomSheet, {
@@ -32,8 +32,7 @@ import {
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
 import { router, useRouter } from "expo-router";
-import GroupRuleComponent from "@/components/group/GroupRuleComponent";
-import { set } from "lodash";
+import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 // temporary use this cause figma not provide the image
@@ -55,6 +54,7 @@ const mockFieldList = [
 
 export default function CreateGroup() {
   const dispatch = useAppDispatch();
+  const route = useRouter();
   const { createGroupSubmitted, createGroupCurrentTags, createGroupCreatedTags } = useAppSelector((state) => state.group);
 
   const uploadedImg = useRef<ImageSource>();
@@ -64,8 +64,12 @@ export default function CreateGroup() {
   const [groupField, setGroupField] = useState<SearchedField>();
   const [groupFields, setGroupFields] = useState<SearchedField[]>([]);
   const [groupTags, setGroupTags] = useState<GroupTag[]>([]);
+  const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["100%"], []);
+
+  const tagsSheetRef = useRef<BottomSheet>(null);
+  const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
 
   useEffect(() => {
     dispatch(searchFields("Development")).then((res) => {
@@ -81,6 +85,14 @@ export default function CreateGroup() {
   useEffect(() => {
     console.log(groupRules)
   }, [groupRules])
+
+  useEffect(() => {
+    let currentTagsString: string[] = []
+    chosenTags.forEach((t) => {
+      currentTagsString.push(t.TagName)
+    })
+    dispatch(setCreateGroupCurrentTags(currentTagsString))
+  }, [chosenTags])
 
   useEffect(() => {
     if (createGroupSubmitted) {
@@ -130,16 +142,17 @@ export default function CreateGroup() {
     setGroupField(field);
 
     setGroupTags(field.DefaultTags);
-    let currentTagsString: string[] = []
-    field.DefaultTags.forEach((t) => {
-      currentTagsString.push(t.TagName)
-    })
-    dispatch(setCreateGroupCurrentTags(currentTagsString))
 
     fieldRef.current?.close();
   }, []);
-  const [createdTags, setCreatedTags] = useState<GroupTag[]>([]);
-  const route = useRouter();
+  const handleTagsSnapPress = useCallback((index: number) => {
+    tagsSheetRef.current?.snapToIndex(index);
+  }, []);
+  
+  const onPressTag = (listTags: GroupTag[]) => {
+    console.log("List tags selected:", listTags);
+    setChosenTags(listTags);
+  };
   const handleCreateTagPress = () => {
     route.push(`/create-tag-screen?fieldID=${groupField?._id}`);
   };
@@ -248,7 +261,7 @@ export default function CreateGroup() {
           </TouchableOpacity>
           {/* Tags */}
           <View style={{ flex: 1 }}>
-            <View
+            <TouchableOpacity
               style={[
                 styles.heading,
                 {
@@ -256,13 +269,28 @@ export default function CreateGroup() {
                   flexWrap: "wrap",
                 },
               ]}
+              onPress={() => handleTagsSnapPress(0)}
             >
-              {groupTags.length > 0 &&
-                groupTags.map((tag) => (
+              <Feather name="flag" size={24} color="#fff" />
+              {chosenTags.length > 0 && groupField !== undefined ? (
+                chosenTags.map((tag) => (
                   <TagWrapper key={tag._id} tag={tag.TagName} />
                 ))
+              ) :
+                <Text
+                    style={[
+                      styles.headingTitle,
+                      {
+                        alignSelf: "center",
+                        color: "#fff",
+                        textAlign: "justify",
+                      },
+                    ]}
+                  >
+                    Select Tags for blog
+                  </Text>
               }
-            </View>
+            </TouchableOpacity>
             {groupField && <TouchableOpacity
               style={[
                 styles.heading,
@@ -500,6 +528,25 @@ export default function CreateGroup() {
           </BottomSheetScrollView>
         </BottomSheet>
       </ScrollView>
+      <BottomSheet
+        ref={tagsSheetRef}
+        index={-1} // Start closed
+        snapPoints={tagsSnapPoints}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: "#212531" }}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        // onChange={handleGroupSheetChange}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+      >
+        <TagDropdownComponent tags={groupTags} onPress={onPressTag}/>
+      </BottomSheet>
     </GestureHandlerRootView>
   );
 }
@@ -607,6 +654,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     marginHorizontal: 10,
     borderRadius: 9,
+  },
+  tagsColumn: {
+    width: "70%",
   },
   headingTitle: {
     fontSize: 16,

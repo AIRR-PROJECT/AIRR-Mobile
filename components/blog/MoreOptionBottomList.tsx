@@ -56,11 +56,21 @@ export default function MoreOptionBottomList({
   };
   const handleReportBlog = () => {
     // Handle reporting the blog
-    route.push(`/options/report-blog?blogID=${blogId}&groupID=${groupId}`);
+    if (groupId) {
+      route.push(`/options/report-blog?blogID=${blogId}&groupID=${groupId}`);
+    }
+    else {
+      route.push(`/options/report-blog?blogID=${blogId}`);
+    }
   };
   const handleEditBlog = () => {
     // Handle editing the blog
-    route.push(`/blog/edit-blog?blogID=${blogId}&groupID=${groupId}`);
+    if (groupId) {
+      route.push(`/blog/edit-blog?blogID=${blogId}&groupID=${groupId}`);
+    }
+    else {
+      route.push(`/blog/edit-blog?blogID=${blogId}`);
+    }
     // Pass the blogId to the edit blog screen
   };
   const handleDeleteBlog = () => {

@@ -49,10 +49,10 @@ export default function TagsApprovalsPage() {
   const [tags, setTags] = useState<PendingTagRequest[]>([]);
 
   useEffect(() => {
-    // dispatch(getPendingTagList(groupID)).then(res => {
-    //   const list = res.payload as PendingTagRequest[]
-    //   setTags(list)
-    // })
+    dispatch(getPendingTagList(groupID)).then(res => {
+      const list = res.payload as PendingTagRequest[]
+      setTags(list)
+    })
   }, [])
 
   useEffect(() => {

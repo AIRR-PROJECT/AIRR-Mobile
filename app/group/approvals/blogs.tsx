@@ -39,10 +39,10 @@ export default function BlogsApprovalsPage() {
   const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
 
   useEffect(() => {
-    // dispatch(getPendingBlogList(groupID)).then(res => {
-    //   const list = res.payload as PendingBlogRequest[]
-    //   setBlogs(list)
-    // })
+    dispatch(getPendingBlogList(groupID)).then(res => {
+      const list = res.payload as PendingBlogRequest[]
+      setBlogs(list)
+    })
   }, [])
 
   useEffect(() => {
@@ -59,10 +59,10 @@ export default function BlogsApprovalsPage() {
 
   useEffect(() => {
     if (blogIDToRemove) {
-      // dispatch(getPendingBlogList(groupID)).then(res => {
-      //   const list = res.payload as PendingBlogRequest[]
-      //   setBlogs(list)
-      // })
+      dispatch(getPendingBlogList(groupID)).then(res => {
+        const list = res.payload as PendingBlogRequest[]
+        setBlogs(list)
+      })
     }
   }, [blogIDToRemove])
 

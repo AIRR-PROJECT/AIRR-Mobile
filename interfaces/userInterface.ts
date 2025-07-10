@@ -14,7 +14,7 @@ export interface User1 {
 }
 
 /** Represents survey tags linked to a user */
-export interface SurveyTags {
+export interface SurveyTag {
     _id: string;
     TagName: string;
 }
@@ -52,7 +52,7 @@ export interface User {
     isAuthenticatedWithGoogle?: boolean;
     phoneNumber?: number;
     joinDate?: Date;
-    survey?: SurveyTags[];
+    survey?: SurveyTag[];
     role?: string;
     profile?: any;
 }

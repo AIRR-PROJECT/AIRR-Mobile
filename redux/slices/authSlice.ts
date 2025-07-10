@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import api from "../api/axiosInstance";
 import { ChangeCurrentPasswordCredentials, LoginCredentials, SetPasswordCredentials, SignUpCredentials, Tokens, VerifyAccountCredentials, VerifyPasswordCredentials } from "@/interfaces/authInterface";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import { PartialUser, UpdateAvatar, UpdateUser, User, User1, UserActivity } from "@/interfaces/userInterface";
+import { PartialUser, SurveyTag, UpdateAvatar, UpdateUser, User, User1, UserActivity } from "@/interfaces/userInterface";
 import { jwtDecode } from "jwt-decode";
 import { setTokens, setCurrentUser, setUserPreviewGroup, setUserAvatar, reset } from "./userSlice";
 import { ResponseFailcode } from "@/enums/failcode.enum";
@@ -297,6 +297,25 @@ export const getPartialUserInfo = createAsyncThunk(
             }
             else {
                 return null
+            }
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
+    }
+)
+
+export const getUserRelatedTags = createAsyncThunk(
+    'user/getUserRelatedTags',
+    async (_, thunkAPI) => {
+        try {
+            const res = await api.get(`tag/get-related-tags`)
+
+            if (res.data.success) {
+                return res.data.data.tagList as SurveyTag[]
+            }
+            else {
+                return []
             }
         }
         catch (err: any) {

@@ -37,23 +37,6 @@ import { router, useRouter } from "expo-router";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
-// temporary use this cause figma not provide the image
-const mockFieldList = [
-  "Web Development",
-  "Mobile Development",
-  "Data Science",
-  "Machine Learning",
-  "Artificial Intelligence",
-  "Cloud Computing",
-  "Cyber Security",
-  "DevOps",
-  "Blockchain",
-  "Internet of Things",
-  "Game Development",
-  "UI/UX Design",
-  "Digital Marketing",
-];
-
 export default function CreateGroup() {
   const dispatch = useAppDispatch();
   const route = useRouter();

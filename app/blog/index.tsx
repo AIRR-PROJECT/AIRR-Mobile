@@ -742,6 +742,7 @@ export default function BlogScreen() {
           groupId={
             currentUserBlog.Group ? currentUserBlog.Group._id : undefined
           }
+          isFromDetail={true}
           handleHideThisBlog={handleHideBlog}
           handleDeleteThisBlog={handleDeleteBlog}
         />

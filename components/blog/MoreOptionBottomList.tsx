@@ -20,8 +20,9 @@ type MoreOptionComponentProps = {
   groupId?: string;
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
   isFromFavourites?: boolean; // Optional prop to indicate if the blog is from favourites
-  handleHideThisBlog: () => void
-  handleDeleteThisBlog: () => void
+  isFromDetail: boolean; // Optional prop to indicate if the blog is from detail
+  handleHideThisBlog: () => void;
+  handleDeleteThisBlog: () => void;
 };
 export default function MoreOptionBottomList({
   sheetRef,
@@ -30,8 +31,9 @@ export default function MoreOptionBottomList({
   groupId,
   isFromFeed = false, // Default to false if not provided
   isFromFavourites = false, // Default to false if not provided
+  isFromDetail = false, // Default to false if not provided
   handleHideThisBlog,
-  handleDeleteThisBlog
+  handleDeleteThisBlog,
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
@@ -47,7 +49,7 @@ export default function MoreOptionBottomList({
 
       if (result == true) {
         ToastAndroid.show("Blog hidden", ToastAndroid.SHORT);
-        handleHideThisBlog()
+        handleHideThisBlog();
         sheetRef.current?.close();
       }
     });
@@ -67,7 +69,7 @@ export default function MoreOptionBottomList({
 
       if (result == true) {
         ToastAndroid.show("Blog deleted", ToastAndroid.SHORT);
-        handleDeleteThisBlog()
+        handleDeleteThisBlog();
         sheetRef.current?.close();
       }
     });
@@ -151,15 +153,17 @@ export default function MoreOptionBottomList({
               </Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
-            style={styles.bottomOptionButton}
-            onPress={handleHideBlog}
-            activeOpacity={0.8}
-          >
-            {/* Hide */}
-            <Entypo name="circle-with-minus" size={24} color="black" />
-            <Text style={styles.bottomOptionText}>Hide blog</Text>
-          </TouchableOpacity>
+          {!isFromDetail && (
+            <TouchableOpacity
+              style={styles.bottomOptionButton}
+              onPress={handleHideBlog}
+              activeOpacity={0.8}
+            >
+              {/* Hide */}
+              <Entypo name="circle-with-minus" size={24} color="black" />
+              <Text style={styles.bottomOptionText}>Hide blog</Text>
+            </TouchableOpacity>
+          )}
           {!isFromFeed && (
             <TouchableOpacity
               style={styles.bottomOptionButton}

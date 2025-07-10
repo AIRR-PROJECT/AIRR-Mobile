@@ -3,8 +3,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 export default function ContentsPageTabLayout() {
-  const { groupID, memberID, requestID } = useLocalSearchParams<{ groupID: string, memberID: string, requestID: string }>()
-
+  const { groupID, memberID, requestID } = useLocalSearchParams<{
+    groupID: string;
+    memberID: string;
+    requestID: string;
+  }>();
+  // TODO: CHECK IF USER IS NOT ADMIN OR OWNER, DISABLE REPORTS TAB
   return (
     <MaterialTopTabs
       style={{ flex: 1 }}
@@ -48,29 +52,28 @@ export default function ContentsPageTabLayout() {
         swipeEnabled: false,
       })}
     >
-     
-        <MaterialTopTabs.Screen
-          name="blogs"
-          options={{ title: "Blogs" }}
-          initialParams={{
-            groupID,
-            requestID
-          }}
-        />
+      <MaterialTopTabs.Screen
+        name="blogs"
+        options={{ title: "Blogs" }}
+        initialParams={{
+          groupID,
+          requestID,
+        }}
+      />
       <MaterialTopTabs.Screen
         name="tags"
         options={{ title: "Tags" }}
         initialParams={{
           groupID,
-          requestID
+          requestID,
         }}
       />
-       <MaterialTopTabs.Screen
+      <MaterialTopTabs.Screen
         name="members"
         options={{ title: "Members" }}
         initialParams={{
           groupID,
-          memberID
+          memberID,
         }}
       />
       <MaterialTopTabs.Screen
@@ -78,7 +81,7 @@ export default function ContentsPageTabLayout() {
         options={{ title: "Reports" }}
         initialParams={{
           groupID,
-          requestID
+          requestID,
         }}
       />
     </MaterialTopTabs>

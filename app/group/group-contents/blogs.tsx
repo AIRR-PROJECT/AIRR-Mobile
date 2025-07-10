@@ -43,6 +43,12 @@ const initialBlogs = [mockBlog, mockBlog, mockBlog].map((b, i) => ({
   blog: { ...b.blog, _id: i.toString() },
 }));
 
+enum TabOptions {
+  All = "all",
+  MyBlogs = "my-blogs",
+  NeedApproval = "need-approval",
+}
+
 export default function BlogsApprovalsPage() {
   // Currently use state to manage the blogs
 
@@ -106,47 +112,48 @@ export default function BlogsApprovalsPage() {
     />
   );
   const flatlistRef = useRef<any>(null);
-  
-  const [selectedTab, setSelectedTab] = useState<
-    "all" | "approved" | "rejected"
-  >("all");
 
+  const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
+  // TODO: Replace with actual logic to check if the user is admin or owner
+  const isUserAdminOrOwner = true; // This should be replaced with actual logic to check if the user is admin or owner
+  // 2 lựa chọn trên thì là cái feed blog preview
+  // Còn cái lựa chọn thứ 3 là cái approval blog như bên approval 
   return (
     <GestureHandlerRootView style={styles.container}>
-      {/* Make a horizontal bar that have 3 option */}
       <View style={styles.optionBar}>
+     
         <TouchableOpacity
           style={[
             styles.optionButton,
-            selectedTab === "all" && styles.optionButtonActive,
+            selectedTab === TabOptions.All && styles.optionButtonActive,
           ]}
-          onPress={() => setSelectedTab("all")}
+          onPress={() => setSelectedTab(TabOptions.All)}
         >
-          <FontAwesome6 name="list" size={16} color="white" />
-          <Text style={styles.optionText}>All</Text>
+          <Text style={styles.optionText}>{isUserAdminOrOwner ? "All Published Blogs" : "All Blogs"}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
             styles.optionButton,
-            selectedTab === "approved" && styles.optionButtonActive,
+            selectedTab === TabOptions.MyBlogs && styles.optionButtonActive,
           ]}
-          onPress={() => setSelectedTab("approved")}
+          onPress={() => setSelectedTab(TabOptions.MyBlogs)}
         >
-          <FontAwesome6 name="check" size={16} color="white" />
-          <Text style={styles.optionText}>Approved</Text>
+          <Text style={styles.optionText}>My Blogs</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.optionButton,
-            selectedTab === "rejected" && styles.optionButtonActive,
-          ]}
-          onPress={() => setSelectedTab("rejected")}
-        >
-          <FontAwesome6 name="times" size={16} color="white" />
-          <Text style={styles.optionText}>Rejected</Text>
-        </TouchableOpacity>
+        {/* TODO: ẤN nút này thì copy cái bên approval qua */}
+        {isUserAdminOrOwner && (
+          <TouchableOpacity
+            style={[
+              styles.optionButton,
+              selectedTab === TabOptions.NeedApproval &&
+                styles.optionButtonActive,
+            ]}
+            onPress={() => setSelectedTab(TabOptions.NeedApproval)}
+          >
+            <Text style={styles.optionText}>Need Approval</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Animated FlatList */}
@@ -187,11 +194,8 @@ const styles = StyleSheet.create({
   },
   optionBar: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     marginBottom: 20,
-    backgroundColor: "#2E3B40",
-    paddingVertical: 12,
-    paddingHorizontal: 15,
     borderRadius: 14,
   },
   optionButton: {
@@ -208,6 +212,5 @@ const styles = StyleSheet.create({
   optionText: {
     color: "#fff",
     fontSize: 14,
-    marginLeft: 8,
   },
 });

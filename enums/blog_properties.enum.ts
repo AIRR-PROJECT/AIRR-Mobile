@@ -6,5 +6,9 @@ export enum BlogViewType {
 
 export enum BlogStatus {
     ACTIVE = 'Active',
-    PENDING = 'Pending'
+    PENDING = 'Pending',
+    BANNED = 'Banned',
+    REJECTED = 'Rejected',
+    IN_PROFILE_PAGE = 'In Profile Page',
+    PRIVATE = 'Private',
 }

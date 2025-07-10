@@ -542,6 +542,21 @@ GroupPageProps) {
           />
         </View>
       </View>
+      <View>
+        <TouchableOpacity
+        style={styles.contentButton}
+        onPress={handleNewPostPress}
+      >
+        <Text
+          style={{
+            color: "#000",
+            fontWeight: "bold",
+          }}
+        >
+          Create Blog 
+        </Text>
+      </TouchableOpacity>
+      </View>
       {/* <View style={styles.rowContainer}>
         <TouchableOpacity
           style={styles.infoContainer}
@@ -549,7 +564,10 @@ GroupPageProps) {
           onPress={handlePressGroupMemberList}
         ></TouchableOpacity>
       </View> */}
-      <Divider color="#242630" width={1} style={{ }} />
+      {/* Divider */}
+      <View style={{ height: 1, backgroundColor: "#4A4A4A", marginVertical: 10 }} />
+      {/* Button to go to tab for Content */}
+      
       {/* Button to go to tab for Content */}
       <TouchableOpacity
         style={styles.contentButton}
@@ -557,7 +575,7 @@ GroupPageProps) {
       >
         <Text
           style={{
-            color: selectedId === 0 ? "#fff" : "#8A94AC",
+            color: "#000",
             fontWeight: "bold",
           }}
         >
@@ -1021,7 +1039,6 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingBlock: 10,
     borderRadius: 20,
-    marginTop: 20,
     alignItems: "center",
   },
 });

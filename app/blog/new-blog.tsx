@@ -761,13 +761,13 @@ export default function NewBlog() {
         )}
         footerComponent={renderGroupFooter}
       >
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={handleCreateGroup}
           style={styles.createGroupButton}
           activeOpacity={0.8}
         >
           <Text style={styles.createGroupButtonText}>Create New Group</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View>
           <BottomSheetFlatList
             data={searchFoundGroups}

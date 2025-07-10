@@ -559,17 +559,7 @@ export default function BlogScreen() {
           {/* Title */}
           <Text style={styles.title}>{title}</Text>
           {/* Status */}
-          {searchParams.userBlogId && currentUserBlog && currentUserBlog.ViewType === BlogViewType.IN_GROUP &&
-            <View style={[styles.statusContainer, { 
-              backgroundColor: currentUserBlog.Status === BlogStatus.ACTIVE ? "#dcfce7" : "#fcdcdc"
-            }]}>
-              {currentUserBlog.Status === BlogStatus.ACTIVE ? 
-                <Feather name="check-circle" size={20} color="green" />
-                : <Feather name="x-circle" size={20} color="red" />
-              }
-              <Text style={{ color: currentUserBlog.Status === BlogStatus.ACTIVE ? "green" : "red" }}>{currentUserBlog.Status}</Text>
-            </View>
-          }
+          {/* TODO: Send status here */}
           <BlogStatusComponent status={ BlogStatus.ACTIVE } />
           <View style={{paddingTop : 20}}/>
           {/* Date and number of comment */}

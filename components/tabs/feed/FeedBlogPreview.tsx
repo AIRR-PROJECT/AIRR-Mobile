@@ -26,6 +26,8 @@ import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
 import { ThemedText } from "@/components/ThemedText";
 import BottomSheet from "@gorhom/bottom-sheet";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
+import BlogStatusComponent from "@/components/blog/BlogStatusComponent";
+import { BlogStatus } from "@/enums/blog_properties.enum";
 const mockGroup = {
   Name: "Group Name",
   CoverURL:
@@ -213,6 +215,8 @@ export default function FeedBlogPreview({
               <Text style={styles.tag}>+{blog.Tags.length - 2} more</Text>
             )}
           </View>
+           <BlogStatusComponent status={BlogStatus.IN_PROFILE_PAGE} />
+
         </Pressable>
       </ImageBackground>
       <View style={{ padding: 20 }}>

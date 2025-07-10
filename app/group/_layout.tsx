@@ -141,6 +141,18 @@ export default function GroupLayout() {
             ),
           }}
         />
+        <Stack.Screen
+          name="group-contents"
+          options={{
+            headerTitle: "Group Contents",
+          }}
+        />
+        <Stack.Screen
+          name="owner-leave"
+          options={{
+            headerTitle: "Owner Leave Group",
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

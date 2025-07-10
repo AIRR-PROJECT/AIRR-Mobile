@@ -27,18 +27,18 @@ import { useLocalSearchParams } from "expo-router";
 // }));
 
 export default function MemberApprovalsPage() {
-  const dispatch = useAppDispatch()
+  // const dispatch = useAppDispatch()
   const flatlistRef = useRef<any>()
   const { groupID, memberID } = useLocalSearchParams<{ groupID: string, memberID: string }>()
 
   const [members, setMembers] = useState<PendingMemberRequest[]>([]);
 
-  useEffect(() => {
-    dispatch(getPendingMemberList(groupID)).then(res => {
-      const list = res.payload as PendingMemberRequest[]
-      setMembers(list)
-    })
-  }, [])
+  // useEffect(() => {
+  //   dispatch(getPendingMemberList(groupID)).then(res => {
+  //     const list = res.payload as PendingMemberRequest[]
+  //     setMembers(list)
+  //   })
+  // }, [])
 
   useEffect(() => {
     // Scroll to specific index
@@ -53,21 +53,21 @@ export default function MemberApprovalsPage() {
   }, [members, memberID])
 
   const onApprove = (id: string) => {
-    dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(res => {
-      if (res.payload === true) {
-        console.log("Approve user with id: ", id);
-        setMembers((prev) => prev.filter((u) => u.Owner._id !== id));
-      }
-    })
+    // dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(res => {
+    //   if (res.payload === true) {
+    //     console.log("Approve user with id: ", id);
+    //     setMembers((prev) => prev.filter((u) => u.Owner._id !== id));
+    //   }
+    // })
   };
 
   const onReject = (id: string) => {
-    dispatch(rejectMember({ groupID, userIDToReject: id })).then(res => {
-      if (res.payload === true) {
-        console.log("Reject user with id: ", id);
-        setMembers((prev) => prev.filter((u) => u.Owner._id !== id));
-      }
-    })
+    // dispatch(rejectMember({ groupID, userIDToReject: id })).then(res => {
+    //   if (res.payload === true) {
+    //     console.log("Reject user with id: ", id);
+    //     setMembers((prev) => prev.filter((u) => u.Owner._id !== id));
+    //   }
+    // })
   };
 
   const renderItem = ({ item }: any) => (

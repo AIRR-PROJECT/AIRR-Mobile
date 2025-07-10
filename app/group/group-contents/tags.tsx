@@ -42,18 +42,18 @@ const initialTags = [mockTag1, mockTag2, mockTag3]
 
 // later remember to add the props
 export default function TagsApprovalsPage() {
-  const dispatch = useAppDispatch()
+  // const dispatch = useAppDispatch()
   const flatlistRef = useRef<any>()
   const { groupID, tagID } = useLocalSearchParams<{ groupID: string, tagID: string }>()
   
   const [tags, setTags] = useState<PendingTagRequest[]>([]);
 
-  useEffect(() => {
-    dispatch(getPendingTagList(groupID)).then(res => {
-      const list = res.payload as PendingTagRequest[]
-      setTags(list)
-    })
-  }, [])
+  // useEffect(() => {
+  //   dispatch(getPendingTagList(groupID)).then(res => {
+  //     const list = res.payload as PendingTagRequest[]
+  //     setTags(list)
+  //   })
+  // }, [])
 
   useEffect(() => {
     // Scroll to specific index
@@ -68,28 +68,28 @@ export default function TagsApprovalsPage() {
   }, [tags, tagID])
 
   const onApprove = (tagId: string, blogIDs: string[]) => {
-    dispatch(approveTag({
-      groupID: groupID,
-      tagIDToApprove: tagId,
-      blogIDsContainTag: blogIDs
-    })).then(res => {
-      if (res.payload === true) {
-        console.log("Approve tag with tag-name: ", tagId);
-        setTags((prev) => prev.filter((b) => b._id !== tagId));
-      }
-    })
+    // dispatch(approveTag({
+    //   groupID: groupID,
+    //   tagIDToApprove: tagId,
+    //   blogIDsContainTag: blogIDs
+    // })).then(res => {
+    //   if (res.payload === true) {
+    //     console.log("Approve tag with tag-name: ", tagId);
+    //     setTags((prev) => prev.filter((b) => b._id !== tagId));
+    //   }
+    // })
   };
   const onReject = (tagId: string, blogIDs: string[]) => {
-    dispatch(rejectTag({
-      groupID: groupID,
-      tagIDToReject: tagId,
-      blogIDsContainTag: blogIDs
-    })).then(res => {
-      if (res.payload === true) {
-        console.log("Reject tag with tag-name: ", tagId);
-        setTags((prev) => prev.filter((b) => b._id !== tagId));
-      }
-    })
+    // dispatch(rejectTag({
+    //   groupID: groupID,
+    //   tagIDToReject: tagId,
+    //   blogIDsContainTag: blogIDs
+    // })).then(res => {
+    //   if (res.payload === true) {
+    //     console.log("Reject tag with tag-name: ", tagId);
+    //     setTags((prev) => prev.filter((b) => b._id !== tagId));
+    //   }
+    // })
   };
   // TODO: Khoa: change the any type to the correct type
   const renderItem = ({ item }: any) => (

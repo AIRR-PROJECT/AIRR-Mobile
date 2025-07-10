@@ -329,7 +329,6 @@ export default function GroupPage() {
           // selectedBlogFilter={selectedBlogFilter}
           // selectedTagFilter={selectedTagFilter}
         />
-        <View>{renderContent()}</View>
       </ParallaxFlatList>
       <BlogMoreOptionBottomList
         sheetRef={sheetRef}

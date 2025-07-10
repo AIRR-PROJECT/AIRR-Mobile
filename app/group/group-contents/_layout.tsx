@@ -29,7 +29,7 @@ export default function ContentsPageTabLayout() {
               style={{
                 borderRadius: 8,
                 paddingVertical: 6,
-                paddingHorizontal: 12,
+                paddingHorizontal: 6,
                 margin: 4,
               }}
             >
@@ -48,28 +48,29 @@ export default function ContentsPageTabLayout() {
         swipeEnabled: false,
       })}
     >
-      <MaterialTopTabs.Screen
-        name="members"
-        options={{ title: "Members" }}
-        initialParams={{
-          groupID,
-          memberID
-        }}
-      />
-      <MaterialTopTabs.Screen
-        name="blogs"
-        options={{ title: "Blogs" }}
-        initialParams={{
-          groupID,
-          requestID
-        }}
-      />
+     
+        <MaterialTopTabs.Screen
+          name="blogs"
+          options={{ title: "Blogs" }}
+          initialParams={{
+            groupID,
+            requestID
+          }}
+        />
       <MaterialTopTabs.Screen
         name="tags"
         options={{ title: "Tags" }}
         initialParams={{
           groupID,
           requestID
+        }}
+      />
+       <MaterialTopTabs.Screen
+        name="members"
+        options={{ title: "Members" }}
+        initialParams={{
+          groupID,
+          memberID
         }}
       />
       <MaterialTopTabs.Screen

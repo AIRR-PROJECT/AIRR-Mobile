@@ -32,6 +32,7 @@ import {
 import {
   AIBlogSection,
   PostComment,
+  UserBlogChildComment,
   UserBlogComment,
   UserBlogTag,
 } from "@/interfaces/blogInterface";
@@ -94,9 +95,9 @@ const mockCommenter: UserBlogComment = {
   },
   createdAt: new Date("18 Nov 2023"),
   updatedAt: new Date("18 Nov 2023"),
-  Content:
-    "I just tried this recipe and it was amazing! The instructions were clear and easy to follow, and the end result was delicious. I will definitely be making this again. Thanks for sharing!",
+  Content: "I just tried this recipe and it was amazing! The instructions were clear and easy to follow, and the end result was delicious. I will definitely be making this again. Thanks for sharing!",
   _id: "123",
+  ChildrenComments: []
 };
 const mockComments = [
   mockCommenter,
@@ -234,6 +235,7 @@ export default function CommentBlogScreen() {
   // Comment options
   const [editCommentContent, setEditCommentContent] = useState("");
   const [chosenComment, setChosenComment] = useState<UserBlogComment>()
+  const [chosenChildComment, setChosenChildComment] = useState<UserBlogChildComment>()
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -352,18 +354,38 @@ export default function CommentBlogScreen() {
   }
   const handleDeleteComment = () => {
     if (chosenComment) {
-      dispatch(deleteComment({
-        BlogID: searchParams.blogId,
-        CommentID: chosenComment._id
-      })).then((res) => {
-        const result = res.payload as boolean
-
-        if (result === true) {
-          ToastAndroid.showWithGravity("Comment deleted", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-          setBlogComments(blogComments.filter((c) => c._id != chosenComment._id))
-          sheetRef.current?.close()
-        }
-      })
+      if (!chosenChildComment) {
+        dispatch(deleteComment({
+          BlogID: searchParams.blogId,
+          CommentID: chosenComment._id
+        })).then((res) => {
+          const result = res.payload as boolean
+  
+          if (result === true) {
+            ToastAndroid.showWithGravity("Comment deleted", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            setBlogComments(blogComments.filter((c) => c._id != chosenComment._id))
+            sheetRef.current?.close()
+          }
+        })
+      }
+      else {
+        dispatch(deleteComment({
+          BlogID: searchParams.blogId,
+          CommentID: chosenChildComment._id
+        })).then((res) => {
+          const result = res.payload as boolean
+  
+          if (result === true) {
+            ToastAndroid.showWithGravity("Comment deleted", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as UserBlogComment[]
+            let index = blogCommentsClone.findIndex((c) => c._id != chosenComment._id)
+            let editedChild = blogCommentsClone[index].ChildrenComments.filter((c) => c._id != chosenChildComment._id)
+            blogCommentsClone[index] = editedChild
+            setBlogComments(blogComments.filter((c) => c._id != chosenComment._id))
+            sheetRef.current?.close()
+          }
+        })
+      }
     }
   }
   useEffect(() => {
@@ -374,11 +396,12 @@ export default function CommentBlogScreen() {
   const [isEditingComment, setIsEditingComment] = useState(false);
   const sheetRef = useRef<BottomSheet>(null);
   const [isUserWrittenComment, setIsUserWrittenComment] = useState(false);
-  const handleMorePress = (isUserWrittenComment: boolean, chosenComment: UserBlogComment) => {
+  const handleMorePress = (isUserWrittenComment: boolean, chosenComment: UserBlogComment, chosenChildComment?: UserBlogChildComment) => {
     setIsUserWrittenComment(isUserWrittenComment);
     if (sheetRef.current) {
       if (isUserWrittenComment) {
         setChosenComment(chosenComment)
+        setChosenChildComment(chosenChildComment)
         sheetRef.current.snapToIndex(0);
       }
     }
@@ -475,7 +498,7 @@ export default function CommentBlogScreen() {
               placeholderTextColor="#565656"
               multiline
               numberOfLines={4}
-              defaultValue={chosenComment?.Content}
+              defaultValue={chosenChildComment ? chosenChildComment.Content : chosenComment?.Content}
               onChangeText={handleInputUserEditComment}
               textAlignVertical="top"
             />
@@ -500,11 +523,10 @@ export default function CommentBlogScreen() {
           keyExtractor={(item, index) => item._id + index}
           renderItem={({ item }) => (
             <BlogCommenter
-              {...item}
-              replies={item.ChildrenComments}
+              comment={item}
               onReplyPosted={handleReplyPosted}
               sheetRef={sheetRef}
-              onMorePress={() => handleMorePress(user._id == (item as UserBlogComment).User._id, item)}
+              onMorePress={handleMorePress}
             />
           )}
           style={[styles.flatListContainer]}

@@ -101,6 +101,7 @@ export interface UserBlogComment {
     Content: string
     createdAt: Date
     updatedAt: Date
+    ChildrenComments: UserBlogChildComment[]
 }
 
 export interface UserBlogChildComment {

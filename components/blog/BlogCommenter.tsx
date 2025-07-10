@@ -59,18 +59,14 @@ const mockUserBlogCommentList = [
   mockUserBlogComment,
 ];
 
-type BlogCommenterProps = UserBlogComment & {
-  replies: UserBlogChildComment[];
+type BlogCommenterProps = {
+  comment: UserBlogComment
   onReplyPosted: () => void;
-  onMorePress?: (isUserWrittenComment: boolean) => void;
+  onMorePress: (isUserWrittenComment: boolean, chosenComment: UserBlogComment, chosenChildComment?: UserBlogChildComment) => void;
   sheetRef: React.RefObject<BottomSheet>; 
 };
 export default function BlogCommenter({
-  User,
-  Content,
-  createdAt,
-  _id,
-  replies,
+  comment,
   onReplyPosted,
   onMorePress,
   sheetRef, 
@@ -87,7 +83,7 @@ export default function BlogCommenter({
   const handleReplyPress = () => {
     setIsReplying(!isReplying);
     if (!isReplying) {
-      setReplyText(`@${User.UserName} `); // Pre-fill with mention
+      setReplyText(`@${comment.User.UserName} `); // Pre-fill with mention
       // // Allow time for the reply section to render before focusing
       // setTimeout(() => {
       //   textInputRef.current?.focus();
@@ -135,12 +131,12 @@ export default function BlogCommenter({
   };
   const handleMorePress = () => {
     if (onMorePress) {
-      onMorePress(isUserWrittenComment);
+      onMorePress(isUserWrittenComment, comment);
     }
   };
-  const isUserWrittenComment = User._id === user._id;
+  const isUserWrittenComment = comment.User._id === user._id;
   console.log("isUserWrittenComment", isUserWrittenComment);
-  console.log("User", User._id);
+  console.log("User", comment.User._id);
   console.log("Current user", user._id);
   return (
     <View style={styles.container}>
@@ -150,13 +146,13 @@ export default function BlogCommenter({
         >
           {/* User avatar */}
           <View style={styles.rowContainer}>
-            <Image style={styles.avatar} source={{ uri: User.AvatarURL }} />
+            <Image style={styles.avatar} source={{ uri: comment.User.AvatarURL }} />
             {/* name and date */}
             <View>
               <View>
-                <Text style={styles.name}>{User.UserName}</Text>
+                <Text style={styles.name}>{comment.User.UserName}</Text>
                 <Text style={styles.date}>
-                  {new Date(createdAt).toDateString()}
+                  {new Date(comment.createdAt).toDateString()}
                 </Text>
               </View>
             </View>
@@ -169,7 +165,7 @@ export default function BlogCommenter({
           )}
         </View>
         {/* Actual Comment */}
-        <Text style={styles.comment}>{Content}</Text>
+        <Text style={styles.comment}>{comment.Content}</Text>
         <Divider />
         {/* Like, Comment, Share */}
         {/* Write comment */}
@@ -198,7 +194,7 @@ export default function BlogCommenter({
           >
             <Text style={styles.replyTo}>
               Replying to{" "}
-              <Text style={styles.otherUserUserName}>@{User.UserName}</Text>{" "}
+              <Text style={styles.otherUserUserName}>@{comment.User.UserName}</Text>{" "}
               comment
             </Text>
             <TouchableOpacity onPress={handleCloseReply}>
@@ -214,12 +210,12 @@ export default function BlogCommenter({
               textAlignVertical="top"
               onChangeText={setReplyText}
             >
-              <Text style={[styles.otherUserUserName]}>@{User.UserName} </Text>{" "}
+              <Text style={[styles.otherUserUserName]}>@{comment.User.UserName} </Text>{" "}
             </TextInput>
             {/* Send button */}
             <TouchableOpacity
               style={[styles.sendButton]}
-              onPress={() => handleSendReply(_id)}
+              onPress={() => handleSendReply(comment._id)}
               activeOpacity={0.8}
             >
               <Text style={styles.sendButtonText}>Reply</Text>
@@ -233,18 +229,15 @@ export default function BlogCommenter({
         contentContainerStyle={{ gap: 10 }}
         ref={childScrollViewRef}
       >
-        {(replies ?? []).map((comment, index) => (
+        {(comment.ChildrenComments ?? []).map((childComment, index) => (
           <BlogCommenterChild
             key={index}
-            User={comment.User}
-            Content={comment.Content}
-            createdAt={comment.createdAt}
-            replyTo={comment.ReplyToComment.User.UserName}
+            parentComment={comment}
+            comment={childComment} 
+            replyTo={childComment.ReplyToComment.User.UserName}
             onReturnContentPress={handleReturnContentPress}
-            _id={comment._id}
-            rootCommentID={_id}
-            onMorePress={onMorePress}
-          />
+            rootCommentID={comment._id}
+            onMorePress={onMorePress}/>
         ))}
       </ScrollView>
       {/* More option for comment */}

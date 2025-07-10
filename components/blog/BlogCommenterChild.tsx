@@ -14,6 +14,7 @@ import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
 import {
   ReplyToBlogComment,
+  UserBlogChildComment,
   UserBlogComment,
 } from "@/interfaces/blogInterface";
 import { useState, useRef, useEffect } from "react";
@@ -25,21 +26,21 @@ import {
 } from "@/redux/slices/blogSlice";
 // reply to là tên của người mà user reply lại trong content
 // nó có thể khác với parent comment
-type BlogCommenterChildProps = UserBlogComment & {
+type BlogCommenterChildProps = {
+  parentComment: UserBlogComment,
+  comment: UserBlogChildComment
   replyTo: string;
   onReturnContentPress: (childCommentContent: string) => void;
-  onMorePress?: (isUserWrittenComment: boolean) => void;
+  onMorePress?: (isUserWrittenComment: boolean, chosenComment: UserBlogComment, chosenChildComment: UserBlogChildComment) => void;
 } & { rootCommentID: string };
 
 export default function BlogCommenterChild({
-  User,
-  Content,
-  createdAt,
+  parentComment,
+  comment,
   replyTo,
-  _id,
   rootCommentID,
   onReturnContentPress: returnContentPress,
-  onMorePress = () => {},
+  onMorePress,
 }: BlogCommenterChildProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -67,7 +68,7 @@ export default function BlogCommenterChild({
   const handleReplyPress = () => {
     setIsReplying(!isReplying);
     if (!isReplying) {
-      setReplyText(`@${User.UserName} `); // Pre-fill with mention
+      setReplyText(`@${comment.User.UserName} `); // Pre-fill with mention
       // // Allow time for the reply section to render before focusing
       // setTimeout(() => {
       //   textInputRef.current?.focus();
@@ -108,10 +109,10 @@ export default function BlogCommenterChild({
     setReplyText("");
     Keyboard.dismiss();
   };
-  const isUserWrittenComment = User._id === user._id;
+  const isUserWrittenComment = comment.User._id === user._id;
   const handleMorePress = () => {
     if (onMorePress) {
-      onMorePress(isUserWrittenComment);
+      onMorePress(isUserWrittenComment, parentComment, comment);
     }
   };
   return (
@@ -122,13 +123,13 @@ export default function BlogCommenterChild({
         >
           {/* User avatar */}
           <View style={styles.rowContainer}>
-            <Image style={styles.avatar} source={{ uri: User.AvatarURL }} />
+            <Image style={styles.avatar} source={{ uri: comment.User.AvatarURL }} />
             {/* name and date */}
             <View>
               <View>
-                <Text style={styles.name}>{User.UserName}</Text>
+                <Text style={styles.name}>{comment.User.UserName}</Text>
                 <Text style={styles.date}>
-                  {new Date(createdAt).toDateString()}
+                  {new Date(comment.createdAt).toDateString()}
                 </Text>
               </View>
             </View>
@@ -142,7 +143,7 @@ export default function BlogCommenterChild({
         </View>
         {/* Actual Comment */}
         <Text style={styles.comment}>
-          <Text style={[styles.otherUserUserName]}>@{replyTo}</Text> {Content}
+          <Text style={[styles.otherUserUserName]}>@{replyTo}</Text> {comment.Content}
         </Text>
         <Divider />
         {/* Like, Comment, Share */}
@@ -170,7 +171,7 @@ export default function BlogCommenterChild({
           >
             <Text style={styles.replyTo}>
               Replying to{" "}
-              <Text style={styles.otherUserUserName}>@{User.UserName}</Text>{" "}
+              <Text style={styles.otherUserUserName}>@{comment.User.UserName}</Text>{" "}
               comment
             </Text>
             <TouchableOpacity onPress={handleCloseReply}>
@@ -186,12 +187,12 @@ export default function BlogCommenterChild({
               textAlignVertical="top"
               onChangeText={setReplyText}
             >
-              <Text style={[styles.otherUserUserName]}>@{User.UserName} </Text>{" "}
+              <Text style={[styles.otherUserUserName]}>@{comment.User.UserName} </Text>{" "}
             </TextInput>
             {/* Send button */}
             <TouchableOpacity
               style={[styles.sendButton]}
-              onPress={() => handleSendReply(_id, rootCommentID)}
+              onPress={() => handleSendReply(comment._id, rootCommentID)}
               activeOpacity={0.8}
             >
               <Text style={styles.sendButtonText}>Reply</Text>

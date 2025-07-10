@@ -21,8 +21,9 @@ import { Collapsible } from "../Collapsible";
 import TabButton from "./feed/TabButton";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { saveTags } from "@/redux/slices/feedSlice";
-import { getUserInfo } from "@/redux/slices/authSlice";
+import { getUserInfo, getUserRelatedTags } from "@/redux/slices/authSlice";
 import { countUnseenNotif } from "@/redux/slices/notifSlice";
+import { SurveyTag, User } from "@/interfaces/userInterface";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type RightHeaderProps = {
@@ -36,10 +37,10 @@ type Tag = {
 
 // const userSelectedTabs = ["Python", "JavaScript", "React", "Vue", "Angular"];
 // const defaultSuggestedTabs = ["Java", "C++", "C#", "Ruby", "Rust", "Go", "Swift"];
-let suggestedTags: Tag[] = [];
-let selectedTags: Tag[] = [];
-let originalSuggestedTags: Tag[];
-let originalSelectedTags: Tag[];
+let suggestedTags: SurveyTag[] = [];
+let selectedTags: SurveyTag[] = [];
+let originalSuggestedTags: SurveyTag[];
+let originalSelectedTags: SurveyTag[];
 
 export default function RightHeader({ avatar }: RightHeaderProps) {
   const route = useRouter();
@@ -76,17 +77,23 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
   }, [user]);
 
   const refreshTags = () => {
-    suggestedTags = user
-      ? ((user as any).survey.RelatedTags as Tag[]).map((tag, index) => tag)
-      : [];
+    // Get suggested tags
+    dispatch(getUserRelatedTags()).then((res) => {
+      suggestedTags = user
+        ? (res.payload as SurveyTag[]).map((tag, index) => tag)
+        : [];
+      originalSuggestedTags = JSON.parse(JSON.stringify(suggestedTags));
+
+      const initSuggestedTagsShow = suggestedTags.map(() => true);
+      setSuggestedTagsShow(initSuggestedTagsShow);
+    })
+    
+    // Get selected tags
     selectedTags = user
-      ? ((user as any).survey.SelectedTags as Tag[]).map((tag, index) => tag)
+      ? ((user as User).survey as SurveyTag[]).map((tag, index) => tag)
       : [];
-    originalSuggestedTags = JSON.parse(JSON.stringify(suggestedTags));
     originalSelectedTags = JSON.parse(JSON.stringify(selectedTags));
 
-    const initSuggestedTagsShow = suggestedTags.map(() => true);
-    setSuggestedTagsShow(initSuggestedTagsShow);
     const initSelectedTagsShow = selectedTags.map(() => true);
     setSelectedTagsShow(initSelectedTagsShow);
   };
@@ -204,8 +211,6 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
       </ScrollView>
     );
   }
-  const [isSortDropdownVisible, setSortDropdownVisible] = useState(false);
-  const [sortOption, setSortOption] = useState("Default"); // or any default
 
   return (
     <View style={styles.container}>
@@ -337,33 +342,6 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
                     </ThemedText>
                   </TouchableOpacity>
                 ))}
-              </View>
-              <View>
-                <TouchableOpacity
-                  style={styles.modalSortButtonContainer}
-                  onPress={() => setSortDropdownVisible((prev) => !prev)}
-                >
-                  <ThemedText style={styles.modalSortButton}>Sort</ThemedText>
-                  <Entypo name="select-arrows" size={24} color="black" />
-                </TouchableOpacity>
-
-                {isSortDropdownVisible && (
-                  <View style={styles.sortDropdown}>
-                    {["Popular", "By Date", "By Like", "By Comments"].map(
-                      (option) => (
-                        <TouchableOpacity
-                          key={option}
-                          onPress={() => {
-                            setSortOption(option);
-                            setSortDropdownVisible(false);
-                          }}
-                        >
-                          <Text style={styles.sortOption}>{option}</Text>
-                        </TouchableOpacity>
-                      )
-                    )}
-                  </View>
-                )}
               </View>
             </View>
             <Divider

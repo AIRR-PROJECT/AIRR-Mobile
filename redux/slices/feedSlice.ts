@@ -2,7 +2,7 @@ import { UserBlog } from "@/interfaces/blogInterface"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { SurveyTags } from "@/interfaces/userInterface"
+import { SurveyTag } from "@/interfaces/userInterface"
 import { SearchBarResult } from "@/interfaces/feedInterface"
 
 const initialState = {
@@ -91,7 +91,7 @@ export const fetchOtherPersonalBlogs = createAsyncThunk(
 
 export const saveTags = createAsyncThunk(
     'feed/saveTags',
-    async (tags: {tags: SurveyTags[]}, thunkAPI) => {
+    async (tags: {tags: SurveyTag[]}, thunkAPI) => {
         try {
             const res = await api.post(`users/update-survey`, tags) as AxiosResponse
 

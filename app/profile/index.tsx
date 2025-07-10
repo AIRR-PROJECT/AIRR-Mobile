@@ -16,7 +16,7 @@ import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
 import { useEffect, useState } from "react";
 import TabButton from "@/components/tabs/feed/TabButton";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import SocialTab from "@/components/profile/ReadmeTab";
+import SocialTab from "@/components/profile/SocialTab";
 import ParallaxFlatList from "@/components/ParallaxFlatList";
 import BlogTab from "@/components/profile/BlogTab";
 import { Divider } from "@rneui/themed";

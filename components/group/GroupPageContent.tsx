@@ -90,7 +90,9 @@ type GroupPageProps = {
   // selectedTagFilter: string;
   // setSelectedTagFilter: (filter: string) => void;
 };
-
+import { Dimensions } from "react-native";
+const height = Dimensions.get("window").height;
+const width = Dimensions.get("window").width;
 const joinConfirmImage = require("@/assets/images/group/join_confirm.png");
 const blogsFilters = ["All blogs", "Needs approval"];
 const tagsFilters = ["All tags", "Needs approval"];
@@ -133,7 +135,7 @@ GroupPageProps) {
       const groupInfo = res.payload as GroupDetailInfo;
 
       setGroupInfo(groupInfo);
-      console.log(groupInfo)
+      console.log(groupInfo);
       const membershipStage =
         groupInfo.UserStatus == "Active"
           ? GroupMembershipStage.JOINED
@@ -156,11 +158,11 @@ GroupPageProps) {
     } else {
       setButtonLabel("Join Group");
     }
-  }, [userCurrentGroupMembershipStage])
+  }, [userCurrentGroupMembershipStage]);
 
   useEffect(() => {
-    console.log(userCurrentGroupRole)
-  }, [userCurrentGroupRole])
+    console.log(userCurrentGroupRole);
+  }, [userCurrentGroupRole]);
 
   const handleGroupJoinConfirmCancel = () => {
     setIsGroupJoinModalVisible(false);
@@ -241,28 +243,39 @@ GroupPageProps) {
   };
   //  TODO: Handle Here
   const handleCancelRequestConfirm = () => {
-    dispatch(cancelJoinGroupRequest({ groupID })).then(res => {
-      const result = res.payload as boolean
+    dispatch(cancelJoinGroupRequest({ groupID })).then((res) => {
+      const result = res.payload as boolean;
 
       if (result === true) {
-        dispatch(setUserMembershipStageInCurrentGroup(GroupMembershipStage.NOT_JOINED))
-        dispatch(setUserRoleInCurrentGroup(null))
+        dispatch(
+          setUserMembershipStageInCurrentGroup(GroupMembershipStage.NOT_JOINED)
+        );
+        dispatch(setUserRoleInCurrentGroup(null));
       }
-    })
+    });
   };
-  const handleLeaveGroupConfirm = () => {
-    
-  };
+  const handleLeaveGroupConfirm = () => {};
   const handleMoreOptionPress = useCallback((index: number) => {
     sheetRef.current?.snapToIndex(index);
   }, []);
-  
+
   const handleContentButtonPress = () => {
     route.push(`/group/group-contents?groupID=${groupID}`);
   };
+
+  const ownSheetRef = useRef<BottomSheet>(null);
+  const handleOwnSheetRefPress = useCallback(() => {
+    ownSheetRef.current?.snapToIndex(1);
+  }, []);
+
+  const isOwnerTheLastMember = false; // Placeholder for logic to determine if the owner is the last member
   return (
-    <View style={styles.container}>
-      <View>
+    <GestureHandlerRootView style={styles.container}>
+      <View
+        style={{
+          height: height * 0.2,
+        }}
+      >
         <DetailGroupCardComponent
           {...(groupInfo ? { ...groupInfo } : mockGroupDetail)}
           moreOptionPress={() => handleMoreOptionPress(0)}
@@ -292,27 +305,31 @@ GroupPageProps) {
           </LinearGradient>
         </TouchableOpacity>
       )}
-      {userCurrentGroupRole == GroupRole.Member && userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && (
-        <TouchableOpacity style={styles.moderatorContainer} activeOpacity={0.8}>
-          <LinearGradient
-            colors={["#1327", "#111A1A"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              borderRadius: 20,
-              gap: 10,
-              paddingHorizontal: 20,
-            }}
+      {userCurrentGroupRole == GroupRole.Member &&
+        userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && (
+          <TouchableOpacity
+            style={styles.moderatorContainer}
+            activeOpacity={0.8}
           >
-            <Text style={styles.welcomeName}>
-              Welcome, <Text style={{ fontWeight: "bold" }}>Member!</Text>
-            </Text>
-            <FontAwesome5 name="fire" size={24} color="#B9FF66" />
-          </LinearGradient>
-        </TouchableOpacity>
-      )}
+            <LinearGradient
+              colors={["#1327", "#111A1A"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                borderRadius: 20,
+                gap: 10,
+                paddingHorizontal: 20,
+              }}
+            >
+              <Text style={styles.welcomeName}>
+                Welcome, <Text style={{ fontWeight: "bold" }}>Member!</Text>
+              </Text>
+              <FontAwesome5 name="fire" size={24} color="#B9FF66" />
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
       {userCurrentGroupRole == GroupRole.Admin && (
         <TouchableOpacity style={styles.moderatorContainer} activeOpacity={0.8}>
           <LinearGradient
@@ -397,7 +414,7 @@ GroupPageProps) {
           {groupInfo ? groupInfo.Description : mockGroupDetail.Description}
         </Text>
         {/* Rules */}
-        <TouchableOpacity
+        {groupInfo.Rules?.length > 0 && <TouchableOpacity
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -419,9 +436,9 @@ GroupPageProps) {
             size={24}
             color="#B9FF66"
           />
-        </TouchableOpacity>
+        </TouchableOpacity>}
 
-        {isShowRules && (
+        {isShowRules && groupInfo.Rules?.length > 0 && (
           <View
             style={{
               borderRadius: 20,
@@ -505,67 +522,67 @@ GroupPageProps) {
             },
           ]}
         >
-          {groupInfo && groupInfo.CreatedBy && <TouchableOpacity
-            style={styles.moderatorContainer}
-            activeOpacity={0.8}
-            onPress={() => {
-              route.push(`/profile?userID=${groupInfo.CreatedBy._id}`)
-            }}
-          >
-            <LinearGradient
-              colors={["#1327", "#111A1A"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                borderRadius: 20,
-                gap: 10,
+          {groupInfo && groupInfo.CreatedBy && (
+            <TouchableOpacity
+              style={styles.moderatorContainer}
+              activeOpacity={0.8}
+              onPress={() => {
+                route.push(`/profile?userID=${groupInfo.CreatedBy._id}`);
               }}
             >
-              <Image
-                source={{ uri: groupInfo.CreatedBy.AvatarURL }}
-                style={styles.moderatorImage}
-              />
-              <Text style={styles.moderatorName}>@{groupInfo.CreatedBy.Username}</Text>
-            </LinearGradient>
-          </TouchableOpacity>}
+              <LinearGradient
+                colors={["#1327", "#111A1A"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderRadius: 20,
+                  gap: 10,
+                }}
+              >
+                <Image
+                  source={{ uri: groupInfo.CreatedBy.AvatarURL }}
+                  style={styles.moderatorImage}
+                />
+                <Text style={styles.moderatorName}>
+                  @{groupInfo.CreatedBy.Username}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
 
           <ButtonGradient
             label={buttonLabel}
             labelStyle={styles.tabButtonText}
             style={styles.tabButton}
-            onPress={handlePressButton}
+            onPress={handleOwnSheetRefPress}
           />
         </View>
       </View>
       <View>
-      {(userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && userCurrentGroupMembershipStage != GroupMembershipStage.NOT_JOINED) && <TouchableOpacity
-        style={styles.contentButton}
-        onPress={handleNewPostPress}
-      >
-        <Text
-          style={{
-            color: "#000",
-            fontWeight: "bold",
-          }}
-        >
-          Create Blog 
-        </Text>
-      </TouchableOpacity>}
+        {userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED &&
+          userCurrentGroupMembershipStage != GroupMembershipStage.BANNED &&
+          userCurrentGroupMembershipStage !=
+            GroupMembershipStage.NOT_JOINED && (
+            <TouchableOpacity
+              style={styles.contentButton}
+              onPress={handleNewPostPress}
+            >
+              <Text
+                style={{
+                  color: "#000",
+                  fontWeight: "bold",
+                }}
+              >
+                Create Blog
+              </Text>
+            </TouchableOpacity>
+          )}
       </View>
-      {/* <View style={styles.rowContainer}>
-        <TouchableOpacity
-          style={styles.infoContainer}
-          activeOpacity={0.8}
-          onPress={handlePressGroupMemberList}
-        ></TouchableOpacity>
-      </View> */}
-      {/* Divider */}
-      <View style={{ height: 1, backgroundColor: "#4A4A4A", marginVertical: 10 }} />
-      {/* Button to go to tab for Content */}
-      
-      {/* Button to go to tab for Content */}
+      <View
+        style={{ height: 1, backgroundColor: "#4A4A4A", marginVertical: 10 }}
+      />
       <TouchableOpacity
         style={styles.contentButton}
         onPress={handleContentButtonPress}
@@ -579,86 +596,83 @@ GroupPageProps) {
           See Group Content
         </Text>
       </TouchableOpacity>
-  
-      <Modal
-        transparent={true}
-        visible={isGroupJoinModalVisible}
-        animationType="fade"
-        onRequestClose={handleGroupJoinConfirmCancel}
+      <BottomSheet
+        ref={ownSheetRef}
+        index={-1}
+        snapPoints={["50%", "100%"]}
+        enablePanDownToClose={true}
+        enableDynamicSizing={true}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            pressBehavior="close"
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        handleStyle={{ backgroundColor: "#1E1E1E" }}
+        style={{ backgroundColor: "#1E1E1E" }}
+        backgroundStyle={{ backgroundColor: "#1E1E1E" }}
       >
-        {/* Modal overlay */}
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={(event) => {
-            if (event.target === event.currentTarget) {
-              handleGroupJoinConfirmCancel();
-            }
-          }}
-        >
-          <View style={styles.modalContentContainer}>
-            <Image style={styles.joinConfirmImage} source={joinConfirmImage} />
-            <View style={{ flex: 1 }}>
-              <View style={{}}>
-                <Text style={styles.joinModalTitle}>
-                  Are You Ready to Join the Group?
-                </Text>
-              </View>
-              <View style={styles.rowContainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setIsGroupJoinModalVisible(false);
-                  }}
-                  style={styles.joinCancelButton}
-                >
-                  <Text style={styles.joinCancelButtonText}>
-                    Let Me Rethink
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    handleConfirmJoinGroup();
-
-                    setIsGroupJoinModalVisible(false);
-                  }}
-                  style={styles.joinConfirmButton}
-                >
-                  <Text style={styles.joinConfirmButtonText}>Count Me In!</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Pressable>
-      </Modal>
-      {userCurrentGroupMembershipStage === GroupMembershipStage.REQUESTED && (
-        <Modal
-          transparent={true}
-          visible={isCancelRequestModalVisible}
-          animationType="fade"
-          onRequestClose={() => setIsCancelRequestModalVisible(false)}
-        >
-          <Pressable
-            style={styles.modalOverlay}
-            onPress={(event) => {
-              if (event.target === event.currentTarget) {
-                setIsCancelRequestModalVisible(false);
-              }
-            }}
-          >
+        <BottomSheetView style={{ backgroundColor: "#1E1E1E" }}>
+          {userCurrentGroupMembershipStage ==
+            GroupMembershipStage.NOT_JOINED && (
             <View style={styles.modalContentContainer}>
               <Image
                 style={styles.joinConfirmImage}
                 source={joinConfirmImage}
               />
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, gap: 10 }}>
+                <View style={{}}>
+                  <Text style={styles.joinModalTitle}>
+                    Are You Ready to Join the Group?
+                  </Text>
+                </View>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      ownSheetRef.current?.close();
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>
+                      Let Me Rethink
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleConfirmJoinGroup();
+
+                      ownSheetRef.current?.close();
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>
+                      Count Me In!
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+          {userCurrentGroupMembershipStage ===
+            GroupMembershipStage.REQUESTED && (
+            <View style={styles.modalContentContainer}>
+              <Image
+                style={styles.joinConfirmImage}
+                source={joinConfirmImage}
+              />
+              <View style={{ flex: 1, gap: 10 }}>
                 <View style={{}}>
                   <Text style={styles.joinModalTitle}>
                     Cancel Request to Join Group?
                   </Text>
                 </View>
-                <View style={styles.rowContainer}>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
                   <TouchableOpacity
                     onPress={() => {
-                      setIsCancelRequestModalVisible(false);
+                      ownSheetRef.current?.close();
                     }}
                     style={styles.joinCancelButton}
                   >
@@ -670,7 +684,7 @@ GroupPageProps) {
                     onPress={() => {
                       handleCancelRequestConfirm();
 
-                      setIsCancelRequestModalVisible(false);
+                      ownSheetRef.current?.close();
                     }}
                     style={styles.joinConfirmButton}
                   >
@@ -681,66 +695,92 @@ GroupPageProps) {
                 </View>
               </View>
             </View>
-          </Pressable>
-        </Modal>
-      )}
+          )}
+          {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED &&
+            userCurrentGroupRole !== GroupRole.Admin && (
+              <View style={[styles.modalContentContainer]}>
+                <Image
+                  style={styles.joinConfirmImage}
+                  source={joinConfirmImage}
+                />
+                <View style={{ flex: 1, gap: 10 }}>
+                  <View style={{}}>
+                    <Text style={styles.joinModalTitle}>
+                      Are You Sure You Want to Leave the Group?
+                    </Text>
+                  </View>
+                  <View style={[styles.rowContainer, { gap: 20 }]}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        ownSheetRef.current?.close();
+                      }}
+                      style={styles.joinCancelButton}
+                    >
+                      <Text style={styles.joinCancelButtonText}>
+                        Let Me Rethink
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        handleLeaveGroupConfirm();
 
-      {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED && (
-        <Modal
-          transparent={true}
-          visible={isLeaveGroupModalVisible}
-          animationType="fade"
-          onRequestClose={() => setIsLeaveGroupModalVisible(false)}
-        >
-          <Pressable
-            style={styles.modalOverlay}
-            onPress={(event) => {
-              if (event.target === event.currentTarget) {
-                setIsLeaveGroupModalVisible(false);
-              }
-            }}
-          >
-            <View style={styles.modalContentContainer}>
-              <Image
-                style={styles.joinConfirmImage}
-                source={joinConfirmImage}
-              />
-              <View style={{ flex: 1 }}>
-                <View style={{}}>
-                  <Text style={styles.joinModalTitle}>
-                    Are You Sure You Want to Leave the Group?
+                        ownSheetRef.current?.close();
+                      }}
+                      style={styles.joinConfirmButton}
+                    >
+                      <Text style={styles.joinConfirmButtonText}>
+                        Sure, I'm Out!
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            )}
+          {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED &&
+            userCurrentGroupRole === GroupRole.Admin &&
+            !isOwnerTheLastMember && (
+              <View
+                style={[
+                  styles.modalContentContainer,
+                  {
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                ]}
+              >
+                <Text style={styles.joinModalTitle}>
+                  Are You Sure For Leaving?
+                </Text>
+                <View style={styles.rowContainer}>
+                  <Entypo name="warning" size={24} color="#FFA500" />
+                  <Text style={styles.warningText}>
+                    You are the only member left in this group. Want to delete
+                    it?
                   </Text>
                 </View>
-                <View style={styles.rowContainer}>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
                   <TouchableOpacity
-                    onPress={() => {
-                      setIsLeaveGroupModalVisible(false);
-                    }}
                     style={styles.joinCancelButton}
+                    onPress={() => {
+                      ownSheetRef.current?.close();
+                    }}
                   >
                     <Text style={styles.joinCancelButtonText}>
-                      Let Me Rethink
+                      Let me rethink
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleLeaveGroupConfirm();
-
-                      setIsLeaveGroupModalVisible(false);
-                    }}
-                    style={styles.joinConfirmButton}
-                  >
+                  <TouchableOpacity style={styles.joinConfirmButton}>
                     <Text style={styles.joinConfirmButtonText}>
-                      Sure, I'm Out!
+                      Delete Group
                     </Text>
                   </TouchableOpacity>
                 </View>
               </View>
-            </View>
-          </Pressable>
-        </Modal>
-      )}
-    </View>
+            )}
+        </BottomSheetView>
+      </BottomSheet>
+    </GestureHandlerRootView>
   );
 }
 
@@ -774,6 +814,7 @@ function CreateTags({ onPress }: { onPress: () => void }) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#1E1E1E",
+    flex: 1,
   },
   description: {
     color: "#fff",
@@ -814,7 +855,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tabButton: {
-    width: 110,
+    width: width * 0.32,
     height: 40,
     borderRadius: 80,
     justifyContent: "center",
@@ -870,14 +911,14 @@ const styles = StyleSheet.create({
   },
   modalContentContainer: {
     flexDirection: "row",
-    backgroundColor: "#1E1E1E",
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
     margin: 20,
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
-    width: "90%",
+    borderWidth: 1,
   },
   joinConfirmImage: {
     width: 50,
@@ -888,13 +929,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#1B1F26",
     padding: 10,
     borderRadius: 20,
-    marginTop: 20,
   },
   joinConfirmButton: {
     backgroundColor: "#B9FF66",
     padding: 10,
     borderRadius: 20,
-    marginTop: 20,
   },
   joinCancelButtonText: {
     color: "#fff",
@@ -915,7 +954,7 @@ const styles = StyleSheet.create({
   joinModalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000",
   },
   createBlogButton: {
     backgroundColor: "#B9FF66",
@@ -1037,5 +1076,10 @@ const styles = StyleSheet.create({
     paddingBlock: 10,
     borderRadius: 20,
     alignItems: "center",
+  },
+  warningText: {
+    fontSize: 14,
+    marginLeft: 10,
+    color: "#CC0000",
   },
 });

@@ -36,7 +36,6 @@ UserInfoProps) {
   const { userAvatar } = useAppSelector((state) => state.user);
 
   const handleEditProfile = () => {
-    console.log("Edit profile");
     router.push("/profile/edit-profile");
   };
   useEffect(() => {}, []);
@@ -76,14 +75,14 @@ UserInfoProps) {
               : "No name"}
           </ThemedText>
           {/* Edit profile button */}
-          {isOwnProfile && (
+          {/* {isOwnProfile && (
             <ButtonGradient
               label="Edit profile"
               onPress={handleEditProfile}
               style={styles.editProfileButton}
               labelStyle={styles.editProfileButtonText}
             />
-          )}
+          )} */}
         </View>
         {/* user username and day joined*/}
         <View style={{ flexDirection: "row" }}>

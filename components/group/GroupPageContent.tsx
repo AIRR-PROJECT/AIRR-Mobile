@@ -139,7 +139,9 @@ GroupPageProps) {
           ? GroupMembershipStage.JOINED
           : groupInfo.UserStatus == "Pending"
           ? GroupMembershipStage.REQUESTED
-          : GroupMembershipStage.NOT_JOINED;
+          : groupInfo.UserStatus == "Banned"
+          ? GroupMembershipStage.BANNED
+          : GroupMembershipStage.NOT_JOINED
 
       dispatch(setUserMembershipStageInCurrentGroup(membershipStage));
       dispatch(setUserRoleInCurrentGroup(groupInfo.Role));

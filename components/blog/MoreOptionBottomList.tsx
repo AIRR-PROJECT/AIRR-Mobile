@@ -23,6 +23,7 @@ type MoreOptionComponentProps = {
   isFromDetail: boolean; // Optional prop to indicate if the blog is from detail
   isBlogStatusPendingOrActive: boolean
   isUserStatusPending: boolean
+  isViewTypePrivateOrInProfile: boolean
   handleHideThisBlog: () => void;
   handleDeleteThisBlog: () => void;
 };
@@ -36,6 +37,7 @@ export default function MoreOptionBottomList({
   isFromDetail = false, // Default to false if not provided
   isBlogStatusPendingOrActive = false,
   isUserStatusPending = false,
+  isViewTypePrivateOrInProfile = false,
   handleHideThisBlog,
   handleDeleteThisBlog,
 }: MoreOptionComponentProps) {
@@ -129,7 +131,7 @@ export default function MoreOptionBottomList({
               </Text>
             </TouchableOpacity>
           )}
-          {isBlogStatusPendingOrActive && <TouchableOpacity
+          {(isBlogStatusPendingOrActive || isViewTypePrivateOrInProfile) && <TouchableOpacity
             style={styles.bottomOptionButton}
             onPress={handleEditBlog}
             activeOpacity={0.8}

@@ -59,7 +59,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { string } from "zod";
-import { BlogStatus } from "@/enums/blog_properties.enum";
+import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>()
@@ -197,12 +197,14 @@ export default function MyFeed() {
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
   const [isBlogStatusPendingOrActive, setIsBlogStatusPendingOrActive] = useState(false)
   const [isUserStatusPending, setIsUserStatusPending] = useState(false)
+  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, isBlogStatusPendingOrActive: boolean, isUserStatusPending: boolean) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, isBlogStatusPendingOrActive: boolean, isUserStatusPending: boolean, isViewTypePrivateOrInProfile: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
     setIsBlogStatusPendingOrActive(isBlogStatusPendingOrActive)
     setIsUserStatusPending(isUserStatusPending)
+    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
     if (moreOptionRef.current) {
@@ -245,7 +247,8 @@ export default function MyFeed() {
               return <FeedBlogPreview blog={item} onPressMoreButton={
                 () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
                   item.Status == BlogStatus.ACTIVE || item.Status == BlogStatus.PENDING,
-                  item.UserGroupStatus == "Pending"
+                  item.UserGroupStatus == "Pending",
+                  item.ViewType != BlogViewType.IN_GROUP
                 )
               }/>;
             }}
@@ -332,6 +335,7 @@ export default function MyFeed() {
         isFromDetail={false}
         isBlogStatusPendingOrActive={isBlogStatusPendingOrActive}
         isUserStatusPending={isUserStatusPending}
+        isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
         handleHideThisBlog={handleHideBlog}
         handleDeleteThisBlog={handleDeleteBlog}/>
     </GestureHandlerRootView>

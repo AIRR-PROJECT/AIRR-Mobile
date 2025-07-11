@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import GroupCardComponent from "@/components/group/GroupCardComponent";
 import { useAppDispatch } from "@/redux/hook";
 import { useEffect, useState } from "react";
-import { getCreatedGroups, getFieldDetail } from "@/redux/slices/groupSlice";
+import { getCreatedGroups, getGroupsByFieldId } from "@/redux/slices/groupSlice";
 import { Group } from "@/interfaces/groupInterface";
 const mockGroup: Group = {
   CoverURL: "https://picsum.photos/200",
@@ -42,7 +42,7 @@ export default function GroupTab(props: {type: string, fieldID?: string}) {
     switch (props.type) {
       case "all":
         if (props.fieldID) {
-          dispatch(getFieldDetail(props.fieldID)).then((val) => {
+          dispatch(getGroupsByFieldId(props.fieldID)).then((val) => {
             setGroups(val.payload as Group[])
           })
         }
@@ -55,7 +55,7 @@ export default function GroupTab(props: {type: string, fieldID?: string}) {
         break
       case "joined":
         if (props.fieldID) {
-          dispatch(getFieldDetail(props.fieldID)).then((val) => {
+          dispatch(getGroupsByFieldId(props.fieldID)).then((val) => {
             setGroups(val.payload as Group[])
           })
         }

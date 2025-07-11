@@ -72,6 +72,9 @@ export default function CreateGroup() {
       setGroupFields((res.payload as SearchFieldResult).Fields);
       console.log((res.payload as SearchFieldResult).Fields);
     });
+
+    dispatch(setCreateGroupCurrentTags([]));
+    dispatch(setCreateGroupCreatedTags([]));
   }, []);
 
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function CreateGroup() {
       formData.append("Name", groupName);
       formData.append(
         "Tags",
-        JSON.stringify([...groupTags, ...createGroupCreatedTags])
+        JSON.stringify([...chosenTags, ...createGroupCreatedTags])
       );
       formData.append("GroupField", JSON.stringify(groupField));
       formData.append("Description", groupDescription);

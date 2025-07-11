@@ -48,7 +48,7 @@ export default function GroupLayout() {
     dispatch(setCreateGroupSubmitted(true));
   };
   const handleEditGroup = () => {
-    console.log("Nút này ở group layout");
+    dispatch(setCreateGroupSubmitted(true));
   };
   // Render the app layout with theme provider and navigation stack
   return (

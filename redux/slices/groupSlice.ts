@@ -120,6 +120,27 @@ export const getFieldDetail = createAsyncThunk(
             const res = await api.get(`groups/fields-detail?fieldID=${fieldID}`) as AxiosResponse
 
             if (res.data.success) {
+                console.log("Field detail")
+                return res.data.data.detail 
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getGroupsByFieldId = createAsyncThunk(
+    'group/getFieldDetail',
+    async (fieldID: string, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/fields-detail?fieldID=${fieldID}`) as AxiosResponse
+
+            if (res.data.success) {
+                console.log("Field detail")
                 return res.data.data.detail.groups as Group[]
             }
             else {
@@ -271,6 +292,29 @@ export const createGroup = createAsyncThunk(
     async (data: FormData, thunkAPI) => {
         try {
             const res = await api.post(`groups/create-group`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const updateGroup = createAsyncThunk(
+    'group/updateGroup',
+    async (data: FormData, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/update-group`, data, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }

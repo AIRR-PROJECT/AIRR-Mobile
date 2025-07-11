@@ -3,7 +3,7 @@ import PopularGroupTab from "@/components/group/PopularGroupTab";
 import { GroupField } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
-  getFieldDetail,
+  getGroupsByFieldId,
   getGroupPopularFields,
   getJoinedFields,
   getPopularGroups,

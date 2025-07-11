@@ -2,21 +2,29 @@ import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import ImageViewer from "@/components/ImageViewer";
 import * as ImagePicker from "expo-image-picker";
 import { type ImageSource } from "expo-image";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Entypo, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import { useAppDispatch } from "@/redux/hook";
 
 type imageProps = {
   imgSource?: ImageSource;
+  disabled?: boolean
   onSetImg: (imgSource: ImageSource) => void
 };
 
-export default function UploadGroupAvatarComponent({ imgSource, onSetImg }: imageProps) {
+export default function UploadGroupAvatarComponent({ imgSource, disabled = false, onSetImg }: imageProps) {
   const dispatch = useAppDispatch();
 
   // Image picker
   const [image, setImage] = useState<ImageSource | null>(imgSource || null);
+
+  useEffect(() => {
+    if (imgSource) {
+      setImage(imgSource)
+    }
+  }, [imgSource])
+
   console.log(image);
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -34,7 +42,7 @@ export default function UploadGroupAvatarComponent({ imgSource, onSetImg }: imag
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={pickImage}>
+    <TouchableOpacity disabled={disabled} style={styles.container} onPress={pickImage}>
       {image != null ? (
         <ImageViewer imgSource={image} style={styles.image} contentFit="cover"/>
       ) : (

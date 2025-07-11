@@ -10,7 +10,7 @@ import ParallaxFlatList from "@/components/ParallaxFlatList";
 import ParallaxFlashList from "@/components/ParallaxFlashList";
 import GradientText from "@/components/GradientText";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
-import { AIBlog, UserBlog } from "@/interfaces/blogInterface";
+import { AIBlog, FavoriteBlog, UserBlog } from "@/interfaces/blogInterface";
 import { loremIpsum } from "lorem-ipsum";
 import AIBlogPreview from "@/components/tabs/feed/AIBlogPreview";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
@@ -59,6 +59,8 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
+import { getFavoriteBlogs } from "@/redux/slices/blogSlice";
+import { getUserGroupStatus } from "@/redux/slices/groupSlice";
 // TODO:
 // Fetching user favourite blogs only 
 // Also implment refresh control and lazy loading
@@ -90,13 +92,19 @@ export default function FavouriteBlog() {
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
   const [page, setPage] = useState(1)
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, isBlogStatusPendingOrActive: boolean, isUserStatusPending: boolean, isViewTypePrivateOrInProfile: boolean) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, isBlogStatusPendingOrActive: boolean, isViewTypePrivateOrInProfile: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
     setIsBlogStatusPendingOrActive(isBlogStatusPendingOrActive)
-    setIsUserStatusPending(isUserStatusPending)
     setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
+
+    // Fetch user status in current group
+    dispatch(getUserGroupStatus(groupId)).then((res) => {
+      const data = res.payload as string
+    })
+
+    setIsUserStatusPending(isUserStatusPending)
     if (moreOptionRef.current) {
       moreOptionRef.current.snapToIndex(0);
     }
@@ -104,24 +112,24 @@ export default function FavouriteBlog() {
   };
 
   const favoriteBlogsQuery = useQuery({
-    queryKey: ["feed-user"],
+    queryKey: ["feed-favorite"],
     queryFn: async () => {
-      const fetchedBlogs = await dispatch(fetchUserBlogs(page));
+      const fetchedBlogs = await dispatch(getFavoriteBlogs({ page }));
 
-      return fetchedBlogs.payload.blogList.blogs as UserBlog[];
+      return fetchedBlogs.payload as FavoriteBlog[];
     },
     placeholderData: keepPreviousData,
   });
   const favoriteBlogsMutation = useMutation({
     mutationFn: async (page: number) => {
-      const moreFetchedBlogs = await dispatch(fetchUserBlogs(page));
+      const moreFetchedBlogs = await dispatch(getFavoriteBlogs({ page }));
 
       // console.log(moreFetchedBlogs.payload.blogList.blogs)
-      return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
+      return moreFetchedBlogs.payload as FavoriteBlog[];
     },
     onSuccess: (data: any) => {
       queryClient.setQueryData(["feed-favorite"], (oldData: any) => {
-        return [...oldData, ...data] as UserBlog[];
+        return [...oldData, ...data] as FavoriteBlog[];
       });
     },
   });
@@ -186,10 +194,9 @@ export default function FavouriteBlog() {
           showsVerticalScrollIndicator={false}
           onEndReached={handleOnUserBlogListEndReached}
           renderItem={({ item }) => {
-            return <FeedBlogPreview blog={item} onPressMoreButton={
+            return <FeedBlogPreview blog={item as any} onPressMoreButton={
               () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
                 item.Status == BlogStatus.ACTIVE || item.Status == BlogStatus.PENDING,
-                item.UserGroupStatus == "Pending",
                 item.ViewType != BlogViewType.IN_GROUP
               )
             }/>;

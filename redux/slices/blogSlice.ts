@@ -13,7 +13,8 @@ const initialState = {
     isCurrentBlogSaved: false,
     commentAdded: false,
     createBlogCurrentTags: [] as string[],
-    createBlogRequestedTags: [] as CreateBlogTag[]
+    createBlogRequestedTags: [] as CreateBlogTag[],
+    createBlogTagCount: 0
 }
 
 export const getAIBlogDetail = createAsyncThunk<AIBlogDetail, string>(
@@ -579,6 +580,10 @@ const blogSlice = createSlice({
             state.createBlogRequestedTags = action.payload as CreateBlogTag[]
         },
 
+        setCreateBlogTagCount(state, action) {
+            state.createBlogTagCount = action.payload
+        },
+
         reset(state) {
             state.currentAIBlog = null as unknown as AIBlogDetail
             state.currentUserBlog = null as unknown as UserBlogDetail
@@ -589,6 +594,7 @@ const blogSlice = createSlice({
             state.commentAdded = false
             state.createBlogCurrentTags = [] as string[],
             state.createBlogRequestedTags = [] as CreateBlogTag[]
+            state.createBlogTagCount = 0
         }
     },
     extraReducers: (builder) => {
@@ -666,5 +672,5 @@ const blogSlice = createSlice({
     }
 })
 
-export const { reset, setCurrentBlogLiked, setCurrentBlogDisliked, setCurrentBlogSaved, setCommentAdded, setCreateBlogCurrentTags, setCreateBlogRequestedTags } = blogSlice.actions
+export const { reset, setCurrentBlogLiked, setCurrentBlogDisliked, setCurrentBlogSaved, setCommentAdded, setCreateBlogCurrentTags, setCreateBlogRequestedTags, setCreateBlogTagCount } = blogSlice.actions
 export default blogSlice.reducer

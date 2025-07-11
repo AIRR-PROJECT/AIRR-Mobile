@@ -15,6 +15,7 @@ const initialState = {
     userAccessToken: "",
     userRefreshToken: "",
     user: null as unknown as User,
+    isViewingOwnProfile: false,
     userAvatar: "",
     userCurrentPassword: "",
     userNewPassword: "",
@@ -38,6 +39,10 @@ const userSlice = createSlice({
             state.user = action.payload.user
             state.userChange = action.payload.user
             state.userAvatar = action.payload.user.avatarURL
+        },
+
+        setIsViewingOwnProfile(state, action) {
+            state.isViewingOwnProfile = action.payload
         },
 
         setUserChange(state, action) {
@@ -88,5 +93,5 @@ const userSlice = createSlice({
     },
 });
 
-export const { reset, resetPassword, setCurrentUser, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup, setCurrentPassword, setNewPassword, setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup } = userSlice.actions;
+export const { reset, resetPassword, setCurrentUser, setIsViewingOwnProfile, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup, setCurrentPassword, setNewPassword, setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup } = userSlice.actions;
 export default userSlice.reducer;

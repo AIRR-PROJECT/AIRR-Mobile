@@ -133,7 +133,6 @@ export default function MyFeed() {
       queryClient.setQueryData(["feed-user"], (oldData: any) => {
         return [...oldData, ...data] as UserBlog[];
       });
-      setUserPage(1)
     },
   });
   const userBlogsReset = useMutation({
@@ -146,6 +145,7 @@ export default function MyFeed() {
       queryClient.setQueryData(["feed-user"], (oldData: any) => {
         return [...data] as UserBlog[];
       });
+      setUserPage(1)
     },
   });
   const handleOnUserBlogListEndReached = () => {

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
-import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail, UserBlogDetailForUpdate, DeleteComment, EditComment, CreateBlogResult } from "@/interfaces/blogInterface"
+import { AIBlogDetail, CreateBlog, CreateReportBlog, PostComment, ReplyToBlogComment, CreateBlogTag, UpdateHideBlog, UserBlog, UserBlogComment, UserBlogDetail, UserBlogDetailForUpdate, DeleteComment, EditComment, CreateBlogResult, FavoriteBlog } from "@/interfaces/blogInterface"
 import { ResponseFailcode } from "@/enums/failcode.enum"
 
 const initialState = {
@@ -513,6 +513,29 @@ export const searchTagCreateBlog = createAsyncThunk(
 
             if (res.data.success) {
                 return res.data.data.tagList as CreateBlogTag[]
+            }
+            else {
+                return []
+            }
+        }
+        catch (error: any) {
+            if (error.response.data.failcode == ResponseFailcode.TAG_NOT_FOUND) {
+                return []
+            }
+            
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getFavoriteBlogs = createAsyncThunk(
+    'blog/getFavoriteBlogs',
+    async (data: { page: number }, thunkAPI) => {
+        try {
+            const res = await api.get(`blogs/favorite-blogs?page=${data.page}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.favoriteBlogs as FavoriteBlog[]
             }
             else {
                 return []

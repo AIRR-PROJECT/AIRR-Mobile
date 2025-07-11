@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { memo, useEffect, useRef, useState } from "react";
 import GroupPageContent from "@/components/group/GroupPageContent";
@@ -318,7 +319,10 @@ export default function GroupPage() {
   const sheetRef = useRef(null);
   return (
     <GestureHandlerRootView style={styles.container}>
-      <View style={styles.contentStyle}>
+      <ScrollView style={styles.contentStyle}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+      >
         <GroupPageContent
           selectedId={selectedId}
           setSelectedId={setSelectedId}
@@ -329,7 +333,7 @@ export default function GroupPage() {
           // selectedBlogFilter={selectedBlogFilter}
           // selectedTagFilter={selectedTagFilter}
         />
-      </View>
+      </ScrollView>
       <BlogMoreOptionBottomList
         sheetRef={sheetRef}
         groupID={groupId}

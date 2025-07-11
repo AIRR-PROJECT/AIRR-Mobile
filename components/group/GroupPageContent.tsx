@@ -262,13 +262,18 @@ GroupPageProps) {
   const handleContentButtonPress = () => {
     route.push(`/group/group-contents?groupID=${groupID}`);
   };
-
+  const isOwnerTheLastMember = false; // Placeholder for logic to determine if the owner is the last member
   const ownSheetRef = useRef<BottomSheet>(null);
-  const handleOwnSheetRefPress = useCallback(() => {
-    ownSheetRef.current?.snapToIndex(1);
+  const handleActionButtonPress = useCallback(() => {
+    if (!isOwnerTheLastMember){
+      route.push("/group/owner-leave")
+    }
+    else{
+      ownSheetRef.current?.snapToIndex(1);
+    }
   }, []);
 
-  const isOwnerTheLastMember = false; // Placeholder for logic to determine if the owner is the last member
+  
   return (
     <GestureHandlerRootView style={styles.container}>
       <View
@@ -414,31 +419,35 @@ GroupPageProps) {
           {groupInfo ? groupInfo.Description : mockGroupDetail.Description}
         </Text>
         {/* Rules */}
-        {groupInfo.Rules?.length > 0 && <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-            paddingHorizontal: 20,
-            paddingTop: 10,
-          }}
-          onPress={() => setIsShowRules(!isShowRules)}
-          activeOpacity={0.8}
-        >
-          <FontAwesome5 name="shield-alt" size={24} color="#B9FF66" />
-          <Text style={{ color: "#B9FF66", fontSize: 16, fontWeight: "bold" }}>
-            Group Rules
-          </Text>
+        {groupInfo.Rules?.length > 0 && (
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              paddingHorizontal: 20,
+              paddingTop: 10,
+            }}
+            onPress={() => setIsShowRules(!isShowRules)}
+            activeOpacity={0.8}
+          >
+            <FontAwesome5 name="shield-alt" size={24} color="#B9FF66" />
+            <Text
+              style={{ color: "#B9FF66", fontSize: 16, fontWeight: "bold" }}
+            >
+              Group Rules
+            </Text>
 
-          {/* Use arrow icon */}
-          <Entypo
-            name={isShowRules ? "chevron-down" : "chevron-right"}
-            size={24}
-            color="#B9FF66"
-          />
-        </TouchableOpacity>}
+            {/* Use arrow icon */}
+            <Entypo
+              name={isShowRules ? "chevron-down" : "chevron-right"}
+              size={24}
+              color="#B9FF66"
+            />
+          </TouchableOpacity>
+        )}
 
-        {isShowRules && groupInfo.Rules?.length > 0 && (
+        {isShowRules && (
           <View
             style={{
               borderRadius: 20,
@@ -556,7 +565,7 @@ GroupPageProps) {
             label={buttonLabel}
             labelStyle={styles.tabButtonText}
             style={styles.tabButton}
-            onPress={handleOwnSheetRefPress}
+            onPress={handleActionButtonPress}
           />
         </View>
       </View>
@@ -697,7 +706,7 @@ GroupPageProps) {
             </View>
           )}
           {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED &&
-            userCurrentGroupRole !== GroupRole.Admin && (
+            userCurrentGroupRole !== GroupRole.Owner && (
               <View style={[styles.modalContentContainer]}>
                 <Image
                   style={styles.joinConfirmImage}
@@ -706,7 +715,7 @@ GroupPageProps) {
                 <View style={{ flex: 1, gap: 10 }}>
                   <View style={{}}>
                     <Text style={styles.joinModalTitle}>
-                      Are You Sure You Want to Leave the Group?
+                      Are You Sure You Want To Leave the Group?
                     </Text>
                   </View>
                   <View style={[styles.rowContainer, { gap: 20 }]}>
@@ -737,8 +746,8 @@ GroupPageProps) {
               </View>
             )}
           {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED &&
-            userCurrentGroupRole === GroupRole.Admin &&
-            !isOwnerTheLastMember && (
+            userCurrentGroupRole === GroupRole.Owner &&
+            isOwnerTheLastMember && (
               <View
                 style={[
                   styles.modalContentContainer,
@@ -778,39 +787,54 @@ GroupPageProps) {
                 </View>
               </View>
             )}
+          {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED &&
+            userCurrentGroupRole === GroupRole.Admin &&
+            !isOwnerTheLastMember && (
+              <View
+                style={[
+                  styles.modalContentContainer,
+                  {
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                ]}
+              >
+                <Text style={styles.joinModalTitle}>
+                  Are You Sure For Leaving?
+                </Text>
+                <View style={styles.rowContainer}>
+                  <Text style={styles.warningText}>
+                    Choose new group owner:
+                  </Text>
+                </View>
+                {/* Search bar */}
+                
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    style={styles.joinCancelButton}
+                    onPress={() => {
+                      ownSheetRef.current?.close();
+                    }}
+                  >
+                    <Text style={styles.joinCancelButtonText}>
+                      Let me rethink
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.joinConfirmButton}>
+                    <Text style={styles.joinConfirmButtonText}>
+                      Delete Group
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
         </BottomSheetView>
       </BottomSheet>
     </GestureHandlerRootView>
   );
 }
 
-function CreatePost({ onPress }: { onPress: () => void }) {
-  return (
-    <View style={styles.rowContainer}>
-      <TouchableOpacity
-        style={styles.tabButton}
-        activeOpacity={0.8}
-        onPress={onPress}
-      >
-        <Text style={styles.tabButtonText}>+ Create Post</Text>
-      </TouchableOpacity>
-      {/* <Entypo name="select-arrows" size={24} color="#B9FF66" /> */}
-    </View>
-  );
-}
-function CreateTags({ onPress }: { onPress: () => void }) {
-  return (
-    <View>
-      <TouchableOpacity
-        style={styles.tabButton}
-        activeOpacity={0.8}
-        onPress={onPress}
-      >
-        <Text style={styles.tabButtonText}>+ Request Tag</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#1E1E1E",

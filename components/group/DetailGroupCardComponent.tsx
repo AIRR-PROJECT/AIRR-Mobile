@@ -35,7 +35,7 @@ export default function DetailGroupCardComponent({
         <View style={{ paddingLeft: 5, gap: 5, width: "70%" }}>
           {/* Title */}
           <View style={styles.textWrap}>
-            <Text style={styles.title}>{Name}</Text>
+            <Text style={styles.title} numberOfLines={3} ellipsizeMode="tail">{Name}</Text>
           </View>
           <View style={styles.tagAndId}>
             {/* Tag and id */}
@@ -105,14 +105,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    width: 100,
-    height: 100,
+    width: 90,
+    height: 90,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "#303030",
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#fff",
   },

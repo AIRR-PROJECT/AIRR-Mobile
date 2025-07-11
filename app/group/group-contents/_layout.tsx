@@ -13,14 +13,15 @@ export default function ContentsPageTabLayout() {
   const { userCurrentGroupRole } = useAppSelector((state) => state.user);
   // TODO: CHECK IF USER IS NOT ADMIN OR OWNER, DISABLE REPORTS TAB
   const canAccessReportsTab =
-    userCurrentGroupRole === GroupRole.Admin || userCurrentGroupRole === GroupRole.Owner; 
+    userCurrentGroupRole === GroupRole.Admin ||
+    userCurrentGroupRole === GroupRole.Owner;
   return (
     <MaterialTopTabs
       style={{ flex: 1 }}
       screenOptions={({ route }) => ({
         tabBarStyle: { height: "auto", backgroundColor: "#1E1E1E" }, // Adjust the height of the tab bar
         tabBarLabelStyle: { fontSize: 12 }, // Adjust the font size of tab labels
-        tabBarIndicatorStyle: { height: 2 }, // Change the indicator thickness
+        tabBarIndicatorStyle: { display: "none" }, // Change the indicator thickness
         tabBarLabel: ({ focused }) => {
           const title =
             route.name === "blogs"
@@ -83,7 +84,7 @@ export default function ContentsPageTabLayout() {
       />
       <MaterialTopTabs.Screen
         name="reports"
-        options={{ title: "Reports",}}
+        options={{ title: "Reports" }}
         initialParams={{
           groupID,
           requestID,

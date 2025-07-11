@@ -20,6 +20,7 @@ type BlogApprovalCardComponentProps = PendingBlogRequest & {
 
 export default function BlogApprovalCardComponent({
   BlogID,
+  Title,
   Owner,
   RequestDate,
   onApprove,
@@ -30,13 +31,8 @@ export default function BlogApprovalCardComponent({
   const [thumbnail, setThumbnail] = useState("")
   
   useEffect(() => {
-    dispatch(getUserBlogDetail(BlogID)).then(res => {
-      if (res.payload) {
-        const payload = res.payload as UserBlogDetail
-        setTitle(payload.Title)
-        setThumbnail(payload.BackgroundURL)
-      }
-    })
+    setTitle(Title)
+    setThumbnail(Owner.AvatarURL)
   }, [])
 
   function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {

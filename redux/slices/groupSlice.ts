@@ -682,10 +682,29 @@ export const cancelJoinGroupRequest = createAsyncThunk(
             const res = await api.post(`groups/cancelJoinGroupRequest`, data) as AxiosResponse
 
             if (res.data.success) {
+                return res.data.status as string
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getUserGroupStatus = createAsyncThunk(
+    'group/getUserGroupStatus',
+    async (groupID: string, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/getUserGroupStatus?groupID=${groupID}`) as AxiosResponse
+
+            if (res.data.success) {
                 return true
             }
             else {
-                return false
+                return 
             }
         }
         catch (error: any) {

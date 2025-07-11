@@ -1,3 +1,4 @@
+import { FontAwesome6 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useState } from "react";
 import {
@@ -18,7 +19,7 @@ interface Member {
 const member: Member = {
   avatar: "https://picsum.photos/200",
   username: "John Doe",
-  role: "Member",
+  role: "Owner",
 };
 
 const members: Member[] = Array.from({ length: 10 }, (_, i) => ({
@@ -43,24 +44,45 @@ export default function OwnerLeaveGroup() {
     return (
       <TouchableOpacity
         key={index}
-        style={[
-          styles.memberItem,
-          isSelected && styles.selectedMemberItem,
-        ]}
+        style={[styles.memberItem, isSelected && styles.selectedMemberItem]}
         onPress={() => handleUserSelect(item.username)}
       >
-        <Image
-          source={{ uri: item.avatar }}
-          style={styles.memberAvatar}
-        />
-        <Text
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Image source={{ uri: item.avatar }} style={styles.memberAvatar} />
+          <Text
+            style={[styles.memberName, isSelected && styles.selectedMemberName]}
+          >
+            @{item.username}
+          </Text>
+        </View>
+
+        <View
           style={[
-            styles.memberName,
-            isSelected && styles.selectedMemberName,
+            styles.roleWrapper,
+            {
+              borderColor:
+                item.role === "Admin"
+                  ? colors.admin
+                  : item.role === "Owner"
+                  ? colors.owner
+                  : colors.member,
+              zIndex: 1,
+            },
           ]}
         >
-          @{item.username}
-        </Text>
+          <Text
+            style={[
+              styles.role,
+              item.role === "Admin"
+                ? { color: colors.admin }
+                : item.role === "Owner"
+                ? { color: colors.owner }
+                : { color: colors.member },
+            ]}
+          >
+            {item.role}
+          </Text>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -74,7 +96,7 @@ export default function OwnerLeaveGroup() {
 
       {/* Search bar */}
       <View style={{ width: "100%", marginBottom: 20, paddingHorizontal: 20 }}>
-        {/* TODO: Nếu như list này ko tự fetch, thì thêm 1 cái kính lúp rồi cho user ấn thì search và/hoặc search khi user submit cái text input như mày thường làm */}
+        {/* TODO: Nếu như list này ko tự fetch, thì thêm 1 cái kính lúp rồi cho user ấn thì search và/hoặc search khi user submit cái text input như bên group fields */}
         <TextInput
           style={styles.searchInput}
           placeholder="Search username..."
@@ -94,6 +116,14 @@ export default function OwnerLeaveGroup() {
         contentContainerStyle={{ paddingBottom: 20 }}
       />
 
+      <View style={[styles.rowContainer, { gap: 20 }]}>
+        <TouchableOpacity style={styles.joinCancelButton}>
+          <Text style={styles.joinCancelButtonText}>Let me rethink</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.joinConfirmButton}>
+          <Text style={styles.joinConfirmButtonText}>Sure, I'm out!</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -126,19 +156,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   memberItem: {
+    width: "100%",
     padding: 15,
     backgroundColor: "#303030",
     borderRadius: 8,
     marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   selectedMemberItem: {
-    backgroundColor: "#B9FF66",
+    backgroundColor: "#E0E0E0",
   },
   memberName: {
     fontSize: 14,
-    color: "#B9FF66",
+    color: "#fff",
   },
   selectedMemberName: {
     color: "#1E1E1E",
@@ -159,4 +191,47 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
+  role: {
+    fontSize: 14,
+    color: "#8A94AC",
+    fontWeight: "bold",
+  },
+  roleWrapper: {
+    padding: 20,
+    borderWidth: 2,
+    borderRadius: 8,
+  },
+  joinCancelButton: {
+    backgroundColor: "#303030",
+    padding: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  joinConfirmButton: {
+    backgroundColor: "#B9FF66",
+    padding: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  joinCancelButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  joinConfirmButtonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 20,
+  },
 });
+const colors = {
+  admin: "#FFBA66",
+  owner: "#B9FF66",
+  member: "#66DBFF",
+};

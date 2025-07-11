@@ -54,6 +54,16 @@ export default function BlogMoreOptionBottomList({
       },
     ]);
   }
+  // const handleDeleteGroup = () => {
+  //   dispatch(deleteGroup(groupID)).then((res) => {
+  //     const result = res.payload as boolean;
+  //     if (result == true) {
+  //       ToastAndroid.show("Group deleted successfully", ToastAndroid.SHORT);
+  //       route.dismiss();
+  //       sheetRef.current?.close();
+  //     }
+  //   });
+  // };
   return (
     <BottomSheet
       ref={sheetRef}

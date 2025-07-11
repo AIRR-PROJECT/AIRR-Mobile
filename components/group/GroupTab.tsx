@@ -4,39 +4,11 @@ import { useAppDispatch } from "@/redux/hook";
 import { useEffect, useState } from "react";
 import { getCreatedGroups, getGroupsByFieldId } from "@/redux/slices/groupSlice";
 import { Group } from "@/interfaces/groupInterface";
-const mockGroup: Group = {
-  CoverURL: "https://picsum.photos/200",
-  Name: "Group Name",
-  _id: "group-id",
-  NumberOfMembers: 350,
-  Description: "",
-  Owner: {
-    _id: "test owner",
-    Username: "Test owner name",
-    AvatarURL: ""
-  },
-  FieldName: "",
-  Tags: [],
-  avatar: "",
-  members: [],
-  timestamp: ""
-};
-const mockGroups = [
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-];
+
 export default function GroupTab(props: {type: string, fieldID?: string}) {
   const dispatch = useAppDispatch()
 
-  const [groups, setGroups] = useState<Group[]>(mockGroups)
+  const [groups, setGroups] = useState<Group[]>()
 
   useEffect(() => {
     switch (props.type) {

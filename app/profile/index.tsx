@@ -29,6 +29,7 @@ import {
 } from "@/redux/slices/authSlice";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { signOut } from "@react-native-firebase/auth";
+import { setIsViewingOwnProfile } from "@/redux/slices/userSlice";
 // type UserInfo = {
 //   username: string;
 //   avatar_url: string;
@@ -82,16 +83,15 @@ export default function ProfileScreen() {
   const [selectedTabs, setSelectedTabs] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState("");
 
-  const { user, userGroups } = useAppSelector((state) => state.user);
+  const { user, userGroups, isViewingOwnProfile } = useAppSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState<UserInfo>(user!);
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!);
-  const [isOwnProfile, setIsOwnProfile] = useState(true);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (userID) {
-      setIsOwnProfile(false);
+      dispatch(setIsViewingOwnProfile(false));
       dispatch(getPartialUserInfo(userID)).then((res) => {
         const currentUserInfo = res.payload as PartialUser;
         if (res.payload) {
@@ -109,13 +109,13 @@ export default function ProfileScreen() {
   }, [userGroups]);
 
   useEffect(() => {
-    if (isOwnProfile) {
+    if (isViewingOwnProfile) {
       setSelectedTabs(["Social", "Blog", "Activity"]);
     } else {
       setSelectedTabs(["Social", "Blog"]);
     }
     setSelectedTab("Social");
-  }, [isOwnProfile]);
+  }, [isViewingOwnProfile]);
 
   const route = useRouter();
   const handleCreateGroup = () => {
@@ -127,7 +127,7 @@ export default function ProfileScreen() {
     <ParallaxFlatList style={styles.container} contentStyle={{ padding: 0 }}>
       {/* User Info */}
       <View style={{ padding: 20, gap: 20 }}>
-        <UserInfoComponent {...userInfo} isOwnProfile={isOwnProfile} />
+        <UserInfoComponent {...userInfo} isOwnProfile={isViewingOwnProfile} />
 
         {/* User student info */}
 

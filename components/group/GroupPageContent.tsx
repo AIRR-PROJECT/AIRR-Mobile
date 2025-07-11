@@ -256,27 +256,7 @@ GroupPageProps) {
   const handleMoreOptionPress = useCallback((index: number) => {
     sheetRef.current?.snapToIndex(index);
   }, []);
-  // Delete this after the group rules are fetched from the server
-  const groupRules: GroupRule[] = [
-    {
-      _id: "rule1",
-      RuleName: "Respect all members",
-      RuleDescription:
-        "All members should be treated with respect and kindness.",
-    },
-    {
-      _id: "rule2",
-      RuleName: "No spamming",
-      RuleDescription:
-        "Spamming or posting irrelevant content is not allowed in this group.",
-    },
-    {
-      _id: "rule3",
-      RuleName: "Stay on topic",
-      RuleDescription:
-        "Please keep discussions relevant to the group's theme and purpose.",
-    },
-  ];
+  
   const handleContentButtonPress = () => {
     route.push(`/group/group-contents?groupID=${groupID}`);
   };

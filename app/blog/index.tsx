@@ -737,6 +737,7 @@ export default function BlogScreen() {
           isFromDetail={true}
           isBlogStatusPendingOrActive={currentUserBlog.Status == BlogStatus.ACTIVE || currentUserBlog.Status == BlogStatus.PENDING}
           isUserStatusPending={currentUserBlog.UserGroupStatus == "Pending"}
+          isViewTypePrivateOrInProfile={currentUserBlog.ViewType != BlogViewType.IN_GROUP}
           handleHideThisBlog={handleHideBlog}
           handleDeleteThisBlog={handleDeleteBlog}/>
       )}

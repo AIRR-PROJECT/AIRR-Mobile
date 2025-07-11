@@ -27,7 +27,7 @@ import { AntDesign, Feather, FontAwesome } from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
 import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
-import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
+import BlogTagDropdownComponent from "@/components/blog/BlogTagDropdownListComponent";
 import { getGroupInfo, getPreviewGroups, searchGroupsForCreateUpdateBlog } from "@/redux/slices/groupSlice";
 import {
   Group,
@@ -48,6 +48,7 @@ import {
   getUserBlogDetailForUpdate,
   setCreateBlogCurrentTags,
   setCreateBlogRequestedTags,
+  setCreateBlogTagCount,
   updateBlog,
 } from "@/redux/slices/blogSlice";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
@@ -162,7 +163,7 @@ export default function Editblog() {
   }>();
   const route = useRouter();
 
-  const { createBlogCurrentTags, createBlogRequestedTags } = useAppSelector(
+  const { createBlogCurrentTags, createBlogRequestedTags, createBlogTagCount } = useAppSelector(
     (state) => state.blog
   );
 
@@ -192,6 +193,7 @@ export default function Editblog() {
   useEffect(() => {
     dispatch(setCreateBlogCurrentTags([]));
     dispatch(setCreateBlogRequestedTags([]));
+    dispatch(setCreateBlogTagCount(0))
   }, []);
 
   useEffect(() => {
@@ -229,6 +231,7 @@ export default function Editblog() {
 
         setChosenTags(data.Tags);
         dispatch(setCreateBlogRequestedTags(data.PendingTags));
+        dispatch(setCreateBlogTagCount(data.Tags.length + data.PendingTags.length))
 
         uploadedImg.current = Image.resolveAssetSource({
           uri: data.BackgroundURL,
@@ -487,7 +490,7 @@ export default function Editblog() {
     route.push(
       `/request-tag-screen?fieldID=${fieldID}&groupID=${
         groupID ?? chosenGroup?._id
-      }`
+      }&currentTagCount=${createBlogTagCount}`
     );
   };
   return (
@@ -865,7 +868,7 @@ export default function Editblog() {
         )}
         footerComponent={renderTagsFooter}
       >
-        <TagDropdownComponent tags={foundTags} preSelectedTags={chosenTags} onPress={onPressTag}/>
+        <BlogTagDropdownComponent tags={foundTags} preSelectedTags={chosenTags} onPress={onPressTag}/>
       </BottomSheet>
     </GestureHandlerRootView>
   );

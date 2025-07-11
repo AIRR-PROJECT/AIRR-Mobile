@@ -39,8 +39,9 @@ import {
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
 import { router, useRouter } from "expo-router";
-import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
+import BlogTagDropdownComponent from "@/components/blog/BlogTagDropdownListComponent";
 import { setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
+import GroupTagDropdownComponent from "@/components/blog/GroupTagDropdownListComponent";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 export default function CreateGroup() {
@@ -598,7 +599,7 @@ export default function CreateGroup() {
           />
         )}
       >
-        <TagDropdownComponent tags={groupTags} onPress={onPressTag}/>
+        <GroupTagDropdownComponent tags={groupTags} onPress={onPressTag}/>
       </BottomSheet>
     </GestureHandlerRootView>
   );

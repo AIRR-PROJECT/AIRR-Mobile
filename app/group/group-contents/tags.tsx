@@ -98,13 +98,13 @@ export default function TagsApprovalsPage() {
           }
         });
 
-        // categorizedTagsList.sort((a, b) => a.id.localeCompare(b.id) == -1)
         Object.entries(categorizedTags).forEach((entry) => {
           categorizedTagsList.push({
             id: entry[0] as string,
             data: entry[1] as GroupTag[],
           });
         });
+        categorizedTagsList = categorizedTagsList.sort((a, b) => a.id.localeCompare(b.id))
         setDisplayTags(categorizedTagsList);
       })
     }

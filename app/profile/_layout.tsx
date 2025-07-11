@@ -6,7 +6,7 @@ import ButtonGradient from "@/components/ButtonGradient";
 import { useAppSelector } from "@/redux/hook";
 
 const SettingsIcon = ({ isOwnProfile }: { isOwnProfile: boolean }) => (
-  
+  isOwnProfile ?
   <ButtonGradient
     label="Edit profile"
     onPress={() => {
@@ -14,7 +14,7 @@ const SettingsIcon = ({ isOwnProfile }: { isOwnProfile: boolean }) => (
     }}
     style={styles.editProfileButton}
     labelStyle={styles.editProfileButtonText}
-  />
+  /> : null
 );
 
 export default function ProfileLayout() {

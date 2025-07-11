@@ -19,7 +19,7 @@ import { createTag } from "@/redux/slices/groupSlice";
 import { GroupTag } from "@/interfaces/groupInterface";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { searchTagCreateBlog, setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
+import { searchTagCreateBlog, setCreateBlogRequestedTags, setCreateBlogTagCount } from "@/redux/slices/blogSlice";
 import { CreateBlogTag } from "@/interfaces/blogInterface";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -31,7 +31,7 @@ export default function RequestTagsScreen({
   isCreate = false, // Default to false if not provided
 }: AddTagsComponentProps) {
   const dispatch = useAppDispatch()
-  const { fieldID, groupID } = useLocalSearchParams<{ keyword: string, fieldID: string, groupID: string }>()
+  const { fieldID, groupID, currentTagCount } = useLocalSearchParams<{ fieldID: string, groupID: string, currentTagCount: string }>()
   const { createBlogCurrentTags, createBlogRequestedTags } = useAppSelector(state => state.blog)
 
   // State to hold the new tag input by user
@@ -48,6 +48,8 @@ export default function RequestTagsScreen({
 
   // Error if the tag selected already chosen for the blog
   const [showError, setShowError] = useState(false)
+
+  const [tagCount, setTagCount] = useState<number>(parseInt(currentTagCount))
 
   const onChangeText = (text: string) => {
     setNewTag(text);
@@ -105,6 +107,9 @@ export default function RequestTagsScreen({
       setSelectableTags([]);
       //Go Back and send the new tags to the parent component
       dispatch(setCreateBlogRequestedTags(newTags))
+
+      // Assign new tag count value
+      dispatch(setCreateBlogTagCount(tagCount))
       router.back()
     }
   };
@@ -158,6 +163,14 @@ export default function RequestTagsScreen({
                   style={styles.selectTagButton}
                   onPress={() => {
                     if (!createBlogCurrentTags.includes(tag.TagName) && !requestedTags.find((t) => t.TagName == tag.TagName)) {
+                      // Don't allow add more tags if tag count exceeds 10
+                      if (tagCount == 10) {
+                        ToastAndroid.show("Total number of tags must not exceed 10", ToastAndroid.SHORT)
+                        return
+                      }
+                      // Add to tag count
+                      setTagCount(tagCount + 1)
+                      
                       setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
                       setRequestedTags(() => [tag, ...requestedTags])
                       setShowError(false)
@@ -181,6 +194,15 @@ export default function RequestTagsScreen({
             onPress={() => {
               // Handle tag creation logic here
               if (validTag && !requestedTags.find((t) => t.TagName == validTag)) {
+                // Don't allow add more tags if tag count exceeds 10
+                console.log(tagCount)
+                if (tagCount == 10) {
+                  ToastAndroid.show("Total number of tags must not exceed 10", ToastAndroid.SHORT)
+                  return
+                }
+                // Add to tag count
+                setTagCount(tagCount + 1)
+
                 setRequestedTags((prev) => [...prev, { _id: Math.random().toString(36).substring(2, 15), TagName: validTag, OperationType: "new-tag" }]);
 
                 setValidTag(null);
@@ -213,6 +235,9 @@ export default function RequestTagsScreen({
                   key={index}
                   style={styles.deselectTagButton}
                   onPress={() => {
+                    // Subtract from tag count
+                    setTagCount(tagCount - 1)
+                    
                     setRequestedTags((prev) => prev.filter((t) => t._id !== tag._id));
                   }}
                 >

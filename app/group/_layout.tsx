@@ -147,12 +147,7 @@ export default function GroupLayout() {
             headerTitle: "Group Contents",
           }}
         />
-        <Stack.Screen
-          name="owner-leave"
-          options={{
-            headerTitle: "Owner Leave Group",
-          }}
-        />
+        
       </Stack>
     </ThemeProvider>
   );

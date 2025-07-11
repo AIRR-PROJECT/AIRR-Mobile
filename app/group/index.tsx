@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { memo, useEffect, useRef, useState } from "react";
 import GroupPageContent from "@/components/group/GroupPageContent";
@@ -277,48 +278,51 @@ export default function GroupPage() {
   //   }
   // }, [blogIdToRemove]);
 
-  const renderContent = () => {
-    switch (selectedId) {
-      case 1:
-        return (
-          <FlatList
-            data={displayBlogs}
-            renderItem={({ item }) => <GroupBlogPreview blog={item} />}
-            keyExtractor={(item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={[styles.list, {}]}
-            style={{ paddingBottom: 80 }}
-            onEndReached={handleBlogListEndReached}
-            ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-          />
-        );
-      case 2:
-        return (
-          <SectionGrid
-            sections={displayTags}
-            itemDimension={150} // Controls column width
-            spacing={10} // Spacing between items
-            style={styles.gridView}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.tagContainer}>
-                <Text style={styles.tag}>#{item.TagName}</Text>
-              </TouchableOpacity>
-            )}
-            renderSectionHeader={({ section }) => (
-              <Text style={styles.title}>{section.id}</Text>
-            )}
-            keyExtractor={(item, index) => item.TagName + index}
-            contentContainerStyle={styles.list}
-          />
-        );
-      default:
-        return null;
-    }
-  };
+  // const renderContent = () => {
+  //   switch (selectedId) {
+  //     case 1:
+  //       return (
+  //         <FlatList
+  //           data={displayBlogs}
+  //           renderItem={({ item }) => <GroupBlogPreview blog={item} />}
+  //           keyExtractor={(item, index) => index.toString()}
+  //           showsVerticalScrollIndicator={false}
+  //           contentContainerStyle={[styles.list, {}]}
+  //           style={{ paddingBottom: 80 }}
+  //           onEndReached={handleBlogListEndReached}
+  //           ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+  //         />
+  //       );
+  //     case 2:
+  //       return (
+  //         <SectionGrid
+  //           sections={displayTags}
+  //           itemDimension={150} // Controls column width
+  //           spacing={10} // Spacing between items
+  //           style={styles.gridView}
+  //           renderItem={({ item }) => (
+  //             <TouchableOpacity style={styles.tagContainer}>
+  //               <Text style={styles.tag}>#{item.TagName}</Text>
+  //             </TouchableOpacity>
+  //           )}
+  //           renderSectionHeader={({ section }) => (
+  //             <Text style={styles.title}>{section.id}</Text>
+  //           )}
+  //           keyExtractor={(item, index) => item.TagName + index}
+  //           contentContainerStyle={styles.list}
+  //         />
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
   const sheetRef = useRef(null);
   return (
-    <GestureHandlerRootView>
-      <ParallaxFlatList contentStyle={styles.contentStyle}>
+    <GestureHandlerRootView style={styles.container}>
+      <ScrollView style={styles.contentStyle}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+      >
         <GroupPageContent
           selectedId={selectedId}
           setSelectedId={setSelectedId}
@@ -329,7 +333,7 @@ export default function GroupPage() {
           // selectedBlogFilter={selectedBlogFilter}
           // selectedTagFilter={selectedTagFilter}
         />
-      </ParallaxFlatList>
+      </ScrollView>
       <BlogMoreOptionBottomList
         sheetRef={sheetRef}
         groupID={groupId}
@@ -384,8 +388,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   contentStyle: {
-    padding: 20,
-    paddingTop: 0,
     flex: 1,
+    padding: 20,
   },
 });

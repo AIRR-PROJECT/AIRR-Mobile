@@ -332,6 +332,7 @@ export default function GroupPage() {
       </ParallaxFlatList>
       <BlogMoreOptionBottomList
         sheetRef={sheetRef}
+        groupID={groupId}
         userRole={userCurrentGroupRole}
       />
     </GestureHandlerRootView>

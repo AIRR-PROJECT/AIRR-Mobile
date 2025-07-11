@@ -551,7 +551,7 @@ export default function PopularGroupTab({
                   name={item.Name}
                   id={item._id}
                   owner_username={item.Owner.Username}
-                  avatar={item.Owner.AvatarURL}
+                  avatar={item.CoverURL}
                   numberOfMembers={item.NumberOfMembers}
                   threeUserAvatar={[]}
                   description={item.Description}
@@ -584,7 +584,7 @@ export default function PopularGroupTab({
           <GroupCardComponent
             name={item.Name}
             id={item._id}
-            image={item.Owner.AvatarURL}
+            image={item.CoverURL}
             members={item.NumberOfMembers}
             style={{
               paddingHorizontal: 20,

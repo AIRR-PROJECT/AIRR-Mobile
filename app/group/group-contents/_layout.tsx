@@ -10,8 +10,10 @@ export default function ContentsPageTabLayout() {
     memberID: string;
     requestID: string;
   }>();
-  const { userCurrentGroupRole } = useAppSelector(state => state.user)
+  const { userCurrentGroupRole } = useAppSelector((state) => state.user);
   // TODO: CHECK IF USER IS NOT ADMIN OR OWNER, DISABLE REPORTS TAB
+  const canAccessReportsTab =
+    userCurrentGroupRole === GroupRole.Admin || userCurrentGroupRole === GroupRole.Owner; 
   return (
     <MaterialTopTabs
       style={{ flex: 1 }}
@@ -81,11 +83,12 @@ export default function ContentsPageTabLayout() {
       />
       <MaterialTopTabs.Screen
         name="reports"
-        options={{ title: "Reports" }}
+        options={{ title: "Reports",}}
         initialParams={{
           groupID,
           requestID,
         }}
+        redirect={!canAccessReportsTab}
       />
     </MaterialTopTabs>
   );

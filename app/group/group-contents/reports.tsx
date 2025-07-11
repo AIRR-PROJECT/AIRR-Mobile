@@ -20,36 +20,54 @@ import {
 import {
   approveTag,
   getPendingMemberList,
+  getPendingReportBlogList,
   getPendingTagList,
   rejectTag,
 } from "@/redux/slices/groupSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useLocalSearchParams } from "expo-router";
 
+type ReportUserComponentProps = GroupReport & {
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+}
+
 function ReportUserComponent({
-  user,
-  reason,
-  time,
-}: {
-  user: { id: string; name: string; avatar: string };
-  reason: string;
-  time: number;
-}) {
+  Blog,
+  Reports,
+  onApprove,
+  onReject
+}: ReportUserComponentProps) {
+  const [temp, setTemp] = useState("")
+  useEffect(() => {
+    let string = ""
+    Reports.forEach((r) => {
+      string += "@" + r.User.UserName + ": (" + r.ReportType + ") " + r.Details + " - " 
+    })
+    setTemp(string)
+  }, [Reports])
+
   return (
     <View
       style={{ flexDirection: "row", alignItems: "center", marginBottom: 20 }}
     >
-      <Image
-        source={{ uri: user.avatar }}
-        style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
-      />
-      <View>
-        <Text style={{ color: "#fff", fontSize: 16 }}>{user.name}</Text>
-        <Text style={{ color: "#aaa", fontSize: 14 }}>{reason}</Text>
-        <Text style={{ color: "#aaa", fontSize: 12 }}>
-          {new Date(time).toLocaleDateString()}
-        </Text>
-      </View>
+      {Blog && 
+        <Image
+          source={{ uri: Blog.CoverURL }}
+          style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
+        />
+      }
+      {Blog && Reports &&
+        <View>
+          <Text style={{ color: "#000", fontSize: 16 }}>{Blog.Title}</Text>
+          <Text style={{ color: "#aaa", fontSize: 14 }}>{Reports.length} Reports</Text>
+          {/* Hải: DISPLAY ALL REPORTS ABOUT THIS BLOG */}
+          <Text style={{ color: "#aaa", fontSize: 12 }}>
+            {temp}
+          </Text>
+          {/* Hải: DISPLAY APPROVE AND REJECT BUTTONS */}
+        </View>
+      }
     </View>
   );
 }
@@ -79,11 +97,14 @@ export default function ReportsApprovalsPage() {
   const [displayReports, setDisplayReports] = useState<GroupReport[]>([]);
 
   useEffect(() => {
-    // dispatch(getPendingTagList(groupID)).then(res => {
-    //   const list = res.payload as PendingTagRequest[]
-    //   setTags(list)
-    // })
-  }, [])
+    if (groupID) {
+      dispatch(getPendingReportBlogList(groupID)).then(res => {
+        const list = res.payload as GroupReport[]
+        
+        setDisplayReports(list)
+      })
+    }
+  }, [groupID])
 
   const onApprove = (tagId: string, blogIDs: string[]) => {
     // dispatch(approveTag({
@@ -113,16 +134,16 @@ export default function ReportsApprovalsPage() {
   const renderItem = ({ item }: any) => (
     <ReportUserComponent
       {...item}
-      //   onApprove={onApprove}
-      //   onReject={onReject}
+        onApprove={onApprove}
+        onReject={onReject}
     />
   );
   return (
     <GestureHandlerRootView style={styles.container}>
       <Animated.FlatList
-        data={initialReports}
+        data={displayReports}
         renderItem={renderItem}
-        keyExtractor={(item) => item.user.id}
+        keyExtractor={(item) => item.Blog._id}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         itemLayoutAnimation={LinearTransition}
@@ -134,8 +155,12 @@ export default function ReportsApprovalsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#1E1E1E",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 20,
   },
   textInputContainer: {
     paddingBottom: 20,

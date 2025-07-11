@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
 import { AxiosResponse } from "axios";
-import { CancelJoinGroupRequest, CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupTag, LeaveGroup, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { CancelJoinGroupRequest, CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupReport, GroupTag, LeaveGroup, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
 import { CreateBlogTag, UserBlog } from "@/interfaces/blogInterface";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 
@@ -636,14 +636,15 @@ export const searchGroupsForCreateUpdateBlog = createAsyncThunk(
     }
 )
 
-export const getReportBlogList = createAsyncThunk(
-    'group/getReportBlogList',
+export const getPendingReportBlogList = createAsyncThunk(
+    'group/getPendingReportBlogList',
     async (groupID: string, thunkAPI) => {
         try {
-            const res = await api.get(`groups/getReportBlogList?groupID=${groupID}`) as AxiosResponse
+            const res = await api.get(`groups/getReportBlogList?groupID=${groupID}&status=Pending`) as AxiosResponse
+            console.log(res.data)
 
             if (res.data.success) {
-                return res.data.data.success as PendingTagRequest[]
+                return res.data.data.reportBlogs as GroupReport[]
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)

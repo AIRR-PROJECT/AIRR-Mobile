@@ -58,18 +58,43 @@ import Carousel, {
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
+import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 // TODO:
 // Fetching user favourite blogs only 
 // Also implment refresh control and lazy loading
 // remove from favourites now is a option in more option
 export default function FavouriteBlog() {
-
+  const dispatch = useAppDispatch()
   const moreOptionRef = useRef<BottomSheet>(null);
+  const { user } = useAppSelector(state => state.user)
+
+  // Simulate refresh
+  const [refreshing, setRefreshing] = useState(false);
+  const [isBlogReset, setBlogReset] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate fetching data
+    console.log("Refreshing");
+    setBlogReset(true);
+    favoriteBlogsReset
+      .mutateAsync()
+      .then(() => setBlogReset(false));
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+  }, []);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
+  const [isBlogStatusPendingOrActive, setIsBlogStatusPendingOrActive] = useState(false)
+  const [isUserStatusPending, setIsUserStatusPending] = useState(false)
+  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string) => {
+  const [page, setPage] = useState(1)
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, isBlogStatusPendingOrActive: boolean, isUserStatusPending: boolean, isViewTypePrivateOrInProfile: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
+    setIsBlogStatusPendingOrActive(isBlogStatusPendingOrActive)
+    setIsUserStatusPending(isUserStatusPending)
+    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
     if (moreOptionRef.current) {
@@ -77,6 +102,47 @@ export default function FavouriteBlog() {
     }
     // console.log("More option pressed", isUserWritten)
   };
+
+  const favoriteBlogsQuery = useQuery({
+    queryKey: ["feed-user"],
+    queryFn: async () => {
+      const fetchedBlogs = await dispatch(fetchUserBlogs(page));
+
+      return fetchedBlogs.payload.blogList.blogs as UserBlog[];
+    },
+    placeholderData: keepPreviousData,
+  });
+  const favoriteBlogsMutation = useMutation({
+    mutationFn: async (page: number) => {
+      const moreFetchedBlogs = await dispatch(fetchUserBlogs(page));
+
+      // console.log(moreFetchedBlogs.payload.blogList.blogs)
+      return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-favorite"], (oldData: any) => {
+        return [...oldData, ...data] as UserBlog[];
+      });
+    },
+  });
+  const favoriteBlogsReset = useMutation({
+    mutationFn: async () => {
+      const refetchedBlog = await dispatch(fetchUserBlogs(1));
+
+      return refetchedBlog.payload.blogList.blogs as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-favorite"], (oldData: any) => {
+        return [...data] as UserBlog[];
+      });
+      setPage(1)
+    },
+  });
+  const handleOnUserBlogListEndReached = () => {
+    setPage(page + 1);
+    favoriteBlogsMutation.mutate(page + 1);
+  };
+
   return (
     <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
@@ -106,7 +172,48 @@ export default function FavouriteBlog() {
           />
         </View>
       )} */}
-      <MoreOptionBottomList sheetRef={moreOptionRef} isUserWrittenBlog={isUserWrittenBlog} blogId={moreOptionBlogId} groupId={moreOptionGroupId} isFromFeed={true}/>
+      
+      <View style={{ flex: 1, width: "100%" }}>
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={favoriteBlogsQuery.data}
+          style={styles.userBlogContainer}
+          scrollEnabled={true}
+          keyExtractor={(item, index) => index.toString()}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          showsVerticalScrollIndicator={false}
+          onEndReached={handleOnUserBlogListEndReached}
+          renderItem={({ item }) => {
+            return <FeedBlogPreview blog={item} onPressMoreButton={
+              () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
+                item.Status == BlogStatus.ACTIVE || item.Status == BlogStatus.PENDING,
+                item.UserGroupStatus == "Pending",
+                item.ViewType != BlogViewType.IN_GROUP
+              )
+            }/>;
+          }}
+          onEndReachedThreshold={0.5}
+        />
+      </View>
+      <MoreOptionBottomList
+        sheetRef={moreOptionRef}
+        isUserWrittenBlog={isUserWrittenBlog}
+        blogId={moreOptionBlogId}
+        groupId={moreOptionGroupId}
+        isBlogStatusPendingOrActive={isBlogStatusPendingOrActive}
+        isUserStatusPending={isUserStatusPending}
+        isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
+        isFromFeed={false}
+        isFromFavourites={true}
+        isFromDetail={false}
+        handleHideThisBlog={function (): void {
+          throw new Error("Function not implemented.");
+        } }
+        handleDeleteThisBlog={function (): void {
+          throw new Error("Function not implemented.");
+        } }/>
     </GestureHandlerRootView>
   );
 }

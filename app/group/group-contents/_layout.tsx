@@ -79,14 +79,14 @@ export default function ContentsPageTabLayout() {
           memberID,
         }}
       />
-      {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && <MaterialTopTabs.Screen
+      <MaterialTopTabs.Screen
         name="reports"
         options={{ title: "Reports" }}
         initialParams={{
           groupID,
           requestID,
         }}
-      />}
+      />
     </MaterialTopTabs>
   );
 }

@@ -134,8 +134,8 @@ export default function ProfileScreen() {
         <UserStudentInfoComponent {...studentInfo} />
 
         {/* Active groups */}
-
-        <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
+        {/* TODO: Integrate API when have */}
+        {/* <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
         <FlatList
           data={userGroups}
           horizontal={true}
@@ -156,7 +156,7 @@ export default function ProfileScreen() {
           renderItem={({ item }) => {
             return <GroupPreviewInfo group={item} />;
           }}
-        />
+        /> */}
 
         {/* Social , Blog, Activity */}
         <View style={styles.rowContainer}>

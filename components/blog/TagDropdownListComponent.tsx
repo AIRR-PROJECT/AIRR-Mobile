@@ -17,8 +17,8 @@ export default function TagDropdownComponent({
   const [selectedTags, setSelectedTags] = useState<GroupTag[]>([]);
 
   const handleTagToggle = (tag: GroupTag) => {
-    if (selectedTags.includes(tag)) {
-      const updated = selectedTags.filter((t) => t !== tag);
+    if (selectedTags.find((t) => t._id == tag._id) !== undefined) {
+      const updated = selectedTags.filter((t) => t._id != tag._id);
       setSelectedTags(updated);
       onPress(updated); // Optional: inform parent that tag was deselected
     } else {

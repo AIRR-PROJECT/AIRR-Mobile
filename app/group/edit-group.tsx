@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Image, ImageSource } from "expo-image";
+import { Image as ImageReactNative } from "react-native";
 import {
   AntDesign,
   Feather, FontAwesome,
@@ -27,11 +28,13 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   createGroup,
+  getGroupsByFieldId,
   getGroupInfo,
   searchFields,
   setCreateGroupCreatedTags,
   setCreateGroupCurrentTags,
   setCreateGroupSubmitted,
+  updateGroup,
 } from "@/redux/slices/groupSlice";
 import {
   GroupDetailInfo,
@@ -43,6 +46,7 @@ import {
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
 import { setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
+import { GroupRole } from "@/enums/group.enum";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 export default function EditGroup() {
@@ -53,6 +57,9 @@ export default function EditGroup() {
     createGroupCurrentTags,
     createGroupCreatedTags,
   } = useAppSelector((state) => state.group);
+  const {
+    userCurrentGroupRole
+  } = useAppSelector((state) => state.user);
   const { groupID } = useLocalSearchParams<{ groupID: string }>()
 
   const uploadedImg = useRef<ImageSource>();
@@ -75,6 +82,9 @@ export default function EditGroup() {
       setGroupFields((res.payload as SearchFieldResult).Fields);
       console.log((res.payload as SearchFieldResult).Fields);
     });
+
+    dispatch(setCreateGroupCurrentTags([]));
+    dispatch(setCreateGroupCreatedTags([]));
   }, []);
 
   useEffect(() => {
@@ -98,7 +108,38 @@ export default function EditGroup() {
       dispatch(getGroupInfo({ groupID })).then((res) => {
         const data = res.payload as GroupDetailInfo
         
+        uploadedImg.current = ImageReactNative.resolveAssetSource({
+          uri: data.CoverURL,
+          fileName: "background.jpg",
+          mimeType: "image/jpeg",
+        });
+        
+        // Get field's default tags
+        dispatch(searchFields(data.Field.FieldName)).then((fieldRes) => {
+          const fieldData = (fieldRes.payload as SearchFieldResult).Fields[0]
+          
+          setGroupField(fieldData)
+          let groupTags = JSON.parse(JSON.stringify(fieldData.DefaultTags)) as GroupTag[]
+          data.Tags.forEach((t) => {
+            if (groupTags.find(t2 => t2._id == t._id) === undefined) {
+              groupTags.push(t)
+            }
+          })
+          setGroupTags(groupTags)
+        })
+        
         setGroupName(data.Name)
+        setChosenTags(data.Tags)
+        setGroupDescription(data.Description)
+        let rules: GroupRule[] = []
+        data.Rules.forEach((r, index) => {
+          rules.push({
+            _id: "rule" + index,
+            RuleName: r.Title,
+            RuleDescription: r.Content
+          })
+        })
+        setGroupRules(rules)
       })
     }
   }, [groupID])
@@ -126,18 +167,20 @@ export default function EditGroup() {
         name: uploadedImg.current?.fileName,
         type: uploadedImg.current?.mimeType,
       });
+      formData.append("GroupID", groupID);
       formData.append("Name", groupName);
       formData.append(
         "Tags",
-        JSON.stringify([...groupTags, ...createGroupCreatedTags])
+        JSON.stringify([...chosenTags, ...createGroupCreatedTags])
       );
       formData.append("GroupField", JSON.stringify(groupField));
       formData.append("Description", groupDescription);
       formData.append("GroupRules", JSON.stringify(groupRules));
 
-      dispatch(createGroup(formData)).then((res) => {
+      dispatch(updateGroup(formData)).then((res) => {
         if ((res.payload as boolean) == true) {
-          router.dismiss();
+          router.dismiss()
+          router.replace(`/group?groupId=${groupID}`)
         }
       });
     }
@@ -240,6 +283,8 @@ export default function EditGroup() {
           Group Avatar
         </Text>
         <UploadGroupAvatarComponent
+          disabled={userCurrentGroupRole != GroupRole.Owner}
+          imgSource={uploadedImg.current}
           onSetImg={(imgSource) => {
             uploadedImg.current = imgSource;
           }}
@@ -253,7 +298,8 @@ export default function EditGroup() {
           <View style={styles.inputWrapper}>
             <TextInput
               style={styles.input}
-              value={groupName}
+              defaultValue={groupName}
+              editable={userCurrentGroupRole == GroupRole.Owner}
               onChangeText={(text) => {
                 if (text.length <= 30) {
                   setGroupName(text);
@@ -275,6 +321,7 @@ export default function EditGroup() {
           {/* Field */}
           <TouchableOpacity
             onPress={() => handleFieldSnapPress(0)}
+            disabled={userCurrentGroupRole != GroupRole.Owner}
             activeOpacity={0.8}
             style={styles.heading}
           >
@@ -379,7 +426,8 @@ export default function EditGroup() {
           </Text>
           <TextInput
             style={[styles.multilineInput]}
-            value={groupDescription}
+            defaultValue={groupDescription}
+            editable={userCurrentGroupRole == GroupRole.Owner}
             onChangeText={(text) => {
               if (text.length <= 250) {
                 setGroupDescription(text);
@@ -399,7 +447,7 @@ export default function EditGroup() {
           </Text>
           {/* Rules Container */}
 
-          {groupRules?.map((rule, index) => (
+          {groupRules && groupRules.length > 0 && groupRules.map((rule, index) => (
             <View key={index} style={styles.ruleOuterContainer}>
               <View
                 style={[
@@ -420,6 +468,7 @@ export default function EditGroup() {
                 </Text>
                 {/* Delete button */}
                 <TouchableOpacity
+                  disabled={userCurrentGroupRole != GroupRole.Owner}
                   onPress={() => {
                     setGroupRules((prevRules) =>
                       prevRules?.filter((_, i) => i !== index)
@@ -446,6 +495,8 @@ export default function EditGroup() {
                     style={styles.ruleText}
                     placeholder="Enter rule name..."
                     placeholderTextColor="#B0B0B0"
+                    defaultValue={rule.RuleName}
+                    editable={userCurrentGroupRole == GroupRole.Owner}
                     onChangeText={(text) => {
                       let groupRulesClone = JSON.parse(
                         JSON.stringify(groupRules)
@@ -463,6 +514,8 @@ export default function EditGroup() {
                     style={styles.ruleText}
                     placeholder="Enter rule description..."
                     placeholderTextColor="#B0B0B0"
+                    defaultValue={rule.RuleDescription}
+                    editable={userCurrentGroupRole == GroupRole.Owner}
                     onChangeText={(text) => {
                       let groupRulesClone = JSON.parse(
                         JSON.stringify(groupRules)
@@ -486,6 +539,7 @@ export default function EditGroup() {
                 backgroundColor: "#fff",
               },
             ]}
+            disabled={userCurrentGroupRole != GroupRole.Owner}
             onPress={handleAddNewRulePress}
             activeOpacity={0.8}
           >
@@ -608,7 +662,7 @@ export default function EditGroup() {
           />
         )}
       >
-        <TagDropdownComponent tags={groupTags} onPress={onPressTag}/>
+        <TagDropdownComponent tags={groupTags} preSelectedTags={chosenTags} onPress={onPressTag}/>
       </BottomSheet>
     </GestureHandlerRootView>
   );

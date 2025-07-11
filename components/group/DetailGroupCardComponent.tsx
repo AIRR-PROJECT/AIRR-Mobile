@@ -47,7 +47,7 @@ export default function DetailGroupCardComponent({
           </View>
         </View>
         {/* More button */}
-        {(
+        {(userRole == GroupRole.Admin || userRole == GroupRole.Owner) &&(
           <TouchableOpacity
             style={{ position: "absolute", right: -10, top: 0, zIndex: 1 }}
             activeOpacity={0.6}

@@ -79,7 +79,7 @@ export default function BlogMoreOptionBottomList({
             <FontAwesome name="edit" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Edit group</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {userRole == GroupRole.Owner && <TouchableOpacity
             style={styles.bottomOptionButton}
             activeOpacity={0.8}
             onPress={() => {
@@ -90,7 +90,7 @@ export default function BlogMoreOptionBottomList({
             {/* delete */}
             <MaterialIcons name="delete" size={24} color="black" />
             <Text style={styles.bottomOptionText}>Delete group</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </BottomSheetView>
       )}
     </BottomSheet>

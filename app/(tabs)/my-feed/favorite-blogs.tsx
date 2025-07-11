@@ -102,6 +102,8 @@ export default function FavouriteBlog() {
     // Fetch user status in current group
     dispatch(getUserGroupStatus(groupId)).then((res) => {
       const data = res.payload as string
+
+      setIsUserStatusPending(data == "Pending")
     })
 
     setIsUserStatusPending(isUserStatusPending)

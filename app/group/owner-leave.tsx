@@ -1,6 +1,10 @@
+import { GroupMember } from "@/interfaces/groupInterface";
+import { useAppDispatch } from "@/redux/hook";
+import { getGroupAdmins, leaveGroup } from "@/redux/slices/groupSlice";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,49 +14,69 @@ import {
   TextInput,
 } from "react-native";
 
-interface Member {
-  avatar: string;
-  username: string;
-  role: string;
-}
-
-const member: Member = {
-  avatar: "https://picsum.photos/200",
-  username: "John Doe",
-  role: "Owner",
-};
-
-const members: Member[] = Array.from({ length: 10 }, (_, i) => ({
-  ...member,
-  username: `User${i + 1}`,
-}));
-
 export default function OwnerLeaveGroup() {
+  const dispatch = useAppDispatch()
+  const { groupID } = useLocalSearchParams<{ groupID: string }>()
+
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
+  const [members, setMembers] = useState<GroupMember[]>([])
+  const [filteredMembers, setFilteredMembers] = useState<GroupMember[]>([])
 
-  const handleUserSelect = (username: string) => {
-    setSelectedUser(username);
+  useEffect(() => {
+    if (groupID) {
+      dispatch(getGroupAdmins(groupID)).then((res) => {
+        const data = res.payload as GroupMember[]
+        console.log(data)
+
+        setMembers(data)
+        setFilteredMembers(data)
+      })
+    }
+  }, [groupID])
+
+  useEffect(() => {
+    if (searchText.length != 0) {
+      setFilteredMembers(members.filter((m) =>
+        m.MemberInfo.Username.toLowerCase().includes(searchText.toLowerCase()))
+      )
+    }
+    else {
+      setFilteredMembers(members)
+    }
+  }, [searchText, members])
+
+  const handleUserSelect = (_id: string) => {
+    setSelectedUser(_id);
   };
 
-  const filteredMembers = members.filter((m) =>
-    m.username.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const handleCancel = () => {
+    router.dismiss()
+  }
+  const handleConfirm = () => {
+    dispatch(leaveGroup({ groupID: groupID, newOwnerID: selectedUser! })).then((res) => {
+      const result = res.payload as boolean
 
-  const renderItem = ({ item, index }: { item: Member; index: number }) => {
-    const isSelected = item.username === selectedUser;
+      if (result == true) {
+        router.dismiss(2)
+      }
+    })
+  }
+
+  const renderItem = ({ item, index }: { item: GroupMember; index: number }) => {
+    const isSelected = item.MemberInfo.Username === selectedUser;
     return (
       <TouchableOpacity
         key={index}
         style={[styles.memberItem, isSelected && styles.selectedMemberItem]}
-        onPress={() => handleUserSelect(item.username)}
+        onPress={() => handleUserSelect(item.MemberInfo._id)}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Image source={{ uri: item.avatar }} style={styles.memberAvatar} />
+          <Image source={{ uri: item.MemberInfo.AvatarURL }} style={styles.memberAvatar} />
           <Text
             style={[styles.memberName, isSelected && styles.selectedMemberName]}
           >
-            @{item.username}
+            @{item.MemberInfo.Username}
           </Text>
         </View>
 
@@ -61,9 +85,9 @@ export default function OwnerLeaveGroup() {
             styles.roleWrapper,
             {
               borderColor:
-                item.role === "Admin"
+                item.Role === "Admin"
                   ? colors.admin
-                  : item.role === "Owner"
+                  : item.Role === "Owner"
                   ? colors.owner
                   : colors.member,
               zIndex: 1,
@@ -73,14 +97,14 @@ export default function OwnerLeaveGroup() {
           <Text
             style={[
               styles.role,
-              item.role === "Admin"
+              item.Role === "Admin"
                 ? { color: colors.admin }
-                : item.role === "Owner"
+                : item.Role === "Owner"
                 ? { color: colors.owner }
                 : { color: colors.member },
             ]}
           >
-            {item.role}
+            {item.Role}
           </Text>
         </View>
       </TouchableOpacity>
@@ -117,11 +141,11 @@ export default function OwnerLeaveGroup() {
       />
 
       <View style={[styles.rowContainer, { gap: 20 }]}>
-        <TouchableOpacity style={styles.joinCancelButton}>
+        <TouchableOpacity style={styles.joinCancelButton} onPress={handleCancel}>
           <Text style={styles.joinCancelButtonText}>Let me rethink</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.joinConfirmButton}>
-          <Text style={styles.joinConfirmButtonText}>Sure, I'm out!</Text>
+        <TouchableOpacity style={selectedUser ? styles.joinConfirmButton : styles.joinConfirmDisabledButton} disabled={selectedUser == null} onPress={handleConfirm}>
+          <Text style={selectedUser ? styles.joinConfirmButtonText : styles.joinConfirmDisabledButtonText}>Sure, I'm out!</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -213,6 +237,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 20,
   },
+  joinConfirmDisabledButton: {
+    backgroundColor: "#DDF5C1",
+    padding: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
   joinCancelButtonText: {
     color: "#fff",
     fontSize: 16,
@@ -220,6 +250,11 @@ const styles = StyleSheet.create({
   },
   joinConfirmButtonText: {
     color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  joinConfirmDisabledButtonText: {
+    color: "#7F7F7E",
     fontSize: 16,
     fontWeight: "bold",
   },

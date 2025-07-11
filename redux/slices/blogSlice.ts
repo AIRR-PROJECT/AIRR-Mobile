@@ -536,17 +536,13 @@ export const getFavoriteBlogs = createAsyncThunk(
             const res = await api.get(`blogs/favorite-blogs?page=${data.page}`) as AxiosResponse
 
             if (res.data.success) {
-                return res.data.data.favoriteBlogs as FavoriteBlog[]
+                return res.data.data.favoriteBlogs.blogs as FavoriteBlog[]
             }
             else {
                 return []
             }
         }
         catch (error: any) {
-            if (error.response.data.failcode == ResponseFailcode.TAG_NOT_FOUND) {
-                return []
-            }
-            
             return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
         }
     }

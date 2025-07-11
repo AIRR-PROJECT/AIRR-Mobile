@@ -31,7 +31,9 @@ import { useRouter } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   cancelJoinGroupRequest,
+  deleteGroup,
   getGroupInfo,
+  leaveGroup,
   requestJoinGroup,
   setGroupBlogsSearchText,
   setGroupTagsSearchText,
@@ -112,6 +114,7 @@ GroupPageProps) {
   const { userCurrentGroupMembershipStage, userCurrentGroupRole } =
     useAppSelector((state) => state.user);
   const [isShowRules, setIsShowRules] = useState(false);
+  const [isOwnerTheLastMember, setIsOwnerTheLastMember] = useState(false)
   const [buttonLabel, setButtonLabel] = useState("Join Group");
   const [isGroupJoinModalVisible, setIsGroupJoinModalVisible] = useState(false);
   const [isCancelRequestModalVisible, setIsCancelRequestModalVisible] =
@@ -135,7 +138,7 @@ GroupPageProps) {
       const groupInfo = res.payload as GroupDetailInfo;
 
       setGroupInfo(groupInfo);
-      console.log(groupInfo);
+      setIsOwnerTheLastMember(groupInfo.NumberOfMembers == 1 && groupInfo.Role == GroupRole.Owner)
       const membershipStage =
         groupInfo.UserStatus == "Active"
           ? GroupMembershipStage.JOINED
@@ -243,7 +246,6 @@ GroupPageProps) {
       }
     });
   };
-  //  TODO: Handle Here
   const handleCancelRequestConfirm = () => {
     dispatch(cancelJoinGroupRequest({ groupID })).then((res) => {
       const result = res.payload as boolean;
@@ -256,7 +258,28 @@ GroupPageProps) {
       }
     });
   };
-  const handleLeaveGroupConfirm = () => {};
+  const handleLeaveGroupConfirm = () => {
+    if (groupInfo.NumberOfMembers != 1) {
+      dispatch(leaveGroup({ groupID })).then((res) => {
+        const result = res.payload as boolean
+        if (result == true) {
+          route.dismiss()
+        }
+      })
+    }
+    else {
+      dispatch(deleteGroup(groupID)).then((res) => {
+        const result = res.payload as boolean
+        if (result == true) {
+          route.dismiss()
+        }
+      })
+    }
+  };
+  const handleLeaveGroupOwnerConfirm = () => {
+
+  };
+
   const handleMoreOptionPress = useCallback((index: number) => {
     sheetRef.current?.snapToIndex(index);
   }, []);
@@ -264,16 +287,16 @@ GroupPageProps) {
   const handleContentButtonPress = () => {
     route.push(`/group/group-contents?groupID=${groupID}`);
   };
-  const isOwnerTheLastMember = false; // Placeholder for logic to determine if the owner is the last member
   const ownSheetRef = useRef<BottomSheet>(null);
-  const handleActionButtonPress = useCallback(() => {
-    if (!isOwnerTheLastMember){
-      route.push("/group/owner-leave")
+  const handleActionButtonPress = () => {
+    console.log(userCurrentGroupRole === GroupRole.Owner)
+    if (groupInfo.NumberOfMembers > 1 && userCurrentGroupRole === GroupRole.Owner){
+      route.push(`/group/owner-leave?groupID=${groupID}`)
     }
     else{
       ownSheetRef.current?.snapToIndex(1);
     }
-  }, []);
+  };
 
   
   return (
@@ -750,7 +773,7 @@ GroupPageProps) {
             )}
           {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED &&
             userCurrentGroupRole === GroupRole.Owner &&
-            isOwnerTheLastMember && (
+            groupInfo.NumberOfMembers == 1 && (
               <View
                 style={[
                   styles.modalContentContainer,
@@ -782,7 +805,7 @@ GroupPageProps) {
                       Let me rethink
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.joinConfirmButton}>
+                  <TouchableOpacity style={styles.joinConfirmButton} onPress={handleLeaveGroupConfirm}>
                     <Text style={styles.joinConfirmButtonText}>
                       Delete Group
                     </Text>
@@ -791,7 +814,7 @@ GroupPageProps) {
               </View>
             )}
           {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED &&
-            userCurrentGroupRole === GroupRole.Admin &&
+            userCurrentGroupRole === GroupRole.Owner &&
             !isOwnerTheLastMember && (
               <View
                 style={[

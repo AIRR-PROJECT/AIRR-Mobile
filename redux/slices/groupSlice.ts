@@ -333,6 +333,25 @@ export const updateGroup = createAsyncThunk(
     }
 )
 
+export const deleteGroup = createAsyncThunk(
+    'group/updateGroup',
+    async (groupID: string, thunkAPI) => {
+        try {
+            const res = await api.delete(`groups/delete-group?groupId=${groupID}`) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 export const requestJoinGroup = createAsyncThunk(
     'group/requestJoin',
     async (data: { groupID: string }, thunkAPI) => {

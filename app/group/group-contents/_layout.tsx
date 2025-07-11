@@ -11,7 +11,6 @@ export default function ContentsPageTabLayout() {
     requestID: string;
   }>();
   const { userCurrentGroupRole } = useAppSelector((state) => state.user);
-  // TODO: CHECK IF USER IS NOT ADMIN OR OWNER, DISABLE REPORTS TAB
   const canAccessReportsTab =
     userCurrentGroupRole === GroupRole.Admin ||
     userCurrentGroupRole === GroupRole.Owner;

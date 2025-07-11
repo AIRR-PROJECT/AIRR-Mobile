@@ -313,7 +313,7 @@ GroupPageProps) {
         </TouchableOpacity>
       )}
       {userCurrentGroupRole == GroupRole.Member &&
-        userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && (
+        userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && (
           <TouchableOpacity
             style={styles.moderatorContainer}
             activeOpacity={0.8}
@@ -594,19 +594,20 @@ GroupPageProps) {
       <View
         style={{ height: 1, backgroundColor: "#4A4A4A", marginVertical: 10 }}
       />
-      <TouchableOpacity
-        style={styles.contentButton}
-        onPress={handleContentButtonPress}
-      >
-        <Text
-          style={{
+      {userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && (
+        <TouchableOpacity
+          style={styles.contentButton}
+          onPress={handleContentButtonPress}
+        >
+          <Text
+            style={{
             color: "#000",
             fontWeight: "bold",
           }}
         >
           See Group Content
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity>)}
       <BottomSheet
         ref={ownSheetRef}
         index={-1}

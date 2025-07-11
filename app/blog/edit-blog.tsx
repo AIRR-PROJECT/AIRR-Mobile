@@ -247,10 +247,10 @@ export default function Editblog() {
   useEffect(() => {
     if (chosenGroup) {
       setFoundTags(chosenGroup?.Tags);
+      // setChosenTags([]);
       
       setRequestedTags([])
       dispatch(setCreateBlogRequestedTags([]))
-      // setChosenTags([]);
     }
   }, [chosenGroup]);
 
@@ -374,6 +374,7 @@ export default function Editblog() {
       JSON.stringify(createBlogRequestedTags)
     ) as CreateBlogTag[];
     requestedTagsReformatted.forEach((t) => {
+      if (t.OperationType === undefined && t.OperationType != "new-tag")
       t.OperationType = "pending-tag-in-group";
     });
     formData.append(
@@ -413,6 +414,7 @@ export default function Editblog() {
         groupData={item}
         onPress={(data) => {
           setChosenGroup(data.groupData);
+          setChosenTags([])
           setIsUserMember(!data.groupData.IsAdminOrOwner);
 
           let chosenGroupTagsString: string[] = [];

@@ -17,15 +17,17 @@ import { G } from "react-native-svg";
 
 type MoreOptionComponentProps = {
   sheetRef: React.RefObject<BottomSheet>;
+  groupID: string
   userRole?: GroupRole;
 };
 export default function BlogMoreOptionBottomList({
   sheetRef,
+  groupID,
   userRole = GroupRole.Member,
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const handleEditGroup = () => {
-    route.push("/group/edit-group");
+    route.push(`/group/edit-group?groupID=${groupID}`);
   }
   const handleDeleteGroup = () => {
     Alert.alert("Are you sure?", "This action cannot be undone.", [
@@ -63,7 +65,7 @@ export default function BlogMoreOptionBottomList({
         />
       )}
     >
-      {userRole == GroupRole.Owner && (
+      {(
         <BottomSheetView style={styles.contentContainer}>
           <TouchableOpacity
             style={styles.bottomOptionButton}

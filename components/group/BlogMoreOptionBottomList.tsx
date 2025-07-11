@@ -1,6 +1,7 @@
 import { GroupRole } from "@/enums/group.enum";
 import { useAppDispatch } from "@/redux/hook";
 import { deleteBlog, updateHideBlog } from "@/redux/slices/blogSlice";
+import { deleteGroup } from "@/redux/slices/groupSlice";
 import {
   Entypo,
   FontAwesome,
@@ -25,6 +26,7 @@ export default function BlogMoreOptionBottomList({
   groupID,
   userRole = GroupRole.Member,
 }: MoreOptionComponentProps) {
+  const dispatch = useAppDispatch()
   const route = useRouter();
   const handleEditGroup = () => {
     route.push(`/group/edit-group?groupID=${groupID}`);
@@ -40,9 +42,14 @@ export default function BlogMoreOptionBottomList({
         style: "destructive",
         onPress: () => {
           // Call delete action here
-          // dispatch(deleteBlog(blogId));
-          ToastAndroid.show("Group deleted successfully", ToastAndroid.SHORT);
-          sheetRef.current?.close();
+          dispatch(deleteGroup(groupID)).then((res) => {
+            const result = res.payload as boolean
+            if (result == true) {
+              ToastAndroid.show("Group deleted successfully", ToastAndroid.SHORT);
+              route.dismiss()
+              sheetRef.current?.close();
+            }
+          })
         },
       },
     ]);

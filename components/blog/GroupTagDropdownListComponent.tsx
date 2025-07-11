@@ -1,19 +1,22 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { View, Text, StyleSheet, TextInput, FlatList } from "react-native";
+import { View, Text, StyleSheet, TextInput, FlatList, ToastAndroid } from "react-native";
 import Checkbox from "expo-checkbox";
 import { useEffect, useState } from "react";
 import { BottomSheetFlatList, BottomSheetView } from "@gorhom/bottom-sheet";
 import { GroupTag } from "@/interfaces/groupInterface";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { setCreateBlogTagCount } from "@/redux/slices/blogSlice";
 type TagDropdownComponentProps = {
   tags: GroupTag[];
   preSelectedTags?: GroupTag[],
   onPress: (tags: GroupTag[]) => void;
 };
-export default function TagDropdownComponent({
+export default function GroupTagDropdownComponent({
   tags,
   preSelectedTags,
   onPress,
 }: TagDropdownComponentProps) {
+  const dispatch = useAppDispatch()
   const [selectedTags, setSelectedTags] = useState<GroupTag[]>([]);
 
   const handleTagToggle = (tag: GroupTag) => {

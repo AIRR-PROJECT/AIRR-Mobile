@@ -44,9 +44,10 @@ import {
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
-import TagDropdownComponent from "@/components/blog/TagDropdownListComponent";
+import BlogTagDropdownComponent from "@/components/blog/BlogTagDropdownListComponent";
 import { setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
 import { GroupRole } from "@/enums/group.enum";
+import GroupTagDropdownComponent from "@/components/blog/GroupTagDropdownListComponent";
 const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 
 export default function EditGroup() {
@@ -662,7 +663,7 @@ export default function EditGroup() {
           />
         )}
       >
-        <TagDropdownComponent tags={groupTags} preSelectedTags={chosenTags} onPress={onPressTag}/>
+        <GroupTagDropdownComponent tags={groupTags} preSelectedTags={chosenTags} onPress={onPressTag}/>
       </BottomSheet>
     </GestureHandlerRootView>
   );

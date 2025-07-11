@@ -100,6 +100,9 @@ export default function ProfileScreen() {
         }
       });
     }
+    else {
+      dispatch(setIsViewingOwnProfile(true))
+    }
 
     dispatch(getUserPreviewGroups(userID ?? user._id));
   }, []);

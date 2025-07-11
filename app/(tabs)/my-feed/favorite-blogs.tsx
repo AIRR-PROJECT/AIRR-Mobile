@@ -205,7 +205,7 @@ export default function FavouriteBlog() {
         isBlogStatusPendingOrActive={isBlogStatusPendingOrActive}
         isUserStatusPending={isUserStatusPending}
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
-        isFromFeed={false}
+        isFromFeed={true}
         isFromFavourites={true}
         isFromDetail={false}
         handleHideThisBlog={function (): void {

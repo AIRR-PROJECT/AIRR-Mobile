@@ -209,3 +209,16 @@ export interface SearchBarBlog {
     Description: string;
     Owner: UserBlogAuthor;
 }
+
+export interface FavoriteBlog {
+    _id: string;
+    Author: UserBlogAuthor;
+    Group: UserBlogGroup;
+    Description: string;
+    Tags: UserBlogTag[];
+    Title: string;
+    BackgroundURL: string;
+    Reaction: UserBlogGroup;
+    Status: string;
+    ViewType: string;
+}

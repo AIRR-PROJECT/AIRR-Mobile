@@ -87,15 +87,15 @@ export default function FavouriteBlog() {
     }, 2000); // 2 seconds refresh
   }, []);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
-  const [isBlogStatusPendingOrActive, setIsBlogStatusPendingOrActive] = useState(false)
-  const [isUserStatusPending, setIsUserStatusPending] = useState(false)
+  const [userStatus, setUserStatus] = useState("")
+  const [blogStatus, setBlogStatus] = useState<BlogStatus>(BlogStatus.ACTIVE)
   const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
   const [page, setPage] = useState(1)
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, isBlogStatusPendingOrActive: boolean, isViewTypePrivateOrInProfile: boolean) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, blogStatus: BlogStatus, isViewTypePrivateOrInProfile: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
-    setIsBlogStatusPendingOrActive(isBlogStatusPendingOrActive)
+    setBlogStatus(blogStatus)
     setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
@@ -104,10 +104,9 @@ export default function FavouriteBlog() {
     dispatch(getUserGroupStatus(groupId)).then((res) => {
       const data = res.payload as string
 
-      setIsUserStatusPending(data == "Pending")
+      setUserStatus(data)
     })
 
-    setIsUserStatusPending(isUserStatusPending)
     if (moreOptionRef.current) {
       moreOptionRef.current.snapToIndex(0);
     }
@@ -168,7 +167,7 @@ export default function FavouriteBlog() {
   }
   const handleRemoveFavoriteBlog = () => {
     moreOptionRef.current?.close();
-    
+
     setBlogReset(true)
     favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
   }
@@ -226,7 +225,7 @@ export default function FavouriteBlog() {
           renderItem={({ item }) => {
             return <FeedBlogPreview blog={item as any} onPressMoreButton={
               () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
-                item.Status == BlogStatus.ACTIVE || item.Status == BlogStatus.PENDING,
+                item.Status as BlogStatus,
                 item.ViewType != BlogViewType.IN_GROUP
               )
             }/>;
@@ -239,8 +238,8 @@ export default function FavouriteBlog() {
         isUserWrittenBlog={isUserWrittenBlog}
         blogId={moreOptionBlogId}
         groupId={moreOptionGroupId}
-        isBlogStatusPendingOrActive={isBlogStatusPendingOrActive}
-        isUserStatusPending={isUserStatusPending}
+        userStatus={userStatus}
+        blogStatus={blogStatus}
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
         isFromFeed={true}
         isFromFavourites={true}

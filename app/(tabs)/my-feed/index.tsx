@@ -60,6 +60,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { string } from "zod";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
+import { getUserGroupStatus } from "@/redux/slices/groupSlice";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>()
@@ -194,18 +195,25 @@ export default function MyFeed() {
 
   const moreOptionRef = useRef<BottomSheet>(null);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
-  const [isBlogStatusPendingOrActive, setIsBlogStatusPendingOrActive] = useState(false)
-  const [isUserStatusPending, setIsUserStatusPending] = useState(false)
+  const [userStatus, setUserStatus] = useState("")
+  const [blogStatus, setBlogStatus] = useState("")
   const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, isBlogStatusPendingOrActive: boolean, isUserStatusPending: boolean, isViewTypePrivateOrInProfile: boolean) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
-    setIsBlogStatusPendingOrActive(isBlogStatusPendingOrActive)
-    setIsUserStatusPending(isUserStatusPending)
     setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
+    
+    // Fetch user status in current group
+    dispatch(getUserGroupStatus(groupId)).then((res) => {
+      const data = res.payload as string
+
+      setUserStatus(data)
+    })
+
+    setBlogStatus(blogStatus)
     if (moreOptionRef.current) {
       moreOptionRef.current.snapToIndex(0);
     }
@@ -246,10 +254,10 @@ export default function MyFeed() {
             showsVerticalScrollIndicator={false}
             onEndReached={handleOnUserBlogListEndReached}
             renderItem={({ item }) => {
+              console.log(item)
               return <FeedBlogPreview blog={item} onPressMoreButton={
                 () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
-                  item.Status == BlogStatus.ACTIVE || item.Status == BlogStatus.PENDING,
-                  item.UserGroupStatus == "Pending",
+                  item.Status,
                   item.ViewType != BlogViewType.IN_GROUP
                 )
               }/>;
@@ -333,10 +341,10 @@ export default function MyFeed() {
         isUserWrittenBlog={isUserWrittenBlog}
         blogId={moreOptionBlogId}
         groupId={moreOptionGroupId}
+        userStatus={userStatus}
+        blogStatus={blogStatus}
         isFromFeed={true}
         isFromDetail={false}
-        isBlogStatusPendingOrActive={isBlogStatusPendingOrActive}
-        isUserStatusPending={isUserStatusPending}
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
         handleHideThisBlog={handleHideBlog}
         handleDeleteThisBlog={handleDeleteBlog}/>

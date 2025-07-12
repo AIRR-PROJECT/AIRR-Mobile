@@ -30,7 +30,7 @@ export default function BlogAuthor({ author, style, time }: BlogAuthorProps) {
           lightColor="#fff"
           darkColor="#fff"
         >
-          {mockDate ?? time}
+          {time}
         </ThemedText>
       </View>
     </View>

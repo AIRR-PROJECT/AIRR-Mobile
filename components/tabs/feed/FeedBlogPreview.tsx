@@ -218,7 +218,7 @@ export default function FeedBlogPreview({
               <Text style={styles.tag}>+{blog.Tags.length - 2} more</Text>
             )}
           </View>
-          <BlogStatusComponent status={blog.Status} />
+          <BlogStatusComponent status={blog.Status ?? blog.ViewType}/>
         </Pressable>
       </ImageBackground>
       <View style={{ padding: 20 }}>

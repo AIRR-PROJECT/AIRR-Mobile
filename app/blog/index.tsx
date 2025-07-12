@@ -545,7 +545,7 @@ export default function BlogScreen() {
           <Text style={styles.title}>{title}</Text>
           {/* Status */}
           {/* TODO: Send status here */}
-          <BlogStatusComponent status={status} />
+          <BlogStatusComponent status={status ?? viewType} />
           <View style={{paddingTop : 20}}/>
           {/* Date and number of comment */}
           <View style={styles.additionalInfo}>

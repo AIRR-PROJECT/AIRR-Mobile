@@ -16,7 +16,7 @@ export default function CareerPath() {
         <Text style={styles.text}>
           Career Path is currently only available on web.
         </Text>
-        <ExternalLink href={webUrl} ref={linkRef}>
+        <ExternalLink href={webUrl}>
           <Text style={styles.link}>
             Open in browser to view the career path workflow.
           </Text>

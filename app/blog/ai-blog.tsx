@@ -113,7 +113,7 @@ const mockData: DetailGroupCardComponentProps = {
       Details:
         "AI has applications in various fields such as healthcare, finance, and transportation.",
       Source: "https://www.ibm.com/cloud/learn/what-is-artificial-intelligence",
-      Code: "function aiApplication() { return 'AI in action'; }",
+      Code: "function aiApplication() {\n  return 'AI in action';\n}",
     },
   ],
 };
@@ -139,12 +139,18 @@ export default function BlogScreen() {
   const { user } = useAppSelector((state) => state.user);
 
   // Shared properties
-  const [title, setTitle] = useState("Mock description");
-  const [description, setDescription] = useState("Mock description");
+  const [title, setTitle] = useState(
+    "Mock asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
+  );
+  const [description, setDescription] = useState(
+    "Mock asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
+  );
   // const [thumbnail, setThumbnail] = useState(mockThumbnail);
   // AI blog properties
   // const [sections, setSections] = useState(mockSections);
-  const [conclusion, setConclusion] = useState("This is concluded.");
+  const [conclusion, setConclusion] = useState(
+    "This is concluded. asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
+  );
   // User blog properties
   // const [author, setAuthor] = useState(mockAuthor);
   // const [tags, setTags] = useState(mockTags);
@@ -218,6 +224,7 @@ export default function BlogScreen() {
     route.back();
   };
   const progress = useSharedValue<number>(0);
+  // 5 anh?
   const thumbnail = [
     "https://picsum.photos/200/300",
     "https://picsum.photos/200/300",
@@ -225,31 +232,27 @@ export default function BlogScreen() {
     "https://picsum.photos/200/300",
     "https://picsum.photos/200/300",
   ];
-  const renderItem = (item: any) => {
+  const renderItem = ({ item }: { item: string }) => {
     return (
-      <View
+      <Image
+        source={{ uri: item }}
         style={{
-          width: window.width,
-          height: 258,
-          justifyContent: "center",
-          alignItems: "center",
+          width: window.width - 40,
+          height: 280,
+          borderRadius: 16,
         }}
-      >
-        <Image
-          source={{ uri: item }}
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: 20,
-          }}
-        />
-      </View>
+      />
     );
   };
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       {/* Back button */}
-      <View style={[styles.rowContainer, { width: "100%", paddingBottom: 20 }]}>
+      <View
+        style={[
+          styles.rowContainer,
+          { width: "100%", margin: 20 },
+        ]}
+      >
         <TouchableOpacity onPress={handleBack}>
           <Entypo name="chevron-small-left" size={30} color="white" />
         </TouchableOpacity>
@@ -262,8 +265,6 @@ export default function BlogScreen() {
       <View style={styles.scrollViewContent}>
         {/* Title */}
         <Text style={styles.title}>{title}</Text>
-        {/* Status */}
-        <View style={{ paddingTop: 20 }} />
 
         {/* Description */}
         <View style={styles.descriptionContainer}>
@@ -289,18 +290,25 @@ export default function BlogScreen() {
         </View>
         {/* Blog content (render from html) */}
         {/* Carousel for background page */}
+      </View>
+      <View
+        id="carousel-ai-blog-component"
+        // dataSet={{ kind: "utils", name: "pagination" }}
+        style={{
+          paddingHorizontal: 20,
+        }}
+      >
         <Carousel
-          autoPlayInterval={2000}
+          autoPlay={true}
           data={thumbnail}
-          height={258}
+          height={280}
           loop={true}
           pagingEnabled={true}
           snapEnabled={true}
-          width={window.width}
+          width={window.width - 40}
           style={{
-            width: window.width,
+            width: window.width - 40,
           }}
-          mode="parallax"
           modeConfig={{
             parallaxScrollingScale: 0.9,
             parallaxScrollingOffset: 50,
@@ -308,34 +316,27 @@ export default function BlogScreen() {
           onProgressChange={progress}
           renderItem={renderItem}
         />
+      </View>
+      <View
+        style={{
+          flex: 1,
+          padding: 20,
+        }}
+      >
+        {/* truyen list data vao day (list.map => ....), nho doi? key khac nhau ko se bi loi */}
         <AIBlogSectionComponent {...mockData} />
-        {searchParams.userBlogId && (
-          <Divider
-            orientation="vertical"
-            width={1}
-            style={{ borderColor: "white" }}
-          />
-        )}
-
-        <Divider
-          orientation="vertical"
-          width={1}
-          style={{ borderColor: "white" }}
-        />
       </View>
       {/* Conclusion */}
-      <View>
+      <View
+        style={{
+          padding: 20,
+          paddingTop: 0,
+        }}
+      >
         <View style={styles.conclusionContainer}>
-          <Text
-            style={[
-              styles.conclusion,
-              { color: "#B9FF66", fontWeight: "bold" },
-            ]}
-          >
-            Conclusion
-          </Text>
+          <Text style={styles.conclusionTitle}>Conclusion</Text>
         </View>
-        <Text style={styles.conclusion}>{conclusion}</Text>
+        <Text style={styles.conclusionText}>{conclusion}</Text>
       </View>
     </ScrollView>
   );
@@ -381,6 +382,8 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     width: "100%",
+    padding: 20,
+    paddingTop: 0
   },
   title: {
     fontSize: 24,
@@ -417,15 +420,21 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "justify",
   },
-  conclusionContainer: {
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    backgroundColor: "#2C2C2C",
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  conclusion: {
+  conclusionContainer: {},
+  conclusionTitle: {
     fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: "#4f82d8",
+  },
+  conclusionHeading: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#4f82d8",
+    padding: 5,
+    marginBottom: 10,
+  },
+  conclusionText: {
+    fontSize: 14,
     color: "#fff",
     textAlign: "justify",
   },

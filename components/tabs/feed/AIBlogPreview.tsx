@@ -13,7 +13,7 @@ export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
   const handlePress = () => {
     console.log("Blog Pressed");
     route.push({
-      pathname: `/blog?aiBlogId=${blog._id}`,
+      pathname: `/blog/ai-blog?aiBlogId=${blog._id}`,
     });
   };
   return (

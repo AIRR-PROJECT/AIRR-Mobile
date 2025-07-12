@@ -26,7 +26,8 @@ type MoreOptionComponentProps = {
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
   isFromFavourites?: boolean; // Optional prop to indicate if the blog is from favourites
   isFromDetail: boolean; // Optional prop to indicate if the blog is from detail
-  isViewTypePrivateOrInProfile: boolean
+  isViewTypePrivateOrInProfile: boolean,
+  isAlreadyReported: boolean
   handleHideThisBlog: () => void;
   handleDeleteThisBlog: () => void;
   handleRemoveFavoriteThisBlog?: () => void;
@@ -42,6 +43,7 @@ export default function MoreOptionBottomList({
   isFromFavourites = false, // Default to false if not provided
   isFromDetail = false, // Default to false if not provided
   isViewTypePrivateOrInProfile = false,
+  isAlreadyReported = false,
   handleHideThisBlog,
   handleDeleteThisBlog,
   handleRemoveFavoriteThisBlog
@@ -57,6 +59,7 @@ export default function MoreOptionBottomList({
     console.log(`role: ${role}`)
     console.log(`blogStatus: ${blogStatus}`)
     console.log(`isViewTypePrivateOrInProfile: ${isViewTypePrivateOrInProfile}`)
+    console.log(`isAlreadyReported: ${isAlreadyReported}`)
   }, [isUserWrittenBlog, blogId, groupId, role, blogStatus, isViewTypePrivateOrInProfile])
 
   const handleHideBlog = () => {
@@ -76,6 +79,12 @@ export default function MoreOptionBottomList({
     });
   };
   const handleReportBlog = () => {
+    if (isAlreadyReported) {
+      ToastAndroid.show("This blog is already reported", ToastAndroid.LONG)
+
+      return
+    }
+
     // Handle reporting the blog
     if (groupId) {
       route.push(`/options/report-blog?blogID=${blogId}&groupID=${groupId}`);

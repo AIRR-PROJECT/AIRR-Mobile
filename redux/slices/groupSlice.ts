@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
 import { AxiosResponse } from "axios";
-import { CancelJoinGroupRequest, CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupReport, GroupTag, LeaveGroup, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult } from "@/interfaces/groupInterface";
+import { BanMember, CancelJoinGroupRequest, CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupReport, GroupTag, InviteMemberToAdmin, KickMember, LeaveGroup, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult, UnbanMember } from "@/interfaces/groupInterface";
 import { CreateBlogTag, UserBlog } from "@/interfaces/blogInterface";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 
@@ -724,6 +724,82 @@ export const getGroupAdmins = createAsyncThunk(
             }
             else {
                 return []
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const banMember = createAsyncThunk(
+    'group/banMember',
+    async (data: BanMember, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/banMember`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const unbanMember = createAsyncThunk(
+    'group/unbanMember',
+    async (data: UnbanMember, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/unbanMember`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const kickMember = createAsyncThunk(
+    'group/kickMember',
+    async (data: KickMember, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/kickMember`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const inviteMemberToAdmin = createAsyncThunk(
+    'group/inviteMemberToAdmin',
+    async (data: InviteMemberToAdmin, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/inviteMemberToAdmin`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
             }
         }
         catch (error: any) {

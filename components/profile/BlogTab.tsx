@@ -82,22 +82,24 @@ type BlogTabProps = {
   setRole: Dispatch<SetStateAction<string>>
   setBlogStatus: Dispatch<SetStateAction<string>>
   setIsViewTypePrivateOrInProfile: Dispatch<SetStateAction<boolean>>
+  setIsAlreadyReported: Dispatch<SetStateAction<boolean>>
   setMoreOptionBlogId: Dispatch<SetStateAction<string>>
   setMoreOptionGroupId: Dispatch<SetStateAction<string>>
   handleHideBlog: MutableRefObject<() => void>
   handleDeleteBlog: MutableRefObject<() => void>
 }
 
-export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, setBlogStatus, setIsViewTypePrivateOrInProfile, setMoreOptionBlogId, setMoreOptionGroupId, handleHideBlog, handleDeleteBlog }: BlogTabProps) {
+export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, setBlogStatus, setIsViewTypePrivateOrInProfile, setIsAlreadyReported, setMoreOptionBlogId, setMoreOptionGroupId, handleHideBlog, handleDeleteBlog }: BlogTabProps) {
   const { userID, blogIdToRemove } = useLocalSearchParams<{ userID: string, blogIdToRemove: string }>()
   const { user } = useAppSelector(state => state.user)
 
   const dispatch = useAppDispatch();
   const [personalPage, setPersonalPage] = useState(1);
 
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean, isAlreadyReported: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
     setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
+    setIsAlreadyReported(isAlreadyReported)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
     setRole(role)
@@ -193,7 +195,8 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
           () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
             item.UserGroupStatus,
             item.Status,
-            item.ViewType != BlogViewType.IN_GROUP
+            item.ViewType != BlogViewType.IN_GROUP,
+            item.IsReportedByUser
           )
         }/>;
       }}

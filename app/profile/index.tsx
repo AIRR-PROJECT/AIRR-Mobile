@@ -95,6 +95,7 @@ export default function ProfileScreen() {
   const [role, setRole] = useState("")
   const [blogStatus, setBlogStatus] = useState("")
   const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
+  const [isAlreadyReported, setIsAlreadyReported] = useState(false)
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
   const handleHideBlog = useRef<() => void>(() => {})
@@ -226,6 +227,7 @@ export default function ProfileScreen() {
             setRole={setRole}
             setBlogStatus={setBlogStatus}
             setIsViewTypePrivateOrInProfile={setIsViewTypePrivateOrInProfile}
+            setIsAlreadyReported={setIsAlreadyReported}
             setMoreOptionBlogId={setMoreOptionBlogId}
             setMoreOptionGroupId={setMoreOptionGroupId}
             handleHideBlog={handleHideBlog}
@@ -244,6 +246,7 @@ export default function ProfileScreen() {
         isFromFeed={true}
         isFromDetail={false}
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
+        isAlreadyReported={isAlreadyReported}
         handleHideThisBlog={handleHideBlog.current}
         handleDeleteThisBlog={handleDeleteBlog.current}/>
     </GestureHandlerRootView>

@@ -1,4 +1,9 @@
-import { FontAwesome6 } from "@expo/vector-icons";
+import {
+  Feather,
+  FontAwesome5,
+  FontAwesome6,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import {
   View,
   TextInput,
@@ -12,7 +17,11 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import React, { useEffect, useRef, useState } from "react";
 import MemberApprovalCardComponent from "@/components/group/MemberApprovalCardComponent";
 import { RequestOwner } from "@/interfaces/notifInterface";
-import { GroupBannedMember, GroupMember, PendingMemberRequest } from "@/interfaces/groupInterface";
+import {
+  GroupBannedMember,
+  GroupMember,
+  PendingMemberRequest,
+} from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   approveMember,
@@ -25,6 +34,10 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { Image } from "expo-image";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 
 // Initial mock data
 // const mockUser: PendingMemberRequest = {
@@ -40,56 +53,67 @@ import { Image } from "expo-image";
 //   ...user,
 //   id: index.toString(),
 // }));
+import { format, formatRelative } from "date-fns";
 enum TabOptions {
   All = "all",
   NeedApproval = "need-approval",
   Banned = "banned",
 }
+const joinConfirmImage = require("@/assets/images/group/join_confirm.png");
 export default function MemberApprovalsPage() {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const displayMembersFlatlistRef = useRef<any>();
   const memberApprovalsFlatlistRef = useRef<any>();
-  const { userCurrentGroupRole } = useAppSelector(state => state.user)
+  const { userCurrentGroupRole, user } = useAppSelector((state) => state.user);
   const { groupID, memberID } = useLocalSearchParams<{
     groupID: string;
     memberID: string;
   }>();
 
   const [displayMembers, setDisplayMembers] = useState<GroupMember[]>([]);
-  const [membersApproval, setMembersApproval] = useState<PendingMemberRequest[]>([]);
+  const [membersApproval, setMembersApproval] = useState<
+    PendingMemberRequest[]
+  >([]);
   const [bannedMembers, setBannedMembers] = useState<GroupBannedMember[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
 
   useEffect(() => {
     if (selectedTab == TabOptions.All) {
       dispatch(getMemberList({ groupID })).then((res) => {
-        let sortOrder = ["Owner", "Admin", "Member"]
-        const groupMembers = res.payload as GroupMember[]
-        const sortedGroupMembers = groupMembers.sort((a, b) => sortOrder.indexOf(a.Role) - sortOrder.indexOf(b.Role))
+        let sortOrder = ["Owner", "Admin", "Member"];
+        const groupMembers = res.payload as GroupMember[];
+        const sortedGroupMembers = groupMembers.sort(
+          (a, b) => sortOrder.indexOf(a.Role) - sortOrder.indexOf(b.Role)
+        );
 
-        setDisplayMembers(sortedGroupMembers)
-      })
+        setDisplayMembers(sortedGroupMembers);
+      });
+    } else if (selectedTab == TabOptions.NeedApproval) {
+      dispatch(getPendingMemberList(groupID)).then((res) => {
+        const list = res.payload as PendingMemberRequest[];
+        setMembersApproval(list);
+      });
+    } else {
+      dispatch(getBannedMemberList(groupID)).then((res) => {
+        const list = res.payload as GroupBannedMember[];
+        setBannedMembers(list);
+      });
     }
-    else if (selectedTab == TabOptions.NeedApproval) {
-      dispatch(getPendingMemberList(groupID)).then(res => {
-        const list = res.payload as PendingMemberRequest[]
-        setMembersApproval(list)
-      })
-    }
-    else {
-      dispatch(getBannedMemberList(groupID)).then(res => {
-        const list = res.payload as GroupBannedMember[]
-        setBannedMembers(list)
-      })
-    }
-  }, [selectedTab])
+  }, [selectedTab]);
 
   useEffect(() => {
     // Scroll to specific index
-    if (membersApproval != undefined && memberID != "" && memberID != undefined) {
+    if (
+      membersApproval != undefined &&
+      memberID != "" &&
+      memberID != undefined
+    ) {
       membersApproval.forEach((value, index) => {
         if (value.Owner._id == memberID) {
-          memberApprovalsFlatlistRef.current.scrollToIndex({ animated: true, index: index });
+          memberApprovalsFlatlistRef.current.scrollToIndex({
+            animated: true,
+            index: index,
+          });
           return;
         }
       });
@@ -97,26 +121,28 @@ export default function MemberApprovalsPage() {
   }, [membersApproval, memberID]);
 
   const onApprove = (id: string) => {
-    dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(res => {
-      if (res.payload === true) {
-        console.log("Approve user with id: ", id);
-        setMembersApproval((prev) => prev.filter((u) => u.Owner._id !== id));
+    dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(
+      (res) => {
+        if (res.payload === true) {
+          console.log("Approve user with id: ", id);
+          setMembersApproval((prev) => prev.filter((u) => u.Owner._id !== id));
+        }
       }
-    })
+    );
   };
 
   const onReject = (id: string) => {
-    dispatch(rejectMember({ groupID, userIDToReject: id })).then(res => {
+    dispatch(rejectMember({ groupID, userIDToReject: id })).then((res) => {
       if (res.payload === true) {
         console.log("Reject user with id: ", id);
         setMembersApproval((prev) => prev.filter((u) => u.Owner._id !== id));
       }
-    })
+    });
   };
 
   const handleOnDisplayMemberPress = (userID: string) => {
-    router.push(`/profile?userID=${userID}`)
-  }
+    router.push(`/profile?userID=${userID}`);
+  };
 
   const renderItem = ({ item }: any) => (
     <MemberApprovalCardComponent
@@ -129,6 +155,30 @@ export default function MemberApprovalsPage() {
       onReject={onReject}
     />
   );
+  const [bottomSheetMode, setBottomSheetMode] = useState<
+    "main" | "kick" | "ban" | "admin" | "unban"
+  >("main");
+  const sheetRef = useRef<BottomSheet>(null);
+  const [selectedMember, setSelectedMember] = useState<GroupMember | null>(
+    null
+  );
+  const [selectedBannedMember, setSelectedBannedMember] = useState<
+    GroupBannedMember | null
+  >(null);
+  const userIsOwner = userCurrentGroupRole === GroupRole.Owner;
+  const userIsAdmin = userCurrentGroupRole === GroupRole.Admin;
+  const userIsMember = userCurrentGroupRole === GroupRole.Member;
+
+  const isMoreDisabled = (item: GroupMember) => {
+    if (item.Role === "Owner") return true;
+    if (userIsAdmin && item.Role !== "Member") return true;
+    if (userIsMember) return true;
+    if (item.MemberInfo._id === user._id) return true;
+    return false;
+  };
+
+  const [banReason, setBanReason] = useState<string>("Spamming");
+  const [otherReason, setOtherReason] = useState<string>("");
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.optionBar}>
@@ -142,7 +192,8 @@ export default function MemberApprovalsPage() {
           <Text style={styles.optionText}>All</Text>
         </TouchableOpacity>
 
-        {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && (
+        {(userCurrentGroupRole == GroupRole.Admin ||
+          userCurrentGroupRole == GroupRole.Owner) && (
           <TouchableOpacity
             style={[
               styles.optionButton,
@@ -155,7 +206,8 @@ export default function MemberApprovalsPage() {
           </TouchableOpacity>
         )}
         {/* TODO: ẤN nút này thì copy cái bên approval qua */}
-        {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && (
+        {(userCurrentGroupRole == GroupRole.Admin ||
+          userCurrentGroupRole == GroupRole.Owner) && (
           <TouchableOpacity
             style={[
               styles.optionButton,
@@ -168,7 +220,7 @@ export default function MemberApprovalsPage() {
         )}
       </View>
       {/* Animated FlatList */}
-      {selectedTab == TabOptions.All ? 
+      {selectedTab == TabOptions.All ? (
         <FlatList
           data={displayMembers}
           renderItem={({ item }) => (
@@ -184,8 +236,14 @@ export default function MemberApprovalsPage() {
               onPress={() => handleOnDisplayMemberPress(item.MemberInfo._id)}
             >
               <Image source={item.MemberInfo.AvatarURL} style={styles.avatar} />
-              <View>
-                <Text style={styles.memberName}>{item.MemberInfo.Username}</Text>
+              <View style={styles.memberInfo}>
+                <Text
+                  style={styles.memberName}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {item.MemberInfo.Username}
+                </Text>
                 <View style={styles.roleWrapper}>
                   <Text
                     style={[
@@ -199,26 +257,29 @@ export default function MemberApprovalsPage() {
                   >
                     {item.Role}
                   </Text>
-                  <FontAwesome6
-                    name="bolt"
-                    size={24}
-                    color={
-                      item.Role === "Admin"
-                        ? colors.admin
-                        : item.Role === "Owner"
-                        ? colors.owner
-                        : colors.member
-                    }
-                  />
                 </View>
               </View>
+              {/* More option */}
+              <TouchableOpacity
+                style={{
+                  marginLeft: "auto",
+                  opacity: isMoreDisabled(item) ? 0.2 : 1,
+                }}
+                onPress={() => {
+                  sheetRef.current?.snapToIndex(0);
+                  setSelectedMember(item);
+                }}
+                disabled={isMoreDisabled(item)}
+              >
+                <Feather name="more-vertical" size={24} color="#fff" />
+              </TouchableOpacity>
             </TouchableOpacity>
           )}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
         />
-      : (selectedTab == TabOptions.NeedApproval ? 
+      ) : selectedTab == TabOptions.NeedApproval ? (
         <Animated.FlatList
           data={membersApproval}
           renderItem={renderItem}
@@ -228,24 +289,52 @@ export default function MemberApprovalsPage() {
           itemLayoutAnimation={LinearTransition}
           ref={memberApprovalsFlatlistRef}
         />
-      : <FlatList
+      ) : (
+        <FlatList
           data={bannedMembers}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={{ borderColor: colors.member }}
-              onPress={() => handleOnDisplayMemberPress(item.Owner._id)}
+              style={[styles.memberContainer]}
+              onPress={() => handleOnDisplayMemberPress(item._id)}
             >
               <Image source={item.Owner.AvatarURL} style={styles.avatar} />
-              <View>
-                <Text style={styles.memberName}>{item.Owner.Username}</Text>
-                <View style={styles.roleWrapper}>
-                  <FontAwesome6
-                    name="bolt"
-                    size={24}
-                    color={colors.member}
-                  />
+              <View style={styles.memberInfo}>
+                <Text
+                  style={styles.memberName}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {item.Owner.Username}
+                </Text>
+                <View style={styles.bannedAtWrapper}>
+                  <Text style={[styles.role]} >
+                    Banned at {formatRelative(item.BannedDate, new Date())}
+                  </Text>
                 </View>
               </View>
+              {/* Un option */}
+              {!userIsMember && (
+                <TouchableOpacity
+                  style={{
+                    marginLeft: "auto",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 5,
+                    borderWidth: 1,
+                    borderColor: "#fff",
+                    padding: 5,
+                    borderRadius: 10,
+                  }}
+                  onPress={() => {
+                    setSelectedBannedMember(item);
+                    setBottomSheetMode("unban");
+                    sheetRef.current?.snapToIndex(0);
+                  }}
+                >
+                  <Feather name="x-circle" size={24} color="white" />
+                  <Text style={{ color: "#fff", fontSize: 12 }}>Unban</Text>
+                </TouchableOpacity>
+              )}
             </TouchableOpacity>
           )}
           keyExtractor={(item, index) => index.toString()}
@@ -253,6 +342,282 @@ export default function MemberApprovalsPage() {
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
         />
       )}
+      <BottomSheet
+        ref={sheetRef}
+        index={-1} // Start closed
+        enablePanDownToClose={true}
+        enableDynamicSizing={true}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            pressBehavior="close"
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        handleStyle={{ backgroundColor: "#1E1E1E" }}
+        style={{ backgroundColor: "#1E1E1E" }}
+        backgroundStyle={{ backgroundColor: "#1E1E1E" }}
+        onClose={() => {
+          setBottomSheetMode("main");
+        }}
+      >
+        <BottomSheetView style={{ padding: 20, gap: 20 }}>
+          {bottomSheetMode === "main" && (
+            <>
+              {/* Kick */}
+              <TouchableOpacity
+                onPress={() => {
+                  setBottomSheetMode("kick");
+                }}
+                style={styles.optionButtonContainer}
+              >
+                <Feather name="user-x" size={24} color="#fff" />
+                <Text style={{ color: "#fff", fontSize: 18 }}>Kick</Text>
+              </TouchableOpacity>
+              {/* Ban */}
+              <TouchableOpacity
+                onPress={() => setBottomSheetMode("ban")}
+                style={styles.optionButtonContainer}
+              >
+                <FontAwesome5 name="ban" size={24} color="#fff" />
+                <Text style={{ color: "#fff", fontSize: 18 }}>Ban</Text>
+              </TouchableOpacity>
+              {/* Invite to Admin */}
+              {selectedMember?.Role !== "Admin" && userIsOwner && (
+                <TouchableOpacity
+                  onPress={() => setBottomSheetMode("admin")}
+                  style={styles.optionButtonContainer}
+                >
+                  <Feather name="user-plus" size={24} color="#fff" />
+                  <Text style={{ color: "#fff", fontSize: 18 }}>
+                    Invite to Admin
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </>
+          )}
+
+          {bottomSheetMode === "kick" && (
+            <View style={[styles.modalContentContainer]}>
+              <Image
+                style={styles.joinConfirmImage}
+                source={joinConfirmImage}
+              />
+              <View style={{ flex: 1, gap: 10 }}>
+                <View style={{}}>
+                  <Text style={styles.joinModalTitle}>
+                    Are you sure to kick this member?
+                  </Text>
+                </View>
+                <Text>They will not belong to this group anymore.</Text>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>Kick</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {bottomSheetMode === "ban" && (
+            <View style={[styles.modalContentContainer]}>
+              <View style={{ flex: 1, gap: 10 }}>
+                <View>
+                  <Text style={styles.joinModalTitle}>Ban Member</Text>
+                </View>
+                <Text style={{ color: "#888", fontSize: 16, flexWrap: "wrap" }}>
+                  Reason for Ban{" "}
+                  <Text style={{ fontWeight: "bold", color: "#77a340ff" }}>
+                    {selectedMember
+                      ? selectedMember.MemberInfo.Username
+                      : "this member"}
+                  </Text>
+                </Text>
+                {/* Here */}
+                <View style={{ marginVertical: 10 }}>
+                  {[
+                    "Spamming",
+                    "Harassment",
+                    "Offensive Language",
+                    "Rule Violation",
+                    "Other",
+                  ].map((reason, idx) => (
+                    <TouchableOpacity
+                      key={reason}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom: 8,
+                      }}
+                      onPress={() => setBanReason(reason)}
+                    >
+                      <View
+                        style={{
+                          height: 20,
+                          width: 20,
+                          borderRadius: 10,
+                          borderWidth: 2,
+                          borderColor: "#77a340ff",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 10,
+                        }}
+                      >
+                        {banReason === reason && (
+                          <View
+                            style={{
+                              height: 10,
+                              width: 10,
+                              borderRadius: 5,
+                              backgroundColor: "#77a340ff",
+                            }}
+                          />
+                        )}
+                      </View>
+                      <Text style={{ color: "#222", fontSize: 16 }}>
+                        {reason}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                  {banReason === "Other" && (
+                    <View style={{ marginTop: 10 }}>
+                      <Text
+                        style={{
+                          marginBottom: 4,
+                          color: "#222",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Please specify the reason
+                      </Text>
+                      <TextInput
+                        style={{
+                          borderWidth: 1,
+                          borderColor: "#77a340ff",
+                          borderRadius: 10,
+                          padding: 10,
+                          color: "#222",
+                          backgroundColor: "#f5f5f5",
+                        }}
+                        placeholder="Enter your reason....."
+                        placeholderTextColor="#888"
+                        value={otherReason}
+                        onChangeText={setOtherReason}
+                        multiline
+                        numberOfLines={3}
+                      />
+                    </View>
+                  )}
+                </View>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      // handle ban logic here, use banReason and otherReason if needed
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>Confirm</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {bottomSheetMode === "admin" && (
+            <View style={[styles.modalContentContainer]}>
+              <Image
+                style={styles.joinConfirmImage}
+                source={joinConfirmImage}
+              />
+              <View style={{ flex: 1, gap: 10 }}>
+                <View style={{}}>
+                  <Text style={styles.joinModalTitle}>
+                    Are you sure to invite this member to be Admin?
+                  </Text>
+                </View>
+                <Text>They will have all admin access.</Text>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>Invite</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {bottomSheetMode === "unban" && (
+            <View style={[styles.modalContentContainer]}>
+              <Image
+                style={styles.joinConfirmImage}
+                source={joinConfirmImage}
+              />
+              <View style={{ flex: 1, gap: 10 }}>
+                <View style={{}}>
+                  <Text style={styles.joinModalTitle}>
+                    Unban this member?
+                  </Text>
+                </View>
+                <Text>They will regain access to the group and its content.</Text>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>Unban</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+        </BottomSheetView>
+      </BottomSheet>
     </GestureHandlerRootView>
   );
 }
@@ -312,6 +677,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
   },
+  memberInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
   memberName: {
     fontSize: 18,
     fontWeight: "bold",
@@ -331,5 +700,71 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 12,
+  },
+  optionButtonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#3B4C55",
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalContentContainer: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    borderWidth: 1,
+  },
+  joinConfirmImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 20,
+  },
+  joinCancelButton: {
+    backgroundColor: "#1B1F26",
+    padding: 30,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  joinConfirmButton: {
+    backgroundColor: "#B9FF66",
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+  },
+  joinCancelButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  joinConfirmButtonText: {
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(36, 87, 75, 0.5)", // Semi-transparent dark background
+  },
+  joinModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bannedAtWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
 });

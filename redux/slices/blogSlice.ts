@@ -315,10 +315,10 @@ export const unsaveBlog = createAsyncThunk(
             const res = await api.post(`blogs/react-blogs`, dto) as AxiosResponse
 
             if (res.data.success) {
-                
+                return true
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                return false
             }
         }
         catch (error: any) {

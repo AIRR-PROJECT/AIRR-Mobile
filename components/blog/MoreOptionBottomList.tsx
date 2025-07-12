@@ -26,6 +26,7 @@ type MoreOptionComponentProps = {
   isViewTypePrivateOrInProfile: boolean
   handleHideThisBlog: () => void;
   handleDeleteThisBlog: () => void;
+  handleRemoveFavoriteThisBlog?: () => void;
 };
 export default function MoreOptionBottomList({
   sheetRef,
@@ -40,6 +41,8 @@ export default function MoreOptionBottomList({
   isViewTypePrivateOrInProfile = false,
   handleHideThisBlog,
   handleDeleteThisBlog,
+  handleRemoveFavoriteThisBlog
+
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
@@ -93,7 +96,12 @@ export default function MoreOptionBottomList({
   // console.log("isFromFeed", isFromFeed);
   const hanleRemoveFromFavourites = () => {
     // Handle removing the blog from favourites
-    dispatch(unsaveBlog(blogId))
+    dispatch(unsaveBlog(blogId)).then((res) => {
+      const result = res.payload as boolean
+      if (result == true) {
+        handleRemoveFavoriteThisBlog!()
+      }
+    })
   };
   return (
     <BottomSheet

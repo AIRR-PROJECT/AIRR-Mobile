@@ -38,7 +38,6 @@ export default function GroupPopularTab() {
   }, [popularFields]);
 
   useEffect(() => {
-    console.log("selectedId", selectedId);
     if (selectedId === "1") {
       dispatch(getPopularGroups());
     }

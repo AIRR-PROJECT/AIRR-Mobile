@@ -196,6 +196,7 @@ export default function FeedBlogPreview({
                   name: blog.Author.Username,
                   avatar: blog.Author.AvatarURL,
                 }}
+                time={blog.Author.CreateDate}
               />
             </View>
             <TouchableOpacity

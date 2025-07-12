@@ -153,7 +153,7 @@ export default function NotificationsLayout() {
         .filter((item) => !isToday(item.time))
         .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()); // Descending
 
-      console.log(earlierItems)
+      // console.log(earlierItems)
 
       const sections = [];
       if (todayItems.length > 0)

@@ -118,6 +118,7 @@ export default function MyFeed() {
     queryKey: ["feed-user"],
     queryFn: async () => {
       const fetchedBlogs = await dispatch(fetchUserBlogs(userPage));
+      console.log(fetchedBlogs)
 
       return fetchedBlogs.payload.blogList.blogs as UserBlog[];
     },
@@ -254,7 +255,6 @@ export default function MyFeed() {
             showsVerticalScrollIndicator={false}
             onEndReached={handleOnUserBlogListEndReached}
             renderItem={({ item }) => {
-              console.log(item)
               return <FeedBlogPreview blog={item} onPressMoreButton={
                 () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
                   item.Status,

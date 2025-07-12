@@ -1,14 +1,16 @@
+import GroupCardComponent from "@/components/group/GroupCardComponent";
 import GroupTab from "@/components/group/GroupTab";
 import PopularGroupTab from "@/components/group/PopularGroupTab";
-import { GroupField } from "@/interfaces/groupInterface";
+import { Group, GroupField } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
+  getCreatedGroups,
   getGroupPopularFields,
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -18,27 +20,63 @@ import {
   Modal,
 } from "react-native";
 
-let fields: GroupField[] = [];
 // Change the impletation to group that user joined
 export default function MyGroupTab() {
   const dispatch = useAppDispatch();
   // const { popularFields } = useAppSelector((state) => state.group);
 
+  const refFields = useRef<FlatList>(null);
+  const currentOffset = useRef(0);
+  
   const [selectedId, setSelectedId] = useState("1");
+  const [fields, setFields] = useState<GroupField[]>([])
+  const [groups, setGroups] = useState(new Map<string, Group[]>())
 
-  // useEffect(() => {
-  //   dispatch(getGroupPopularFields());
-  // }, []);
+  const handleArrowPress = () => {
+    refFields?.current?.scrollToOffset({
+      offset: currentOffset.current + 300, // Adjust as needed
+      animated: true,
+    });
+  };
 
-  // useEffect(() => {
-  //   if (popularFields) {
-  //     // console.log(popularFields)
-  //     fields.push(...popularFields);
-  //   }
-  // }, [popularFields]);
+  // Track scroll position without causing re-render
+  const handleScroll = ({ nativeEvent }: any) => {
+    const offsetX = nativeEvent.contentOffset.x;
+    if (Math.abs(currentOffset.current - offsetX) > 10) {
+      currentOffset.current = offsetX;
+    }
+  };
 
   useEffect(() => {
-  }, [selectedId]);
+    dispatch(getCreatedGroups()).then((res) => {
+      const data = res.payload as Group[]
+
+      let fields: GroupField[] = []
+      let groups = new Map<string, Group[]>()
+      data.forEach((g) => {
+        // Add to fields
+        if (fields.find(f => f._id == g.FieldID) === undefined) {
+          fields.push({
+            _id: g.FieldID,
+            FieldName: g.FieldName
+          })
+        }
+
+        // Add to groups
+        if (groups.has(g.FieldID)) {
+          let temp = groups.get(g.FieldID)
+          temp!.push(g)
+          groups.set(g.FieldID, temp!)
+        }
+        else {
+          groups.set(g.FieldID, [g])
+        }
+      })
+      setFields(fields)
+      setGroups(groups)
+      setSelectedId(fields[0]?._id)
+    })
+  }, []);
   const route = useRouter();
   const handleCreateButtonPress = () => {
     // Handle create group button press
@@ -56,7 +94,63 @@ export default function MyGroupTab() {
         <FontAwesome name="plus" size={24} color="#000" />
         <Text style={styles.createGroupButtonText}>Create Group</Text>
       </TouchableOpacity>
-      <GroupTab type="my" />
+
+      <View style={styles.container}>
+        {/* list tags */}
+        <View style={styles.rowWrapper}>
+          <FlatList
+            data={fields}
+            ref={refFields}
+            onScroll={handleScroll}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.tabItem,
+                  selectedId === item._id && styles.tabItemActive,
+                ]}
+                onPress={() => {
+                  setSelectedId(item._id);
+                }}
+              >
+                <Text
+                  style={{
+                    color: selectedId === item._id ? "#fff" : "#8A94AC",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {item.FieldName}
+                </Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+          />
+          <TouchableOpacity onPress={handleArrowPress} activeOpacity={0.8}>
+            <FontAwesome name="caret-right" size={30} color="white" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.container, {paddingHorizontal: 20}]}>
+          <FlatList
+            data={groups.get(selectedId)}
+            renderItem={({ item }) => (
+              <GroupCardComponent
+                image={item.CoverURL}
+                name={item.Name}
+                id={item._id}
+                members={item.NumberOfMembers}
+                isJoined={true}
+              />
+            )}
+            keyExtractor={(item, index) => item._id + index}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            ItemSeparatorComponent={() => <View style={{ height: 20 }} />} // Add space between items
+          />
+        </View>
+      </View>
     </View>
   );
 }

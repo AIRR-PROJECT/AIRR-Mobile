@@ -586,12 +586,12 @@ GroupPageProps) {
             </TouchableOpacity>
           )}
 
-          <ButtonGradient
+          {userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && <ButtonGradient
             label={buttonLabel}
             labelStyle={styles.tabButtonText}
             style={styles.tabButton}
             onPress={handleActionButtonPress}
-          />
+          />}
         </View>
       </View>
       <View>

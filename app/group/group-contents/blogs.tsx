@@ -50,6 +50,7 @@ export default function BlogsApprovalsPage() {
   const { user, userCurrentGroupRole } = useAppSelector(state => state.user)
   const { groupID, blogID, blogIdToRemove } = useLocalSearchParams<{ groupID: string, blogID: string, blogIdToRemove: string }>()
 
+  const [userStatus, setUserStatus] = useState("NotJoined")
   const [displayBlogs, setDisplayBlogs] = useState<UserBlog[]>([])
   const [blogApprovals, setBlogApprovals] = useState<PendingBlogRequest[]>([])
   const [blogPage, setBlogPage] = useState(1)
@@ -180,6 +181,16 @@ export default function BlogsApprovalsPage() {
   };
 
   useEffect(() => {
+    if (groupID) {
+      dispatch(getUserGroupStatus(groupID)).then((res) => {
+        const data = res.payload as string
+
+        setUserStatus(data)
+      })
+    }
+  }, [groupID])
+
+  useEffect(() => {
     setDisplayBlogs(groupBlogsQuery.data as UserBlog[]);
   }, [groupBlogsQuery.data]);
 
@@ -271,7 +282,7 @@ export default function BlogsApprovalsPage() {
           <Text style={styles.optionText}>{userCurrentGroupRole === GroupRole.Owner || userCurrentGroupRole === GroupRole.Admin ? "All Published Blogs" : "All Blogs"}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {userStatus == "Active" && <TouchableOpacity
           style={[
             styles.optionButton,
             selectedTab === TabOptions.MyBlogs && styles.optionButtonActive,
@@ -279,7 +290,8 @@ export default function BlogsApprovalsPage() {
           onPress={() => setSelectedTab(TabOptions.MyBlogs)}
         >
           <Text style={styles.optionText}>My Blogs</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
+
         {/* TODO: ẤN nút này thì copy cái bên approval qua */}
         {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && (
           <TouchableOpacity

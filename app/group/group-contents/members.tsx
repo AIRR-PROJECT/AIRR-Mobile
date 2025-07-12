@@ -10,6 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
+  ToastAndroid,
 } from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
 import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
@@ -29,6 +30,7 @@ import {
   getBannedMemberList,
   getMemberList,
   getPendingMemberList,
+  getUserGroupStatus,
   inviteMemberToAdmin,
   kickMember,
   rejectBlog,
@@ -169,6 +171,7 @@ export default function MemberApprovalsPage() {
   const [selectedBannedMember, setSelectedBannedMember] = useState<
     GroupBannedMember | null
   >(null);
+  const [isSelectedMemberBanned, setIsSelectedMemberBanned] = useState(false)
   const userIsOwner = userCurrentGroupRole === GroupRole.Owner;
   const userIsAdmin = userCurrentGroupRole === GroupRole.Admin;
   const userIsMember = userCurrentGroupRole === GroupRole.Member;
@@ -194,7 +197,10 @@ export default function MemberApprovalsPage() {
         const result = res.payload as boolean
 
         if (result == true) {
-          console.log("User banned")
+          ToastAndroid.show("User banned", ToastAndroid.SHORT)
+        }
+        else {
+          ToastAndroid.show("User is already banned", ToastAndroid.LONG)
         }
       })
     }
@@ -239,7 +245,8 @@ export default function MemberApprovalsPage() {
           const index = displayMembers.findIndex((m) => m.MemberInfo._id == selectedMember.MemberInfo._id)
           if (index != -1) {
             let temp = displayMembers
-            temp[index].Role == GroupRole.Admin
+            temp[index].Role = GroupRole.Admin
+            console.log(temp)
             setDisplayMembers(temp)
           }
         }

@@ -319,11 +319,10 @@ export default function MemberApprovalsPage() {
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 5,
-                    borderWidth: 1,
-                    borderColor: "#fff",
+                    borderWidth: 2,
+                    borderColor: "#000",
                     padding: 5,
                     borderRadius: 10,
-                    backgroundColor: "#fff",
                   }}
                   onPress={() => {
                     setSelectedBannedMember(item);
@@ -331,8 +330,8 @@ export default function MemberApprovalsPage() {
                     sheetRef.current?.snapToIndex(0);
                   }}
                 >
-                  <Feather name="x-circle" size={24} color="white" />
-                  <Text style={{ color: "#fff", fontSize: 12 }}>Unban</Text>
+                  <Feather name="x-circle" size={24} color="black" />
+                  <Text style={{ color: "#000", fontSize: 12 }}>Unban</Text>
                 </TouchableOpacity>
               )}
             </TouchableOpacity>

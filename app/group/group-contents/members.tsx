@@ -168,9 +168,8 @@ export default function MemberApprovalsPage() {
   const [selectedMember, setSelectedMember] = useState<GroupMember | null>(
     null
   );
-  const [selectedBannedMember, setSelectedBannedMember] = useState<
-    GroupBannedMember | null
-  >(null);
+  const [selectedBannedMember, setSelectedBannedMember] =
+    useState<GroupBannedMember | null>(null);
   const [isSelectedMemberBanned, setIsSelectedMemberBanned] = useState(false)
   const userIsOwner = userCurrentGroupRole === GroupRole.Owner;
   const userIsAdmin = userCurrentGroupRole === GroupRole.Admin;
@@ -346,7 +345,7 @@ export default function MemberApprovalsPage() {
                 }}
                 disabled={isMoreDisabled(item)}
               >
-                <Feather name="more-vertical" size={24} color="#fff" />
+                <Feather name="more-vertical" size={24} color="#000" />
               </TouchableOpacity>
             </TouchableOpacity>
           )}
@@ -369,7 +368,7 @@ export default function MemberApprovalsPage() {
           data={bannedMembers}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={[styles.memberContainer]}
+              style={[styles.memberContainer, { backgroundColor: "#fff" }]}
               onPress={() => handleOnDisplayMemberPress(item._id)}
             >
               <Image source={item.Owner.AvatarURL} style={styles.avatar} />
@@ -387,7 +386,7 @@ export default function MemberApprovalsPage() {
                   </Text>
                 </View>
               </View>
-              {/* Un option */}
+              {/* Unban option */}
               {!userIsMember && (
                 <TouchableOpacity
                   style={{
@@ -395,8 +394,8 @@ export default function MemberApprovalsPage() {
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 5,
-                    borderWidth: 1,
-                    borderColor: "#fff",
+                    borderWidth: 2,
+                    borderColor: "#000",
                     padding: 5,
                     borderRadius: 10,
                   }}
@@ -406,8 +405,8 @@ export default function MemberApprovalsPage() {
                     sheetRef.current?.snapToIndex(0);
                   }}
                 >
-                  <Feather name="x-circle" size={24} color="white" />
-                  <Text style={{ color: "#fff", fontSize: 12 }}>Unban</Text>
+                  <Feather name="x-circle" size={24} color="black" />
+                  <Text style={{ color: "#000", fontSize: 12 }}>Unban</Text>
                 </TouchableOpacity>
               )}
             </TouchableOpacity>
@@ -668,11 +667,11 @@ export default function MemberApprovalsPage() {
               />
               <View style={{ flex: 1, gap: 10 }}>
                 <View style={{}}>
-                  <Text style={styles.joinModalTitle}>
-                    Unban this member?
-                  </Text>
+                  <Text style={styles.joinModalTitle}>Unban this member?</Text>
                 </View>
-                <Text>They will regain access to the group and its content.</Text>
+                <Text>
+                  They will regain access to the group and its content.
+                </Text>
                 <View style={[styles.rowContainer, { gap: 20 }]}>
                   <TouchableOpacity
                     onPress={() => {
@@ -702,9 +701,9 @@ export default function MemberApprovalsPage() {
 }
 
 const colors = {
-  admin: "#FFBA66",
-  owner: "#B9FF66",
-  member: "#66DBFF",
+  admin: "#c4791dff",
+  owner: "#69b40dff",
+  member: "#32aed4ff",
 };
 const styles = StyleSheet.create({
   container: {
@@ -753,8 +752,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 20,
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 20,
+    backgroundColor: "#fff",
   },
   memberInfo: {
     flex: 1,
@@ -763,11 +763,12 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000",
   },
   role: {
     fontSize: 14,
     color: "#8A94AC",
+    fontWeight: "bold",
   },
   roleWrapper: {
     flexDirection: "row",

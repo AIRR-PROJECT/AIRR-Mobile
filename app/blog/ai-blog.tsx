@@ -148,50 +148,27 @@ export default function BlogScreen() {
   const [description, setDescription] = useState(
     "Mock asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
   );
-  // const [thumbnail, setThumbnail] = useState(mockThumbnail);
   // AI blog properties
   // const [sections, setSections] = useState(mockSections);
   const [conclusion, setConclusion] = useState(
     "This is concluded. asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
   );
-  // User blog properties
-  // const [author, setAuthor] = useState(mockAuthor);
-  // const [tags, setTags] = useState(mockTags);
-  // const [group, setGroup] = useState(mockGroup);
-  const reactTimeout = 500;
-  const [likes, setLikes] = useState(123);
-  const [dislikes, setDislikes] = useState(123);
-  const [comments, setComments] = useState(123);
-  const [blogLiked, setBlogLiked] = useState<boolean>(false);
-  const [blogDisliked, setBlogDisliked] = useState<boolean>(false);
-  const [blogSaved, setBlogSaved] = useState<boolean>(false);
-  // const [html, setHtml] = useState(mockHtml);
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    } else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId));
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogLiked(data.payload as boolean);
-        }
-      );
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogDisliked(data.payload as boolean);
-        }
-      );
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogSaved(data.payload as boolean);
-        }
-      );
-    }
-    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+    dispatch(getAIBlogDetail(searchParams.aiBlogId));
+    dispatch(getBlogComment(searchParams.aiBlogId));
   }, []);
+
+  useEffect(() => {
+    if (currentAIBlog) {
+      console.log(currentAIBlog)
+      setTitle(currentAIBlog.Title)
+      setDescription(currentAIBlog.Description)
+      setConclusion(currentAIBlog.Conclusion)
+    }
+  }, [currentAIBlog])
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -200,27 +177,8 @@ export default function BlogScreen() {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
 
-    if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    } else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId));
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogLiked(data.payload as boolean);
-        }
-      );
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogDisliked(data.payload as boolean);
-        }
-      );
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogSaved(data.payload as boolean);
-        }
-      );
-    }
-    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+    dispatch(getAIBlogDetail(searchParams.aiBlogId));
+    dispatch(getBlogComment(searchParams.aiBlogId));
   };
 
   const handleBack = () => {
@@ -361,7 +319,7 @@ export default function BlogScreen() {
         }}
       >
         {/* truyen list data vao day (list.map => ....), nho doi? key khac nhau ko se bi loi */}
-        <AIBlogSectionComponent {...mockData} />
+        {currentAIBlog && <AIBlogSectionComponent Sections={currentAIBlog.Sections} />}
       </View>
       {/* Conclusion */}
       <View

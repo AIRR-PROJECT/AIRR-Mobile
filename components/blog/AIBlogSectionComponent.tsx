@@ -10,50 +10,57 @@ type SubDetailGroupCardComponentProps = {
   Code?: string;
 };
 type DetailGroupCardComponentProps = {
-  Heading: string;
-  Content: SubDetailGroupCardComponentProps[];
+  Sections: {
+    Heading: string;
+    Content: SubDetailGroupCardComponentProps[];
+  }[]
 };
 export default function AIBlogSectionComponent({
-  Heading,
-  Content,
+  Sections
 }: DetailGroupCardComponentProps) {
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#2c5364", "#1E1E1E"]} // dark blue to light blue to dark
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.headingContainer}
-      >
-        <Text style={styles.heading}>{Heading}</Text>
-      </LinearGradient>
+      {Sections.map((section, secIndex) => {
+        return (
+          <View key={`section${secIndex}`} style={styles.container}>
+            <LinearGradient
+              colors={["#2c5364", "#1E1E1E"]} // dark blue to light blue to dark
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.headingContainer}
+            >
+              <Text style={styles.heading}>{section.Heading}</Text>
+            </LinearGradient>
 
-      {Content.map((item, index) => (
-        <View key={index} style={styles.contentContainer}>
-          <View style={styles.subHeadingContainer}>
-            <Text style={styles.subHeading}>{item.SubHeading}</Text>
+            {section.Content.map((item, index) => (
+              <View key={`section${secIndex}_${index}`} style={styles.contentContainer}>
+                <View style={styles.subHeadingContainer}>
+                  <Text style={styles.subHeading}>{item.SubHeading}</Text>
+                </View>
+                <Text style={styles.details}>{item.Details}</Text>
+                {item.Code && (
+                  <View style={styles.codeContainer}>
+                    <Text style={styles.code}>{item.Code}</Text>
+                  </View>
+                )}
+                <View style={styles.sourceContainer}>
+                  <Entypo name="link" size={24} color="#84b0c1" />
+                  <Text style={styles.sourceText}>Source: </Text>
+                  <View style={{ flex: 1, justifyContent: "center" }}>
+                    <Text
+                      style={styles.source}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.Source}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))}
           </View>
-          <Text style={styles.details}>{item.Details}</Text>
-          {item.Code && (
-            <View style={styles.codeContainer}>
-              <Text style={styles.code}>{item.Code}</Text>
-            </View>
-          )}
-          <View style={styles.sourceContainer}>
-            <Entypo name="link" size={24} color="#84b0c1" />
-            <Text style={styles.sourceText}>Source: </Text>
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              <Text
-                style={styles.source}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {item.Source}
-              </Text>
-            </View>
-          </View>
-        </View>
-      ))}
+        )
+      })}
     </View>
   );
 }

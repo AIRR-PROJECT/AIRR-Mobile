@@ -30,6 +30,7 @@ import queryClient from "@/redux/api/queryClient";
 import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
 import GroupBlogPreview from "@/components/group/GroupBlogPreview";
 import { GroupRole } from "@/enums/group.enum";
+import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
 
 // Initial mock data
 const mockBlog = {
@@ -283,7 +284,7 @@ export default function BlogsApprovalsPage() {
 
       {selectedTab != TabOptions.NeedApproval ? <FlatList
           data={displayBlogs}
-          renderItem={({ item }) => <GroupBlogPreview blog={item} />}
+          renderItem={({ item }) => <FeedBlogPreview blog={item} />}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           // contentContainerStyle={[styles.list, {}]}

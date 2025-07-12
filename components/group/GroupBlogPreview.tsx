@@ -11,6 +11,7 @@ import { dislikeBlog, dislikeToLikeBlog, likeBlog, likeToDislikeBlog, removeDisl
 import { getUserBlogDislikeActivities, getUserBlogLikeActivities, getUserBlogSaveActivities } from "@/redux/slices/authSlice";
 import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
 import { ThemedText } from "@/components/ThemedText";
+import BlogStatusComponent from "../blog/BlogStatusComponent";
 const mockGroup = {
   Name: "Group Name",
   CoverURL:
@@ -186,6 +187,7 @@ export default function GroupBlogPreview({ blog }: { blog: UserBlog }) {
               <Text style={styles.tag}>+{blog.Tags.length - 3} more</Text>
             )}
           </View>
+          <BlogStatusComponent status={blog.Status} />
         </Pressable>
       </ImageBackground>
       <View style={{ padding: 20 }}>

@@ -338,7 +338,6 @@ export default function BlogsApprovalsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: "#1E1E1E",
   },
   textInputContainer: {
@@ -360,7 +359,8 @@ const styles = StyleSheet.create({
   optionBar: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    marginBottom: 20,
+    marginVertical: 20,
+    paddingHorizontal: 20,
     borderRadius: 14,
   },
   optionButton: {

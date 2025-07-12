@@ -19,6 +19,7 @@ export default function DetailGroupCardComponent({
   TotalNumberOfBlogsLikes,
   NumberOfMembers,
   NumberOfTag,
+  UserStatus,
   userRole = GroupRole.Member,
   moreOptionPress,
 }: DetailGroupCardComponentProps) {
@@ -47,7 +48,7 @@ export default function DetailGroupCardComponent({
           </View>
         </View>
         {/* More button */}
-        {(userRole == GroupRole.Admin || userRole == GroupRole.Owner) &&(
+        {(userRole == GroupRole.Admin || userRole == GroupRole.Owner) && UserStatus == "Active" && (
           <TouchableOpacity
             style={{ position: "absolute", right: -10, top: 0, zIndex: 1 }}
             activeOpacity={0.6}

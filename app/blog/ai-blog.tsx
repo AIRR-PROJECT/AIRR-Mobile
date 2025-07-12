@@ -60,6 +60,11 @@ import BottomSheet, {
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { formatDistanceToNow } from "date-fns";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
+import { useSharedValue } from "react-native-reanimated";
+import Carousel, {
+  ICarouselInstance,
+  Pagination,
+} from "react-native-reanimated-carousel";
 
 // TODO: CONSIDER MOVE THIS TO A SEPARATE FILE OR USER ALREADY EXISTING ENUM
 export function debounce<T extends (...args: any[]) => void>(
@@ -81,8 +86,40 @@ export function debounce<T extends (...args: any[]) => void>(
     [callback, delay]
   );
 }
-
+import { Dimensions } from "react-native";
+import AIBlogSectionComponent from "@/components/blog/AIBlogSectionComponent";
+const window = Dimensions.get("window");
 let isReactOnTimeout = false;
+
+type SubDetailGroupCardComponentProps = {
+  SubHeading: string;
+  Details: string;
+  Source: string;
+  Code?: string;
+};
+type DetailGroupCardComponentProps = {
+  Heading: string;
+  Content: SubDetailGroupCardComponentProps[];
+};
+const mockData: DetailGroupCardComponentProps = {
+  Heading: "AI Blog Section",
+  Content: [
+    {
+      SubHeading: "Introduction to AI",
+      Details:
+        "AI is a branch of computer science that aims to create intelligent machines capable of performing tasks that typically require human intelligence.",
+      Source: "https://en.wikipedia.org/wiki/Artificial_intelligence",
+      Code: "console.log('Hello, AI!');",
+    },
+    {
+      SubHeading: "Applications of AI",
+      Details:
+        "AI has applications in various fields such as healthcare, finance, and transportation.",
+      Source: "https://www.ibm.com/cloud/learn/what-is-artificial-intelligence",
+      Code: "function aiApplication() {\n  return 'AI in action';\n}",
+    },
+  ],
+};
 export default function BlogScreen() {
   const searchParams = useLocalSearchParams<{
     aiBlogId: string;
@@ -105,12 +142,18 @@ export default function BlogScreen() {
   const { user } = useAppSelector((state) => state.user);
 
   // Shared properties
-  const [title, setTitle] = useState("Mock description");
-  const [description, setDescription] = useState("Mock description");
+  const [title, setTitle] = useState(
+    "Mock asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
+  );
+  const [description, setDescription] = useState(
+    "Mock asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
+  );
   // const [thumbnail, setThumbnail] = useState(mockThumbnail);
   // AI blog properties
   // const [sections, setSections] = useState(mockSections);
-  const [conclusion, setConclusion] = useState("This is concluded.");
+  const [conclusion, setConclusion] = useState(
+    "This is concluded. asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
+  );
   // User blog properties
   // const [author, setAuthor] = useState(mockAuthor);
   // const [tags, setTags] = useState(mockTags);
@@ -183,11 +226,43 @@ export default function BlogScreen() {
   const handleBack = () => {
     route.back();
   };
+  const progress = useSharedValue<number>(0);
+  // 5 anh?
+  const thumbnail = [
+    "https://picsum.photos/200/300",
+    "https://picsum.photos/200/300",
+    "https://picsum.photos/200/300",
+    "https://picsum.photos/200/300",
+    "https://picsum.photos/200/300",
+  ];
+  const renderItem = ({ item }: { item: string }) => {
+    return (
+      <Image
+        source={{ uri: item }}
+        style={{
+          width: window.width - 40,
+          height: 280,
+          borderRadius: 16,
+        }}
+      />
+    );
+  };
+  const ref = useRef<ICarouselInstance>(null);
 
+  const onPressPagination = (index: number) => {
+    ref.current?.scrollTo({
+      /**
+       * Calculate the difference between the current index and the target index
+       * to ensure that the carousel scrolls to the nearest index
+       */
+      count: index - progress.value,
+      animated: true,
+    });
+  };
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       {/* Back button */}
-      <View style={[styles.rowContainer, { width: "100%", paddingBottom: 20 }]}>
+      <View style={[styles.rowContainer, { width: "100%", margin: 20 }]}>
         <TouchableOpacity onPress={handleBack}>
           <Entypo name="chevron-small-left" size={30} color="white" />
         </TouchableOpacity>
@@ -200,8 +275,6 @@ export default function BlogScreen() {
       <View style={styles.scrollViewContent}>
         {/* Title */}
         <Text style={styles.title}>{title}</Text>
-        {/* Status */}
-        <View style={{ paddingTop: 20 }} />
 
         {/* Description */}
         <View style={styles.descriptionContainer}>
@@ -226,23 +299,82 @@ export default function BlogScreen() {
           </View>
         </View>
         {/* Blog content (render from html) */}
-        {/* <QuillRenderer dom={{ matchContents: true }} content={html} /> */}
-
-        {searchParams.userBlogId && (
-          <Divider
-            orientation="vertical"
-            width={1}
-            style={{ borderColor: "white" }}
-          />
-        )}
-
-        <Divider
-          orientation="vertical"
-          width={1}
-          style={{ borderColor: "white" }}
+        {/* Carousel for background page */}
+      </View>
+      <View
+        id="carousel-ai-blog-component"
+        // dataSet={{ kind: "utils", name: "pagination" }}
+        style={{
+          paddingHorizontal: 20,
+        }}
+      >
+        <Carousel
+          ref={ref}
+          autoPlay={true}
+          data={thumbnail}
+          height={280}
+          loop={true}
+          pagingEnabled={true}
+          snapEnabled={true}
+          width={window.width - 40}
+          style={{
+            width: window.width - 40,
+          }}
+          modeConfig={{
+            parallaxScrollingScale: 0.9,
+            parallaxScrollingOffset: 50,
+          }}
+          onProgressChange={progress}
+          renderItem={renderItem}
+        />
+        <Pagination.Basic
+          progress={progress}
+          data={thumbnail}
+          size={20}
+          dotStyle={{
+            borderRadius: 100,
+            backgroundColor: "#262626",
+          }}
+          activeDotStyle={{
+            borderRadius: 100,
+            overflow: "hidden",
+            backgroundColor: "#f1f1f1",
+          }}
+          containerStyle={[
+            {
+              gap: 5,
+              marginBottom: 10,
+              marginTop: 10,
+              alignSelf: "center",
+              zIndex: 1,
+            },
+          ]}
+          horizontal
+          onPress={onPressPagination}
         />
       </View>
-      {/* Write comment button */}
+
+      <View
+        style={{
+          flex: 1,
+          padding: 20,
+        }}
+      >
+        {/* truyen list data vao day (list.map => ....), nho doi? key khac nhau ko se bi loi */}
+        <AIBlogSectionComponent {...mockData} />
+      </View>
+      {/* Conclusion */}
+      <View
+        style={{
+          padding: 20,
+          paddingTop: 0,
+        }}
+      >
+        <View style={styles.conclusionContainer}>
+          <Text style={styles.conclusionTitle}>Conclusion</Text>
+        </View>
+        <Text style={styles.conclusionText}>{conclusion}</Text>
+      </View>
     </ScrollView>
   );
 }
@@ -287,6 +419,8 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     width: "100%",
+    padding: 20,
+    paddingTop: 0,
   },
   title: {
     fontSize: 24,
@@ -307,11 +441,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     gap: 5,
   },
-  dateAndComment: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-  },
   additionalInfo: {
     flexDirection: "row",
     alignItems: "center",
@@ -328,140 +457,22 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "justify",
   },
-  tagsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    columnGap: 10,
-    alignItems: "center",
-    paddingBottom: 20,
-  },
-  interactSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 20,
-  },
-  likeContainerNo: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    backgroundColor: "#3C574960",
-    padding: 10,
-    borderRadius: 13,
-  },
-  likeContainerYes: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 13,
-  },
-  dislikeContainerNo: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#3C574960",
-    borderRadius: 13,
-  },
-  dislikeContainerYes: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#fff",
-    borderRadius: 13,
-  },
-  commentContainer: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    padding: 10,
-    borderRadius: 13,
-    backgroundColor: "#3C574960",
-  },
-  bookmarkContainerYes: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    padding: 10,
-    borderRadius: 13,
-    backgroundColor: "#fff",
-  },
-  bookmarkContainerNo: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    padding: 10,
-    borderRadius: 13,
-    backgroundColor: "#3C574960",
-  },
-  commentButtonContainer: {
-    alignItems: "flex-start",
-    width: "100%",
-    backgroundColor: "#B9FF66",
-    padding: 20,
-    borderRadius: 90,
-    marginTop: 20,
-  },
-  commentText: {
-    color: "#000",
+  conclusionContainer: {},
+  conclusionTitle: {
     fontSize: 16,
     fontWeight: "bold",
+    marginBottom: 5,
+    color: "#4f82d8",
   },
-
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 45,
-    marginRight: 10,
+  conclusionHeading: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#4f82d8",
+    padding: 5,
+    marginBottom: 10,
   },
-  name: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  date: {
-    color: "#fff",
+  conclusionText: {
     fontSize: 14,
-  },
-  comment: {
     color: "#fff",
-    fontSize: 16,
     textAlign: "justify",
-  },
-  replyText: {
-    color: "#fff",
-    fontSize: 16,
-    textAlign: "justify",
-  },
-  replyTextInput: {
-    color: "#fff",
-    minHeight: 80,
-    textAlign: "justify",
-  },
-  commentWriteContainer: {
-    padding: 20,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#fff",
-    borderRadius: 20,
-    backgroundColor: "#191926",
-    marginTop: 20,
-  },
-  commentWriteButtonContainer: {
-    backgroundColor: "#B9FF66",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 90,
-    marginTop: 20,
-    width: "40%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  commentWriteButtonText: {
-    color: "#000",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });

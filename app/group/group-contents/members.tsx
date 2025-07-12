@@ -38,7 +38,6 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { delay } from "lodash";
 
 // Initial mock data
 // const mockUser: PendingMemberRequest = {
@@ -54,6 +53,7 @@ import { delay } from "lodash";
 //   ...user,
 //   id: index.toString(),
 // }));
+import { format, formatRelative } from "date-fns";
 enum TabOptions {
   All = "all",
   NeedApproval = "need-approval",
@@ -156,12 +156,15 @@ export default function MemberApprovalsPage() {
     />
   );
   const [bottomSheetMode, setBottomSheetMode] = useState<
-    "main" | "kick" | "ban" | "admin"
+    "main" | "kick" | "ban" | "admin" | "unban"
   >("main");
   const sheetRef = useRef<BottomSheet>(null);
   const [selectedMember, setSelectedMember] = useState<GroupMember | null>(
     null
   );
+  const [selectedBannedMember, setSelectedBannedMember] = useState<
+    GroupBannedMember | null
+  >(null);
   const userIsOwner = userCurrentGroupRole === GroupRole.Owner;
   const userIsAdmin = userCurrentGroupRole === GroupRole.Admin;
   const userIsMember = userCurrentGroupRole === GroupRole.Member;
@@ -291,16 +294,47 @@ export default function MemberApprovalsPage() {
           data={bannedMembers}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={{ borderColor: colors.member }}
-              onPress={() => handleOnDisplayMemberPress(item.Owner._id)}
+              style={[styles.memberContainer]}
+              onPress={() => handleOnDisplayMemberPress(item._id)}
             >
               <Image source={item.Owner.AvatarURL} style={styles.avatar} />
-              <View>
-                <Text style={styles.memberName}>{item.Owner.Username}</Text>
-                <View style={styles.roleWrapper}>
-                  <FontAwesome6 name="bolt" size={24} color={colors.member} />
+              <View style={styles.memberInfo}>
+                <Text
+                  style={styles.memberName}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {item.Owner.Username}
+                </Text>
+                <View style={styles.bannedAtWrapper}>
+                  <Text style={[styles.role]} >
+                    Banned at {formatRelative(item.BannedDate, new Date())}
+                  </Text>
                 </View>
               </View>
+              {/* Un option */}
+              {!userIsMember && (
+                <TouchableOpacity
+                  style={{
+                    marginLeft: "auto",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 5,
+                    borderWidth: 1,
+                    borderColor: "#fff",
+                    padding: 5,
+                    borderRadius: 10,
+                  }}
+                  onPress={() => {
+                    setSelectedBannedMember(item);
+                    setBottomSheetMode("unban");
+                    sheetRef.current?.snapToIndex(0);
+                  }}
+                >
+                  <Feather name="x-circle" size={24} color="white" />
+                  <Text style={{ color: "#fff", fontSize: 12 }}>Unban</Text>
+                </TouchableOpacity>
+              )}
             </TouchableOpacity>
           )}
           keyExtractor={(item, index) => index.toString()}
@@ -547,6 +581,41 @@ export default function MemberApprovalsPage() {
               </View>
             </View>
           )}
+
+          {bottomSheetMode === "unban" && (
+            <View style={[styles.modalContentContainer]}>
+              <Image
+                style={styles.joinConfirmImage}
+                source={joinConfirmImage}
+              />
+              <View style={{ flex: 1, gap: 10 }}>
+                <View style={{}}>
+                  <Text style={styles.joinModalTitle}>
+                    Unban this member?
+                  </Text>
+                </View>
+                <Text>They will regain access to the group and its content.</Text>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheetRef.current?.close();
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>Unban</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
         </BottomSheetView>
       </BottomSheet>
     </GestureHandlerRootView>
@@ -692,5 +761,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+  },
+  bannedAtWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
 });

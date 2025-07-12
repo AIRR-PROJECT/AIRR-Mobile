@@ -49,7 +49,7 @@ import queryClient from "@/redux/api/queryClient";
 import { FlashList } from "@shopify/flash-list";
 import AIBlogPreviewSkeleton from "@/components/tabs/feed/AIBlogPreviewSkeleton";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
-import { useSegments } from "expo-router";
+import { useLocalSearchParams, useSegments } from "expo-router";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, {
   ICarouselInstance,
@@ -69,6 +69,7 @@ export default function FavouriteBlog() {
   const dispatch = useAppDispatch()
   const moreOptionRef = useRef<BottomSheet>(null);
   const { user } = useAppSelector(state => state.user)
+  const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>()
 
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
@@ -153,6 +154,33 @@ export default function FavouriteBlog() {
     favoriteBlogsMutation.mutate(page + 1);
   };
 
+  const handleHideBlog = () => {
+    moreOptionRef.current?.close();
+
+    setBlogReset(true);
+    favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
+  }
+  const handleDeleteBlog = () => {
+    moreOptionRef.current?.close();
+
+    setBlogReset(true);
+    favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
+  }
+  const handleRemoveFavoriteBlog = () => {
+    moreOptionRef.current?.close();
+    
+    setBlogReset(true)
+    favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
+  }
+
+  // Handle hiding or deleting blog while viewing that blog
+  useEffect(() => {
+    if (blogIdToRemove) {
+      setBlogReset(true)
+      favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
+    }
+  }, [blogIdToRemove])
+
   return (
     <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
@@ -217,12 +245,10 @@ export default function FavouriteBlog() {
         isFromFeed={true}
         isFromFavourites={true}
         isFromDetail={false}
-        handleHideThisBlog={function (): void {
-          throw new Error("Function not implemented.");
-        } }
-        handleDeleteThisBlog={function (): void {
-          throw new Error("Function not implemented.");
-        } }/>
+        handleHideThisBlog={handleHideBlog}
+        handleDeleteThisBlog={handleDeleteBlog}
+        handleRemoveFavoriteThisBlog={handleRemoveFavoriteBlog}
+      />
     </GestureHandlerRootView>
   );
 }

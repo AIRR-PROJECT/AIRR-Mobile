@@ -183,7 +183,6 @@ export default function MyFeed() {
   // If user's tags are updated, update the feed
   useEffect(() => {
     if (user) {
-      setUserPage(1);
       setUserBlogReset(true);
       userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
     }
@@ -213,14 +212,17 @@ export default function MyFeed() {
     // console.log("More option pressed", isUserWritten)
   };
   const handleHideBlog = () => {
+    setUserBlogReset(true);
     userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
   }
   const handleDeleteBlog = () => {
+    setUserBlogReset(true);
     userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
   }
   // Handle hiding or deleting blog while viewing that blog
   useEffect(() => {
     if (blogIdToRemove) {
+      setUserBlogReset(true);
       userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
     }
   }, [blogIdToRemove])

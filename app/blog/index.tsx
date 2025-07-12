@@ -525,6 +525,12 @@ export default function BlogScreen() {
       blogIdToRemove: currentUserBlog._id
     })
   }
+  const handleRemoveFavoriteBlog = () => {
+    router.back()
+    router.setParams({
+      blogIdToRemove: currentUserBlog._id
+    })
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
@@ -735,11 +741,14 @@ export default function BlogScreen() {
           blogId={currentUserBlog._id}
           groupId={currentUserBlog.Group ? currentUserBlog.Group._id : undefined}
           isFromDetail={true}
+          isFromFavourites={blogSaved}
           isBlogStatusPendingOrActive={currentUserBlog.Status == BlogStatus.ACTIVE || currentUserBlog.Status == BlogStatus.PENDING}
           isUserStatusPending={currentUserBlog.UserGroupStatus == "Pending"}
           isViewTypePrivateOrInProfile={currentUserBlog.ViewType != BlogViewType.IN_GROUP}
           handleHideThisBlog={handleHideBlog}
-          handleDeleteThisBlog={handleDeleteBlog}/>
+          handleDeleteThisBlog={handleDeleteBlog}
+          handleRemoveFavoriteThisBlog={handleRemoveFavoriteBlog}
+        />
       )}
     </GestureHandlerRootView>
   );

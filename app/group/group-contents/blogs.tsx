@@ -63,7 +63,7 @@ export default function BlogsApprovalsPage() {
   const dispatch = useAppDispatch()
   // const flatlistRef = useRef<any>()
   const { user, userCurrentGroupRole } = useAppSelector(state => state.user)
-  const { groupID, blogID, blogIDToRemove } = useLocalSearchParams<{ groupID: string, blogID: string, blogIDToRemove: string }>()
+  const { groupID, blogID, blogIdToRemove } = useLocalSearchParams<{ groupID: string, blogID: string, blogIdToRemove: string }>()
 
   const [displayBlogs, setDisplayBlogs] = useState<UserBlog[]>([])
   const [blogApprovals, setBlogApprovals] = useState<PendingBlogRequest[]>([])
@@ -208,13 +208,11 @@ export default function BlogsApprovalsPage() {
   // }, [blogs, blogID])
 
   useEffect(() => {
-    if (blogIDToRemove) {
-      dispatch(getPendingBlogList(groupID)).then(res => {
-        const list = res.payload as PendingBlogRequest[]
-        setBlogApprovals(list)
-      })
+    console.log(blogIdToRemove)
+    if (blogIdToRemove && selectedTab != TabOptions.NeedApproval) {
+      groupBlogsReset.mutateAsync()
     }
-  }, [blogIDToRemove])
+  }, [blogIdToRemove])
 
   const onApprove = (id: string, blogOwnerId: string) => {
     dispatch(approveBlog({ groupID: groupID, blogIDToApprove: id, blogOwnerID: blogOwnerId })).then(res => {
@@ -243,7 +241,6 @@ export default function BlogsApprovalsPage() {
   );
   const blogApprovalFlatlistRef = useRef<any>(null);
   // TODO: Replace with actual logic to check if the user is admin or owner
-  const isUserAdminOrOwner = true; // This should be replaced with actual logic to check if the user is admin or owner
   // 2 lựa chọn trên thì là cái feed blog preview
   // Còn cái lựa chọn thứ 3 là cái approval blog như bên approval 
   return (
@@ -257,7 +254,7 @@ export default function BlogsApprovalsPage() {
           ]}
           onPress={() => setSelectedTab(TabOptions.All)}
         >
-          <Text style={styles.optionText}>{isUserAdminOrOwner ? "All Published Blogs" : "All Blogs"}</Text>
+          <Text style={styles.optionText}>{userCurrentGroupRole === GroupRole.Owner || userCurrentGroupRole === GroupRole.Admin ? "All Published Blogs" : "All Blogs"}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

@@ -21,6 +21,7 @@ import {
   getGroupPersonalBlogsByID,
   getPendingBlogList,
   getPendingTagList,
+  getUserGroupStatus,
   rejectBlog,
 } from "@/redux/slices/groupSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
@@ -31,26 +32,9 @@ import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
 import GroupBlogPreview from "@/components/group/GroupBlogPreview";
 import { GroupRole } from "@/enums/group.enum";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
-
-// Initial mock data
-const mockBlog = {
-  blog: {
-    _id: Math.random().toString(),
-    title: "How to build a React Native app",
-    thumbnail: "https://picsum.photos/200",
-  },
-  author: {
-    id: "1",
-    name: "John Doe",
-    avatar: "https://picsum.photos/220",
-  },
-  time: new Date().getTime() - 1000 * 60 * 60 * 24,
-};
-
-const initialBlogs = [mockBlog, mockBlog, mockBlog].map((b, i) => ({
-  ...b,
-  blog: { ...b.blog, _id: i.toString() },
-}));
+import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { BlogViewType } from "@/enums/blog_properties.enum";
 
 enum TabOptions {
   All = "all",
@@ -72,6 +56,27 @@ export default function BlogsApprovalsPage() {
 
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
   // const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
+  
+  const moreOptionRef = useRef<BottomSheet>(null);
+  const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
+  const [role, setRole] = useState("")
+  const [blogStatus, setBlogStatus] = useState("")
+  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
+  const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
+  const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
+
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean) => {
+    setIsUserWrittenBlog(isUserWritten);
+    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
+    setMoreOptionBlogId(blogId)
+    setMoreOptionGroupId(groupId)
+    setRole(role)
+    setBlogStatus(blogStatus)
+    if (moreOptionRef.current) {
+      moreOptionRef.current.snapToIndex(0);
+    }
+    // console.log("More option pressed", isUserWritten)
+  };
 
   const groupBlogsQuery = useQuery({
     queryKey: ["feed-group-blogs"],
@@ -208,6 +213,12 @@ export default function BlogsApprovalsPage() {
   //   }
   // }, [blogs, blogID])
 
+  const handleHideBlog = () => {
+    groupBlogsReset.mutateAsync();
+  }
+  const handleDeleteBlog = () => {
+    groupBlogsReset.mutateAsync();
+  }
   useEffect(() => {
     console.log(blogIdToRemove)
     if (blogIdToRemove && selectedTab != TabOptions.NeedApproval) {
@@ -284,7 +295,12 @@ export default function BlogsApprovalsPage() {
 
       {selectedTab != TabOptions.NeedApproval ? <FlatList
           data={displayBlogs}
-          renderItem={({ item }) => <FeedBlogPreview blog={item} />}
+          renderItem={({ item }) => <FeedBlogPreview blog={item} onPressMoreButton={
+            () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
+              item.UserGroupStatus,
+              item.Status,
+              item.ViewType != BlogViewType.IN_GROUP
+            )}/>}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           // contentContainerStyle={[styles.list, {}]}
@@ -302,6 +318,19 @@ export default function BlogsApprovalsPage() {
           ref={blogApprovalFlatlistRef}
         />
       }
+
+      <MoreOptionBottomList
+        sheetRef={moreOptionRef}
+        isUserWrittenBlog={isUserWrittenBlog}
+        blogId={moreOptionBlogId}
+        groupId={moreOptionGroupId}
+        role={role}
+        blogStatus={blogStatus}
+        isFromFeed={true}
+        isFromDetail={false}
+        isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
+        handleHideThisBlog={handleHideBlog}
+        handleDeleteThisBlog={handleDeleteBlog}/>
     </GestureHandlerRootView>
   );
 }

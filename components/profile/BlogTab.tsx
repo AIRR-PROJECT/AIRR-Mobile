@@ -6,9 +6,14 @@ import { View } from "react-native";
 import queryClient from "@/redux/api/queryClient";
 import { fetchOtherPersonalBlogs, fetchPersonalBlogs, fetchUserBlogs } from "@/redux/slices/feedSlice";
 import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
-import { useAppDispatch } from "@/redux/hook";
-import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { Dispatch, MutableRefObject, RefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { getUserGroupStatus } from "@/redux/slices/groupSlice";
+import { BlogViewType } from "@/enums/blog_properties.enum";
+import MoreOptionBottomList from "../blog/MoreOptionBottomList";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 const mockBlog: UserBlog = {
   _id: "123",
   Title: "How to fix clipboard if it isn’t working",
@@ -71,11 +76,42 @@ const Data = [
   mockBlog,
 ];
 
-export default function BlogTab() {
+type BlogTabProps = {
+  moreOptionRef: RefObject<BottomSheet>,
+  setIsUserWrittenBlog: Dispatch<SetStateAction<boolean>>
+  setRole: Dispatch<SetStateAction<string>>
+  setBlogStatus: Dispatch<SetStateAction<string>>
+  setIsViewTypePrivateOrInProfile: Dispatch<SetStateAction<boolean>>
+  setMoreOptionBlogId: Dispatch<SetStateAction<string>>
+  setMoreOptionGroupId: Dispatch<SetStateAction<string>>
+  handleHideBlog: MutableRefObject<() => void>
+  handleDeleteBlog: MutableRefObject<() => void>
+}
+
+export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, setBlogStatus, setIsViewTypePrivateOrInProfile, setMoreOptionBlogId, setMoreOptionGroupId, handleHideBlog, handleDeleteBlog }: BlogTabProps) {
   const { userID, blogIdToRemove } = useLocalSearchParams<{ userID: string, blogIdToRemove: string }>()
+  const { user } = useAppSelector(state => state.user)
 
   const dispatch = useAppDispatch();
   const [personalPage, setPersonalPage] = useState(1);
+
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean) => {
+    setIsUserWrittenBlog(isUserWritten);
+    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
+    setMoreOptionBlogId(blogId)
+    setMoreOptionGroupId(groupId)
+    setRole(role)
+    setBlogStatus(blogStatus)
+    
+    handleHideBlog.current = () => {personalBlogsReset.mutateAsync();}
+    handleDeleteBlog.current = () => {personalBlogsReset.mutateAsync();}
+
+    if (moreOptionRef.current) {
+      moreOptionRef.current.snapToIndex(0);
+    }
+    // console.log("More option pressed", isUserWritten)
+  };
+
   const personalBlogsQuery = useQuery({
     queryKey: ["feed-personal"],
     queryFn: async () => {
@@ -130,6 +166,12 @@ export default function BlogTab() {
     personalBlogsMutation.mutate(personalPage + 1);
   };
   
+  // const handleHideBlog = () => {
+  //   personalBlogsReset.mutateAsync();
+  // }
+  // const handleDeleteBlog = () => {
+  //   personalBlogsReset.mutateAsync();
+  // }
   // Handle hiding or deleting blog while viewing that blog
   useEffect(() => {
     if (blogIdToRemove) {
@@ -146,9 +188,16 @@ export default function BlogTab() {
       showsHorizontalScrollIndicator={false}
       onEndReached={handleOnUserBlogListEndReached}
       renderItem={({ item }) => {
-        return <FeedBlogPreview blog={item} />;
+        console.log(item)
+        return <FeedBlogPreview blog={item} onPressMoreButton={
+          () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
+            item.UserGroupStatus,
+            item.Status,
+            item.ViewType != BlogViewType.IN_GROUP
+          )
+        }/>;
       }}
-     
+    
       estimatedItemSize={400}
     />
   );

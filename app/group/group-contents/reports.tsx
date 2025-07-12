@@ -100,6 +100,7 @@ export default function ReportsApprovalsPage() {
     if (groupID) {
       dispatch(getPendingReportBlogList(groupID)).then(res => {
         const list = res.payload as GroupReport[]
+        console.log(list)
         
         setDisplayReports(list)
       })

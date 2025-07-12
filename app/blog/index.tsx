@@ -62,6 +62,7 @@ import { formatDistanceToNow } from "date-fns";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 import { green } from "react-native-reanimated/lib/typescript/Colors";
 import BlogStatusComponent from "@/components/blog/BlogStatusComponent";
+import { getUserGroupStatus } from "@/redux/slices/groupSlice";
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
 sada
@@ -267,7 +268,6 @@ export default function BlogScreen() {
   const route = useRouter();
   const dispatch = useAppDispatch();
   const {
-    currentAIBlog,
     currentUserBlog,
     currentBlogComments,
     isCurrentBlogLiked,
@@ -281,9 +281,6 @@ export default function BlogScreen() {
   const [title, setTitle] = useState("Mock description");
   const [description, setDescription] = useState("Mock description");
   const [thumbnail, setThumbnail] = useState(mockThumbnail);
-  // AI blog properties
-  const [sections, setSections] = useState(mockSections);
-  const [conclusion, setConclusion] = useState("This is concluded.");
   // User blog properties
   const [author, setAuthor] = useState(mockAuthor);
   const [tags, setTags] = useState(mockTags);
@@ -303,37 +300,24 @@ export default function BlogScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    } else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId));
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogLiked(data.payload as boolean);
-        }
-      );
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogDisliked(data.payload as boolean);
-        }
-      );
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogSaved(data.payload as boolean);
-        }
-      );
-    }
-    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+    dispatch(getUserBlogDetail(searchParams.userBlogId));
+    dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
+      (data) => {
+        setBlogLiked(data.payload as boolean);
+      }
+    );
+    dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
+      (data) => {
+        setBlogDisliked(data.payload as boolean);
+      }
+    );
+    dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
+      (data) => {
+        setBlogSaved(data.payload as boolean);
+      }
+    );
+    dispatch(getBlogComment(searchParams.userBlogId));
   }, []);
-
-  useEffect(() => {
-    if (currentAIBlog) {
-      setTitle(currentAIBlog.Title);
-      setDescription(currentAIBlog.Description);
-      setSections(currentAIBlog.Sections);
-      setConclusion(currentAIBlog.Conclusion);
-    }
-  }, [currentAIBlog]);
 
   useEffect(() => {
     if (currentUserBlog) {
@@ -386,27 +370,23 @@ export default function BlogScreen() {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
 
-    if (searchParams.aiBlogId) {
-      dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    } else {
-      dispatch(getUserBlogDetail(searchParams.userBlogId));
-      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogLiked(data.payload as boolean);
-        }
-      );
-      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogDisliked(data.payload as boolean);
-        }
-      );
-      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
-        (data) => {
-          setBlogSaved(data.payload as boolean);
-        }
-      );
-    }
-    dispatch(getBlogComment(searchParams.aiBlogId ?? searchParams.userBlogId));
+    dispatch(getUserBlogDetail(searchParams.userBlogId));
+    dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
+      (data) => {
+        setBlogLiked(data.payload as boolean);
+      }
+    );
+    dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
+      (data) => {
+        setBlogDisliked(data.payload as boolean);
+      }
+    );
+    dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
+      (data) => {
+        setBlogSaved(data.payload as boolean);
+      }
+    );
+    dispatch(getBlogComment(searchParams.userBlogId));
   };
 
   const handleBack = () => {
@@ -541,11 +521,9 @@ export default function BlogScreen() {
           <TouchableOpacity onPress={handleBack}>
             <Entypo name="chevron-small-left" size={30} color="white" />
           </TouchableOpacity>
-          {!searchParams.aiBlogId && (
-            <TouchableOpacity onPress={() => handleSnapPress(0)}>
-              <Fontisto name="more-v-a" size={30} color="white" />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={() => handleSnapPress(0)}>
+            <Fontisto name="more-v-a" size={30} color="white" />
+          </TouchableOpacity>
         </View>
         <Divider
           orientation="vertical"
@@ -739,7 +717,7 @@ export default function BlogScreen() {
           isUserWrittenBlog={isUserWrittenBlog}
           blogId={currentUserBlog._id}
           groupId={currentUserBlog.Group ? currentUserBlog.Group._id : undefined}
-          userStatus={currentUserBlog.UserGroupStatus}
+          role={currentUserBlog.UserGroupStatus}
           blogStatus={currentUserBlog.Status}
           isFromDetail={true}
           isFromFavourites={blogSaved}

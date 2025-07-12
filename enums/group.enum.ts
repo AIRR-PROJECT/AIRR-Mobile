@@ -12,6 +12,19 @@ export enum GroupMembershipStage {
     BANNED = 'BANNED'
 }
 
+/*
+    Not Member = Unjoin / Pending
+    Member = Active 
+    Admin = Active
+    Owner = Active
+*/
+export enum GroupRoleCheck {
+    MEMBER = "Member",
+    NOT_MEMBER = "Not Member",
+    ADMIN = "Admin",
+    OWNER = "Owner"
+}
+
 export enum GroupReportType {
     Clickbait = 'Clickbait',
     Inappropriate_Content = 'Inappropriate Content',

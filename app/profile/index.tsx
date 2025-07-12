@@ -13,7 +13,7 @@ import UserStudentInfoComponent from "@/components/profile/UserStudentInfoCompon
 import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { loremIpsum } from "lorem-ipsum";
 import GroupPreviewInfo from "@/components/tabs/GroupPreviewInfo";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import TabButton from "@/components/tabs/feed/TabButton";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import SocialTab from "@/components/profile/SocialTab";
@@ -30,6 +30,9 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { signOut } from "@react-native-firebase/auth";
 import { setIsViewingOwnProfile } from "@/redux/slices/userSlice";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
+import BottomSheet from "@gorhom/bottom-sheet";
 // type UserInfo = {
 //   username: string;
 //   avatar_url: string;
@@ -86,6 +89,16 @@ export default function ProfileScreen() {
   const { user, userGroups, isViewingOwnProfile } = useAppSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState<UserInfo>(user!);
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!);
+  
+  const moreOptionRef = useRef<BottomSheet>(null);
+  const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
+  const [role, setRole] = useState("")
+  const [blogStatus, setBlogStatus] = useState("")
+  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
+  const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
+  const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
+  const handleHideBlog = useRef<() => void>(() => {})
+  const handleDeleteBlog = useRef<() => void>(() => {})
 
   const dispatch = useAppDispatch();
 
@@ -127,87 +140,113 @@ export default function ProfileScreen() {
   return (
     // change light color to #fff later because figma of the app is not ready
 
-    <ParallaxFlatList style={styles.container} contentStyle={{ padding: 0 }}>
-      {/* User Info */}
-      <View style={{ padding: 20, gap: 20 }}>
-        <UserInfoComponent {...userInfo} isOwnProfile={isViewingOwnProfile} />
+    <GestureHandlerRootView>
+      <ParallaxFlatList style={styles.container} contentStyle={{ padding: 0 }}>
+        {/* User Info */}
+        <View style={{ padding: 20, gap: 20 }}>
+          <UserInfoComponent {...userInfo} isOwnProfile={isViewingOwnProfile} />
 
-        {/* User student info */}
+          {/* User student info */}
 
-        <UserStudentInfoComponent {...studentInfo} />
+          <UserStudentInfoComponent {...studentInfo} />
 
-        {/* Active groups */}
-        {/* TODO: Integrate API when have */}
-        {/* <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
-        <FlatList
-          data={userGroups}
-          horizontal={true}
-          style={styles.groupContainer}
-          keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={{ columnGap: 25 }}
-          showsHorizontalScrollIndicator={false}
-          ListHeaderComponent={
-            <TouchableOpacity activeOpacity={0.7} onPress={handleCreateGroup}>
-              <FontAwesome
-                name="plus-circle"  
-                size={50}
-                color="white"
-                style={styles.plusIcon}
-              />
-            </TouchableOpacity>
-          }
-          renderItem={({ item }) => {
-            return <GroupPreviewInfo group={item} />;
-          }}
-        /> */}
+          {/* Active groups */}
+          {/* TODO: Integrate API when have */}
+          {/* <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
+          <FlatList
+            data={userGroups}
+            horizontal={true}
+            style={styles.groupContainer}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={{ columnGap: 25 }}
+            showsHorizontalScrollIndicator={false}
+            ListHeaderComponent={
+              <TouchableOpacity activeOpacity={0.7} onPress={handleCreateGroup}>
+                <FontAwesome
+                  name="plus-circle"  
+                  size={50}
+                  color="white"
+                  style={styles.plusIcon}
+                />
+              </TouchableOpacity>
+            }
+            renderItem={({ item }) => {
+              return <GroupPreviewInfo group={item} />;
+            }}
+          /> */}
 
-        {/* Social , Blog, Activity */}
-        <View style={styles.rowContainer}>
-          {selectedTabs.length != 0 &&
-            selectedTabs.map((tab) => {
-              return (
-                <TouchableOpacity
-                  key={tab}
-                  style={[
-                    styles.tabButton,
-                    {
-                      backgroundColor:
-                        selectedTab === tab ? "#2F2F2F" : "#1E1E1E",
-                      borderRadius: 10,
-                      borderBottomWidth: selectedTab === tab ? 1 : 0,
-                      borderBottomColor: "#fff",
-                    },
-                  ]}
-                  onPress={() => setSelectedTab(tab)}
-                >
-                  <ThemedText
+          {/* Social , Blog, Activity */}
+          <View style={styles.rowContainer}>
+            {selectedTabs.length != 0 &&
+              selectedTabs.map((tab) => {
+                return (
+                  <TouchableOpacity
+                    key={tab}
                     style={[
-                      styles.tabText,
+                      styles.tabButton,
                       {
-                        color: selectedTab === tab ? "#fff" : "#8A94AC",
+                        backgroundColor:
+                          selectedTab === tab ? "#2F2F2F" : "#1E1E1E",
+                        borderRadius: 10,
+                        borderBottomWidth: selectedTab === tab ? 1 : 0,
+                        borderBottomColor: "#fff",
                       },
                     ]}
+                    onPress={() => setSelectedTab(tab)}
                   >
-                    {tab}
-                  </ThemedText>
-                </TouchableOpacity>
-              );
-            })}
+                    <ThemedText
+                      style={[
+                        styles.tabText,
+                        {
+                          color: selectedTab === tab ? "#fff" : "#8A94AC",
+                        },
+                      ]}
+                    >
+                      {tab}
+                    </ThemedText>
+                  </TouchableOpacity>
+                );
+              })}
+          </View>
         </View>
-      </View>
-      <Divider
-        orientation="horizontal"
-        style={{ width: "100%", borderColor: "#fff", borderWidth: 1 }}
-      />
+        <Divider
+          orientation="horizontal"
+          style={{ width: "100%", borderColor: "#fff", borderWidth: 1 }}
+        />
 
-      {/* Readme if tab == readme */}
-      <View style={{ padding: 20 }}>
-        {selectedTab === "Social" && <SocialTab />}
-        {selectedTab === "Activity" && <ActivityTab />}
-      </View>
-      {selectedTab === "Blog" && <BlogTab />}
-      {/* Sign out */}
-    </ParallaxFlatList>
+        {/* Readme if tab == readme */}
+        <View style={{ padding: 20 }}>
+          {selectedTab === "Social" && <SocialTab />}
+          {selectedTab === "Activity" && <ActivityTab />}
+        </View>
+        {selectedTab === "Blog" && 
+          <BlogTab 
+            moreOptionRef={moreOptionRef}
+            setIsUserWrittenBlog={setIsUserWrittenBlog}
+            setRole={setRole}
+            setBlogStatus={setBlogStatus}
+            setIsViewTypePrivateOrInProfile={setIsViewTypePrivateOrInProfile}
+            setMoreOptionBlogId={setMoreOptionBlogId}
+            setMoreOptionGroupId={setMoreOptionGroupId}
+            handleHideBlog={handleHideBlog}
+            handleDeleteBlog={handleDeleteBlog}
+          />
+        }
+      </ParallaxFlatList>
+
+      <MoreOptionBottomList
+        sheetRef={moreOptionRef}
+        isUserWrittenBlog={isUserWrittenBlog}
+        blogId={moreOptionBlogId}
+        groupId={moreOptionGroupId}
+        role={role}
+        blogStatus={blogStatus}
+        isFromFeed={true}
+        isFromDetail={false}
+        isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
+        handleHideThisBlog={handleHideBlog.current}
+        handleDeleteThisBlog={handleDeleteBlog.current}/>
+    </GestureHandlerRootView>
   );
 }
 

@@ -80,6 +80,7 @@ export interface UserBlogDetail {
     ViewType: string
     Group: UserBlogGroup;
     UserGroupStatus: string
+    UserStatus: string
 }
 export interface UserBlogDetailForUpdate {
     _id: string;

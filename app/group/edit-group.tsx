@@ -81,7 +81,7 @@ export default function EditGroup() {
   useEffect(() => {
     dispatch(searchFields("Development")).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
-      console.log((res.payload as SearchFieldResult).Fields);
+      // console.log((res.payload as SearchFieldResult).Fields);
     });
 
     dispatch(setCreateGroupCurrentTags([]));
@@ -89,11 +89,9 @@ export default function EditGroup() {
   }, []);
 
   useEffect(() => {
-    console.log(groupFields);
   }, [groupFields]);
 
   useEffect(() => {
-    console.log(groupRules)
   }, [groupRules])
 
   useEffect(() => {
@@ -196,7 +194,7 @@ export default function EditGroup() {
   const handleFieldSearchSubmit = () => {
     dispatch(searchFields(fieldSearchText.current)).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
-      console.log((res.payload as SearchFieldResult).Fields);
+      // console.log((res.payload as SearchFieldResult).Fields);
     });
   }
   const handleFieldSheetChange = useCallback((index: any) => {

@@ -38,10 +38,8 @@ export default function MyGroupTab() {
   // }, [popularFields]);
 
   useEffect(() => {
-    console.log(selectedId);
   }, [selectedId]);
   const route = useRouter();
-  console.log("selectedId", selectedId);
   const handleCreateButtonPress = () => {
     // Handle create group button press
     console.log("Create Group button pressed");

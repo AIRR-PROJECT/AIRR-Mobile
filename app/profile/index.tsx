@@ -108,7 +108,7 @@ export default function ProfileScreen() {
   }, []);
 
   useEffect(() => {
-    console.log(userGroups);
+    // console.log(userGroups);
   }, [userGroups]);
 
   useEffect(() => {

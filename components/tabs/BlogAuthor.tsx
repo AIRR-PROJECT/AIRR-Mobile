@@ -2,6 +2,7 @@ import React from "react";
 import { View, Image, StyleSheet, ViewStyle } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { User1 } from "@/interfaces/userInterface";
+import { formatDistanceToNow, formatDistanceToNowStrict } from "date-fns";
 
 type Author = Pick<User1, "name" | "avatar">;
 
@@ -30,7 +31,7 @@ export default function BlogAuthor({ author, style, time }: BlogAuthorProps) {
           lightColor="#fff"
           darkColor="#fff"
         >
-          {time}
+          {time ? formatDistanceToNowStrict(new Date(time)) + " ago" : "Unknown time ago"}
         </ThemedText>
       </View>
     </View>

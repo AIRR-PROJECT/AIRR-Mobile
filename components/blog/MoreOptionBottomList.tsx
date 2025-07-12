@@ -156,7 +156,7 @@ export default function MoreOptionBottomList({
               </Text>
             </TouchableOpacity>
           )}
-          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && role !== GroupRoleCheck.NOT_MEMBER) 
+          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupRoleCheck.NOT_MEMBER)) 
             || isViewTypePrivateOrInProfile) && 
             <TouchableOpacity
               style={styles.bottomOptionButton}
@@ -168,7 +168,7 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Edit blog</Text>
             </TouchableOpacity>
           }
-          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && role !== GroupRoleCheck.NOT_MEMBER) 
+          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupRoleCheck.NOT_MEMBER)) 
             || isViewTypePrivateOrInProfile || blogStatus === BlogStatus.REJECTED || blogStatus === BlogStatus.BANNED) &&
             <TouchableOpacity
               style={styles.bottomOptionButton}

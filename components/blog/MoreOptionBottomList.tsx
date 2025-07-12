@@ -1,5 +1,5 @@
 import { useAppDispatch } from "@/redux/hook";
-import { deleteBlog, updateHideBlog } from "@/redux/slices/blogSlice";
+import { deleteBlog, unsaveBlog, updateHideBlog } from "@/redux/slices/blogSlice";
 import {
   Entypo,
   FontAwesome,
@@ -93,6 +93,7 @@ export default function MoreOptionBottomList({
   // console.log("isFromFeed", isFromFeed);
   const hanleRemoveFromFavourites = () => {
     // Handle removing the blog from favourites
+    dispatch(unsaveBlog(blogId))
   };
   return (
     <BottomSheet

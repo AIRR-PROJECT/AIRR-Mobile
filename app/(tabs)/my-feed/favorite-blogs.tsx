@@ -137,13 +137,13 @@ export default function FavouriteBlog() {
   });
   const favoriteBlogsReset = useMutation({
     mutationFn: async () => {
-      const refetchedBlog = await dispatch(fetchUserBlogs(1));
+      const refetchedBlog = await dispatch(getFavoriteBlogs({ page: 1 }));
 
-      return refetchedBlog.payload.blogList.blogs as UserBlog[];
+      return refetchedBlog.payload as FavoriteBlog[];
     },
     onSuccess: (data: any) => {
       queryClient.setQueryData(["feed-favorite"], (oldData: any) => {
-        return [...data] as UserBlog[];
+        return [...data] as FavoriteBlog[];
       });
       setPage(1)
     },

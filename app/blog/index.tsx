@@ -116,9 +116,9 @@ const mockCommenter: UserBlogComment = {
   },
   createdAt: new Date("18 Nov 2023"),
   updatedAt: new Date("18 Nov 2023"),
-  Content:
-    "I just tried this recipe and it was amazing! The instructions were clear and easy to follow, and the end result was delicious. I will definitely be making this again. Thanks for sharing!",
+  Content: "I just tried this recipe and it was amazing! The instructions were clear and easy to follow, and the end result was delicious. I will definitely be making this again. Thanks for sharing!",
   _id: "123",
+  ChildrenComments: []
 };
 const mockComments = [
   mockCommenter,
@@ -298,7 +298,7 @@ export default function BlogScreen() {
   const [blogDisliked, setBlogDisliked] = useState<boolean>(false);
   const [blogSaved, setBlogSaved] = useState<boolean>(false);
   const [html, setHtml] = useState(mockHtml);
-  const [commentsDetail, setCommentsDetail] = useState(mockComments);
+  const [commentsDetail, setCommentsDetail] = useState<UserBlogComment[]>(mockComments);
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
 
@@ -337,7 +337,6 @@ export default function BlogScreen() {
 
   useEffect(() => {
     if (currentUserBlog) {
-      console.log(currentUserBlog)
       setTitle(currentUserBlog.Title);
       setDescription(currentUserBlog.Description);
       setThumbnail(currentUserBlog.BackgroundURL);
@@ -740,10 +739,10 @@ export default function BlogScreen() {
           isUserWrittenBlog={isUserWrittenBlog}
           blogId={currentUserBlog._id}
           groupId={currentUserBlog.Group ? currentUserBlog.Group._id : undefined}
+          userStatus={currentUserBlog.UserGroupStatus}
+          blogStatus={currentUserBlog.Status}
           isFromDetail={true}
           isFromFavourites={blogSaved}
-          isBlogStatusPendingOrActive={currentUserBlog.Status == BlogStatus.ACTIVE || currentUserBlog.Status == BlogStatus.PENDING}
-          isUserStatusPending={currentUserBlog.UserGroupStatus == "Pending"}
           isViewTypePrivateOrInProfile={currentUserBlog.ViewType != BlogViewType.IN_GROUP}
           handleHideThisBlog={handleHideBlog}
           handleDeleteThisBlog={handleDeleteBlog}

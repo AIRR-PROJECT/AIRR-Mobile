@@ -1,3 +1,4 @@
+import { BlogStatus } from "@/enums/blog_properties.enum";
 import { useAppDispatch } from "@/redux/hook";
 import { deleteBlog, unsaveBlog, updateHideBlog } from "@/redux/slices/blogSlice";
 import {
@@ -11,6 +12,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { TouchableOpacity, StyleSheet, Text, ToastAndroid } from "react-native";
 
 type MoreOptionComponentProps = {
@@ -18,11 +20,11 @@ type MoreOptionComponentProps = {
   isUserWrittenBlog: boolean;
   blogId: string;
   groupId?: string;
+  userStatus: string
+  blogStatus: string
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
   isFromFavourites?: boolean; // Optional prop to indicate if the blog is from favourites
   isFromDetail: boolean; // Optional prop to indicate if the blog is from detail
-  isBlogStatusPendingOrActive: boolean
-  isUserStatusPending: boolean
   isViewTypePrivateOrInProfile: boolean
   handleHideThisBlog: () => void;
   handleDeleteThisBlog: () => void;
@@ -33,11 +35,11 @@ export default function MoreOptionBottomList({
   isUserWrittenBlog,
   blogId,
   groupId,
+  userStatus,
+  blogStatus,
   isFromFeed = false, // Default to false if not provided
   isFromFavourites = false, // Default to false if not provided
   isFromDetail = false, // Default to false if not provided
-  isBlogStatusPendingOrActive = false,
-  isUserStatusPending = false,
   isViewTypePrivateOrInProfile = false,
   handleHideThisBlog,
   handleDeleteThisBlog,
@@ -46,6 +48,11 @@ export default function MoreOptionBottomList({
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    console.log(`userStatus: ${userStatus}`)
+    console.log(`blogStatus: ${blogStatus}`)
+  }, [userStatus, blogStatus])
 
   const handleHideBlog = () => {
     dispatch(
@@ -140,24 +147,30 @@ export default function MoreOptionBottomList({
               </Text>
             </TouchableOpacity>
           )}
-          {(isBlogStatusPendingOrActive || isViewTypePrivateOrInProfile) && <TouchableOpacity
-            style={styles.bottomOptionButton}
-            onPress={handleEditBlog}
-            activeOpacity={0.8}
-          >
-            {/* Edit */}
-            <FontAwesome name="edit" size={24} color="black" />
-            <Text style={styles.bottomOptionText}>Edit blog</Text>
-          </TouchableOpacity>}
-          <TouchableOpacity
-            style={styles.bottomOptionButton}
-            onPress={handleDeleteBlog}
-            activeOpacity={0.8}
-          >
-            {/* delete */}
-            <MaterialIcons name="delete" size={24} color="black" />
-            <Text style={styles.bottomOptionText}>Delete blog</Text>
-          </TouchableOpacity>
+          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && userStatus == "Active") 
+            || isViewTypePrivateOrInProfile) && 
+            <TouchableOpacity
+              style={styles.bottomOptionButton}
+              onPress={handleEditBlog}
+              activeOpacity={0.8}
+            >
+              {/* Edit */}
+              <FontAwesome name="edit" size={24} color="black" />
+              <Text style={styles.bottomOptionText}>Edit blog</Text>
+            </TouchableOpacity>
+          }
+          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && userStatus == "Active") 
+            || isViewTypePrivateOrInProfile || blogStatus === BlogStatus.REJECTED || blogStatus === BlogStatus.BANNED) &&
+            <TouchableOpacity
+              style={styles.bottomOptionButton}
+              onPress={handleDeleteBlog}
+              activeOpacity={0.8}
+            >
+              {/* delete */}
+              <MaterialIcons name="delete" size={24} color="black" />
+              <Text style={styles.bottomOptionText}>Delete blog</Text>
+            </TouchableOpacity>
+          }
         </BottomSheetView>
       ) : (
         <BottomSheetView style={styles.contentContainer}>
@@ -189,7 +202,7 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Hide blog</Text>
             </TouchableOpacity>
           )}
-          {!isFromFeed && !isUserStatusPending && (
+          {!isFromFeed && userStatus != "Pending" && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={handleReportBlog}

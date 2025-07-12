@@ -26,6 +26,7 @@ import {
 } from "@/redux/slices/groupSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useLocalSearchParams } from "expo-router";
+import ReportCardComponent from "@/components/group/ReportCardComponent";
 
 type ReportUserComponentProps = GroupReport & {
   onApprove: (id: string) => void;
@@ -49,12 +50,12 @@ function ReportUserComponent({
 
   return (
     <View
-      style={{ flexDirection: "row", alignItems: "center", marginBottom: 20 }}
+      style={styles.reportContainer}
     >
       {Blog && 
         <Image
           source={{ uri: Blog.CoverURL }}
-          style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
+          style={styles.avatar}
         />
       }
       {Blog && Reports &&
@@ -133,7 +134,7 @@ export default function ReportsApprovalsPage() {
   };
   // TODO: Khoa: change the any type to the correct type
   const renderItem = ({ item }: any) => (
-    <ReportUserComponent
+    <ReportCardComponent
       {...item}
         onApprove={onApprove}
         onReject={onReject}
@@ -195,5 +196,19 @@ const styles = StyleSheet.create({
   optionText: {
     color: "#fff",
     fontSize: 14,
+  },
+  reportContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    borderWidth: 1,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
   },
 });

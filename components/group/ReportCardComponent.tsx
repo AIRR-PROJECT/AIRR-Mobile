@@ -6,35 +6,24 @@ import Reanimated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { formatDistance, set } from "date-fns";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { PendingBlogRequest } from "@/interfaces/groupInterface";
+import { GroupReport, PendingBlogRequest } from "@/interfaces/groupInterface";
 import { getUserBlogDetail } from "@/redux/slices/blogSlice";
 import { useAppDispatch } from "@/redux/hook";
 import { UserBlogDetail } from "@/interfaces/blogInterface";
-type BlogApprovalCardComponentProps = PendingBlogRequest & {
-  onApprove: (id: string, blogOwnerId: string) => void;
-  onReject: (id: string, blogOwnerId: string) => void;
+type ReportUserComponentProps = GroupReport & {
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
 };
 
-export default function BlogApprovalCardComponent({
-  BlogID,
-  Title,
-  Owner,
-  RequestDate,
+export default function ReportCardComponent({
+  Blog,
+  Reports,
   onApprove,
   onReject,
-}: BlogApprovalCardComponentProps) {
-  const dispatch = useAppDispatch()
-  const [title, setTitle] = useState("")
-  const [thumbnail, setThumbnail] = useState("")
-  
-  useEffect(() => {
-    setTitle(Title)
-    setThumbnail(Owner.AvatarURL)
-  }, [])
-
+}: ReportUserComponentProps) {
   function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {
     const styleAnimation = useAnimatedStyle(() => {
       //   console.log("showRightProgress:", prog.value);
@@ -56,10 +45,7 @@ export default function BlogApprovalCardComponent({
   }
   const [isOpenStartDrag, setIsOpenStartDrag] = useState(false);
   const route = useRouter();
-  const handlePress = () => {
-    console.log("Press blog with id: ", BlogID);
-    route.push(`/group/pending-blog?blogID=${BlogID}`);
-  }
+  const handlePress = () => {};
   return (
     <ReanimatedSwipeable
       containerStyle={styles.swipeable}
@@ -70,7 +56,7 @@ export default function BlogApprovalCardComponent({
       overshootRight={false}
       onSwipeableOpen={() => {
         console.log("onSwipeableOpen");
-        onReject(BlogID, Owner._id);
+        onReject(Blog._id);
       }}
       onSwipeableOpenStartDrag={(drag) => {
         setIsOpenStartDrag(true);
@@ -96,45 +82,59 @@ export default function BlogApprovalCardComponent({
         ]}
       >
         <View style={styles.imageContainer}>
-          <Image source={Owner.AvatarURL} style={styles.avatar} />
-          <Image source={thumbnail} style={styles.thumbnail} />
+          <Image source={Blog.CoverURL} style={styles.thumbnail} />
+          <Text style={styles.title}>{Blog.Title}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+            <View style={styles.reportSymbolContainer}>
+              <MaterialIcons name="report-problem" size={16} color="red" />
+            </View>
+            <Text style={styles.description}>{Reports.length} reports</Text>
+          </View>
         </View>
 
         <View style={styles.detailContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.description}>
-            {Owner.Username} request a new blog
-          </Text>
-          <Text style={styles.time}>
-            {formatDistance(new Date(RequestDate), new Date(), {
-              addSuffix: true,
-            })}
-          </Text>
-          {/* Approve and Reject Button */}
-          {
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.approveButton}
-                onPress={() => {
-                  onApprove(BlogID, Owner._id);
-                }}
-                activeOpacity={0.7}
-              >
-                <AntDesign name="checkcircle" size={14} color="black" />
-                <Text style={styles.approveButtonText}>Approve</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.rejectButton}
-                onPress={() => {
-                  onReject(BlogID, Owner._id);
-                }}
-                activeOpacity={0.7}
-              >
-                <AntDesign name="closecircle" size={14} color="black" />
-                <Text style={styles.rejectButtonText}>Reject</Text>
-              </TouchableOpacity>
+          {Reports.map((report) => (
+            <View key={report.User._id} style={styles.userReportContainer}>
+              <Image source={report.User.AvatarURL} style={styles.avatar} />
+              <View style={styles.userReportDetail}>
+                <View style={styles.usernameContainer}>
+                  <Text style={{ fontWeight: "bold", width: "55%" }}>
+                    {report.User.UserName}
+                  </Text>
+                  <View style={styles.reportContainer}>
+                    <Text style={{ fontWeight: "bold", color: "red" }}>
+                      {report.ReportType}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.description}>{report.Details}</Text>
+              </View>
             </View>
-          }
+          ))}
+
+          {/* Approve and Reject Button */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.approveButton}
+              onPress={() => {
+                onApprove(Blog._id);
+              }}
+              activeOpacity={0.7}
+            >
+              <AntDesign name="checkcircle" size={14} color="black" />
+              <Text style={styles.approveButtonText}>Approve</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.rejectButton}
+              onPress={() => {
+                onReject(Blog._id);
+              }}
+              activeOpacity={0.7}
+            >
+              <AntDesign name="closecircle" size={14} color="black" />
+              <Text style={styles.rejectButtonText}>Reject</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </TouchableOpacity>
     </ReanimatedSwipeable>
@@ -143,13 +143,13 @@ export default function BlogApprovalCardComponent({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    padding: 10,
+    padding: 20,
+    borderWidth: 1,
     borderRadius: 20,
+    backgroundColor: "#fff",
+    flex: 1,
   },
   swipeable: {
     flex: 1,
@@ -157,8 +157,7 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 80,
     height: 80,
-    borderRadius: 20,
-    right: 15,
+    borderRadius: 5,
   },
   rightAction: {
     backgroundColor: "purple",
@@ -173,21 +172,22 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   avatar: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: 999,
-    zIndex: 1,
   },
-  imageContainer: { flexDirection: "row", alignItems: "center" },
+  imageContainer: { alignItems: "center", width: 80, gap: 5, marginRight: 10 },
   detailContainer: { flex: 1, gap: 4 },
   title: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#000",
+    textAlign: "center",
   },
   description: {
     fontSize: 14,
-    color: "#000",
+    color: "#2d3036ff",
+    flexWrap: "wrap",
   },
   time: {
     fontSize: 12,
@@ -227,7 +227,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
     flex: 1,
   },
   rejectOnDrag: {
@@ -239,5 +238,37 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,
+  },
+  userReportContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#F0F0F0",
+    marginBottom: 10,
+  },
+  userReportDetail: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  reportSymbolContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 3,
+    borderRadius: 999,
+    backgroundColor: "#FEE2E2",
+  },
+  usernameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  reportContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 999,
+    backgroundColor: "#FEE2E2",
+    padding: 5,
+    paddingHorizontal: 10,
   },
 });

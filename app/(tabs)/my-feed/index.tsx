@@ -199,11 +199,13 @@ export default function MyFeed() {
   const [role, setRole] = useState("")
   const [blogStatus, setBlogStatus] = useState("")
   const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
+  const [isAlreadyReported, setIsAlreadyReported] = useState(false)
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean, isAlreadyReported: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
     setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
+    setIsAlreadyReported(isAlreadyReported)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
     setRole(role)
@@ -252,7 +254,8 @@ export default function MyFeed() {
                 () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
                   item.UserGroupStatus,
                   item.Status,
-                  item.ViewType != BlogViewType.IN_GROUP
+                  item.ViewType != BlogViewType.IN_GROUP,
+                  item.IsReportedByUser
                 )
               }/>;
             }}
@@ -340,6 +343,7 @@ export default function MyFeed() {
         isFromFeed={true}
         isFromDetail={false}
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
+        isAlreadyReported={isAlreadyReported}
         handleHideThisBlog={handleHideBlog}
         handleDeleteThisBlog={handleDeleteBlog}/>
     </GestureHandlerRootView>

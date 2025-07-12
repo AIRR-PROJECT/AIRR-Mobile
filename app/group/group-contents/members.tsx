@@ -25,11 +25,15 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   approveMember,
+  banMember,
   getBannedMemberList,
   getMemberList,
   getPendingMemberList,
+  inviteMemberToAdmin,
+  kickMember,
   rejectBlog,
   rejectMember,
+  unbanMember,
 } from "@/redux/slices/groupSlice";
 import { router, useLocalSearchParams } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
@@ -179,6 +183,70 @@ export default function MemberApprovalsPage() {
 
   const [banReason, setBanReason] = useState<string>("Spamming");
   const [otherReason, setOtherReason] = useState<string>("");
+
+  const handleConfirmBanMember = () => {
+    if (selectedMember) {
+      dispatch(banMember({
+        groupID: groupID,
+        userIDToBan: selectedMember.MemberInfo._id,
+        bannedReason: banReason != "Other" ? banReason : otherReason
+      })).then((res) => {
+        const result = res.payload as boolean
+
+        if (result == true) {
+          console.log("User banned")
+        }
+      })
+    }
+  }
+  const handleConfirmUnbanMember = () => {
+    if (selectedBannedMember) {
+      dispatch(unbanMember({
+        groupID: groupID,
+        userIDToUnban: selectedBannedMember.Owner._id
+      })).then((res) => {
+        const result = res.payload as boolean
+
+        if (result == true) {
+          setBannedMembers(bannedMembers.filter((m) => m._id != selectedBannedMember._id))
+        }
+      })
+    }
+  }
+  const handleConfirmKickMember = () => {
+    if (selectedMember) {
+      dispatch(kickMember({
+        groupID: groupID,
+        userID: selectedMember.MemberInfo._id
+      })).then((res) => {
+        const result = res.payload as boolean
+
+        if (result == true) {
+          setDisplayMembers(displayMembers.filter((m) => m.MemberInfo._id != selectedMember.MemberInfo._id))
+        }
+      })
+    }
+  }
+  const handleConfirmInviteMemberToAdmin = () => {
+    if (selectedMember) {
+      dispatch(inviteMemberToAdmin({
+        groupID: groupID,
+        userIDToInvite: selectedMember.MemberInfo._id
+      })).then((res) => {
+        const result = res.payload as boolean
+
+        if (result == true) {
+          const index = displayMembers.findIndex((m) => m.MemberInfo._id == selectedMember.MemberInfo._id)
+          if (index != -1) {
+            let temp = displayMembers
+            temp[index].Role == GroupRole.Admin
+            setDisplayMembers(temp)
+          }
+        }
+      })
+    }
+  }
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.optionBar}>
@@ -308,7 +376,7 @@ export default function MemberApprovalsPage() {
                 </Text>
                 <View style={styles.bannedAtWrapper}>
                   <Text style={[styles.role]} >
-                    Banned at {formatRelative(item.BannedDate, new Date())}
+                    Banned on {formatRelative(item.BannedDate, new Date())}
                   </Text>
                 </View>
               </View>
@@ -423,6 +491,7 @@ export default function MemberApprovalsPage() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
+                      handleConfirmKickMember()
                       sheetRef.current?.close();
                     }}
                     style={styles.joinConfirmButton}
@@ -536,6 +605,7 @@ export default function MemberApprovalsPage() {
                   <TouchableOpacity
                     onPress={() => {
                       // handle ban logic here, use banReason and otherReason if needed
+                      handleConfirmBanMember()
                       sheetRef.current?.close();
                     }}
                     style={styles.joinConfirmButton}
@@ -571,6 +641,7 @@ export default function MemberApprovalsPage() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
+                      handleConfirmInviteMemberToAdmin()
                       sheetRef.current?.close();
                     }}
                     style={styles.joinConfirmButton}
@@ -606,6 +677,7 @@ export default function MemberApprovalsPage() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
+                      handleConfirmUnbanMember()
                       sheetRef.current?.close();
                     }}
                     style={styles.joinConfirmButton}

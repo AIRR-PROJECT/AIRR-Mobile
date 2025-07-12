@@ -183,3 +183,24 @@ export interface LeaveGroup {
 export interface CancelJoinGroupRequest {
     groupID: string
 }
+
+export interface BanMember {
+    groupID: string;
+    userIDToBan: string;
+    bannedReason: string
+}
+
+export interface UnbanMember {
+    groupID: string;
+    userIDToUnban: string
+}
+
+export interface KickMember {
+    groupID: string;
+    userID: string
+}
+
+export interface InviteMemberToAdmin {
+    groupID: string;
+    userIDToInvite: string
+}

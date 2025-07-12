@@ -54,6 +54,7 @@ export interface UserBlog {
     BackgroundURL: string;
     UserInteraction: string;
     IsSavedByUser: boolean;
+    IsReportedByUser: boolean
     Reaction: UserBlogReaction;
     // content: string;
     // timestamp: string;
@@ -76,6 +77,7 @@ export interface UserBlogDetail {
     Tags: UserBlogTag[];
     PendingTags: UserBlogTag[];
     IsSavedByUser: boolean
+    IsReportedByUser: boolean
     Status: BlogStatus
     ViewType: string
     Group: UserBlogGroup;

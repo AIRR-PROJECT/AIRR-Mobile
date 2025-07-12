@@ -722,6 +722,7 @@ export default function BlogScreen() {
           isFromDetail={true}
           isFromFavourites={blogSaved}
           isViewTypePrivateOrInProfile={currentUserBlog.ViewType != BlogViewType.IN_GROUP}
+          isAlreadyReported={currentUserBlog.IsReportedByUser}
           handleHideThisBlog={handleHideBlog}
           handleDeleteThisBlog={handleDeleteBlog}
           handleRemoveFavoriteThisBlog={handleRemoveFavoriteBlog}

@@ -196,24 +196,17 @@ export default function MyFeed() {
 
   const moreOptionRef = useRef<BottomSheet>(null);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
-  const [userStatus, setUserStatus] = useState("")
+  const [role, setRole] = useState("")
   const [blogStatus, setBlogStatus] = useState("")
   const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
     setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
-    
-    // Fetch user status in current group
-    dispatch(getUserGroupStatus(groupId)).then((res) => {
-      const data = res.payload as string
-
-      setUserStatus(data)
-    })
-
+    setRole(role)
     setBlogStatus(blogStatus)
     if (moreOptionRef.current) {
       moreOptionRef.current.snapToIndex(0);
@@ -257,6 +250,7 @@ export default function MyFeed() {
             renderItem={({ item }) => {
               return <FeedBlogPreview blog={item} onPressMoreButton={
                 () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
+                  item.UserGroupStatus,
                   item.Status,
                   item.ViewType != BlogViewType.IN_GROUP
                 )
@@ -341,7 +335,7 @@ export default function MyFeed() {
         isUserWrittenBlog={isUserWrittenBlog}
         blogId={moreOptionBlogId}
         groupId={moreOptionGroupId}
-        userStatus={userStatus}
+        role={role}
         blogStatus={blogStatus}
         isFromFeed={true}
         isFromDetail={false}

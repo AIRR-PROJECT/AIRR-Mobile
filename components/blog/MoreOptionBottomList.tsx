@@ -1,4 +1,5 @@
 import { BlogStatus } from "@/enums/blog_properties.enum";
+import { GroupRoleCheck } from "@/enums/group.enum";
 import { useAppDispatch } from "@/redux/hook";
 import { deleteBlog, unsaveBlog, updateHideBlog } from "@/redux/slices/blogSlice";
 import {
@@ -20,7 +21,7 @@ type MoreOptionComponentProps = {
   isUserWrittenBlog: boolean;
   blogId: string;
   groupId?: string;
-  userStatus: string
+  role: string
   blogStatus: string
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
   isFromFavourites?: boolean; // Optional prop to indicate if the blog is from favourites
@@ -35,7 +36,7 @@ export default function MoreOptionBottomList({
   isUserWrittenBlog,
   blogId,
   groupId,
-  userStatus,
+  role,
   blogStatus,
   isFromFeed = false, // Default to false if not provided
   isFromFavourites = false, // Default to false if not provided
@@ -50,9 +51,13 @@ export default function MoreOptionBottomList({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log(`userStatus: ${userStatus}`)
+    console.log(`isUserWrittenBlog: ${isUserWrittenBlog}`)
+    console.log(`blogId: ${blogId}`)
+    console.log(`groupId: ${groupId}`)
+    console.log(`role: ${role}`)
     console.log(`blogStatus: ${blogStatus}`)
-  }, [userStatus, blogStatus])
+    console.log(`isViewTypePrivateOrInProfile: ${isViewTypePrivateOrInProfile}`)
+  }, [isUserWrittenBlog, blogId, groupId, role, blogStatus, isViewTypePrivateOrInProfile])
 
   const handleHideBlog = () => {
     dispatch(
@@ -110,6 +115,10 @@ export default function MoreOptionBottomList({
       }
     })
   };
+  const handleBanBlog = () => {
+    
+  }
+
   return (
     <BottomSheet
       ref={sheetRef}
@@ -147,7 +156,7 @@ export default function MoreOptionBottomList({
               </Text>
             </TouchableOpacity>
           )}
-          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && userStatus == "Active") 
+          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupRoleCheck.NOT_MEMBER)) 
             || isViewTypePrivateOrInProfile) && 
             <TouchableOpacity
               style={styles.bottomOptionButton}
@@ -159,7 +168,7 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Edit blog</Text>
             </TouchableOpacity>
           }
-          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && userStatus == "Active") 
+          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupRoleCheck.NOT_MEMBER)) 
             || isViewTypePrivateOrInProfile || blogStatus === BlogStatus.REJECTED || blogStatus === BlogStatus.BANNED) &&
             <TouchableOpacity
               style={styles.bottomOptionButton}
@@ -202,7 +211,7 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Hide blog</Text>
             </TouchableOpacity>
           )}
-          {!isFromFeed && userStatus != "Pending" && (
+          {!isFromFeed && role === GroupRoleCheck.MEMBER && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={handleReportBlog}
@@ -211,6 +220,17 @@ export default function MoreOptionBottomList({
               {/* Report */}
               <MaterialIcons name="report" size={24} color="black" />
               <Text style={styles.bottomOptionText}>Report blog</Text>
+            </TouchableOpacity>
+          )}
+          {(role === GroupRoleCheck.ADMIN || role === GroupRoleCheck.OWNER) && (
+            <TouchableOpacity
+              style={styles.bottomOptionButton}
+              onPress={handleBanBlog}
+              activeOpacity={0.8}
+            >
+              {/* Ban */}
+              <FontAwesome name="ban" size={24} color="black" />
+              <Text style={styles.bottomOptionText}>Ban blog</Text>
             </TouchableOpacity>
           )}
         </BottomSheetView>

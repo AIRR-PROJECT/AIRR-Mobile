@@ -155,12 +155,8 @@ export default function ReportsApprovalsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 20,
+    backgroundColor: "#1E1E1E",
+    padding: 20,
   },
   textInputContainer: {
     paddingBottom: 20,

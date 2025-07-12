@@ -61,7 +61,10 @@ import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { formatDistanceToNow } from "date-fns";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 import { useSharedValue } from "react-native-reanimated";
-import Carousel from "react-native-reanimated-carousel";
+import Carousel, {
+  ICarouselInstance,
+  Pagination,
+} from "react-native-reanimated-carousel";
 
 // TODO: CONSIDER MOVE THIS TO A SEPARATE FILE OR USER ALREADY EXISTING ENUM
 export function debounce<T extends (...args: any[]) => void>(
@@ -244,15 +247,22 @@ export default function BlogScreen() {
       />
     );
   };
+  const ref = useRef<ICarouselInstance>(null);
+
+  const onPressPagination = (index: number) => {
+    ref.current?.scrollTo({
+      /**
+       * Calculate the difference between the current index and the target index
+       * to ensure that the carousel scrolls to the nearest index
+       */
+      count: index - progress.value,
+      animated: true,
+    });
+  };
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       {/* Back button */}
-      <View
-        style={[
-          styles.rowContainer,
-          { width: "100%", margin: 20 },
-        ]}
-      >
+      <View style={[styles.rowContainer, { width: "100%", margin: 20 }]}>
         <TouchableOpacity onPress={handleBack}>
           <Entypo name="chevron-small-left" size={30} color="white" />
         </TouchableOpacity>
@@ -299,6 +309,7 @@ export default function BlogScreen() {
         }}
       >
         <Carousel
+          ref={ref}
           autoPlay={true}
           data={thumbnail}
           height={280}
@@ -316,7 +327,33 @@ export default function BlogScreen() {
           onProgressChange={progress}
           renderItem={renderItem}
         />
+        <Pagination.Basic
+          progress={progress}
+          data={thumbnail}
+          size={20}
+          dotStyle={{
+            borderRadius: 100,
+            backgroundColor: "#262626",
+          }}
+          activeDotStyle={{
+            borderRadius: 100,
+            overflow: "hidden",
+            backgroundColor: "#f1f1f1",
+          }}
+          containerStyle={[
+            {
+              gap: 5,
+              marginBottom: 10,
+              marginTop: 10,
+              alignSelf: "center",
+              zIndex: 1,
+            },
+          ]}
+          horizontal
+          onPress={onPressPagination}
+        />
       </View>
+
       <View
         style={{
           flex: 1,
@@ -383,7 +420,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     width: "100%",
     padding: 20,
-    paddingTop: 0
+    paddingTop: 0,
   },
   title: {
     fontSize: 24,

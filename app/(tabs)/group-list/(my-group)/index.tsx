@@ -9,7 +9,7 @@ import {
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Text,
@@ -23,7 +23,9 @@ import {
 // Change the impletation to group that user joined
 export default function MyGroupTab() {
   const dispatch = useAppDispatch();
+  const route = useRouter();
   // const { popularFields } = useAppSelector((state) => state.group);
+  const { groupIDToRemove } = useLocalSearchParams<{ groupIDToRemove: string }>()
 
   const refFields = useRef<FlatList>(null);
   const currentOffset = useRef(0);
@@ -31,6 +33,12 @@ export default function MyGroupTab() {
   const [selectedId, setSelectedId] = useState("1");
   const [fields, setFields] = useState<GroupField[]>([])
   const [groups, setGroups] = useState(new Map<string, Group[]>())
+
+  const handleCreateButtonPress = () => {
+    // Handle create group button press
+    console.log("Create Group button pressed");
+    route.push("/group/create-group");
+  };
 
   const handleArrowPress = () => {
     refFields?.current?.scrollToOffset({
@@ -77,12 +85,40 @@ export default function MyGroupTab() {
       setSelectedId(fields[0]?._id)
     })
   }, []);
-  const route = useRouter();
-  const handleCreateButtonPress = () => {
-    // Handle create group button press
-    console.log("Create Group button pressed");
-    route.push("/group/create-group");
-  };
+
+  useEffect(() => {
+    if (groupIDToRemove) {
+      dispatch(getCreatedGroups()).then((res) => {
+        const data = res.payload as Group[]
+  
+        let fields: GroupField[] = []
+        let groups = new Map<string, Group[]>()
+        data.forEach((g) => {
+          // Add to fields
+          if (fields.find(f => f._id == g.FieldID) === undefined) {
+            fields.push({
+              _id: g.FieldID,
+              FieldName: g.FieldName
+            })
+          }
+  
+          // Add to groups
+          if (groups.has(g.FieldID)) {
+            let temp = groups.get(g.FieldID)
+            temp!.push(g)
+            groups.set(g.FieldID, temp!)
+          }
+          else {
+            groups.set(g.FieldID, [g])
+          }
+        })
+        setFields(fields)
+        setGroups(groups)
+        setSelectedId(fields[0]?._id)
+      })
+    }
+  }, [groupIDToRemove])
+  
   return (
     <View style={styles.container}>
       {/* Create Group Button */}

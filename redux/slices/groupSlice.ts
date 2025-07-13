@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
 import { AxiosResponse } from "axios";
-import { BanMember, CancelJoinGroupRequest, CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupReport, GroupTag, InviteMemberToAdmin, KickMember, LeaveGroup, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult, UnbanMember } from "@/interfaces/groupInterface";
+import { BanMember, BlogReportAction, CancelJoinGroupRequest, CreateGroupTag, Group, GroupDetailInfo, GroupField, GroupMember, GroupReport, GroupTag, InviteMemberToAdmin, KickMember, LeaveGroup, PendingBlogRequest, PendingMemberRequest, PendingTagRequest, PopularGroups, PopularGroupsByField, SearchFieldResult, UnbanMember } from "@/interfaces/groupInterface";
 import { CreateBlogTag, UserBlog } from "@/interfaces/blogInterface";
 import { ResponseFailcode } from "@/enums/failcode.enum";
 
@@ -221,7 +221,7 @@ export const getGroupInfo = createAsyncThunk(
                 return res.data.data as GroupDetailInfo
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                return null
             }
         }
         catch (error: any) {
@@ -655,6 +655,26 @@ export const getPendingReportBlogList = createAsyncThunk(
         }
     }
 )
+
+export const actionBlogReport = createAsyncThunk(
+    'group/actionBlogReport',
+    async (data: BlogReportAction, thunkAPI) => {
+        try {
+            const res = await api.post(`groups/actionReportBlog`, data) as AxiosResponse
+
+            if (res.data.success) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 
 export const leaveGroup = createAsyncThunk(
     'group/leaveGroup',

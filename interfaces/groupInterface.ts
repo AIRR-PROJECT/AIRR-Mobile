@@ -175,6 +175,12 @@ export interface GroupReport {
     Reports: GroupReportBlog[];
 }
 
+export interface BlogReportAction {
+    BlogID: string;
+    GroupID: string;
+    Action: string;
+}
+
 export interface LeaveGroup {
     groupID: string;
     newOwnerID?: string

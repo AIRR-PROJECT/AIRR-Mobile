@@ -86,32 +86,34 @@ export default function FavouriteBlog() {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
   }, []);
-  const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
-  const [userStatus, setUserStatus] = useState("")
-  const [blogStatus, setBlogStatus] = useState<BlogStatus>(BlogStatus.ACTIVE)
-  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
-  const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
-  const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
+  // const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
+  // const [role, setRole] = useState("")
+  // const [userStatus, setUserStatus] = useState("")
+  // const [blogStatus, setBlogStatus] = useState<BlogStatus>(BlogStatus.ACTIVE)
+  // const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
+  // const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
+  // const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
   const [page, setPage] = useState(1)
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, blogStatus: BlogStatus, isViewTypePrivateOrInProfile: boolean) => {
-    setIsUserWrittenBlog(isUserWritten);
-    setBlogStatus(blogStatus)
-    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
-    setMoreOptionBlogId(blogId)
-    setMoreOptionGroupId(groupId)
+  // const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: BlogStatus, isViewTypePrivateOrInProfile: boolean) => {
+  //   setIsUserWrittenBlog(isUserWritten);
+  //   setRole(role)
+  //   setBlogStatus(blogStatus)
+  //   setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
+  //   setMoreOptionBlogId(blogId)
+  //   setMoreOptionGroupId(groupId)
 
-    // Fetch user status in current group
-    dispatch(getUserGroupStatus(groupId)).then((res) => {
-      const data = res.payload as string
+  //   // Fetch user status in current group
+  //   dispatch(getUserGroupStatus(groupId)).then((res) => {
+  //     const data = res.payload as string
 
-      setUserStatus(data)
-    })
+  //     setUserStatus(data)
+  //   })
 
-    if (moreOptionRef.current) {
-      moreOptionRef.current.snapToIndex(0);
-    }
-    // console.log("More option pressed", isUserWritten)
-  };
+  //   if (moreOptionRef.current) {
+  //     moreOptionRef.current.snapToIndex(0);
+  //   }
+  //   // console.log("More option pressed", isUserWritten)
+  // };
 
   const favoriteBlogsQuery = useQuery({
     queryKey: ["feed-favorite"],
@@ -153,21 +155,7 @@ export default function FavouriteBlog() {
     favoriteBlogsMutation.mutate(page + 1);
   };
 
-  const handleHideBlog = () => {
-    moreOptionRef.current?.close();
-
-    setBlogReset(true);
-    favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
-  }
-  const handleDeleteBlog = () => {
-    moreOptionRef.current?.close();
-
-    setBlogReset(true);
-    favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
-  }
   const handleRemoveFavoriteBlog = () => {
-    moreOptionRef.current?.close();
-
     setBlogReset(true)
     favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
   }
@@ -223,22 +211,17 @@ export default function FavouriteBlog() {
           showsVerticalScrollIndicator={false}
           onEndReached={handleOnUserBlogListEndReached}
           renderItem={({ item }) => {
-            return <FeedBlogPreview blog={item as any} onPressMoreButton={
-              () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
-                item.Status as BlogStatus,
-                item.ViewType != BlogViewType.IN_GROUP
-              )
-            }/>;
+            return <FeedBlogPreview blog={item as any} onPressUnsave={handleRemoveFavoriteBlog}/>;
           }}
           onEndReachedThreshold={0.5}
         />
       </View>
-      <MoreOptionBottomList
+      {/* <MoreOptionBottomList
         sheetRef={moreOptionRef}
         isUserWrittenBlog={isUserWrittenBlog}
         blogId={moreOptionBlogId}
         groupId={moreOptionGroupId}
-        userStatus={userStatus}
+        role={role}
         blogStatus={blogStatus}
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
         isFromFeed={true}
@@ -247,7 +230,7 @@ export default function FavouriteBlog() {
         handleHideThisBlog={handleHideBlog}
         handleDeleteThisBlog={handleDeleteBlog}
         handleRemoveFavoriteThisBlog={handleRemoveFavoriteBlog}
-      />
+      /> */}
     </GestureHandlerRootView>
   );
 }

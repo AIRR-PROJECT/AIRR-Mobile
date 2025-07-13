@@ -7,6 +7,7 @@ import {
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Text,
@@ -19,6 +20,8 @@ import {
 
 export default function GroupPopularTab() {
   const dispatch = useAppDispatch();
+  const { groupIDToRemove } = useLocalSearchParams<{ groupIDToRemove: string }>()
+  
   const { popularFields } = useAppSelector((state) => state.group);
 
   const [selectedId, setSelectedId] = useState("1");
@@ -42,6 +45,14 @@ export default function GroupPopularTab() {
       dispatch(getPopularGroups());
     }
   }, [selectedId]);
+
+  useEffect(() => {
+    if (groupIDToRemove) {
+      dispatch(getGroupPopularFields()).then(() => {
+        setSelectedId("1")
+      })
+    }
+  }, [groupIDToRemove]);
 
   const currentOffset = useRef(0);
 

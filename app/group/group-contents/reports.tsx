@@ -18,6 +18,7 @@ import {
   PendingTagRequest,
 } from "@/interfaces/groupInterface";
 import {
+  actionBlogReport,
   approveTag,
   getPendingMemberList,
   getPendingReportBlogList,
@@ -108,29 +109,29 @@ export default function ReportsApprovalsPage() {
     }
   }, [groupID])
 
-  const onApprove = (tagId: string, blogIDs: string[]) => {
-    // dispatch(approveTag({
-    //   groupID: groupID,
-    //   tagIDToApprove: tagId,
-    //   blogIDsContainTag: blogIDs
-    // })).then(res => {
-    //   if (res.payload === true) {
-    //     console.log("Approve tag with tag-name: ", tagId);
-    //     setTags((prev) => prev.filter((b) => b._id !== tagId));
-    //   }
-    // })
+  const onApprove = (blogID: string) => {
+    dispatch(actionBlogReport({
+      BlogID: blogID,
+      GroupID: groupID,
+      Action: "Resolve"
+    })).then(res => {
+      if (res.payload === true) {
+        console.log("Resolve report");
+        setDisplayReports((prev) => prev.filter((r) => r.Blog._id !== blogID));
+      }
+    })
   };
-  const onReject = (tagId: string, blogIDs: string[]) => {
-    // dispatch(rejectTag({
-    //   groupID: groupID,
-    //   tagIDToReject: tagId,
-    //   blogIDsContainTag: blogIDs
-    // })).then(res => {
-    //   if (res.payload === true) {
-    //     console.log("Reject tag with tag-name: ", tagId);
-    //     setTags((prev) => prev.filter((b) => b._id !== tagId));
-    //   }
-    // })
+  const onReject = (blogID: string) => {
+    dispatch(actionBlogReport({
+      BlogID: blogID,
+      GroupID: groupID,
+      Action: "Reject"
+    })).then(res => {
+      if (res.payload === true) {
+        console.log("Reject report");
+        setDisplayReports((prev) => prev.filter((r) => r.Blog._id !== blogID));
+      }
+    })
   };
   // TODO: Khoa: change the any type to the correct type
   const renderItem = ({ item }: any) => (

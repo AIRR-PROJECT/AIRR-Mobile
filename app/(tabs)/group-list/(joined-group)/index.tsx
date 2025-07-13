@@ -9,6 +9,7 @@ import {
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Text,
@@ -23,6 +24,8 @@ import {
 export default function JoinedGroupTab() {
   const dispatch = useAppDispatch();
 
+  const { groupIDToRemove } = useLocalSearchParams<{ groupIDToRemove: string }>()
+  
   const [selectedId, setSelectedId] = useState("1");
   const [joinedFields, setJoinedFields] = useState<GroupField[]>([]);
   const refFields = useRef<FlatList>(null);
@@ -53,10 +56,15 @@ export default function JoinedGroupTab() {
   }, []);
 
   useEffect(() => {
-    if (selectedId) {
+    if (groupIDToRemove) {
+      dispatch(getJoinedFields()).then((res) => {
+        const data = res.payload as GroupField[]
 
+        setJoinedFields(data)
+        if (data.length != 0) setSelectedId(data[0]._id)
+      })
     }
-  }, [selectedId]);
+  }, [groupIDToRemove]);
 
   return (
     <View style={styles.container}>

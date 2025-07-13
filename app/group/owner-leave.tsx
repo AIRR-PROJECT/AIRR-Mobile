@@ -59,6 +59,9 @@ export default function OwnerLeaveGroup() {
 
       if (result == true) {
         router.dismiss(2)
+        router.setParams({
+          groupIDToRemove: groupID
+        })
       }
     })
   }

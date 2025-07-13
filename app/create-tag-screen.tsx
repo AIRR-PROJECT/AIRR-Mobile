@@ -107,6 +107,14 @@ export default function CreateTagsScreen({
       dispatch(setCreateGroupCreatedTags(newTags))
       router.back()
     }
+    else {
+      setNewTag("");
+      setValidTag(null);
+      setSelectableTags([]);
+      //Go Back and send the new tags to the parent component
+      dispatch(setCreateGroupCreatedTags([]))
+      router.back()
+    }
   };
 
   return (
@@ -231,9 +239,12 @@ export default function CreateTagsScreen({
         </View>
       </View>
       {/* Done button */}
-      <TouchableOpacity style={createdTags.length != 0 ? styles.button : styles.buttonDisabled} disabled={createdTags.length == 0} onPress={handleSubmit}>
-        <Text style={createdTags.length != 0 ? [styles.buttonText, { fontWeight: "bold" }] : [styles.buttonDisabledText, { fontWeight: "bold" }]}>Finish</Text>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={[styles.buttonText, { fontWeight: "bold" }]}>Finish</Text>
       </TouchableOpacity>
+      {/* <TouchableOpacity style={createdTags.length != 0 ? styles.button : styles.buttonDisabled} disabled={createdTags.length == 0} onPress={handleSubmit}>
+        <Text style={createdTags.length != 0 ? [styles.buttonText, { fontWeight: "bold" }] : [styles.buttonDisabledText, { fontWeight: "bold" }]}>Finish</Text>
+      </TouchableOpacity> */}
     </View>
   );
 }

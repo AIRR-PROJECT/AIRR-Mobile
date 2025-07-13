@@ -313,7 +313,7 @@ export default function BlogsApprovalsPage() {
             () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
               item.UserGroupStatus,
               item.Status,
-              item.ViewType != BlogViewType.IN_GROUP,
+              false,
               item.IsReportedByUser
             )}/>}
           keyExtractor={(item, index) => index.toString()}

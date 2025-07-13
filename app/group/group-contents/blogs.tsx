@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
+  ToastAndroid,
 } from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -33,50 +34,70 @@ import GroupBlogPreview from "@/components/group/GroupBlogPreview";
 import { GroupRole } from "@/enums/group.enum";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import { BlogViewType } from "@/enums/blog_properties.enum";
-
+import { Image } from "expo-image";
 enum TabOptions {
   All = "all",
   MyBlogs = "my-blogs",
   NeedApproval = "need-approval",
 }
-
+const joinConfirmImage = require("@/assets/images/group/join_confirm.png");
 export default function BlogsApprovalsPage() {
   // Currently use state to manage the blogs
 
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   // const flatlistRef = useRef<any>()
-  const { user, userCurrentGroupRole } = useAppSelector(state => state.user)
-  const { groupID, blogID, blogIdToRemove } = useLocalSearchParams<{ groupID: string, blogID: string, blogIdToRemove: string }>()
+  const { user, userCurrentGroupRole } = useAppSelector((state) => state.user);
+  const { groupID, blogID, blogIdToRemove } = useLocalSearchParams<{
+    groupID: string;
+    blogID: string;
+    blogIdToRemove: string;
+  }>();
 
-  const [userStatus, setUserStatus] = useState("NotJoined")
-  const [displayBlogs, setDisplayBlogs] = useState<UserBlog[]>([])
-  const [blogApprovals, setBlogApprovals] = useState<PendingBlogRequest[]>([])
-  const [blogPage, setBlogPage] = useState(1)
+  const [userStatus, setUserStatus] = useState("NotJoined");
+  const [displayBlogs, setDisplayBlogs] = useState<UserBlog[]>([]);
+  const [blogApprovals, setBlogApprovals] = useState<PendingBlogRequest[]>([]);
+  const [blogPage, setBlogPage] = useState(1);
 
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
   // const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
-  
+
   const moreOptionRef = useRef<BottomSheet>(null);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
-  const [role, setRole] = useState("")
-  const [blogStatus, setBlogStatus] = useState("")
-  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
-  const [isAlreadyReported, setIsAlreadyReported] = useState(false)
-  const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
-  const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
+  const [role, setRole] = useState("");
+  const [blogStatus, setBlogStatus] = useState("");
+  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] =
+    useState(false);
+  const [isAlreadyReported, setIsAlreadyReported] = useState(false);
+  const [moreOptionBlogId, setMoreOptionBlogId] = useState("");
+  const [moreOptionGroupId, setMoreOptionGroupId] = useState("");
 
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean, isAlreadyReported: boolean) => {
+  const handlePressMoreOption = (
+    isUserWritten: boolean,
+    blogId: string,
+    groupId: string,
+    blogStatus: string,
+    isViewTypePrivateOrInProfile: boolean,
+    isAlreadyReported: boolean
+  ) => {
     setIsUserWrittenBlog(isUserWritten);
-    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
-    setIsAlreadyReported(isAlreadyReported)
-    setMoreOptionBlogId(blogId)
-    setMoreOptionGroupId(groupId)
-    setBlogStatus(blogStatus)
+    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile);
+    setIsAlreadyReported(isAlreadyReported);
+    setMoreOptionBlogId(blogId);
+    setMoreOptionGroupId(groupId);
+    setBlogStatus(blogStatus);
 
-    const role = userStatus == "Pending" ? "Pending" : (userCurrentGroupRole ? userCurrentGroupRole : "Not Member")
-    setRole(role)
+    const role =
+      userStatus == "Pending"
+        ? "Pending"
+        : userCurrentGroupRole
+        ? userCurrentGroupRole
+        : "Not Member";
+    setRole(role);
 
     if (moreOptionRef.current) {
       moreOptionRef.current.snapToIndex(0);
@@ -87,7 +108,7 @@ export default function BlogsApprovalsPage() {
   const groupBlogsQuery = useQuery({
     queryKey: ["feed-group-blogs"],
     queryFn: async () => {
-      let fetchedBlogs
+      let fetchedBlogs;
       if (selectedTab == TabOptions.All) {
         fetchedBlogs = await dispatch(
           getGroupBlogsByID({
@@ -96,15 +117,14 @@ export default function BlogsApprovalsPage() {
             page: blogPage,
           })
         );
-      }
-      else {
+      } else {
         fetchedBlogs = await dispatch(
           getGroupPersonalBlogsByID({
             groupID: groupID,
             userID: user._id,
-            page: blogPage
+            page: blogPage,
           })
-        )
+        );
       }
 
       // console.log(fetchedBlogs.payload.blogList.blogs)
@@ -117,7 +137,7 @@ export default function BlogsApprovalsPage() {
       if (displayBlogs.length == 0) {
         return [];
       }
-      let moreFetchedBlogs
+      let moreFetchedBlogs;
       if (selectedTab == TabOptions.All) {
         moreFetchedBlogs = await dispatch(
           getGroupBlogsByID({
@@ -126,15 +146,14 @@ export default function BlogsApprovalsPage() {
             page: blogPage,
           })
         );
-      }
-      else {
+      } else {
         moreFetchedBlogs = await dispatch(
           getGroupPersonalBlogsByID({
             groupID: groupID,
             userID: user._id,
-            page: blogPage
+            page: blogPage,
           })
-        )
+        );
       }
 
       // console.log(moreFetchedBlogs.payload.blogList.blogs)
@@ -148,7 +167,7 @@ export default function BlogsApprovalsPage() {
   });
   const groupBlogsReset = useMutation({
     mutationFn: async () => {
-      let refetchedBlog
+      let refetchedBlog;
       if (selectedTab == TabOptions.All) {
         refetchedBlog = await dispatch(
           getGroupBlogsByID({
@@ -157,15 +176,14 @@ export default function BlogsApprovalsPage() {
             page: 1,
           })
         );
-      }
-      else {
+      } else {
         refetchedBlog = await dispatch(
           getGroupPersonalBlogsByID({
             groupID: groupID,
             userID: user._id,
-            page: blogPage
+            page: blogPage,
           })
-        )
+        );
       }
 
       return refetchedBlog.payload as UserBlog[];
@@ -186,12 +204,12 @@ export default function BlogsApprovalsPage() {
   useEffect(() => {
     if (groupID) {
       dispatch(getUserGroupStatus(groupID)).then((res) => {
-        const data = res.payload as string
+        const data = res.payload as string;
 
-        setUserStatus(data)
-      })
+        setUserStatus(data);
+      });
     }
-  }, [groupID])
+  }, [groupID]);
 
   useEffect(() => {
     setDisplayBlogs(groupBlogsQuery.data as UserBlog[]);
@@ -199,16 +217,15 @@ export default function BlogsApprovalsPage() {
 
   useEffect(() => {
     if (selectedTab != TabOptions.NeedApproval) {
-      setBlogPage(1)
+      setBlogPage(1);
       groupBlogsReset.mutateAsync();
+    } else {
+      dispatch(getPendingBlogList(groupID)).then((res) => {
+        const list = res.payload as PendingBlogRequest[];
+        setBlogApprovals(list);
+      });
     }
-    else {
-      dispatch(getPendingBlogList(groupID)).then(res => {
-        const list = res.payload as PendingBlogRequest[]
-        setBlogApprovals(list)
-      })
-    }
-  }, [selectedTab])
+  }, [selectedTab]);
 
   // useEffect(() => {
   //   dispatch(getPendingBlogList(groupID)).then(res => {
@@ -231,33 +248,64 @@ export default function BlogsApprovalsPage() {
 
   const handleHideBlog = () => {
     groupBlogsReset.mutateAsync();
-  }
+  };
   const handleDeleteBlog = () => {
     groupBlogsReset.mutateAsync();
-  }
-  useEffect(() => {
-    console.log(blogIdToRemove)
-    if (blogIdToRemove && selectedTab != TabOptions.NeedApproval) {
-      groupBlogsReset.mutateAsync()
-    }
-  }, [blogIdToRemove])
-
-  const onApprove = (id: string, blogOwnerId: string) => {
-    dispatch(approveBlog({ groupID: groupID, blogIDToApprove: id, blogOwnerID: blogOwnerId })).then(res => {
-      if (res.payload === true) {
-        console.log("Approve blog with id: ", id);
-        setBlogApprovals((prev) => prev.filter((b) => b.BlogID !== id));
-      }
-    })
   };
+  useEffect(() => {
+    console.log(blogIdToRemove);
+    if (blogIdToRemove && selectedTab != TabOptions.NeedApproval) {
+      groupBlogsReset.mutateAsync();
+    }
+  }, [blogIdToRemove]);
+
+  const [approvalBlogAction, setApprovalBlogAction] = useState<
+    "main" | "approve" | "reject"
+  >("main");
+  const approvalSheetRef = useRef<BottomSheet>(null);
+  const [approvalBlog, setApprovalBlog] = useState<{
+    id: string;
+    blogOwnerId: string;
+  }>({ id: "", blogOwnerId: "" });
+  const onApprove = (id: string, blogOwnerId: string) => {
+    setApprovalBlogAction("approve");
+    setApprovalBlog({ id, blogOwnerId });
+    approvalSheetRef.current?.snapToIndex(0);
+  };
+  // const onReject = (id: string, blogOwnerId: string) => {
+  //   setApprovalBlogAction("reject");
+  //   setApprovalBlog({ id, blogOwnerId });
+  //   approvalSheetRef.current?.snapToIndex(0);
+  // };
+  // const onApprove = (id: string, blogOwnerId: string) => {
+  //   dispatch(
+  //     approveBlog({
+  //       groupID: groupID,
+  //       blogIDToApprove: id,
+  //       blogOwnerID: blogOwnerId,
+  //     })
+  //   ).then((res) => {
+  //     if (res.payload === true) {
+  //       console.log("Approve blog with id: ", id);
+  //       setBlogApprovals((prev) => prev.filter((b) => b.BlogID !== id));
+  //     }
+  //   });
+  // };
 
   const onReject = (id: string, blogOwnerId: string) => {
-    dispatch(rejectBlog({ groupID: groupID, blogIDToReject: id, blogOwnerID: blogOwnerId })).then(res => {
+    dispatch(
+      rejectBlog({
+        groupID: groupID,
+        blogIDToReject: id,
+        blogOwnerID: blogOwnerId,
+      })
+    ).then((res) => {
       if (res.payload === true) {
         console.log("Reject blog with id: ", id);
+        ToastAndroid.show("Blog rejected successfully!", ToastAndroid.SHORT);
         setBlogApprovals((prev) => prev.filter((b) => b.BlogID !== id));
       }
-    })
+    });
   };
 
   const renderBlogApprovalItem = ({ item }: any) => (
@@ -270,11 +318,11 @@ export default function BlogsApprovalsPage() {
   const blogApprovalFlatlistRef = useRef<any>(null);
   // TODO: Replace with actual logic to check if the user is admin or owner
   // 2 lựa chọn trên thì là cái feed blog preview
-  // Còn cái lựa chọn thứ 3 là cái approval blog như bên approval 
+  // Còn cái lựa chọn thứ 3 là cái approval blog như bên approval
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.optionBar}>
-     
         <TouchableOpacity
           style={[
             styles.optionButton,
@@ -282,21 +330,29 @@ export default function BlogsApprovalsPage() {
           ]}
           onPress={() => setSelectedTab(TabOptions.All)}
         >
-          <Text style={styles.optionText}>{userCurrentGroupRole === GroupRole.Owner || userCurrentGroupRole === GroupRole.Admin ? "All Published Blogs" : "All Blogs"}</Text>
+          <Text style={styles.optionText}>
+            {userCurrentGroupRole === GroupRole.Owner ||
+            userCurrentGroupRole === GroupRole.Admin
+              ? "All Published Blogs"
+              : "All Blogs"}
+          </Text>
         </TouchableOpacity>
 
-        {userStatus == "Active" && <TouchableOpacity
-          style={[
-            styles.optionButton,
-            selectedTab === TabOptions.MyBlogs && styles.optionButtonActive,
-          ]}
-          onPress={() => setSelectedTab(TabOptions.MyBlogs)}
-        >
-          <Text style={styles.optionText}>My Blogs</Text>
-        </TouchableOpacity>}
+        {userStatus == "Active" && (
+          <TouchableOpacity
+            style={[
+              styles.optionButton,
+              selectedTab === TabOptions.MyBlogs && styles.optionButtonActive,
+            ]}
+            onPress={() => setSelectedTab(TabOptions.MyBlogs)}
+          >
+            <Text style={styles.optionText}>My Blogs</Text>
+          </TouchableOpacity>
+        )}
 
         {/* TODO: ẤN nút này thì copy cái bên approval qua */}
-        {(userCurrentGroupRole == GroupRole.Admin || userCurrentGroupRole == GroupRole.Owner) && (
+        {(userCurrentGroupRole == GroupRole.Admin ||
+          userCurrentGroupRole == GroupRole.Owner) && (
           <TouchableOpacity
             style={[
               styles.optionButton,
@@ -310,37 +366,47 @@ export default function BlogsApprovalsPage() {
         )}
       </View>
 
-      {selectedTab != TabOptions.NeedApproval ? <FlatList
+      {selectedTab != TabOptions.NeedApproval ? (
+        <FlatList
           data={displayBlogs}
           renderItem={({ item }) => {
-            console.log(item)
-              return (
-              <FeedBlogPreview blog={item} onPressMoreButton={
-                () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
-                  item.Status,
-                  false,
-                  item.IsReportedByUser
-                )}
-              />)
-            }
-          }
+            console.log(item);
+            return (
+              <FeedBlogPreview
+                blog={item}
+                onPressMoreButton={() =>
+                  handlePressMoreOption(
+                    item.Author._id === user._id,
+                    item._id,
+                    item.Group._id,
+                    item.Status,
+                    false,
+                    item.IsReportedByUser
+                  )
+                }
+              />
+            );
+          }}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           // contentContainerStyle={[styles.list, {}]}
           style={{ paddingBottom: 80 }}
           onEndReached={handleBlogListEndReached}
           ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-        /> : 
-        <Animated.FlatList
-          data={blogApprovals}
-          renderItem={renderBlogApprovalItem}
-          keyExtractor={(item) => item._id}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-          itemLayoutAnimation={LinearTransition}
-          ref={blogApprovalFlatlistRef}
         />
-      }
+      ) : (
+        <View style={{ flex: 1, padding: 20 }}>
+          <Animated.FlatList
+            data={blogApprovals}
+            renderItem={renderBlogApprovalItem}
+            keyExtractor={(item) => item._id}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+            itemLayoutAnimation={LinearTransition}
+            ref={blogApprovalFlatlistRef}
+          />
+        </View>
+      )}
 
       <MoreOptionBottomList
         sheetRef={moreOptionRef}
@@ -354,7 +420,92 @@ export default function BlogsApprovalsPage() {
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
         isAlreadyReported={isAlreadyReported}
         handleHideThisBlog={handleHideBlog}
-        handleDeleteThisBlog={handleDeleteBlog}/>
+        handleDeleteThisBlog={handleDeleteBlog}
+      />
+
+      <BottomSheet
+        ref={approvalSheetRef}
+        index={-1}
+        enableDynamicSizing
+        enablePanDownToClose={true}
+        handleIndicatorStyle={{ backgroundColor: "#fff" }}
+        backgroundStyle={{ backgroundColor: "#1E1E1E" }}
+        style={{ borderRadius: 20 }}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+        onClose={() => {
+          setApprovalBlogAction("main");
+        }}
+      >
+        <BottomSheetView style={{ padding: 20, gap: 20 }}>
+          {approvalBlogAction === "approve" && (
+            <View style={[styles.modalContentContainer]}>
+              <Image
+                style={styles.joinConfirmImage}
+                source={joinConfirmImage}
+              />
+              <View style={{ flex: 1, gap: 10 }}>
+                <View style={{}}>
+                  <Text style={styles.joinModalTitle}>
+                    Confirm Blog Approval!
+                  </Text>
+                </View>
+                <Text style={{ color: "#000", fontSize: 14 }}>
+                  Are you sure you want to approve this blog? It will be
+                  published and visible to everyone once approved.
+                </Text>
+                <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      approvalSheetRef.current?.close();
+                    }}
+                    style={styles.joinCancelButton}
+                  >
+                    <Text style={styles.joinCancelButtonText}>
+                      Let Me Rethink
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      dispatch(
+                        approveBlog({
+                          groupID: groupID,
+                          blogIDToApprove: approvalBlog.id,
+                          blogOwnerID: approvalBlog.blogOwnerId,
+                        })
+                      ).then((res) => {
+                        if (res.payload === true) {
+                          console.log(
+                            "Approve blog with id: ",
+                            approvalBlog.id
+                          );
+                          ToastAndroid.show(
+                            "Blog approved successfully!",
+                            ToastAndroid.SHORT
+                          );
+                          setBlogApprovals((prev) =>
+                            prev.filter((b) => b.BlogID !== approvalBlog.id)
+                          );
+                        }
+                      });
+                      approvalSheetRef.current?.close();
+                    }}
+                    style={styles.joinConfirmButton}
+                  >
+                    <Text style={styles.joinConfirmButtonText}>Approve</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+        </BottomSheetView>
+      </BottomSheet>
     </GestureHandlerRootView>
   );
 }
@@ -401,5 +552,56 @@ const styles = StyleSheet.create({
   optionText: {
     color: "#fff",
     fontSize: 14,
+  },
+  modalContentContainer: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    borderWidth: 1,
+  },
+  joinConfirmImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 20,
+  },
+  joinCancelButton: {
+    backgroundColor: "#1B1F26",
+    padding: 10,
+    borderRadius: 20,
+  },
+  joinConfirmButton: {
+    backgroundColor: "#B9FF66",
+    padding: 10,
+    borderRadius: 20,
+  },
+  joinCancelButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  joinConfirmButtonText: {
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(36, 87, 75, 0.5)", // Semi-transparent dark background
+  },
+  joinModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

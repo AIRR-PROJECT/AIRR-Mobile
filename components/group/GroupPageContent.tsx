@@ -136,6 +136,7 @@ GroupPageProps) {
       })
     ).then((res) => {
       const groupInfo = res.payload as GroupDetailInfo;
+      console.log(groupInfo.Role)
 
       setGroupInfo(groupInfo);
       setIsOwnerTheLastMember(groupInfo.NumberOfMembers == 1 && groupInfo.Role == GroupRole.Owner)

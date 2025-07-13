@@ -44,7 +44,6 @@ export function BlogActionHistoryComponent({
 
 const styles = StyleSheet.create({
   container: {
-
     alignItems: "center",
     flexDirection: "row",
     width: "100%",
@@ -71,6 +70,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
+    flexWrap: "wrap",
+    maxWidth: "91%",
   },
   action: {
     fontSize: 16,

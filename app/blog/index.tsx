@@ -21,7 +21,7 @@ import {
 } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
 import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
-import BlogTagButton from "@/components/blog/BlogTagButton";
+import {BlogTagButton,  PendingTagButton}  from "@/components/blog/BlogTagButton";
 import { ThemedText } from "@/components/ThemedText";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
@@ -284,6 +284,7 @@ export default function BlogScreen() {
   // User blog properties
   const [author, setAuthor] = useState(mockAuthor);
   const [tags, setTags] = useState(mockTags);
+  const [pendingTags, setPendingTags] = useState<UserBlogTag[]>(mockTags);
   const [group, setGroup] = useState(mockGroup);
   const [status, setStatus] = useState<BlogStatus>(BlogStatus.ACTIVE)
   const [viewType, setViewType] = useState<string>(BlogViewType.IN_GROUP)
@@ -591,6 +592,7 @@ export default function BlogScreen() {
             </View>
           </View>
           {/* List of tags */}
+          <Text style={{ fontWeight: "bold", color: "#fff" }}>Tags</Text>
           {searchParams.userBlogId && (
             <View style={styles.tagsContainer}>
               {tags.map((tag, index) => (
@@ -598,7 +600,17 @@ export default function BlogScreen() {
               ))}
             </View>
           )}
-
+          {/* /Pending Tags */}
+          {pendingTags.length > 0 && (
+            <Text style={{ fontWeight: "bold", color: "#fff" }}>Pending Tags</Text>
+          )}
+          {searchParams.userBlogId && (
+            <View style={styles.tagsContainer}>
+              {pendingTags.map((tag, index) => (
+                <PendingTagButton title={tag.TagName} key={tag._id + index} />
+              ))}
+            </View>
+          )}
           {/* Thumbnail */}
           {searchParams.userBlogId && (
             <Image
@@ -608,6 +620,8 @@ export default function BlogScreen() {
               transition={1000}
             />
           )}
+        
+          {/* AI Blog Section */}
           {/* Blog content (render from html) */}
           <QuillRenderer dom={{ matchContents: true }} content={html} />
 

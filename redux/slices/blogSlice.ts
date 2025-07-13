@@ -341,11 +341,11 @@ export const createBlog = createAsyncThunk(
                 return res.data.data as CreateBlogResult
             }
             else {
-                return ""
+                return null
             }
         }
         catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+            return null
         }
     }
 )

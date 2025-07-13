@@ -148,13 +148,12 @@ export default function MoreOptionBottomList({
     >
       {isUserWrittenBlog ? (
         <BottomSheetView style={styles.contentContainer}>
-          {isFromFavourites && (
+          {/* {isFromFavourites && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={hanleRemoveFromFavourites}
               activeOpacity={0.8}
             >
-              {/* Remove from favorites */}
               <MaterialCommunityIcons
                 name="bookmark-remove"
                 size={24}
@@ -164,7 +163,7 @@ export default function MoreOptionBottomList({
                 Remove from favourites
               </Text>
             </TouchableOpacity>
-          )}
+          )} */}
           {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupRoleCheck.NOT_MEMBER)) 
             || isViewTypePrivateOrInProfile) && 
             <TouchableOpacity
@@ -192,13 +191,12 @@ export default function MoreOptionBottomList({
         </BottomSheetView>
       ) : (
         <BottomSheetView style={styles.contentContainer}>
-          {isFromFavourites && (
+          {/* {isFromFavourites && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={hanleRemoveFromFavourites}
               activeOpacity={0.8}
             >
-              {/* Remove from favorites */}
               <MaterialCommunityIcons
                 name="bookmark-remove"
                 size={24}
@@ -208,7 +206,7 @@ export default function MoreOptionBottomList({
                 Remove from favourites
               </Text>
             </TouchableOpacity>
-          )}
+          )} */}
           {!isFromDetail && (
             <TouchableOpacity
               style={styles.bottomOptionButton}

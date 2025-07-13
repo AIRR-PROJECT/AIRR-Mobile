@@ -352,6 +352,13 @@ export default function Editblog() {
       return;
     }
 
+    if (title.current.length < 10) {
+      Alert.alert("Error", "Title must be at lease 10 characters long")
+    }
+    if (description.current.length < 10) {
+      Alert.alert("Error", "Description must be at lease 10 characters long")
+    }
+
     const formData = new FormData();
     console.log(uploadedImg.current);
     formData.append("thumbnail", {

@@ -272,6 +272,13 @@ export default function NewBlog() {
       return;
     }
 
+    if (title.current.length < 10) {
+      Alert.alert("Error", "Title must be at lease 10 characters long")
+    }
+    if (description.current.length < 10) {
+      Alert.alert("Error", "Description must be at lease 10 characters long")
+    }
+
     const formData = new FormData();
     formData.append("thumbnail", {
       uri: uploadedImg.current?.uri,
@@ -280,9 +287,7 @@ export default function NewBlog() {
     });
     formData.append(
       "group",
-      chosenGroup.Name != Private.Name &&
-        chosenGroup.Name &&
-        OnlyInMyProfile.Name
+      chosenGroup.Name != Private.Name && chosenGroup.Name != OnlyInMyProfile.Name
         ? JSON.stringify(chosenGroup)
         : null
     );
@@ -295,9 +300,7 @@ export default function NewBlog() {
     });
     formData.append(
       "tags",
-      chosenGroup.Name != Private.Name &&
-        chosenGroup.Name &&
-        OnlyInMyProfile.Name
+      chosenGroup.Name != Private.Name && chosenGroup.Name != OnlyInMyProfile.Name
         ? JSON.stringify([...chosenTagsReformatted, ...createBlogRequestedTags])
         : null
     );
@@ -315,7 +318,13 @@ export default function NewBlog() {
 
     dispatch(createBlog(formData)).then((res) => {
       const data = res.payload as CreateBlogResult;
-      router.replace(`/blog?userBlogId=${data.blogID}`);
+      console.log(res.payload)
+      if (res.payload != null) {
+        router.replace(`/blog?userBlogId=${data.blogID}`);
+      }
+      else {
+        Alert.alert("Error", "Could not post blog")
+      }
     });
   };
 

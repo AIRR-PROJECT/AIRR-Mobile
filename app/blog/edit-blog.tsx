@@ -175,6 +175,7 @@ export default function Editblog() {
     useState<Group[]>(defaultSearchGroups);
   const [foundTags, setFoundTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
+  const [displayRequestedTags, setDisplayRequestedTags] = useState<GroupTag[]>([])
   const [chosenGroupTags, setChosenGroupTags] = useState<string[]>([]);
   const uploadedImg = useRef<ImageSource>();
   const title = useRef("");
@@ -275,6 +276,7 @@ export default function Editblog() {
     console.log(
       `createBlogRequestedTags: ${JSON.stringify(createBlogRequestedTags)}`
     );
+    setDisplayRequestedTags(createBlogRequestedTags)
   }, [createBlogRequestedTags]);
 
   // Callbacks
@@ -646,8 +648,8 @@ export default function Editblog() {
                     //   },
                     // ]}
                     >
-                      {createBlogRequestedTags.length > 0 &&
-                        createBlogRequestedTags.map((tag) => (
+                      {displayRequestedTags.length > 0 &&
+                        displayRequestedTags.map((tag) => (
                           <TagWrapper key={tag._id} tag={tag} />
                         ))
                       }

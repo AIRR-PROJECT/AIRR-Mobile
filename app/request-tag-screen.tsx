@@ -112,6 +112,17 @@ export default function RequestTagsScreen({
       dispatch(setCreateBlogTagCount(tagCount))
       router.back()
     }
+    else {
+      setNewTag("");
+      setValidTag(null);
+      setSelectableTags([]);
+      //Go Back and send the new tags to the parent component
+      dispatch(setCreateBlogRequestedTags([]))
+
+      // Assign new tag count value
+      dispatch(setCreateBlogTagCount(tagCount))
+      router.back()
+    }
   };
 
   return (
@@ -256,9 +267,12 @@ export default function RequestTagsScreen({
         </View>
       </View>
       {/* Done button */}
-      <TouchableOpacity style={requestedTags.length != 0 ? styles.button : styles.buttonDisabled} disabled={requestedTags.length == 0} onPress={handleSubmit}>
-        <Text style={requestedTags.length != 0 ? [styles.buttonText, { fontWeight: "bold" }] : [styles.buttonDisabledText, { fontWeight: "bold" }]}>Finish</Text>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={[styles.buttonText, { fontWeight: "bold" }]}>Finish</Text>
       </TouchableOpacity>
+      {/* <TouchableOpacity style={requestedTags.length != 0 ? styles.button : styles.buttonDisabled} disabled={requestedTags.length == 0} onPress={handleSubmit}>
+        <Text style={requestedTags.length != 0 ? [styles.buttonText, { fontWeight: "bold" }] : [styles.buttonDisabledText, { fontWeight: "bold" }]}>Finish</Text>
+      </TouchableOpacity> */}
     </View>
   );
 }

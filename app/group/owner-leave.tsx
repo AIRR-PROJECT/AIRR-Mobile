@@ -1,6 +1,6 @@
 import { GroupMember } from "@/interfaces/groupInterface";
 import { useAppDispatch } from "@/redux/hook";
-import { getGroupAdmins, leaveGroup } from "@/redux/slices/groupSlice";
+import { getGroupAdmins, getMemberList, leaveGroup } from "@/redux/slices/groupSlice";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
@@ -25,7 +25,7 @@ export default function OwnerLeaveGroup() {
 
   useEffect(() => {
     if (groupID) {
-      dispatch(getGroupAdmins(groupID)).then((res) => {
+      dispatch(getMemberList({ groupID })).then((res) => {
         const data = res.payload as GroupMember[]
         console.log(data)
 

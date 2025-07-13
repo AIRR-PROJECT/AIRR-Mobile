@@ -1,5 +1,5 @@
 import { BlogStatus } from "@/enums/blog_properties.enum";
-import { GroupRoleCheck } from "@/enums/group.enum";
+import { GroupStatusRoleCheck } from "@/enums/group.enum";
 import { useAppDispatch } from "@/redux/hook";
 import { deleteBlog, unsaveBlog, updateHideBlog } from "@/redux/slices/blogSlice";
 import {
@@ -148,13 +148,12 @@ export default function MoreOptionBottomList({
     >
       {isUserWrittenBlog ? (
         <BottomSheetView style={styles.contentContainer}>
-          {isFromFavourites && (
+          {/* {isFromFavourites && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={hanleRemoveFromFavourites}
               activeOpacity={0.8}
             >
-              {/* Remove from favorites */}
               <MaterialCommunityIcons
                 name="bookmark-remove"
                 size={24}
@@ -164,8 +163,8 @@ export default function MoreOptionBottomList({
                 Remove from favourites
               </Text>
             </TouchableOpacity>
-          )}
-          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupRoleCheck.NOT_MEMBER)) 
+          )} */}
+          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupStatusRoleCheck.NOT_MEMBER)) 
             || isViewTypePrivateOrInProfile) && 
             <TouchableOpacity
               style={styles.bottomOptionButton}
@@ -177,7 +176,7 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Edit blog</Text>
             </TouchableOpacity>
           }
-          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupRoleCheck.NOT_MEMBER)) 
+          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupStatusRoleCheck.NOT_MEMBER)) 
             || isViewTypePrivateOrInProfile || blogStatus === BlogStatus.REJECTED || blogStatus === BlogStatus.BANNED) &&
             <TouchableOpacity
               style={styles.bottomOptionButton}
@@ -192,13 +191,12 @@ export default function MoreOptionBottomList({
         </BottomSheetView>
       ) : (
         <BottomSheetView style={styles.contentContainer}>
-          {isFromFavourites && (
+          {/* {isFromFavourites && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={hanleRemoveFromFavourites}
               activeOpacity={0.8}
             >
-              {/* Remove from favorites */}
               <MaterialCommunityIcons
                 name="bookmark-remove"
                 size={24}
@@ -208,7 +206,7 @@ export default function MoreOptionBottomList({
                 Remove from favourites
               </Text>
             </TouchableOpacity>
-          )}
+          )} */}
           {!isFromDetail && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
@@ -220,7 +218,7 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Hide blog</Text>
             </TouchableOpacity>
           )}
-          {!isFromFeed && role === GroupRoleCheck.MEMBER && (
+          {role === GroupStatusRoleCheck.MEMBER && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={handleReportBlog}
@@ -231,7 +229,7 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Report blog</Text>
             </TouchableOpacity>
           )}
-          {(role === GroupRoleCheck.ADMIN || role === GroupRoleCheck.OWNER) && (
+          {(role === GroupStatusRoleCheck.ADMIN || role === GroupStatusRoleCheck.OWNER) && (
             <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={handleBanBlog}

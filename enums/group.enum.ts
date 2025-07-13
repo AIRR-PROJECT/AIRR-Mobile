@@ -18,11 +18,12 @@ export enum GroupMembershipStage {
     Admin = Active
     Owner = Active
 */
-export enum GroupRoleCheck {
+export enum GroupStatusRoleCheck {
     MEMBER = "Member",
     NOT_MEMBER = "Not Member",
     ADMIN = "Admin",
-    OWNER = "Owner"
+    OWNER = "Owner",
+    PENDING = "Pending"
 }
 
 export enum GroupReportType {

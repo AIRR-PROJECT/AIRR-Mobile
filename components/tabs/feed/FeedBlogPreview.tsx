@@ -58,9 +58,11 @@ export function debounce<T extends (...args: any[]) => void>(
 export default function FeedBlogPreview({
   blog,
   onPressMoreButton,
+  onPressUnsave
 }: {
   blog: UserBlog;
   onPressMoreButton?: (isUserWrittenBlog: boolean) => void;
+  onPressUnsave?: () => void
 }) {
   // default to mock blog for this, but later will be passed as props
   const route = useRouter();
@@ -155,6 +157,11 @@ export default function FeedBlogPreview({
       dispatch(unsaveBlog(blog._id));
 
       setBlogSaved(false);
+
+      // Favorite-blog-exclusive feature
+      if (onPressUnsave) {
+        onPressUnsave()
+      }
     } else {
       dispatch(saveBlog(blog._id));
 
@@ -199,13 +206,13 @@ export default function FeedBlogPreview({
                 time={blog.Author.CreateDate}
               />
             </View>
-            <TouchableOpacity
+            {onPressMoreButton && <TouchableOpacity
               onPress={() =>
                 onPressMoreButton && onPressMoreButton(isUserWrittenBlog)
               }
             >
               <Entypo name="dots-three-vertical" size={24} color="white" />
-            </TouchableOpacity>
+            </TouchableOpacity>}
           </View>
           {/* 2nd Part: List of Tags */}
           <View style={styles.tagsSection}>

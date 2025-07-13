@@ -136,7 +136,12 @@ GroupPageProps) {
       })
     ).then((res) => {
       const groupInfo = res.payload as GroupDetailInfo;
-      console.log(groupInfo.Role)
+      
+      if (groupInfo == null) {
+        ToastAndroid.show("This group doesn't exist or is already deleted", ToastAndroid.LONG)
+
+        route.dismiss()
+      }
 
       setGroupInfo(groupInfo);
       setIsOwnerTheLastMember(groupInfo.NumberOfMembers == 1 && groupInfo.Role == GroupRole.Owner)
@@ -265,6 +270,9 @@ GroupPageProps) {
         const result = res.payload as boolean
         if (result == true) {
           route.dismiss()
+          route.setParams({
+            groupIDToRemove: groupID
+          })
         }
       })
     }
@@ -273,6 +281,9 @@ GroupPageProps) {
         const result = res.payload as boolean
         if (result == true) {
           route.dismiss()
+          route.setParams({
+            groupIDToRemove: groupID
+          })
         }
       })
     }

@@ -98,11 +98,23 @@ export default function ReportCardComponent({
               <Image source={report.User.AvatarURL} style={styles.avatar} />
               <View style={styles.userReportDetail}>
                 <View style={styles.usernameContainer}>
-                  <Text style={{ fontWeight: "bold", width: "55%" }}>
+                  <Text style={{ fontWeight: "bold", width: "50%" }}>
                     {report.User.UserName}
                   </Text>
-                  <View style={styles.reportContainer}>
-                    <Text style={{ fontWeight: "bold", color: "red" }}>
+                  <View
+                    style={[
+                      styles.reportContainer,
+                      { flexShrink: 1, maxWidth: "50%" },
+                    ]}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        color: "red",
+                        flexWrap: "wrap",
+                      }}
+                      
+                    >
                       {report.ReportType}
                     </Text>
                   </View>

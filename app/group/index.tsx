@@ -29,7 +29,7 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
 import GroupBlogPreview from "@/components/group/GroupBlogPreview";
 import { Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
-import BlogMoreOptionBottomList from "@/components/group/BlogMoreOptionBottomList";
+import GroupMoreOptionBottomList from "@/components/group/GroupMoreOptionBottomList";
 // const mockBlog = {
 //   Title: "How to fix clipboard if it isn’t working",
 //   BackgroundURL:
@@ -334,7 +334,7 @@ export default function GroupPage() {
           // selectedTagFilter={selectedTagFilter}
         />
       </ScrollView>
-      <BlogMoreOptionBottomList
+      <GroupMoreOptionBottomList
         sheetRef={sheetRef}
         groupID={groupId}
         userRole={userCurrentGroupRole}

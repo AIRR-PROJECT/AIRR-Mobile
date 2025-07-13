@@ -46,7 +46,7 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GroupMembershipStage, GroupRole } from "@/enums/group.enum";
 import Scroll from "quill/blots/scroll";
-import BlogMoreOptionBottomList from "./BlogMoreOptionBottomList";
+import GroupMoreOptionBottomList from "./GroupMoreOptionBottomList";
 type GroupDetailProps = {
   name: string;
   id: string;

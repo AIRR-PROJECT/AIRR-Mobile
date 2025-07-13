@@ -26,10 +26,10 @@ export default function ReportBlog() {
   const { blogID, groupID } = useLocalSearchParams<{ blogID: string, groupID: string }>()
   
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const detail = useRef("")
+  const [detail, setDetail] = useState("")
   
   const handleOnTextChange = (val: string) => {
-    detail.current = val
+    setDetail(val)
   }
 
   const handleCancel = () => {
@@ -41,7 +41,7 @@ export default function ReportBlog() {
       BlogID: blogID,
       GroupID: groupID,
       ReportType: selectedOption!,
-      Details: detail.current
+      Details: detail
     }
     // console.log(data)
 
@@ -128,10 +128,10 @@ export default function ReportBlog() {
             padding: 10,
             borderRadius: 20,
           }}
-          disabled={selectedOption == null || detail.current.length == 0}
+          disabled={selectedOption == null || detail.length == 0}
           onPress={handleSubmit}
         >
-          <Text style={selectedOption == null || detail.current.length == 0 ? { color: "#000", fontWeight: "bold" } : { color: "white", fontWeight: "bold" }}>Submit</Text>
+          <Text style={selectedOption == null || detail.length == 0 ? { color: "#000", fontWeight: "bold" } : { color: "white", fontWeight: "bold" }}>Submit</Text>
         </TouchableOpacity>
       </View>
     </View>

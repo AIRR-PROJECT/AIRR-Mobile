@@ -105,56 +105,34 @@ export default function BlogsApprovalsPage() {
     // console.log("More option pressed", isUserWritten)
   };
 
-  const groupBlogsQuery = useQuery({
+  const groupAllBlogsQuery = useQuery({
     queryKey: ["feed-group-blogs"],
     queryFn: async () => {
-      let fetchedBlogs;
-      if (selectedTab == TabOptions.All) {
-        fetchedBlogs = await dispatch(
-          getGroupBlogsByID({
-            groupID: groupID,
-            userID: user._id,
-            page: blogPage,
-          })
-        );
-      } else {
-        fetchedBlogs = await dispatch(
-          getGroupPersonalBlogsByID({
-            groupID: groupID,
-            userID: user._id,
-            page: blogPage,
-          })
-        );
-      }
+      let fetchedBlogs = await dispatch(
+        getGroupBlogsByID({
+          groupID: groupID,
+          userID: user._id,
+          page: 1,
+        })
+      );
 
       // console.log(fetchedBlogs.payload.blogList.blogs)
       return fetchedBlogs.payload as UserBlog[];
     },
     placeholderData: keepPreviousData,
   });
-  const groupBlogsMutation = useMutation({
+  const groupAllBlogsMutation = useMutation({
     mutationFn: async (page: number) => {
       if (displayBlogs.length == 0) {
         return [];
       }
-      let moreFetchedBlogs;
-      if (selectedTab == TabOptions.All) {
-        moreFetchedBlogs = await dispatch(
-          getGroupBlogsByID({
-            groupID: groupID,
-            userID: user._id,
-            page: blogPage,
-          })
-        );
-      } else {
-        moreFetchedBlogs = await dispatch(
-          getGroupPersonalBlogsByID({
-            groupID: groupID,
-            userID: user._id,
-            page: blogPage,
-          })
-        );
-      }
+      let moreFetchedBlogs = await dispatch(
+        getGroupBlogsByID({
+          groupID: groupID,
+          userID: user._id,
+          page: page,
+        })
+      );
 
       // console.log(moreFetchedBlogs.payload.blogList.blogs)
       return moreFetchedBlogs.payload as UserBlog[];
@@ -165,26 +143,15 @@ export default function BlogsApprovalsPage() {
       });
     },
   });
-  const groupBlogsReset = useMutation({
+  const groupAllBlogsReset = useMutation({
     mutationFn: async () => {
-      let refetchedBlog;
-      if (selectedTab == TabOptions.All) {
-        refetchedBlog = await dispatch(
-          getGroupBlogsByID({
-            groupID: groupID,
-            userID: user._id,
-            page: 1,
-          })
-        );
-      } else {
-        refetchedBlog = await dispatch(
-          getGroupPersonalBlogsByID({
-            groupID: groupID,
-            userID: user._id,
-            page: blogPage,
-          })
-        );
-      }
+      let refetchedBlog = await dispatch(
+        getGroupBlogsByID({
+          groupID: groupID,
+          userID: user._id,
+          page: 1,
+        })
+      );
 
       return refetchedBlog.payload as UserBlog[];
     },
@@ -196,10 +163,79 @@ export default function BlogsApprovalsPage() {
     },
   });
 
+  // My blogs
+  const groupMyBlogsQuery = useQuery({
+    queryKey: ["feed-group-my-blogs"],
+    queryFn: async () => {
+      let fetchedBlogs = await dispatch(
+        getGroupPersonalBlogsByID({
+          groupID: groupID,
+          userID: user._id,
+          page: 1,
+        })
+      );
+
+      // console.log(fetchedBlogs.payload.blogList.blogs)
+      return fetchedBlogs.payload as UserBlog[];
+    },
+    placeholderData: keepPreviousData,
+    enabled: selectedTab === TabOptions.MyBlogs
+  });
+  const groupMyBlogsMutation = useMutation({
+    mutationFn: async (page: number) => {
+      if (displayBlogs.length == 0) {
+        return [];
+      }
+      let moreFetchedBlogs = await dispatch(
+        getGroupPersonalBlogsByID({
+          groupID: groupID,
+          userID: user._id,
+          page: page,
+        })
+      );
+
+      // console.log(moreFetchedBlogs.payload.blogList.blogs)
+      return moreFetchedBlogs.payload as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-group-my-blogs"], (oldData: any) => {
+        return [...oldData, ...data] as UserBlog[];
+      });
+    },
+  });
+  const groupMyBlogsReset = useMutation({
+    mutationFn: async () => {
+      let refetchedBlog = await dispatch(
+        getGroupPersonalBlogsByID({
+          groupID: groupID,
+          userID: user._id,
+          page: 1,
+        })
+      );
+
+      return refetchedBlog.payload as UserBlog[];
+    },
+    onSuccess: (data: any) => {
+      queryClient.setQueryData(["feed-group-my-blogs"], (oldData: any) => {
+        return [...data] as UserBlog[];
+      });
+      setBlogPage(1);
+    },
+  });
+
   const handleBlogListEndReached = () => {
     setBlogPage(blogPage + 1);
-    groupBlogsMutation.mutate(blogPage + 1);
+    if (selectedTab === TabOptions.All) {
+      groupAllBlogsMutation.mutate(blogPage + 1);
+    }
+    else if (selectedTab === TabOptions.MyBlogs) {
+      groupMyBlogsMutation.mutate(blogPage + 1)
+    }
   };
+
+  useEffect(() => {
+    groupAllBlogsQuery.refetch()
+  }, [])
 
   useEffect(() => {
     if (groupID) {
@@ -212,14 +248,24 @@ export default function BlogsApprovalsPage() {
   }, [groupID]);
 
   useEffect(() => {
-    setDisplayBlogs(groupBlogsQuery.data as UserBlog[]);
-  }, [groupBlogsQuery.data]);
+    console.log("groupAllBlogsQuery")
+    if (selectedTab === TabOptions.All)
+      setDisplayBlogs(groupAllBlogsQuery.data as UserBlog[]);
+  }, [groupAllBlogsQuery]);
+  useEffect(() => {
+    console.log("groupMyBlogsQuery")
+    if (selectedTab === TabOptions.MyBlogs)
+      setDisplayBlogs(groupMyBlogsQuery.data as UserBlog[]);
+  }, [groupMyBlogsQuery]);
 
   useEffect(() => {
-    if (selectedTab != TabOptions.NeedApproval) {
-      setBlogPage(1);
-      groupBlogsReset.mutateAsync();
-    } else {
+    if (selectedTab === TabOptions.All) {
+      groupAllBlogsReset.mutateAsync();
+    }
+    else if (selectedTab === TabOptions.MyBlogs) {
+      groupMyBlogsReset.mutateAsync()
+    }
+    else {
       dispatch(getPendingBlogList(groupID)).then((res) => {
         const list = res.payload as PendingBlogRequest[];
         setBlogApprovals(list);
@@ -247,15 +293,29 @@ export default function BlogsApprovalsPage() {
   // }, [blogs, blogID])
 
   const handleHideBlog = () => {
-    groupBlogsReset.mutateAsync();
+    if (selectedTab === TabOptions.All) {
+      groupAllBlogsReset.mutateAsync();
+    }
+    else if (selectedTab === TabOptions.MyBlogs) {
+      groupMyBlogsReset.mutateAsync()
+    }
   };
   const handleDeleteBlog = () => {
-    groupBlogsReset.mutateAsync();
+    if (selectedTab === TabOptions.All) {
+      groupAllBlogsReset.mutateAsync();
+    }
+    else if (selectedTab === TabOptions.MyBlogs) {
+      groupMyBlogsReset.mutateAsync()
+    }
   };
   useEffect(() => {
-    console.log(blogIdToRemove);
     if (blogIdToRemove && selectedTab != TabOptions.NeedApproval) {
-      groupBlogsReset.mutateAsync();
+      if (selectedTab === TabOptions.All) {
+        groupAllBlogsReset.mutateAsync();
+      }
+      else if (selectedTab === TabOptions.MyBlogs) {
+        groupMyBlogsReset.mutateAsync()
+      }
     }
   }, [blogIdToRemove]);
 
@@ -370,7 +430,6 @@ export default function BlogsApprovalsPage() {
         <FlatList
           data={displayBlogs}
           renderItem={({ item }) => {
-            console.log(item);
             return (
               <FeedBlogPreview
                 blog={item}

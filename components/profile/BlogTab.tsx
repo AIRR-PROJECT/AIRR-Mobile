@@ -2,7 +2,7 @@ import { UserBlog } from "@/interfaces/blogInterface";
 import { FlashList } from "@shopify/flash-list";
 import { loremIpsum } from "lorem-ipsum";
 import FeedBlogPreview from "../tabs/feed/FeedBlogPreview";
-import { View } from "react-native";
+import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
 import queryClient from "@/redux/api/queryClient";
 import { fetchOtherPersonalBlogs, fetchPersonalBlogs, fetchUserBlogs } from "@/redux/slices/feedSlice";
 import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
@@ -145,6 +145,7 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
     },
     onSuccess: (data: any) => {
       queryClient.setQueryData(["feed-personal"], (oldData: any) => {
+        console.log(data)
         return [...oldData, ...data] as UserBlog[];
       });
     },
@@ -168,12 +169,10 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
     personalBlogsMutation.mutate(personalPage + 1);
   };
   
-  // const handleHideBlog = () => {
-  //   personalBlogsReset.mutateAsync();
-  // }
-  // const handleDeleteBlog = () => {
-  //   personalBlogsReset.mutateAsync();
-  // }
+  useEffect(() => {
+    personalBlogsReset.mutateAsync()
+  }, [])
+  
   // Handle hiding or deleting blog while viewing that blog
   useEffect(() => {
     if (blogIdToRemove) {
@@ -181,27 +180,45 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
     }
   }, [blogIdToRemove])
 
+  let onEndReachedCalledDuringMomentum = false
   return (
-    <FlashList
-      data={personalBlogsQuery.data}
-      scrollEnabled={false}
-      keyExtractor={(item, index) => index.toString()}
-      ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-      showsHorizontalScrollIndicator={false}
-      onEndReached={handleOnUserBlogListEndReached}
-      renderItem={({ item }) => {
-        console.log(item)
-        return <FeedBlogPreview blog={item} onPressMoreButton={
-          () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
-            item.UserGroupStatus,
-            item.Status,
-            item.ViewType != BlogViewType.IN_GROUP,
-            item.IsReportedByUser
-          )
-        }/>;
-      }}
-    
-      estimatedItemSize={400}
-    />
+    <View>
+      <FlashList
+        data={personalBlogsQuery.data}
+        scrollEnabled={false}
+        keyExtractor={(item, index) => index.toString()}
+        ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+        renderItem={({ item }) => {
+          return <FeedBlogPreview blog={item} onPressMoreButton={
+            () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
+              item.UserGroupStatus,
+              item.Status,
+              item.ViewType != BlogViewType.IN_GROUP,
+              item.IsReportedByUser
+            )
+          }/>;
+        }}
+      
+        estimatedItemSize={400}
+      />
+      <TouchableOpacity style={styles.loadMoreButton} onPress={handleOnUserBlogListEndReached}>
+        <Text style={styles.loadMoreText}>Load more blogs</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  loadMoreButton: {
+    backgroundColor: "#B9FF66",
+    marginHorizontal: 30,
+    marginVertical: 20,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  loadMoreText: {
+    color: "#000",
+    fontWeight: "bold",
+  },
+});

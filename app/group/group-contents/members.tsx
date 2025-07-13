@@ -180,6 +180,7 @@ export default function MemberApprovalsPage() {
     if (userIsAdmin && item.Role !== "Member") return true;
     if (userIsMember) return true;
     if (item.MemberInfo._id === user._id) return true;
+    if (userCurrentGroupRole == null) return true
     return false;
   };
 

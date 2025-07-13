@@ -9,7 +9,7 @@ import {
   Text,
   Dimensions,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "expo-router";
 import {
   SearchBlogComponent,
@@ -48,8 +48,8 @@ type Section = {
 };
 
 export default function LeftHeader() {
-  const [visible, setVisible] = useState(false);
   const router = useRouter();
+  const [visible, setVisible] = useState(false);
 
   const handleSearchPress = () => {
     console.log("Search button pressed");
@@ -82,6 +82,7 @@ function SearchScreen({
   const [searchText, setSearchText] = useState("");
   const [items, setItems] = useState<SearchItem[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
+  const timerIdRef = useRef<NodeJS.Timeout>()
 
   // 2. Simulate fetching mixed data
   useEffect(() => {
@@ -170,6 +171,8 @@ function SearchScreen({
 
   const handleSearchSubmit  = () => {
     if (searchText.length > 0) {
+      clearTimeout(timerIdRef.current)
+
       dispatch(searchFromSearchBar(searchText)).then((res) => {
         const data = res.payload as SearchBarResult
 
@@ -190,6 +193,34 @@ function SearchScreen({
       })
     }
   }
+
+  useEffect(() => {
+    timerIdRef.current = setTimeout(() => {
+      console.log("test")
+      dispatch(searchFromSearchBar(searchText)).then((res) => {
+        const data = res.payload as SearchBarResult
+
+        let result: SearchItem[] = []
+        data.searchBlogs.forEach((i) => {
+          result.push({
+            type: "blog",
+            blogItem: i
+          })
+        })
+        data.searchGroups.forEach((i) => {
+          result.push({
+            type: "group",
+            groupItem: i
+          })
+        })
+        setItems(result)
+      })
+    }, 1500)
+
+    return () => {
+      clearTimeout(timerIdRef.current)
+    }
+  }, [searchText])
 
   // 3. Group into sections when items or searchText changes
   // Change the search logic to filter based on searchText

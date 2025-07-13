@@ -179,7 +179,7 @@ export default function MemberApprovalsPage() {
     if (item.Role === "Owner") return true;
     if (userIsAdmin && item.Role !== "Member") return true;
     if (userIsMember) return true;
-    if (item.MemberInfo._id === user._id) return true;
+    if (user && item.MemberInfo._id === user._id) return true;
     if (userCurrentGroupRole == null) return true
     return false;
   };

@@ -67,14 +67,17 @@ export default function BlogsApprovalsPage() {
   const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
   const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
 
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean, isAlreadyReported: boolean) => {
+  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean, isAlreadyReported: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
     setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
     setIsAlreadyReported(isAlreadyReported)
     setMoreOptionBlogId(blogId)
     setMoreOptionGroupId(groupId)
-    setRole(role)
     setBlogStatus(blogStatus)
+
+    const role = userStatus == "Pending" ? "Pending" : (userCurrentGroupRole ? userCurrentGroupRole : "Not Member")
+    setRole(role)
+
     if (moreOptionRef.current) {
       moreOptionRef.current.snapToIndex(0);
     }
@@ -309,13 +312,18 @@ export default function BlogsApprovalsPage() {
 
       {selectedTab != TabOptions.NeedApproval ? <FlatList
           data={displayBlogs}
-          renderItem={({ item }) => <FeedBlogPreview blog={item} onPressMoreButton={
-            () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
-              item.UserGroupStatus,
-              item.Status,
-              false,
-              item.IsReportedByUser
-            )}/>}
+          renderItem={({ item }) => {
+            console.log(item)
+              return (
+              <FeedBlogPreview blog={item} onPressMoreButton={
+                () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
+                  item.Status,
+                  false,
+                  item.IsReportedByUser
+                )}
+              />)
+            }
+          }
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           // contentContainerStyle={[styles.list, {}]}

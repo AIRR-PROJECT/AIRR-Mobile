@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  ToastAndroid,
 } from "react-native";
 import { Image } from "expo-image";
 import { useEffect, useRef, useState } from "react";
@@ -111,24 +112,24 @@ export default function ReportsApprovalsPage() {
 
   const onApprove = (blogID: string) => {
     dispatch(actionBlogReport({
-      BlogID: blogID,
-      GroupID: groupID,
-      Action: "Resolve"
+      blogID: blogID,
+      groupID: groupID,
+      action: "Resolve"
     })).then(res => {
       if (res.payload === true) {
-        console.log("Resolve report");
+        ToastAndroid.show("Report resolved", ToastAndroid.SHORT);
         setDisplayReports((prev) => prev.filter((r) => r.Blog._id !== blogID));
       }
     })
   };
   const onReject = (blogID: string) => {
     dispatch(actionBlogReport({
-      BlogID: blogID,
-      GroupID: groupID,
-      Action: "Reject"
+      blogID: blogID,
+      groupID: groupID,
+      action: "Reject"
     })).then(res => {
       if (res.payload === true) {
-        console.log("Reject report");
+        ToastAndroid.show("Report rejected", ToastAndroid.SHORT);
         setDisplayReports((prev) => prev.filter((r) => r.Blog._id !== blogID));
       }
     })

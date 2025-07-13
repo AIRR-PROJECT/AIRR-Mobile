@@ -187,6 +187,11 @@ export default function CreateTagsScreen({
           <TouchableOpacity
             style={styles.createTagButton}
             onPress={() => {
+              // Length check
+              if (validTag && validTag.length < 3) {
+                ToastAndroid.show("Tag name must be at least 3 characters long", ToastAndroid.SHORT)
+                return
+              }
               // Handle tag creation logic here
               if (validTag && !createdTags.find((t) => t.TagName == validTag)) {
                 setCreatedTags((prev) => [...prev, { _id: Math.random().toString(36).substring(2, 15), TagName: validTag, OperationType: "new-tag"}])

@@ -205,6 +205,11 @@ export default function RequestTagsScreen({
             onPress={() => {
               // Handle tag creation logic here
               if (validTag && !requestedTags.find((t) => t.TagName == validTag)) {
+                // Length check
+                if (validTag.length < 3) {
+                  ToastAndroid.show("Tag name must be at least 3 characters long", ToastAndroid.SHORT)
+                  return
+                }
                 // Don't allow add more tags if tag count exceeds 10
                 console.log(tagCount)
                 if (tagCount == 10) {

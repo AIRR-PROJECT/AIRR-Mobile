@@ -176,9 +176,9 @@ export interface GroupReport {
 }
 
 export interface BlogReportAction {
-    BlogID: string;
-    GroupID: string;
-    Action: string;
+    blogID: string;
+    groupID: string;
+    action: string;
 }
 
 export interface LeaveGroup {

@@ -198,13 +198,13 @@ export default function FeedBlogPreview({
           <View style={styles.topSection}>
             <View style={styles.userSection}>
               {/* TODO: need blog time */}
-              <BlogAuthor
+              {blog.Author && <BlogAuthor
                 author={{
                   name: blog.Author.Username,
                   avatar: blog.Author.AvatarURL,
                 }}
                 time={blog.Author.CreateDate}
-              />
+              />}
             </View>
             {onPressMoreButton && <TouchableOpacity
               onPress={() =>
@@ -216,12 +216,12 @@ export default function FeedBlogPreview({
           </View>
           {/* 2nd Part: List of Tags */}
           <View style={styles.tagsSection}>
-            {blog.Tags.slice(0, 2).map((tag, index) => (
+            {blog.Tags && blog.Tags.slice(0, 2).map((tag, index) => (
               <Text key={index} style={styles.tag}>
                 #{tag.TagName}
               </Text>
             ))}
-            {blog.Tags.length > 2 && (
+            {blog.Tags && blog.Tags.length > 2 && (
               <Text style={styles.tag}>+{blog.Tags.length - 2} more</Text>
             )}
           </View>

@@ -143,7 +143,7 @@ export default function BlogsApprovalsPage() {
           getGroupBlogsByID({
             groupID: groupID,
             userID: user._id,
-            page: blogPage,
+            page: page,
           })
         );
       } else {
@@ -151,7 +151,7 @@ export default function BlogsApprovalsPage() {
           getGroupPersonalBlogsByID({
             groupID: groupID,
             userID: user._id,
-            page: blogPage,
+            page: page,
           })
         );
       }
@@ -181,7 +181,7 @@ export default function BlogsApprovalsPage() {
           getGroupPersonalBlogsByID({
             groupID: groupID,
             userID: user._id,
-            page: blogPage,
+            page: 1,
           })
         );
       }
@@ -200,6 +200,10 @@ export default function BlogsApprovalsPage() {
     setBlogPage(blogPage + 1);
     groupBlogsMutation.mutate(blogPage + 1);
   };
+
+  useEffect(() => {
+    groupBlogsReset.mutateAsync()
+  }, [])
 
   useEffect(() => {
     if (groupID) {
@@ -253,7 +257,6 @@ export default function BlogsApprovalsPage() {
     groupBlogsReset.mutateAsync();
   };
   useEffect(() => {
-    console.log(blogIdToRemove);
     if (blogIdToRemove && selectedTab != TabOptions.NeedApproval) {
       groupBlogsReset.mutateAsync();
     }
@@ -370,7 +373,6 @@ export default function BlogsApprovalsPage() {
         <FlatList
           data={displayBlogs}
           renderItem={({ item }) => {
-            console.log(item);
             return (
               <FeedBlogPreview
                 blog={item}

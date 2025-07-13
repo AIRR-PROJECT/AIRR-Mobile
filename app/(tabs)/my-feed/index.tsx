@@ -118,7 +118,6 @@ export default function MyFeed() {
     queryKey: ["feed-user"],
     queryFn: async () => {
       const fetchedBlogs = await dispatch(fetchUserBlogs(userPage));
-      console.log(fetchedBlogs)
 
       return fetchedBlogs.payload.blogList.blogs as UserBlog[];
     },
@@ -132,7 +131,7 @@ export default function MyFeed() {
       return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
     },
     onSuccess: (data: any) => {
-      queryClient.setQueryData(["feed-user"], (oldData: any) => {
+      queryClient.setQueryData(["feed-user"], (oldData: UserBlog[]) => {
         return [...oldData, ...data] as UserBlog[];
       });
     },
@@ -171,6 +170,18 @@ export default function MyFeed() {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
   }, []);
+
+  useEffect(() => {
+    setRecommendedBlogReset(true);
+    setUserBlogReset(true);
+    recommendedBlogsReset
+      .mutateAsync()
+      .then(() => setRecommendedBlogReset(false));
+    userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+  }, [])
 
   useEffect(() => {
     console.log("Refetching");
@@ -308,7 +319,6 @@ export default function MyFeed() {
                         parallaxScrollingScale: 0.9,
                         parallaxScrollingOffset: 50,
                       }}
-                      onProgressChange={progress}
                       renderItem={({ item }) => <AIBlogPreview blog={item} />}
                     />
                   </View>

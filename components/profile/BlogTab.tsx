@@ -14,6 +14,7 @@ import { getUserGroupStatus } from "@/redux/slices/groupSlice";
 import { BlogViewType } from "@/enums/blog_properties.enum";
 import MoreOptionBottomList from "../blog/MoreOptionBottomList";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import FeedBlogPreviewSkeleton from "../tabs/feed/FeedBlogPreviewSkeleton";
 const mockBlog: UserBlog = {
   _id: "123",
   Title: "How to fix clipboard if it isn’t working",
@@ -95,6 +96,7 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
 
   const dispatch = useAppDispatch();
   const [personalPage, setPersonalPage] = useState(1);
+  const [isFetching, setIsFetching] = useState(false)
 
   const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean, isAlreadyReported: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
@@ -104,7 +106,7 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
     setMoreOptionGroupId(groupId)
     setRole(role)
     setBlogStatus(blogStatus)
-    
+
     handleHideBlog.current = () => {personalBlogsReset.mutateAsync();}
     handleDeleteBlog.current = () => {personalBlogsReset.mutateAsync();}
 
@@ -170,18 +172,21 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
   };
   
   useEffect(() => {
-    personalBlogsReset.mutateAsync()
+    setIsFetching(true)
+    personalBlogsReset.mutateAsync().then(() => setIsFetching(false))
   }, [])
   
   // Handle hiding or deleting blog while viewing that blog
   useEffect(() => {
     if (blogIdToRemove) {
-      personalBlogsReset.mutateAsync();
+      setIsFetching(true)
+      personalBlogsReset.mutateAsync().then(() => setIsFetching(false));
     }
   }, [blogIdToRemove])
 
-  let onEndReachedCalledDuringMomentum = false
   return (
+    isFetching ?
+    <FeedBlogPreviewSkeleton/> :
     <View>
       <FlashList
         data={personalBlogsQuery.data}

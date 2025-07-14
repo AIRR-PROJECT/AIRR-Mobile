@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import { ThemedText } from "../ThemedText";
 import { Divider } from "@rneui/base";
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import { BlogActionHistory } from "@/interfaces/blogInterface";
 import { FlashList } from "@shopify/flash-list";
 import { BlogActionHistoryComponent } from "./BlogActionHistoryComponent";
@@ -11,6 +11,7 @@ import { useAppDispatch } from "@/redux/hook";
 import { getUserActivity } from "@/redux/slices/authSlice";
 import { UserActivity } from "@/interfaces/userInterface";
 import { formatDistanceStrict, formatDistanceToNow, formatRelative } from "date-fns";
+import FeedBlogPreviewSkeleton from "../tabs/feed/FeedBlogPreviewSkeleton";
 
 type ChartType = {
   value: number,
@@ -70,10 +71,17 @@ export default function ActivityTab() {
   const [listData, setListData] = useState<(string | BlogActionHistory)[]>([])
   const [chartData, setChartData] = useState<ChartType[]>([])
   const [timeSumText, setTimeSumText] = useState("0m")
+  const [isListFetching, setIsListFetching] = useState(false)
 
   useEffect(() => {
+    setIsListFetching(true)
     dispatch(getUserActivity()).then((res) => {
       let activities = res.payload as UserActivity[]
+
+      if (activities.length == 0) {
+        setIsListFetching(false)
+        return
+      }
 
       let monSum = 0
       let tueSum = 0
@@ -136,6 +144,8 @@ export default function ActivityTab() {
           Timestamp: new Date(act.ActivityDate).toString()
         }
         listData.push(displayAct)
+
+        setIsListFetching(false)
       })
 
       // Calculate average time spent
@@ -238,21 +248,24 @@ export default function ActivityTab() {
 
       {/* User Action History */}
       <View style={{width: "100%"}}>
-        <FlashList
-          data={listData}
-          renderItem={({ item }) => {
-            if (typeof item === "string") {
-              return <ThemedText style={styles.dateHeader}>{item}</ThemedText>;
-            }
-            return <BlogActionHistoryComponent {...item} />;
-          }}
-          getItemType={(item) => {
-            // To achieve better performance, specify the type based on the item
-            return typeof item === "string" ? "sectionHeader" : "row";
-          }}
-      
-          estimatedItemSize={100}
-        />
+        {isListFetching ?
+          <FeedBlogPreviewSkeleton/> :
+          <FlashList
+            data={listData}
+            renderItem={({ item }) => {
+              if (typeof item === "string") {
+                return <ThemedText style={styles.dateHeader}>{item}</ThemedText>;
+              }
+              return <BlogActionHistoryComponent {...item} />;
+            }}
+            getItemType={(item) => {
+              // To achieve better performance, specify the type based on the item
+              return typeof item === "string" ? "sectionHeader" : "row";
+            }}
+        
+            estimatedItemSize={100}
+          />
+        }
       </View>
     </View>
   );

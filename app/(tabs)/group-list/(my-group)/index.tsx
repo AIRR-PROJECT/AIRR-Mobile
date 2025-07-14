@@ -1,6 +1,7 @@
 import GroupCardComponent from "@/components/group/GroupCardComponent";
 import GroupTab from "@/components/group/GroupTab";
 import PopularGroupTab from "@/components/group/PopularGroupTab";
+import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 import { Group, GroupField } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
@@ -33,6 +34,7 @@ export default function MyGroupTab() {
   const [selectedId, setSelectedId] = useState("1");
   const [fields, setFields] = useState<GroupField[]>([])
   const [groups, setGroups] = useState(new Map<string, Group[]>())
+  const [isFetching, setIsFetching] = useState(false)
 
   const handleCreateButtonPress = () => {
     // Handle create group button press
@@ -56,6 +58,7 @@ export default function MyGroupTab() {
   };
 
   useEffect(() => {
+    setIsFetching(true)
     dispatch(getCreatedGroups()).then((res) => {
       const data = res.payload as Group[]
 
@@ -83,10 +86,13 @@ export default function MyGroupTab() {
       setFields(fields)
       setGroups(groups)
       setSelectedId(fields[0]?._id)
+
+      setIsFetching(false)
     })
   }, []);
 
   useEffect(() => {
+    setIsFetching(true)
     if (groupIDToRemove) {
       dispatch(getCreatedGroups()).then((res) => {
         const data = res.payload as Group[]
@@ -115,11 +121,15 @@ export default function MyGroupTab() {
         setFields(fields)
         setGroups(groups)
         setSelectedId(fields[0]?._id)
+
+        setIsFetching(false)
       })
     }
   }, [groupIDToRemove])
   
   return (
+    isFetching ? 
+    <FeedBlogPreviewSkeleton/> :
     <View style={styles.container}>
       {/* Create Group Button */}
       <TouchableOpacity

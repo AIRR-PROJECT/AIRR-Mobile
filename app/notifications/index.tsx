@@ -1,4 +1,5 @@
 import NotificationsItem from "@/components/notifications/NotificationsItem";
+import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 import { NotificationType, RequestType } from "@/enums/notif_type.enum";
 import { BlogInteractNotification, NotificationResponseData, OtherNotification, PermissionNotification } from "@/interfaces/notifInterface";
 import { useAppDispatch } from "@/redux/hook";
@@ -120,6 +121,7 @@ export default function NotificationsLayout() {
   const dispatch = useAppDispatch()
 
   const [sections, setSections] = useState<{ title: string; data: NotificationResponseData[]; }[]>([])
+  const [isFetching, setIsFetching] = useState(false)
 
   const handleMarkAsRead = (id: string) => {
     // Khoa: Call your API to mark the notification as read
@@ -142,6 +144,7 @@ export default function NotificationsLayout() {
   //   sections.push({ title: "Earlier", data: earlierItems });
 
   useEffect(() => {
+    setIsFetching(true)
     dispatch(getAllNotif()).then((res) => {
       const data = res.payload as NotificationResponseData[]
 
@@ -162,11 +165,15 @@ export default function NotificationsLayout() {
         sections.push({ title: "Earlier", data: earlierItems });
 
       setSections(sections)
+
+      setIsFetching(false)
     })
   }, [])
 
   return (
     <View style={styles.container}>
+      {isFetching ?
+      <FeedBlogPreviewSkeleton/> :
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
@@ -265,7 +272,7 @@ export default function NotificationsLayout() {
           </TouchableOpacity>
         )}
         ListFooterComponentStyle={{ marginTop: 20 }}
-      />
+      />}
     </View>
   );
 }

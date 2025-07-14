@@ -29,6 +29,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useLocalSearchParams } from "expo-router";
 import ReportCardComponent from "@/components/group/ReportCardComponent";
+import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 
 type ReportUserComponentProps = GroupReport & {
   onApprove: (id: string) => void;
@@ -42,6 +43,7 @@ function ReportUserComponent({
   onReject
 }: ReportUserComponentProps) {
   const [temp, setTemp] = useState("")
+
   useEffect(() => {
     let string = ""
     Reports.forEach((r) => {
@@ -74,21 +76,7 @@ function ReportUserComponent({
     </View>
   );
 }
-const mockData = {
-  user: {
-    id: "1",
-    name: "John Doe",
-    avatar: "https://picsum.photos/220",
-  },
-  reason: "Inappropriate content",
-  time: new Date().getTime() - 1000 * 60 * 60 * 24,
-};
-const initialReports = Array(10)
-  .fill(mockData)
-  .map((item, index) => ({
-    ...item,
-    user: { ...item.user, id: index.toString() },
-  }));
+
 export default function ReportsApprovalsPage() {
   const dispatch = useAppDispatch()
   const flatlistRef = useRef<any>();
@@ -98,14 +86,19 @@ export default function ReportsApprovalsPage() {
   }>();
 
   const [displayReports, setDisplayReports] = useState<GroupReport[]>([]);
+  const [isReportFetching, setIsReportFetching] = useState(false)
 
   useEffect(() => {
     if (groupID) {
+      setIsReportFetching(true)
+
       dispatch(getPendingReportBlogList(groupID)).then(res => {
         const list = res.payload as GroupReport[]
         console.log(list)
         
         setDisplayReports(list)
+
+        setIsReportFetching(false)
       })
     }
   }, [groupID])
@@ -143,6 +136,8 @@ export default function ReportsApprovalsPage() {
     />
   );
   return (
+    isReportFetching ? 
+    <FeedBlogPreviewSkeleton/> : 
     <GestureHandlerRootView style={styles.container}>
       <Animated.FlatList
         data={displayReports}

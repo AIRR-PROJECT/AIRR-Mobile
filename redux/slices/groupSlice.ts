@@ -415,7 +415,6 @@ export const getBannedMemberList = createAsyncThunk(
     async (groupID: string, thunkAPI) => {
         try {
             const res = await api.get(`groups/getBannedMemberList?groupID=${groupID}`) as AxiosResponse
-            console.log(res.data)
 
             if (res.data.success) {
                 return res.data.data.success as GroupMember[]

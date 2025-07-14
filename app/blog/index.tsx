@@ -327,6 +327,7 @@ export default function BlogScreen() {
       setThumbnail(currentUserBlog.BackgroundURL);
       setGroup(currentUserBlog.Group)
       setTags(currentUserBlog.Tags);
+      setPendingTags(currentUserBlog.PendingTags)
       setAuthor(currentUserBlog.Author);
       setViewType(currentUserBlog.ViewType)
       setStatus(currentUserBlog.Status)

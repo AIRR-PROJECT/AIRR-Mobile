@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Text,
   ToastAndroid,
+  Alert,
 } from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
 import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
@@ -72,9 +73,9 @@ export default function MemberApprovalsPage() {
   const displayMembersFlatlistRef = useRef<any>();
   const memberApprovalsFlatlistRef = useRef<any>();
   const { userCurrentGroupRole, user } = useAppSelector((state) => state.user);
-  const { groupID, memberID } = useLocalSearchParams<{
+  const { groupID, memberIDNotif } = useLocalSearchParams<{
     groupID: string;
-    memberID: string;
+    memberIDNotif: string;
   }>();
 
   const [displayMembers, setDisplayMembers] = useState<GroupMember[]>([]);
@@ -84,10 +85,13 @@ export default function MemberApprovalsPage() {
   const [bannedMembers, setBannedMembers] = useState<GroupBannedMember[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
   const [isMemberFetching, setIsMemberFetching] = useState(false)
+  const memberIDToScroll = useRef<string | null>(memberIDNotif)
 
   useEffect(() => {
-    setIsMemberFetching(true)
+    if (groupID.length == 0) return
 
+    setIsMemberFetching(true)
+    
     if (selectedTab == TabOptions.All) {
       dispatch(getMemberList({ groupID })).then((res) => {
         let sortOrder = ["Owner", "Admin", "Member"];
@@ -115,26 +119,30 @@ export default function MemberApprovalsPage() {
         setIsMemberFetching(false)
       });
     }
-  }, [selectedTab]);
+  }, [selectedTab, groupID]);
 
   useEffect(() => {
+    // Prevent scroll to member altogether
+    if (memberIDToScroll.current == null) return;
+
     // Scroll to specific index
-    if (
-      membersApproval != undefined &&
-      memberID != "" &&
-      memberID != undefined
-    ) {
+    if (selectedTab !== TabOptions.NeedApproval) {
+      setSelectedTab(TabOptions.NeedApproval)
+    }
+    else if (membersApproval != undefined && memberIDToScroll.current != "") {
       membersApproval.forEach((value, index) => {
-        if (value.Owner._id == memberID) {
+        if (value.Owner._id == memberIDToScroll.current) {
           memberApprovalsFlatlistRef.current.scrollToIndex({
             animated: true,
             index: index,
           });
+          // Turn on prevention 
+          memberIDToScroll.current = null
           return;
         }
       });
     }
-  }, [membersApproval, memberID]);
+  }, [membersApproval, memberIDToScroll.current, selectedTab])
 
   const onApprove = (id: string) => {
     dispatch(approveMember({ groupID: groupID, userIDToApprove: id })).then(

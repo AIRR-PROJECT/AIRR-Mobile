@@ -69,10 +69,11 @@ export default function TagsApprovalsPage() {
   const dispatch = useAppDispatch()
   const flatlistRef = useRef<any>();
   const { userCurrentGroupRole } = useAppSelector(state => state.user)
-  const { groupID, tagID } = useLocalSearchParams<{
+  const { groupID, tagIDNotif } = useLocalSearchParams<{
     groupID: string;
-    tagID: string;
+    tagIDNotif: string;
   }>();
+  const tagIDToScroll = useRef<string | null>(tagIDNotif)
 
   const [displayTags, setDisplayTags] = useState<
     { id: string; data: GroupTag[] }[]
@@ -124,16 +125,24 @@ export default function TagsApprovalsPage() {
   }, [selectedTab])
 
   useEffect(() => {
+    // Prevent scroll to member altogether
+    if (tagIDToScroll.current == null) return;
+
     // Scroll to specific index
-    if (tagsApproval != undefined && tagID != "" && tagID != undefined) {
+    if (selectedTab !== TabOptions.NeedApproval) {
+      setSelectedTab(TabOptions.NeedApproval)
+    }
+    else if (tagsApproval != undefined && tagIDToScroll.current != "") {
       tagsApproval.forEach((value, index) => {
-        if (value._id == tagID) {
+        if (value._id == tagIDToScroll.current) {
           flatlistRef.current.scrollToIndex({ animated: true, index: index });
+          // Turn on prevention 
+          tagIDToScroll.current = null
           return;
         }
       });
     }
-  }, [tagsApproval, tagID]);
+  }, [tagsApproval, tagIDToScroll.current, selectedTab]);
 
   const onApprove = (tagId: string, blogIDs: string[]) => {
     dispatch(approveTag({

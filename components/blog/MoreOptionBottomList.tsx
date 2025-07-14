@@ -53,13 +53,13 @@ export default function MoreOptionBottomList({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log(`isUserWrittenBlog: ${isUserWrittenBlog}`)
-    console.log(`blogId: ${blogId}`)
-    console.log(`groupId: ${groupId}`)
-    console.log(`role: ${role}`)
-    console.log(`blogStatus: ${blogStatus}`)
-    console.log(`isViewTypePrivateOrInProfile: ${isViewTypePrivateOrInProfile}`)
-    console.log(`isAlreadyReported: ${isAlreadyReported}`)
+    // console.log(`isUserWrittenBlog: ${isUserWrittenBlog}`)
+    // console.log(`blogId: ${blogId}`)
+    // console.log(`groupId: ${groupId}`)
+    // console.log(`role: ${role}`)
+    // console.log(`blogStatus: ${blogStatus}`)
+    // console.log(`isViewTypePrivateOrInProfile: ${isViewTypePrivateOrInProfile}`)
+    // console.log(`isAlreadyReported: ${isAlreadyReported}`)
   }, [isUserWrittenBlog, blogId, groupId, role, blogStatus, isViewTypePrivateOrInProfile])
 
   const handleHideBlog = () => {

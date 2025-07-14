@@ -6,17 +6,6 @@ import { useRouter } from "expo-router";
 //   MENTION = "MENTION",
 //   FOLLOW = "FOLLOW",
 // }
-type NotificationItemProps = {
-  id: string;
-  description: string;
-  date: Date;
-  isRead: boolean;
-  from: Pick<User, "_id" | "username" | "avatarURL">;
-  type: NotificationType;
-  blogImage?: string;
-  data: BlogInteractNotification | PermissionNotification | OtherNotification;
-  onMarkAsRead: (id: string) => void;
-};
 
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
@@ -42,6 +31,18 @@ import { formatDistance } from "date-fns";
 // if notification is user mention you in the post, move to the post screen
 
 // if notification is user follow you, move to the user profile screen
+
+type NotificationItemProps = {
+  id: string;
+  description: string;
+  date: Date;
+  isRead: boolean;
+  from: Pick<User, "_id" | "username" | "avatarURL">;
+  type: NotificationType;
+  blogImage?: string;
+  data: BlogInteractNotification | PermissionNotification | OtherNotification;
+  onMarkAsRead: (id: string) => void;
+};
 
 export default function NotificationsItem({
   id,
@@ -85,19 +86,19 @@ export default function NotificationsItem({
             break;
           case RequestType.REQUEST_POST_BLOG:
             route.push(
-              `/group/approvals/blogs?groupID=${permissionData.group_id}&blogID=${permissionData.blog_id}`
+              `/group/pending-blog?blogID=${permissionData.blog_id}`
             );
 
             break;
           case RequestType.REQUEST_JOIN_GROUP:
             route.push(
-              `/group/approvals/members?groupID=${permissionData.group_id}&memberID=${permissionData.request_owner._id}`
+              `/group?groupId=${permissionData.group_id}&memberIDNotif=${permissionData.request_owner._id}`
             );
 
             break;
           case RequestType.REQUEST_NEW_TAG:
             route.push(
-              `/group/approvals/tags?groupID=${permissionData.group_id}&tagID=${permissionData.request_tag_id}`
+              `/group?groupId=${permissionData.group_id}&tagIDNotif=${permissionData.request_tag_id}`
             );
 
             break;

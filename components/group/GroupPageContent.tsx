@@ -9,6 +9,7 @@ import {
   Pressable,
   ScrollView,
   ToastAndroid,
+  Alert,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -27,7 +28,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   cancelJoinGroupRequest,
@@ -81,28 +82,31 @@ const mockGroupDetail: GroupDetailInfo = {
   NumberOfMembers: 100,
   isJoined: false,
 };
-type GroupPageProps = {
-  selectedId: number;
-  setSelectedId: (id: number) => void;
-  groupID: string;
-  sheetRef: React.RefObject<BottomSheet>;
-
-  // selectedBlogFilter: string;
-  // setSelectedBlogFilter: (filter: string) => void;
-  // selectedTagFilter: string;
-  // setSelectedTagFilter: (filter: string) => void;
-};
 import { Dimensions } from "react-native";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 const joinConfirmImage = require("@/assets/images/group/join_confirm.png");
 const blogsFilters = ["All blogs", "Needs approval"];
 const tagsFilters = ["All tags", "Needs approval"];
+type GroupPageProps = {
+  selectedId: number;
+  setSelectedId: (id: number) => void;
+  groupID: string;
+  sheetRef: React.RefObject<BottomSheet>;
+  memberIDNotif?: string
+  tagIDNotif?: string
+  // selectedBlogFilter: string;
+  // setSelectedBlogFilter: (filter: string) => void;
+  // selectedTagFilter: string;
+  // setSelectedTagFilter: (filter: string) => void;
+};
 export default function GroupPageContent({
   selectedId,
   setSelectedId,
   groupID,
   sheetRef,
+  memberIDNotif,
+  tagIDNotif
 }: // selectedBlogFilter,
 // setSelectedBlogFilter,
 // selectedTagFilter,
@@ -113,6 +117,7 @@ GroupPageProps) {
   const dispatch = useAppDispatch();
   const { userCurrentGroupMembershipStage, userCurrentGroupRole } =
     useAppSelector((state) => state.user);
+
   const [isShowRules, setIsShowRules] = useState(false);
   const [isOwnerTheLastMember, setIsOwnerTheLastMember] = useState(false)
   const [buttonLabel, setButtonLabel] = useState("Join Group");
@@ -127,9 +132,10 @@ GroupPageProps) {
     useState(false);
   const [isTagsFilterModalVisible, setIsTagsFilterModalVisible] =
     useState(false);
-  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>(mockGroupDetail);
+  const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>();
 
   useEffect(() => {
+    console.log(groupID)
     dispatch(
       getGroupInfo({
         groupID,
@@ -172,8 +178,27 @@ GroupPageProps) {
   }, [userCurrentGroupMembershipStage]);
 
   useEffect(() => {
-    console.log(userCurrentGroupRole);
-  }, [userCurrentGroupRole]);
+    if (!groupInfo) return
+
+    const memberIDCheck = memberIDNotif !== undefined && memberIDNotif.length != 0
+    const tagIDCheck = tagIDNotif !== undefined && tagIDNotif.length != 0
+    if (memberIDCheck || tagIDCheck) {
+      if (userCurrentGroupRole != null && userCurrentGroupRole !== GroupRole.Admin && userCurrentGroupRole !== GroupRole.Owner) {
+        Alert.alert("Missing role", 
+          "Cannot view this because you are currently not an admin or the owner of this group")
+        return
+      }
+      else {
+        if (memberIDCheck) {
+          route.push(`/group/group-contents/members?groupID=${groupID}&memberIDNotif=${memberIDNotif}`)
+        }
+
+        if (tagIDCheck) {
+          route.push(`/group/group-contents/tags?groupID=${groupID}&tagIDNotif=${tagIDNotif}`);
+        }
+      }
+    }
+  }, [userCurrentGroupRole, groupInfo, memberIDNotif, tagIDNotif]);
 
   const handleGroupJoinConfirmCancel = () => {
     setIsGroupJoinModalVisible(false);
@@ -203,7 +228,7 @@ GroupPageProps) {
     // modify this url to /group/{groupID}/group-member-list if needed
     // route.push(`/group/${groupID}/group-member-list`);
     route.push(
-      `/group/group-member-list?groupID=${groupID}&fieldID=${groupInfo.Field._id}`
+      `/group/group-member-list?groupID=${groupID}&fieldID=${groupInfo?.Field._id}`
     );
   };
   const handleSearchTextChange = (val: string) => {
@@ -236,7 +261,7 @@ GroupPageProps) {
     // Handle the approval button press
     // When Press it should carry a parameter of groupID or groupName
     // so that the new blog will automatically be assigned to the group
-    route.push(`/group/approvals?groupID=${groupID}`);
+    route.push(`/group/approvals?groupID=${groupID!}`);
   };
 
   const handlePressJoinGroup = () => {
@@ -265,7 +290,7 @@ GroupPageProps) {
     });
   };
   const handleLeaveGroupConfirm = () => {
-    if (groupInfo.NumberOfMembers != 1) {
+    if (groupInfo?.NumberOfMembers != 1) {
       dispatch(leaveGroup({ groupID })).then((res) => {
         const result = res.payload as boolean
         if (result == true) {
@@ -297,12 +322,12 @@ GroupPageProps) {
   }, []);
 
   const handleContentButtonPress = () => {
-    route.push(`/group/group-contents?groupID=${groupID}`);
+    route.push(`/group/group-contents?groupID=${groupID!}`);
   };
   const ownSheetRef = useRef<BottomSheet>(null);
   const handleActionButtonPress = () => {
     console.log(userCurrentGroupRole === GroupRole.Owner)
-    if (groupInfo.NumberOfMembers > 1 && userCurrentGroupRole === GroupRole.Owner){
+    if (groupInfo?.NumberOfMembers! > 1 && userCurrentGroupRole === GroupRole.Owner){
       route.push(`/group/owner-leave?groupID=${groupID}`)
     }
     else{
@@ -456,7 +481,7 @@ GroupPageProps) {
           {groupInfo ? groupInfo.Description : mockGroupDetail.Description}
         </Text>
         {/* Rules */}
-        {groupInfo.Rules?.length > 0 && (
+        {groupInfo?.Rules?.length! > 0 && (
           <TouchableOpacity
             style={{
               flexDirection: "row",
@@ -491,7 +516,7 @@ GroupPageProps) {
               overflow: "hidden",
             }}
           >
-            {groupInfo.Rules?.map((rule, index) => (
+            {groupInfo?.Rules?.map((rule, index) => (
               <View key={index} style={styles.ruleOuterContainer}>
                 <View
                   style={[
@@ -785,7 +810,7 @@ GroupPageProps) {
             )}
           {userCurrentGroupMembershipStage === GroupMembershipStage.JOINED &&
             userCurrentGroupRole === GroupRole.Owner &&
-            groupInfo.NumberOfMembers == 1 && (
+            groupInfo?.NumberOfMembers == 1 && (
               <View
                 style={[
                   styles.modalContentContainer,

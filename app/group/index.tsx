@@ -91,13 +91,14 @@ import GroupMoreOptionBottomList from "@/components/group/GroupMoreOptionBottomL
 // ];
 
 export default function GroupPage() {
-  const dispatch = useAppDispatch();
 
-  const { groupId, blogIdToRemove } = useLocalSearchParams<{
+  const { groupId, memberIDNotif, tagIDNotif } = useLocalSearchParams<{
     groupId: string;
     blogIdToRemove: string;
+    memberIDNotif: string
+    tagIDNotif: string
   }>();
-  const { user, userCurrentGroupRole } = useAppSelector((state) => state.user);
+  const { userCurrentGroupRole } = useAppSelector((state) => state.user);
   const { groupBlogsSearchText, groupTagsSearchText } = useAppSelector(
     (state) => state.group
   );
@@ -110,212 +111,7 @@ export default function GroupPage() {
   const [displayTags, setDisplayTags] = useState<
     { id: string; data: GroupTag[] }[]
   >([]);
-
-  // useEffect(() => {
-  //   // Reset saved search bar state
-  //   dispatch(setGroupBlogsSearchText(""));
-  //   dispatch(setGroupTagsSearchText(""));
-
-  //   dispatch(
-  //     getGroupTagsByID({
-  //       groupID: groupId,
-  //     })
-  //   ).then((res) => {
-  //     let categorizedTags = {};
-  //     let categorizedTagsList: { id: string; data: GroupTag[] }[] = [];
-  //     const retrievedTags = res.payload as GroupTag[];
-
-  //     retrievedTags.forEach((tags) => {
-  //       const initial = tags.TagName.charAt(0).toLowerCase();
-
-  //       if (Object.hasOwn(categorizedTags, initial)) {
-  //         (categorizedTags[initial] as GroupTag[]).push(tags);
-  //       } else {
-  //         categorizedTags[initial] = [tags];
-  //       }
-  //     });
-
-  //     Object.entries(categorizedTags).forEach((entry) => {
-  //       categorizedTagsList.push({
-  //         id: entry[0] as string,
-  //         data: entry[1] as GroupTag[],
-  //       });
-  //     });
-  //     setTags(categorizedTagsList);
-  //   });
-  // }, []);
-
-  // // Filter blogs search result
-  // useEffect(() => {
-  //   if (groupBlogsSearchText) {
-  //     if (selectedId == 1) {
-  //       const data = JSON.parse(
-  //         JSON.stringify(groupBlogsQuery.data)
-  //       ) as UserBlog[];
-  //       data.forEach((item) => {
-  //         const title = item.Title;
-
-  //         if (
-  //           !title.toLowerCase().includes(groupBlogsSearchText.toLowerCase())
-  //         ) {
-  //           data.splice(data.indexOf(item));
-  //         }
-  //       });
-
-  //       setDisplayBlogs(data);
-  //     }
-  //   } else {
-  //     setDisplayBlogs(groupBlogsQuery.data as UserBlog[]);
-  //   }
-  // }, [groupBlogsSearchText]);
-
-  // // Filter tags search result
-  // useEffect(() => {
-  //   if (groupTagsSearchText) {
-  //     if (selectedId == 2) {
-  //       const data = JSON.parse(JSON.stringify(tags)) as {
-  //         id: string;
-  //         data: GroupTag[];
-  //       }[];
-  //       data.forEach((item) => {
-  //         item.data.forEach((inner_item) => {
-  //           if (
-  //             !inner_item.TagName.toLowerCase().includes(
-  //               groupTagsSearchText.toLowerCase()
-  //             )
-  //           ) {
-  //             item.data.splice(item.data.indexOf(inner_item));
-  //           }
-  //         });
-
-  //         if (item.data.length == 0) {
-  //           data.splice(data.indexOf(item));
-  //         }
-  //       });
-
-  //       setDisplayTags(data);
-  //     }
-  //   } else {
-  //     setDisplayTags(tags);
-  //   }
-  // }, [groupTagsSearchText]);
-
-  // const groupBlogsQuery = useQuery({
-  //   queryKey: ["feed-group-blogs"],
-  //   queryFn: async () => {
-  //     const fetchedBlogs = await dispatch(
-  //       getGroupBlogsByID({
-  //         groupID: groupId,
-  //         userID: user._id,
-  //         page: blogPage,
-  //       })
-  //     );
-
-  //     // console.log(fetchedBlogs.payload.blogList.blogs)
-  //     return fetchedBlogs.payload as UserBlog[];
-  //   },
-  //   placeholderData: keepPreviousData,
-  // });
-  // const groupBlogsMutation = useMutation({
-  //   mutationFn: async (page: number) => {
-  //     if (displayBlogs.length == 0) {
-  //       return [];
-  //     }
-  //     const moreFetchedBlogs = await dispatch(
-  //       getGroupBlogsByID({
-  //         groupID: groupId,
-  //         userID: user._id,
-  //         page: blogPage,
-  //       })
-  //     );
-
-  //     // console.log(moreFetchedBlogs.payload.blogList.blogs)
-  //     return moreFetchedBlogs.payload as UserBlog[];
-  //   },
-  //   onSuccess: (data: any) => {
-  //     queryClient.setQueryData(["feed-group-blogs"], (oldData: any) => {
-  //       return [...oldData, ...data] as UserBlog[];
-  //     });
-  //   },
-  // });
-  // const groupBlogsReset = useMutation({
-  //   mutationFn: async () => {
-  //     const refetchedBlog = await dispatch(
-  //       getGroupBlogsByID({
-  //         groupID: groupId,
-  //         userID: user._id,
-  //         page: 1,
-  //       })
-  //     );
-
-  //     return refetchedBlog.payload as UserBlog[];
-  //   },
-  //   onSuccess: (data: any) => {
-  //     queryClient.setQueryData(["feed-group-blogs"], (oldData: any) => {
-  //       return [...data] as UserBlog[];
-  //     });
-  //     setBlogPage(1);
-  //   },
-  // });
-  const handleBlogListEndReached = () => {
-    // setBlogPage(blogPage + 1);
-    // groupBlogsMutation.mutate(blogPage + 1);
-  };
-
-  // useEffect(() => {
-  //   setDisplayBlogs(groupBlogsQuery.data as UserBlog[]);
-  // }, [groupBlogsQuery.data]);
-
-  // useEffect(() => {
-  //   setDisplayTags(tags);
-  // }, [tags]);
-
-  // // Handle hiding or deleting blog while viewing that blog
-  // useEffect(() => {
-  //   if (blogIdToRemove) {
-  //     console.log(`blogIdToRemove: ${blogIdToRemove}`);
-  //     groupBlogsReset.mutateAsync();
-  //   }
-  // }, [blogIdToRemove]);
-
-  // const renderContent = () => {
-  //   switch (selectedId) {
-  //     case 1:
-  //       return (
-  //         <FlatList
-  //           data={displayBlogs}
-  //           renderItem={({ item }) => <GroupBlogPreview blog={item} />}
-  //           keyExtractor={(item, index) => index.toString()}
-  //           showsVerticalScrollIndicator={false}
-  //           contentContainerStyle={[styles.list, {}]}
-  //           style={{ paddingBottom: 80 }}
-  //           onEndReached={handleBlogListEndReached}
-  //           ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-  //         />
-  //       );
-  //     case 2:
-  //       return (
-  //         <SectionGrid
-  //           sections={displayTags}
-  //           itemDimension={150} // Controls column width
-  //           spacing={10} // Spacing between items
-  //           style={styles.gridView}
-  //           renderItem={({ item }) => (
-  //             <TouchableOpacity style={styles.tagContainer}>
-  //               <Text style={styles.tag}>#{item.TagName}</Text>
-  //             </TouchableOpacity>
-  //           )}
-  //           renderSectionHeader={({ section }) => (
-  //             <Text style={styles.title}>{section.id}</Text>
-  //           )}
-  //           keyExtractor={(item, index) => item.TagName + index}
-  //           contentContainerStyle={styles.list}
-  //         />
-  //       );
-  //     default:
-  //       return null;
-  //   }
-  // };
+  
   const sheetRef = useRef(null);
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -328,6 +124,8 @@ export default function GroupPage() {
           setSelectedId={setSelectedId}
           groupID={groupId}
           sheetRef={sheetRef}
+          memberIDNotif={memberIDNotif}
+          tagIDNotif={tagIDNotif}
           // setSelectedBlogFilter={setSelectedBlogFilter}
           // setSelectedTagFilter={setSelectedTagFilter}
           // selectedBlogFilter={selectedBlogFilter}

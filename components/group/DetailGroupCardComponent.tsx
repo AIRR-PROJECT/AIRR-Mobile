@@ -42,7 +42,7 @@ export default function DetailGroupCardComponent({
             {/* Tag and id */}
             <View style={styles.viewBoxShadow}>
               <FontAwesome6 name="tags" size={20} color="black" />
-              <Text style={styles.tag}>{Field.FieldName}</Text>
+              <Text style={styles.tag}>{Field ? Field.FieldName : "Field name here"}</Text>
             </View>
             {/* <Text style={styles.id}>@{_id}</Text> */}
           </View>

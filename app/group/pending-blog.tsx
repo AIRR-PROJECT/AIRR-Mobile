@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Text,
+  ToastAndroid,
 } from "react-native";
 import { Image } from "expo-image";
 import { AIBlogSection, UserBlogDetail, UserBlogGroup, UserBlogTag } from "@/interfaces/blogInterface";
@@ -18,6 +19,7 @@ import { useEffect, useState } from "react";
 import { getUserBlogDetail } from "@/redux/slices/blogSlice";
 import { useAppDispatch } from "@/redux/hook";
 import { approveBlog, rejectBlog } from "@/redux/slices/groupSlice";
+import { BlogStatus } from "@/enums/blog_properties.enum";
 
 const mockHtml = `
 <p>adsada</p><h1>adasdad</h1><ul><li>12313</li></ul><p class="ql-indent-3"><span style="color: rgb(240, 102, 102);">ádasadasda</span></p><pre class="ql-syntax" spellcheck="false">	asdasdsadad
@@ -173,6 +175,7 @@ export default function PendingBlogInGroup() {
   const [author, setAuthor] = useState(mockAuthor);
   const [tags, setTags] = useState(mockTags);
   const [group, setGroup] = useState(mockGroup);
+  const [status, setStatus] = useState("Active")
   const [html, setHtml] = useState(mockHtml);
 
   const route = useRouter();
@@ -214,6 +217,11 @@ export default function PendingBlogInGroup() {
         setTags(data.Tags)
         setGroup(data.Group)
         setHtml(data.Content)
+
+        setStatus(data.Status)
+        if (data.Status !== BlogStatus.PENDING) {
+          ToastAndroid.show(`This blog is already ${data.Status}`, ToastAndroid.LONG)
+        }
       })
     }
   }, [blogID])
@@ -226,22 +234,22 @@ export default function PendingBlogInGroup() {
           <Entypo name="chevron-small-left" size={30} color="white" />
         </TouchableOpacity>
         <View style={styles.rowContainer}>
-          <TouchableOpacity
+          {status === BlogStatus.PENDING && <TouchableOpacity
             style={styles.approveButton}
             onPress={handleApprove}
             activeOpacity={0.7}
           >
             <AntDesign name="checkcircle" size={14} color="black" />
             <Text style={styles.approveButtonText}>Approve</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </TouchableOpacity>}
+          {status === BlogStatus.PENDING && <TouchableOpacity
             style={styles.rejectButton}
             onPress={handleReject}
             activeOpacity={0.7}
           >
             <AntDesign name="closecircle" size={14} color="black" />
             <Text style={styles.rejectButtonText}>Reject</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </View>
       </View>
       <Divider

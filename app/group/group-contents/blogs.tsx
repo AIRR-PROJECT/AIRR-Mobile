@@ -248,12 +248,10 @@ export default function BlogsApprovalsPage() {
   }, [groupID]);
 
   useEffect(() => {
-    console.log("groupAllBlogsQuery")
     if (selectedTab === TabOptions.All)
       setDisplayBlogs(groupAllBlogsQuery.data as UserBlog[]);
   }, [groupAllBlogsQuery]);
   useEffect(() => {
-    console.log("groupMyBlogsQuery")
     if (selectedTab === TabOptions.MyBlogs)
       setDisplayBlogs(groupMyBlogsQuery.data as UserBlog[]);
   }, [groupMyBlogsQuery]);

@@ -40,6 +40,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { BlogViewType } from "@/enums/blog_properties.enum";
 import { Image } from "expo-image";
+import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 enum TabOptions {
   All = "all",
   MyBlogs = "my-blogs",
@@ -62,6 +63,7 @@ export default function BlogsApprovalsPage() {
   const [displayBlogs, setDisplayBlogs] = useState<UserBlog[]>([]);
   const [blogApprovals, setBlogApprovals] = useState<PendingBlogRequest[]>([]);
   const [blogPage, setBlogPage] = useState(1);
+  const [isBlogReset, setIsBlogReset] = useState(false)
 
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
   // const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
@@ -258,10 +260,12 @@ export default function BlogsApprovalsPage() {
 
   useEffect(() => {
     if (selectedTab === TabOptions.All) {
-      groupAllBlogsReset.mutateAsync();
+      setIsBlogReset(true)
+      groupAllBlogsReset.mutateAsync().then(() => setIsBlogReset(false));
     }
     else if (selectedTab === TabOptions.MyBlogs) {
-      groupMyBlogsReset.mutateAsync()
+      setIsBlogReset(true)
+      groupMyBlogsReset.mutateAsync().then(() => setIsBlogReset(false))
     }
     else {
       dispatch(getPendingBlogList(groupID)).then((res) => {
@@ -292,27 +296,33 @@ export default function BlogsApprovalsPage() {
 
   const handleHideBlog = () => {
     if (selectedTab === TabOptions.All) {
-      groupAllBlogsReset.mutateAsync();
+      setIsBlogReset(true)
+      groupAllBlogsReset.mutateAsync().then(() => setIsBlogReset(false));
     }
     else if (selectedTab === TabOptions.MyBlogs) {
-      groupMyBlogsReset.mutateAsync()
+      setIsBlogReset(true)
+      groupMyBlogsReset.mutateAsync().then(() => setIsBlogReset(false))
     }
   };
   const handleDeleteBlog = () => {
     if (selectedTab === TabOptions.All) {
-      groupAllBlogsReset.mutateAsync();
+      setIsBlogReset(true)
+      groupAllBlogsReset.mutateAsync().then(() => setIsBlogReset(false));
     }
     else if (selectedTab === TabOptions.MyBlogs) {
-      groupMyBlogsReset.mutateAsync()
+      setIsBlogReset(true)
+      groupMyBlogsReset.mutateAsync().then(() => setIsBlogReset(false))
     }
   };
   useEffect(() => {
     if (blogIdToRemove && selectedTab != TabOptions.NeedApproval) {
       if (selectedTab === TabOptions.All) {
-        groupAllBlogsReset.mutateAsync();
+        setIsBlogReset(true)
+        groupAllBlogsReset.mutateAsync().then(() => setIsBlogReset(false));
       }
       else if (selectedTab === TabOptions.MyBlogs) {
-        groupMyBlogsReset.mutateAsync()
+        setIsBlogReset(true)
+        groupMyBlogsReset.mutateAsync().then(() => setIsBlogReset(false))
       }
     }
   }, [blogIdToRemove]);
@@ -423,47 +433,51 @@ export default function BlogsApprovalsPage() {
           </TouchableOpacity>
         )}
       </View>
-
-      {selectedTab != TabOptions.NeedApproval ? (
-        <FlatList
-          data={displayBlogs}
-          renderItem={({ item }) => {
-            return (
-              <FeedBlogPreview
-                blog={item}
-                onPressMoreButton={() =>
-                  handlePressMoreOption(
-                    item.Author._id === user._id,
-                    item._id,
-                    item.Group._id,
-                    item.Status,
-                    false,
-                    item.IsReportedByUser
-                  )
-                }
-              />
-            );
-          }}
-          keyExtractor={(item, index) => index.toString()}
-          showsVerticalScrollIndicator={false}
-          // contentContainerStyle={[styles.list, {}]}
-          style={{ paddingBottom: 80 }}
-          onEndReached={handleBlogListEndReached}
-          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-        />
-      ) : (
-        <View style={{ flex: 1, padding: 20 }}>
-          <Animated.FlatList
-            data={blogApprovals}
-            renderItem={renderBlogApprovalItem}
-            keyExtractor={(item) => item._id}
+      
+      {groupAllBlogsQuery.isFetching || groupMyBlogsQuery.isFetching || isBlogReset ? (
+        <FeedBlogPreviewSkeleton />
+      ) : 
+        (selectedTab != TabOptions.NeedApproval ? (
+          <FlatList
+            data={displayBlogs}
+            renderItem={({ item }) => {
+              return (
+                <FeedBlogPreview
+                  blog={item}
+                  onPressMoreButton={() =>
+                    handlePressMoreOption(
+                      item.Author._id === user._id,
+                      item._id,
+                      item.Group._id,
+                      item.Status,
+                      false,
+                      item.IsReportedByUser
+                    )
+                  }
+                />
+              );
+            }}
+            keyExtractor={(item, index) => index.toString()}
             showsVerticalScrollIndicator={false}
+            // contentContainerStyle={[styles.list, {}]}
+            style={{ paddingBottom: 80 }}
+            onEndReached={handleBlogListEndReached}
             ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-            itemLayoutAnimation={LinearTransition}
-            ref={blogApprovalFlatlistRef}
           />
-        </View>
-      )}
+        ) : (
+          <View style={{ flex: 1, padding: 20 }}>
+            <Animated.FlatList
+              data={blogApprovals}
+              renderItem={renderBlogApprovalItem}
+              keyExtractor={(item) => item._id}
+              showsVerticalScrollIndicator={false}
+              ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+              itemLayoutAnimation={LinearTransition}
+              ref={blogApprovalFlatlistRef}
+            />
+          </View>
+        ))
+      }
 
       <MoreOptionBottomList
         sheetRef={moreOptionRef}

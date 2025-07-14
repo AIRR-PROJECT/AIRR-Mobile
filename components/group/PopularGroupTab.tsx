@@ -23,6 +23,7 @@ import Carousel, {
 import { Group, PopularGroups } from "@/interfaces/groupInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { getPopularGroups } from "@/redux/slices/groupSlice";
+import FeedBlogPreviewSkeleton from "../tabs/feed/FeedBlogPreviewSkeleton";
 type PopularGroupTabProps = {
   onPressSectionHeader?: (title: string) => void;
 };
@@ -51,9 +52,13 @@ export default function PopularGroupTab({
   const [groupData, setGroupData] = useState<
     { title: string; data: Group[] }[]
   >([]);
+  const [isFetching, setIsFetching] = useState(false)
 
   useEffect(() => {
-    dispatch(getPopularGroups());
+    setIsFetching(true)
+    dispatch(getPopularGroups()).then(() => {
+      setIsFetching(false)
+    });
   }, []);
 
   useEffect(() => {
@@ -81,6 +86,8 @@ export default function PopularGroupTab({
     }
   };
   return (
+    isFetching ?
+    <FeedBlogPreviewSkeleton/> :
     // Container for the Popular Group Screen
     <View style={styles.container}>
       {/* Section list for each section */}

@@ -60,6 +60,7 @@ import BottomSheet, {
 //   id: index.toString(),
 // }));
 import { format, formatRelative } from "date-fns";
+import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 enum TabOptions {
   All = "all",
   NeedApproval = "need-approval",
@@ -82,8 +83,11 @@ export default function MemberApprovalsPage() {
   >([]);
   const [bannedMembers, setBannedMembers] = useState<GroupBannedMember[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
+  const [isMemberFetching, setIsMemberFetching] = useState(false)
 
   useEffect(() => {
+    setIsMemberFetching(true)
+
     if (selectedTab == TabOptions.All) {
       dispatch(getMemberList({ groupID })).then((res) => {
         let sortOrder = ["Owner", "Admin", "Member"];
@@ -93,16 +97,22 @@ export default function MemberApprovalsPage() {
         );
 
         setDisplayMembers(sortedGroupMembers);
+
+        setIsMemberFetching(false)
       });
     } else if (selectedTab == TabOptions.NeedApproval) {
       dispatch(getPendingMemberList(groupID)).then((res) => {
         const list = res.payload as PendingMemberRequest[];
         setMembersApproval(list);
+
+        setIsMemberFetching(false)
       });
     } else {
       dispatch(getBannedMemberList(groupID)).then((res) => {
         const list = res.payload as GroupBannedMember[];
         setBannedMembers(list);
+
+        setIsMemberFetching(false)
       });
     }
   }, [selectedTab]);
@@ -295,128 +305,131 @@ export default function MemberApprovalsPage() {
         )}
       </View>
       {/* Animated FlatList */}
-      {selectedTab == TabOptions.All ? (
-        <FlatList
-          data={displayMembers}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.memberContainer,
-                item.Role === "Admin"
-                  ? { borderColor: colors.admin }
-                  : item.Role === "Owner"
-                  ? { borderColor: colors.owner }
-                  : { borderColor: colors.member },
-              ]}
-              onPress={() => handleOnDisplayMemberPress(item.MemberInfo._id)}
-            >
-              <Image source={item.MemberInfo.AvatarURL} style={styles.avatar} />
-              <View style={styles.memberInfo}>
-                <Text
-                  style={styles.memberName}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {item.MemberInfo.Username}
-                </Text>
-                <View style={styles.roleWrapper}>
-                  <Text
-                    style={[
-                      styles.role,
-                      item.Role === "Admin"
-                        ? { color: colors.admin }
-                        : item.Role === "Owner"
-                        ? { color: colors.owner }
-                        : { color: colors.member },
-                    ]}
-                  >
-                    {item.Role}
-                  </Text>
-                </View>
-              </View>
-              {/* More option */}
+      {isMemberFetching ?
+        <FeedBlogPreviewSkeleton/> :
+        (selectedTab == TabOptions.All ? (
+          <FlatList
+            data={displayMembers}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                style={{
-                  marginLeft: "auto",
-                  opacity: isMoreDisabled(item) ? 0.2 : 1,
-                }}
-                onPress={() => {
-                  sheetRef.current?.snapToIndex(0);
-                  setSelectedMember(item);
-                }}
-                disabled={isMoreDisabled(item)}
+                style={[
+                  styles.memberContainer,
+                  item.Role === "Admin"
+                    ? { borderColor: colors.admin }
+                    : item.Role === "Owner"
+                    ? { borderColor: colors.owner }
+                    : { borderColor: colors.member },
+                ]}
+                onPress={() => handleOnDisplayMemberPress(item.MemberInfo._id)}
               >
-                <Feather name="more-vertical" size={24} color="#000" />
-              </TouchableOpacity>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-        />
-      ) : selectedTab == TabOptions.NeedApproval ? (
-        <Animated.FlatList
-          data={membersApproval}
-          renderItem={renderItem}
-          keyExtractor={(item) => item._id}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-          itemLayoutAnimation={LinearTransition}
-          ref={memberApprovalsFlatlistRef}
-        />
-      ) : (
-        <FlatList
-          data={bannedMembers}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[styles.memberContainer, { backgroundColor: "#fff" }]}
-              onPress={() => handleOnDisplayMemberPress(item._id)}
-            >
-              <Image source={item.Owner.AvatarURL} style={styles.avatar} />
-              <View style={styles.memberInfo}>
-                <Text
-                  style={styles.memberName}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {item.Owner.Username}
-                </Text>
-                <View style={styles.bannedAtWrapper}>
-                  <Text style={[styles.role]} >
-                    Banned on {formatRelative(item.BannedDate, new Date())}
+                <Image source={item.MemberInfo.AvatarURL} style={styles.avatar} />
+                <View style={styles.memberInfo}>
+                  <Text
+                    style={styles.memberName}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {item.MemberInfo.Username}
                   </Text>
+                  <View style={styles.roleWrapper}>
+                    <Text
+                      style={[
+                        styles.role,
+                        item.Role === "Admin"
+                          ? { color: colors.admin }
+                          : item.Role === "Owner"
+                          ? { color: colors.owner }
+                          : { color: colors.member },
+                      ]}
+                    >
+                      {item.Role}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-              {/* Unban option */}
-              {!userIsMember && (
+                {/* More option */}
                 <TouchableOpacity
                   style={{
                     marginLeft: "auto",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 5,
-                    borderWidth: 2,
-                    borderColor: "#000",
-                    padding: 5,
-                    borderRadius: 10,
+                    opacity: isMoreDisabled(item) ? 0.2 : 1,
                   }}
                   onPress={() => {
-                    setSelectedBannedMember(item);
-                    setBottomSheetMode("unban");
                     sheetRef.current?.snapToIndex(0);
+                    setSelectedMember(item);
                   }}
+                  disabled={isMoreDisabled(item)}
                 >
-                  <Feather name="x-circle" size={24} color="black" />
-                  <Text style={{ color: "#000", fontSize: 12 }}>Unban</Text>
+                  <Feather name="more-vertical" size={24} color="#000" />
                 </TouchableOpacity>
-              )}
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-        />
-      )}
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+          />
+        ) : selectedTab == TabOptions.NeedApproval ? (
+          <Animated.FlatList
+            data={membersApproval}
+            renderItem={renderItem}
+            keyExtractor={(item) => item._id}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+            itemLayoutAnimation={LinearTransition}
+            ref={memberApprovalsFlatlistRef}
+          />
+        ) : (
+          <FlatList
+            data={bannedMembers}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[styles.memberContainer, { backgroundColor: "#fff" }]}
+                onPress={() => handleOnDisplayMemberPress(item._id)}
+              >
+                <Image source={item.Owner.AvatarURL} style={styles.avatar} />
+                <View style={styles.memberInfo}>
+                  <Text
+                    style={styles.memberName}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {item.Owner.Username}
+                  </Text>
+                  <View style={styles.bannedAtWrapper}>
+                    <Text style={[styles.role]} >
+                      Banned on {formatRelative(item.BannedDate, new Date())}
+                    </Text>
+                  </View>
+                </View>
+                {/* Unban option */}
+                {!userIsMember && (
+                  <TouchableOpacity
+                    style={{
+                      marginLeft: "auto",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 5,
+                      borderWidth: 2,
+                      borderColor: "#000",
+                      padding: 5,
+                      borderRadius: 10,
+                    }}
+                    onPress={() => {
+                      setSelectedBannedMember(item);
+                      setBottomSheetMode("unban");
+                      sheetRef.current?.snapToIndex(0);
+                    }}
+                  >
+                    <Feather name="x-circle" size={24} color="black" />
+                    <Text style={{ color: "#000", fontSize: 12 }}>Unban</Text>
+                  </TouchableOpacity>
+                )}
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+          />
+        ))
+      }
       <BottomSheet
         ref={sheetRef}
         index={-1} // Start closed

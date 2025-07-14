@@ -28,6 +28,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useLocalSearchParams } from "expo-router";
 import { SectionGrid } from "react-native-super-grid";
 import { GroupRole } from "@/enums/group.enum";
+import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 
 // Initial mock data
 const mockTag1 = {
@@ -78,8 +79,10 @@ export default function TagsApprovalsPage() {
   >([]);
   const [tagsApproval, setTagsApproval] = useState<PendingTagRequest[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
+  const [isTagFetching, setIsTagFetching] = useState(false)
 
   useEffect(() => {
+    setIsTagFetching(true)
     if (selectedTab == TabOptions.All) {
       dispatch(getGroupTagsByID({ groupID })).then(res => {
         const list = res.payload as GroupTag[]
@@ -106,12 +109,16 @@ export default function TagsApprovalsPage() {
         });
         categorizedTagsList = categorizedTagsList.sort((a, b) => a.id.localeCompare(b.id))
         setDisplayTags(categorizedTagsList);
+
+        setIsTagFetching(false)
       })
     }
     else {
       dispatch(getPendingTagList(groupID)).then(res => {
         const list = res.payload as PendingTagRequest[]
         setTagsApproval(list)
+        
+        setIsTagFetching(false)
       })
     }
   }, [selectedTab])
@@ -188,31 +195,34 @@ export default function TagsApprovalsPage() {
         </TouchableOpacity>}
       </View>
       
-      {selectedTab == TabOptions.All ? 
-        <SectionGrid
-          sections={displayTags}
-          itemDimension={150} // Controls column width
-          spacing={10} // Spacing between items
-          style={styles.gridView}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.tagContainer}>
-              <Text style={styles.tag}>#{item.TagName}</Text>
-            </TouchableOpacity>
-          )}
-          renderSectionHeader={({ section }) => (
-            <Text style={styles.title}>{section.id}</Text>
-          )}
-          keyExtractor={(item, index) => item.TagName + index}
-          // contentContainerStyle={styles.list}
-        />
-        : <Animated.FlatList
-          data={tagsApproval}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.TagName}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-          itemLayoutAnimation={LinearTransition}
-        />
+      {isTagFetching ? 
+        <FeedBlogPreviewSkeleton/> :
+        (selectedTab == TabOptions.All ? 
+          <SectionGrid
+            sections={displayTags}
+            itemDimension={150} // Controls column width
+            spacing={10} // Spacing between items
+            style={styles.gridView}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.tagContainer}>
+                <Text style={styles.tag}>#{item.TagName}</Text>
+              </TouchableOpacity>
+            )}
+            renderSectionHeader={({ section }) => (
+              <Text style={styles.title}>{section.id}</Text>
+            )}
+            keyExtractor={(item, index) => item.TagName + index}
+            // contentContainerStyle={styles.list}
+          />
+          : <Animated.FlatList
+            data={tagsApproval}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.TagName}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+            itemLayoutAnimation={LinearTransition}
+          />
+        )
       }
     </GestureHandlerRootView>
   );

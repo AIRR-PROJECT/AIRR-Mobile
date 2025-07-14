@@ -42,7 +42,7 @@ export default function GroupPopularTab() {
 
   useEffect(() => {
     if (selectedId === "1") {
-      dispatch(getPopularGroups());
+      // dispatch(getPopularGroups());
     }
   }, [selectedId]);
 

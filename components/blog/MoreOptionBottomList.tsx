@@ -218,28 +218,18 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Hide blog</Text>
             </TouchableOpacity>
           )}
-          {role === GroupStatusRoleCheck.MEMBER && (
-            <TouchableOpacity
+          <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={handleReportBlog}
               activeOpacity={0.8}
             >
               {/* Report */}
               <MaterialIcons name="report" size={24} color="black" />
-              <Text style={styles.bottomOptionText}>Report blog</Text>
-            </TouchableOpacity>
-          )}
-          {(role === GroupStatusRoleCheck.ADMIN || role === GroupStatusRoleCheck.OWNER) && (
-            <TouchableOpacity
-              style={styles.bottomOptionButton}
-              onPress={handleBanBlog}
-              activeOpacity={0.8}
-            >
-              {/* Ban */}
-              <FontAwesome name="ban" size={24} color="black" />
-              <Text style={styles.bottomOptionText}>Ban blog</Text>
-            </TouchableOpacity>
-          )}
+              {role === GroupStatusRoleCheck.MEMBER && <Text style={styles.bottomOptionText}>Report blog</Text>}
+              {(role === GroupStatusRoleCheck.ADMIN || role === GroupStatusRoleCheck.OWNER) &&
+                <Text style={styles.bottomOptionText}>Ban blog</Text>
+              }
+          </TouchableOpacity>
         </BottomSheetView>
       )}
     </BottomSheet>

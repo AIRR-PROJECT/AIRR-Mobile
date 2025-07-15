@@ -15,7 +15,6 @@ const initialState = {
 export const fetchRecommendedBlogs = createAsyncThunk(
     'feed/fetchRecommended',
     async (page: number, thunkAPI) => {
-        console.log("test")
         try {
             const res = await api.get(`blogs/preview-recommend-blogs?page=${page}`)
 

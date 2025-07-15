@@ -5,6 +5,7 @@ import { Image, ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
+import { useState } from "react";
 
 // TODO:  add thumbnail to the AI Blog interface
 const mockThumbnail = "https://picsum.photos/400/200";
@@ -24,13 +25,6 @@ export default function AIBlogPreview({
       pathname: `/blog/ai-blog?aiBlogId=${blog._id}`,
     });
   };
-  // Mock tags for the blog, replace with actual tags from the blog data
-  const tags: UserBlogTag[] = [
-    { _id: "1", TagName: "AI" },
-    { _id: "2", TagName: "Technology" },
-    { _id: "3", TagName: "Innovation" },
-    { _id: "4", TagName: "Future" },
-  ];
 
   return (
     <View style={styles.outerContainer}>
@@ -58,8 +52,8 @@ export default function AIBlogPreview({
             {blog.Description}
           </Text>
           <View style={styles.tagsSection}>
-            {tags &&
-              tags.slice(0, 2).map((tag, index) => (
+            {blog.Tags &&
+              blog.Tags.slice(0, 2).map((tag, index) => (
                 <Text
                   key={index}
                   style={[
@@ -70,14 +64,14 @@ export default function AIBlogPreview({
                   #{tag.TagName}
                 </Text>
               ))}
-            {tags && tags.length > 2 && (
+            {blog.Tags && blog.Tags.length > 2 && (
               <Text
                 style={[
                   styles.tag,
                   { backgroundColor: color || "rgba(114, 150, 115, 0.5)" },
                 ]}
               >
-                +{tags.length - 2} more
+                +{blog.Tags.length - 2} more
               </Text>
             )}
           </View>

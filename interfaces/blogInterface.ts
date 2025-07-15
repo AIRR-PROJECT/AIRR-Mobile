@@ -1,11 +1,13 @@
 import BlogAuthor from "@/components/tabs/BlogAuthor";
 import { User1 } from "./userInterface";
 import { BlogStatus } from "@/enums/blog_properties.enum";
+import { GroupTag } from "./groupInterface";
 
 export interface AIBlog {
     _id: string;
     Title: string;
     Description: string;
+    Tags: GroupTag[]
 }
 export interface AIBlogDetail {
     _id: string;
@@ -13,6 +15,7 @@ export interface AIBlogDetail {
     Description: string;
     Sections: AIBlogSection[];
     Conclusion: string;
+    Tags: GroupTag[]
 }
 export interface AIBlogSection {
     Heading: string;

@@ -21,7 +21,7 @@ import {
 } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
 import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
-import BlogTagButton from "@/components/blog/BlogTagButton";
+import {BlogTagButton} from "@/components/blog/BlogTagButton";
 import { ThemedText } from "@/components/ThemedText";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
@@ -163,12 +163,12 @@ export default function BlogScreen() {
 
   useEffect(() => {
     if (currentAIBlog) {
-      console.log(currentAIBlog)
-      setTitle(currentAIBlog.Title)
-      setDescription(currentAIBlog.Description)
-      setConclusion(currentAIBlog.Conclusion)
+      console.log(currentAIBlog);
+      setTitle(currentAIBlog.Title);
+      setDescription(currentAIBlog.Description);
+      setConclusion(currentAIBlog.Conclusion);
     }
-  }, [currentAIBlog])
+  }, [currentAIBlog]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -217,6 +217,11 @@ export default function BlogScreen() {
       animated: true,
     });
   };
+  const tags: UserBlogTag[] = [
+    { _id: "1", TagName: "AI" },
+    { _id: "2", TagName: "React" },
+    { _id: "3", TagName: "JavaScript" },
+  ];
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       {/* Back button */}
@@ -257,8 +262,15 @@ export default function BlogScreen() {
           </View>
         </View>
         {/* Blog content (render from html) */}
-        {/* Carousel for background page */}
       </View>
+      {/* Tag here */}
+      <View style={styles.tagsContainer}>
+        {tags.map((tag, index) => (
+          <BlogTagButton title={tag.TagName} key={tag._id + index} /> // may change key in the future
+        ))}
+      </View>
+
+      {/* Carousel for background page */}
       <View
         id="carousel-ai-blog-component"
         // dataSet={{ kind: "utils", name: "pagination" }}
@@ -319,7 +331,9 @@ export default function BlogScreen() {
         }}
       >
         {/* truyen list data vao day (list.map => ....), nho doi? key khac nhau ko se bi loi */}
-        {currentAIBlog && <AIBlogSectionComponent Sections={currentAIBlog.Sections} />}
+        {currentAIBlog && (
+          <AIBlogSectionComponent Sections={currentAIBlog.Sections} />
+        )}
       </View>
       {/* Conclusion */}
       <View
@@ -378,14 +392,14 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     width: "100%",
     padding: 20,
-    paddingTop: 0,
+    paddingVertical: 0,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#fff",
-    paddingVertical: 20,
     textAlign: "justify",
+    paddingTop: 20,
   },
   smallText: {
     fontSize: 12,
@@ -432,5 +446,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#fff",
     textAlign: "justify",
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    columnGap: 10,
+    alignItems: "center",
+    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
 });

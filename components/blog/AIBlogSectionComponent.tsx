@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 18,
     fontWeight: "bold",
-    textAlign: "justify",
     color: "#90CDF4",
   },
   contentContainer: {

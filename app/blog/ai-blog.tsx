@@ -88,6 +88,7 @@ export function debounce<T extends (...args: any[]) => void>(
 }
 import { Dimensions } from "react-native";
 import AIBlogSectionComponent from "@/components/blog/AIBlogSectionComponent";
+import { GroupTag } from "@/interfaces/groupInterface";
 const window = Dimensions.get("window");
 let isReactOnTimeout = false;
 
@@ -148,11 +149,10 @@ export default function BlogScreen() {
   const [description, setDescription] = useState(
     "Mock asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
   );
-  // AI blog properties
-  // const [sections, setSections] = useState(mockSections);
   const [conclusion, setConclusion] = useState(
     "This is concluded. asfvassdfasfwefwefwefwefwefwefwefwefwefwefwefwefwefwefwefwef"
   );
+  const [tags, setTags] = useState<GroupTag[]>([])
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
 
@@ -163,10 +163,10 @@ export default function BlogScreen() {
 
   useEffect(() => {
     if (currentAIBlog) {
-      console.log(currentAIBlog);
       setTitle(currentAIBlog.Title);
       setDescription(currentAIBlog.Description);
       setConclusion(currentAIBlog.Conclusion);
+      setTags(currentAIBlog.Tags)
     }
   }, [currentAIBlog]);
 
@@ -217,11 +217,6 @@ export default function BlogScreen() {
       animated: true,
     });
   };
-  const tags: UserBlogTag[] = [
-    { _id: "1", TagName: "AI" },
-    { _id: "2", TagName: "React" },
-    { _id: "3", TagName: "JavaScript" },
-  ];
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
       {/* Back button */}

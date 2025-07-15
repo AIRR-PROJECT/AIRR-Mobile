@@ -297,6 +297,7 @@ export default function CreateGroup() {
                 {
                   justifyContent: "flex-start",
                   flexWrap: "wrap",
+                  padding: 10,
                 },
               ]}
               onPress={() => handleTagsSnapPress(0)}
@@ -314,6 +315,7 @@ export default function CreateGroup() {
                         alignSelf: "center",
                         color: "#fff",
                         textAlign: "justify",
+                        marginLeft: 5,
                       },
                     ]}
                   >

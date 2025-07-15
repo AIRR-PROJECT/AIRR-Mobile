@@ -11,7 +11,7 @@ import { ThemedText } from "../ThemedText";
 import GradientText from "../GradientText";
 import { LinearGradient } from "expo-linear-gradient";
 import ReadmeComponent from "./ReadmeComponent";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import TotalBlogComponent from "./TotalBlogComponent";
 import { FlashList } from "@shopify/flash-list";
 import ProfileTabButton from "./ProfileTabButton";
@@ -19,15 +19,19 @@ import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import { useAppDispatch } from "@/redux/hook";
 import { logOut } from "@/redux/slices/authSlice";
+
 // Get list of tags [max 10]
 const tags = Array(10).fill("Frontend");
 const chunkedTags = chunkArray(tags, 5);
 const mockLink = "https://dly.to/dfdsc";
+const facebookLink = "https://facebook.com/yourprofile";
+const linkedInLink = "https://linkedin.com/in/yourprofile";
+const githubLink = "https://github.com/yourprofileddddddddddddddddddddddddddddddddddddddddddddddddddd";
 export default function SocialTab() {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const handleCopyLink = async () => {
-    await Clipboard.setStringAsync(mockLink);
+  const handleCopyLink = async ({link}: {link:string}) => {
+    await Clipboard.setStringAsync(link);
 
     ToastAndroid.show("Link copied to clipboard", ToastAndroid.SHORT);
   };
@@ -37,62 +41,91 @@ export default function SocialTab() {
       if ((res.payload as boolean) === true) {
         route.push("/auth");
       }
-    })
+    });
   };
   return (
     // Readme
     <View style={styles.container}>
-      {/* User Readme */}
-      <ReadmeComponent />
-      {/* Reading Journey */}
-      <View style={styles.rowContainer}>
-        <FontAwesome6 name="fire" size={40} color="#FF6E6E" />
-        <ThemedText style={styles.readingTitle}>Reading Journey</ThemedText>
-      </View>
-      {/* Total reading */}
-      <View style={styles.totalReadingContainer}>
-        <TotalBlogComponent numberOfBlogs={1000} label="Total Blogs Reading" />
-        <TotalBlogComponent numberOfBlogs={50} label="Total Blogs Posting" />
-        <TotalBlogComponent numberOfBlogs={100} label="Total Reading Time" />
-      </View>
-      {/* Top tags */}
-      <View style={styles.topTagsContainer}>
-        <ThemedText style={styles.topTagsTitle}>
-          Top tags by reading days
-        </ThemedText>
-        <FlashList
-          data={tags}
-          keyExtractor={(item, index) => index.toString()}
-          scrollEnabled={false}
-          numColumns={5}
-          renderItem={({ item }) => (
-            <ProfileTabButton title={item} onPress={() => {}} />
-          )}
-          estimatedItemSize={50}
-        ></FlashList>
-      </View>
       {/* Invite friends */}
-      <ThemedText style={styles.inviteFriendTitle}>Invite Friends</ThemedText>
-      <ThemedText style={styles.inviteFriendText}>
-        Invite other developers to discover how easy it is to stay updated with
-        daily.dev
-      </ThemedText>
+      <Text style={styles.inviteFriendTitle}>Profile Links</Text>
       {/* Link */}
-      <View style={[styles.linkContainer]}>
-        <ThemedText style={styles.linkText}>{mockLink}</ThemedText>
+      <LinearGradient
+        colors={["#142c11ff", "#1d1d1dff"]} // dark green to dark
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.linkContainer}
+      >
+        <View style={styles.iconContainer}>
+          <Feather name="external-link" size={24} color="#B9FF66" />
+        </View>
+        <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{mockLink}</Text>
         <TouchableOpacity
           style={styles.copyLinkButton}
-          onPress={handleCopyLink}
+          onPress={() => handleCopyLink({ link: mockLink })}
         >
-          <ThemedText style={styles.copyLinkText}>Copy Link</ThemedText>
+          <Ionicons name="copy-outline" size={24} color="#fff" />
         </TouchableOpacity>
-      </View>
+      </LinearGradient>
+
+      <Text style={styles.inviteFriendTitle}>Social Links</Text>
+      <LinearGradient
+        colors={["#0e1342ff", "#1d1d1dff"]} // dark blue to dark
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.linkContainer}
+      >
+        <View style={[styles.iconContainer, { backgroundColor: "#012e46ff" }]}>
+          <Feather name="facebook" size={24} color="#1977F2" />
+        </View>
+        <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{facebookLink}</Text>
+        <TouchableOpacity
+          style={[styles.copyLinkButton, {}]}
+          onPress={() => handleCopyLink({ link: facebookLink })}
+        >
+          <Ionicons name="copy-outline" size={24} color="#fff" />
+        </TouchableOpacity>
+      </LinearGradient>
+      <LinearGradient
+        colors={["#0e1342ff", "#1d1d1dff"]} // dark blue to dark
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.linkContainer}
+      >
+        <View style={[styles.iconContainer, { backgroundColor: "#012e46ff" }]}>
+          <Feather name="linkedin" size={24} color="#1977F2" />
+        </View>
+        <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{linkedInLink}</Text>
+        <TouchableOpacity
+          style={styles.copyLinkButton}
+          onPress={() => handleCopyLink({ link: linkedInLink })}
+        >
+          <Ionicons name="copy-outline" size={24} color="#fff" />
+        </TouchableOpacity>
+      </LinearGradient>
+      <LinearGradient
+        colors={["#142c11ff", "#1d1d1dff"]} // dark green to dark
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.linkContainer}
+      >
+        <View style={styles.iconContainer}>
+          <Feather name="github" size={24} color="#B9FF66" />
+        </View>
+        <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{githubLink}</Text>
+        <TouchableOpacity
+          style={styles.copyLinkButton}
+          onPress={() => handleCopyLink({ link: githubLink })}
+        >
+          <Ionicons name="copy-outline" size={24} color="#fff" />
+        </TouchableOpacity>
+      </LinearGradient>
       <View>
         <TouchableOpacity
           style={styles.signOutButton}
           activeOpacity={0.7}
           onPress={handleSignOut}
         >
+          <Feather name="log-out" size={24} color="#fff" />
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
@@ -157,19 +190,17 @@ const styles = StyleSheet.create({
   linkContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#1F1F63",
     padding: 20,
     borderRadius: 20,
   },
   linkText: {
     fontSize: 16,
     color: "#fff",
+    marginHorizontal: 10,
+    flex: 1,
   },
   copyLinkButton: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 20,
+    marginLeft: "auto",
   },
   copyLinkText: {
     fontSize: 16,
@@ -181,9 +212,19 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
   },
   signOutText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  iconContainer: {
+    padding: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#193b15ff",
+    borderRadius: 5,
   },
 });

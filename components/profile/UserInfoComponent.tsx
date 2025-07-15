@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 import { User } from "@/interfaces/userInterface";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
+import { format } from "date-fns";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type UserInfo = Pick<
@@ -26,7 +27,7 @@ export default function UserInfoComponent({
   avatarURL,
   firstName,
   lastName,
-  dateOfBirth: dateJoined,
+  joinDate,
   isOwnProfile,
 }: // followers,
 // following,
@@ -39,6 +40,17 @@ UserInfoProps) {
     router.push("/profile/edit-profile");
   };
   useEffect(() => {}, []);
+  // Format join date as "Joined at MM/yyyy"
+  let joinedText = "Joined at ";
+  if (joinDate) {
+    try {
+      joinedText += format(new Date(joinDate), "MM/yyyy");
+    } catch {
+      joinedText += "unknown";
+    }
+  } else {
+    joinedText += "unknown";
+  }
   return (
     <View style={styles.container}>
       {/* User avatar */}
@@ -61,21 +73,11 @@ UserInfoProps) {
       {/* user info */}
       <View style={styles.userInfoSection}>
         {/* user full name */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "80%",
-            alignItems: "center",
-          }}
-        >
-          <ThemedText type="title" style={styles.userFullName}>
-            {firstName || lastName
-              ? (firstName + " " + lastName)
-              : "No name"}
-          </ThemedText>
-          {/* Edit profile button */}
-          {/* {isOwnProfile && (
+        <Text style={styles.userFullName}>
+          {firstName || lastName ? firstName + " " + lastName : "No name"}
+        </Text>
+        {/* Edit profile button */}
+        {/* {isOwnProfile && (
             <ButtonGradient
               label="Edit profile"
               onPress={handleEditProfile}
@@ -83,26 +85,17 @@ UserInfoProps) {
               labelStyle={styles.editProfileButtonText}
             />
           )} */}
-        </View>
+
         {/* user username and day joined*/}
-        <View style={{ flexDirection: "row" }}>
-          <Text
-            style={styles.userUsername}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-          >
-            @{username}
-          </Text>
-        </View>
-        {/* User joined Date */}
-        <Text style={styles.userDateJoined}>
-          Joined at{" "}
-          {new Date(dateJoined).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+        <Text
+          style={styles.userUsername}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+        >
+          @{username}
         </Text>
+        {/* User joined Date */}
+        <Text style={styles.userDateJoined}>{joinedText}</Text>
       </View>
     </View>
   );
@@ -114,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 120,
     borderRadius: 20,
-    backgroundColor: "#1B1B24",
+    backgroundColor: "#181818",
     paddingVertical: 20,
   },
   avatar: {
@@ -122,13 +115,14 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: "#B9FF9F",
+    borderColor: "#80ff52ff",
   },
   userInfoSection: {
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "flex-start",
     marginLeft: 10,
-    width: "auto",
+    flex: 1,
+    height: 80,
   },
   userFullName: {
     fontSize: 16,
@@ -138,6 +132,7 @@ const styles = StyleSheet.create({
   userUsername: {
     fontSize: 12,
     color: "#B9FF66",
+    width: "90%",
   },
   userDateJoined: {
     fontSize: 12,

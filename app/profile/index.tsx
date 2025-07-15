@@ -153,7 +153,7 @@ export default function ProfileScreen() {
 
           {/* Active groups */}
           {/* TODO: Integrate API when have */}
-          {/* <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
+          <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
           <FlatList
             data={userGroups}
             horizontal={true}
@@ -174,7 +174,7 @@ export default function ProfileScreen() {
             renderItem={({ item }) => {
               return <GroupPreviewInfo group={item} />;
             }}
-          /> */}
+          />
 
           {/* Social , Blog, Activity */}
           <View style={styles.rowContainer}>

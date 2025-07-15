@@ -218,7 +218,8 @@ export default function MoreOptionBottomList({
               <Text style={styles.bottomOptionText}>Hide blog</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
+          {!isFromFeed && role !== GroupStatusRoleCheck.NOT_MEMBER && role !== GroupStatusRoleCheck.PENDING && (
+            <TouchableOpacity
               style={styles.bottomOptionButton}
               onPress={handleReportBlog}
               activeOpacity={0.8}
@@ -229,7 +230,7 @@ export default function MoreOptionBottomList({
               {(role === GroupStatusRoleCheck.ADMIN || role === GroupStatusRoleCheck.OWNER) &&
                 <Text style={styles.bottomOptionText}>Ban blog</Text>
               }
-          </TouchableOpacity>
+          </TouchableOpacity>)}  
         </BottomSheetView>
       )}
     </BottomSheet>

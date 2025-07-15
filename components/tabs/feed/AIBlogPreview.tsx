@@ -1,14 +1,22 @@
-import { AIBlog, UserBlog } from "@/interfaces/blogInterface";
+import { AIBlog, UserBlog, UserBlogTag } from "@/interfaces/blogInterface";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { TouchableOpacity, Text } from "react-native";
 import { Image, ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
 
 // TODO:  add thumbnail to the AI Blog interface
 const mockThumbnail = "https://picsum.photos/400/200";
-export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
+// TODO: there are 4 colors in the cycle => coressponding to 4 different AI blogs thumbnails => check ticket
+
+export default function AIBlogPreview({
+  blog,
+  color,
+}: {
+  blog: AIBlog;
+  color?: string;
+}) {
   const route = useRouter();
   const handlePress = () => {
     console.log("Blog Pressed");
@@ -16,6 +24,14 @@ export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
       pathname: `/blog/ai-blog?aiBlogId=${blog._id}`,
     });
   };
+  // Mock tags for the blog, replace with actual tags from the blog data
+  const tags: UserBlogTag[] = [
+    { _id: "1", TagName: "AI" },
+    { _id: "2", TagName: "Technology" },
+    { _id: "3", TagName: "Innovation" },
+    { _id: "4", TagName: "Future" },
+  ];
+
   return (
     <View style={styles.outerContainer}>
       <TouchableOpacity
@@ -24,18 +40,78 @@ export default function AIBlogPreview({ blog }: { blog: AIBlog }) {
         activeOpacity={0.8}
       >
         {/* 1st Part: Title */}
-        <View style={styles.titleSection}>
-          <Text style={styles.title}>{blog.Title}</Text>
-        </View>
-        {/* 2nd Part: Thumbnail */}
         <ImageBackground
           source={mockThumbnail}
           imageStyle={styles.thumbnailStyle}
           style={styles.thumbnail}
         >
-          <Text style={styles.description}>{blog.Description}</Text>
-          <BottomLeftArrowIcon />
+          <View style={styles.titleSection}>
+            <Text style={styles.title}>{blog.Title}</Text>
+          </View>
         </ImageBackground>
+        <View style={styles.contentSection}>
+          <Text
+            style={styles.description}
+            numberOfLines={3}
+            ellipsizeMode="tail"
+          >
+            {blog.Description}
+          </Text>
+          <View style={styles.tagsSection}>
+            {tags &&
+              tags.slice(0, 2).map((tag, index) => (
+                <Text
+                  key={index}
+                  style={[
+                    styles.tag,
+                    { backgroundColor: color || "rgba(114, 150, 115, 0.5)" },
+                  ]}
+                >
+                  #{tag.TagName}
+                </Text>
+              ))}
+            {tags && tags.length > 2 && (
+              <Text
+                style={[
+                  styles.tag,
+                  { backgroundColor: color || "rgba(114, 150, 115, 0.5)" },
+                ]}
+              >
+                +{tags.length - 2} more
+              </Text>
+            )}
+          </View>
+          {/* Divider */}
+          <View
+            style={{
+              borderBottomColor: "#ccc",
+              borderBottomWidth: 1,
+              marginVertical: 10,
+            }}
+          />
+
+          <View style={styles.rowContainer}>
+            <MaterialCommunityIcons
+              name="lightning-bolt-outline"
+              size={24}
+              color={color || "black"}
+            />
+            <Text style={{ marginLeft: 8 }}>Powered by AI</Text>
+            <Entypo
+              name="dots-three-horizontal"
+              size={24}
+              color={color || "black"}
+              style={{ marginLeft: 8 }}
+            />
+          </View>
+        </View>
+
+        <BottomLeftArrowIcon
+          color={"#fff"}
+          style={{
+            backgroundColor: color || "rgba(114, 150, 115, 0.5)",
+          }}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -51,21 +127,17 @@ const styles = StyleSheet.create({
     height: 280,
   },
   thumbnail: {
-    width: Dimensions.get("window").width - 50,
-    height: 150,
-    borderRadius: 16,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").width * 0.25,
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
     overflow: "hidden",
+    padding: 16,
   },
-  thumbnailStyle: {
-    borderRadius: 16,
-  },
+  thumbnailStyle: {},
   container: {
     alignItems: "center",
     flex: 1,
-    padding: 16,
     backgroundColor: "#fff",
     overflow: "hidden",
   },
@@ -77,26 +149,23 @@ const styles = StyleSheet.create({
   },
 
   buttonSection: {
-    flex: 1,
     justifyContent: "center",
-    alignItems: "flex-end",
+    flexDirection: "row",
   },
   titleSection: {
     flex: 1,
     width: "90%",
     justifyContent: "center",
-    marginBottom: 8,
   },
   contentSection: {
-    flex: 1,
     justifyContent: "center",
+    padding: 16,
   },
   tagsSection: {
-    flex: 1,
-    paddingVertical: 8,
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
+    alignSelf: "flex-start",
   },
   text: {
     color: "#fff",
@@ -116,17 +185,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 19,
     fontWeight: "bold",
-    color: "#000",
+    color: "#fff",
   },
   description: {
     fontSize: 16,
-    color: "#fff",
+    color: "#000",
     textAlign: "justify",
   },
   tag: {
     marginVertical: 5,
     marginRight: 8,
     padding: 5,
+    paddingHorizontal: 10,
     backgroundColor: "rgba(114, 150, 115, 0.5)",
     borderRadius: 999,
   },
@@ -139,5 +209,9 @@ const styles = StyleSheet.create({
     backdropFilter: "transparent",
     elevation: 5,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

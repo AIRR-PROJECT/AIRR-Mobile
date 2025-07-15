@@ -241,7 +241,8 @@ export default function MyFeed() {
       userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
     }
   }, [blogIdToRemove])
-
+  // Color cycle for ai blog previews
+  const colorCycle = ["#e45febff", "#20b0e9ff", "#15d3adff", "#ff5c2fff"];
   return (
     <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
@@ -319,7 +320,7 @@ export default function MyFeed() {
                         parallaxScrollingScale: 0.9,
                         parallaxScrollingOffset: 50,
                       }}
-                      renderItem={({ item }) => <AIBlogPreview blog={item} />}
+                      renderItem={({ item, index }) => <AIBlogPreview blog={item} color={colorCycle[index % colorCycle.length]} />}
                     />
                   </View>
                 )}

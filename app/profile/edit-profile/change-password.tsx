@@ -21,29 +21,28 @@ export default function ChangePasswordScreen() {
     formState: { errors },
   } = useForm<FormData>({
     mode: "onChange",
-  
   });
-  const dispatch = useAppDispatch()
-  const { isCurrentPasswordIncorrect } = useAppSelector(state => state.auth)
+  const dispatch = useAppDispatch();
+  const { isCurrentPasswordIncorrect } = useAppSelector((state) => state.auth);
   const currentPassword = watch("currentPassword");
   // console.log(currentPassword);
   const newPassword = watch("newPassword");
   const mockData: string = "12345678";
 
   useEffect(() => {
-    dispatch(setCurrentPasswordIncorrect(false))
+    dispatch(setCurrentPasswordIncorrect(false));
 
-    dispatch(setCurrentPassword(currentPassword))
-  }, [currentPassword])
+    dispatch(setCurrentPassword(currentPassword));
+  }, [currentPassword]);
 
   useEffect(() => {
-    dispatch(setNewPassword(newPassword))
-  }, [newPassword])
+    dispatch(setNewPassword(newPassword));
+  }, [newPassword]);
 
   // Trigger the Current Password validation every times isCurrentPasswordIncorrect changes
   useEffect(() => {
-    trigger("currentPassword")
-  }, [isCurrentPasswordIncorrect])
+    trigger("currentPassword");
+  }, [isCurrentPasswordIncorrect]);
 
   return (
     <View style={styles.container}>
@@ -59,15 +58,17 @@ export default function ChangePasswordScreen() {
         <ThemedText style={styles.paragraph}>Current Password</ThemedText>
         <Controller
           control={control}
-          rules= {{
+          rules={{
             required: "Current password is required",
-            validate: (value) =>{
+            validate: (value) => {
               console.log(value);
-              return !isCurrentPasswordIncorrect || "Current password is incorrect"
+              return (
+                !isCurrentPasswordIncorrect || "Current password is incorrect"
+              );
             },
             onChange: () => {
-              dispatch(setCurrentPasswordIncorrect(false))
-            }
+              dispatch(setCurrentPasswordIncorrect(false));
+            },
           }}
           render={({ field: { onChange, onBlur, value } }) => {
             const [showPassword, setShowPassword] = useState(false);
@@ -114,6 +115,24 @@ export default function ChangePasswordScreen() {
         <ThemedText style={styles.paragraph}>New Password</ThemedText>
         <Controller
           control={control}
+          name="newPassword"
+          rules={{
+            required: "New password is required",
+            minLength: {
+              value: 6,
+              message: "Password must be at least 6 characters",
+            },
+            maxLength: {
+              value: 20,
+              message: "Password must be at most 20 characters",
+            },
+            pattern: {
+              value:
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,20}$/,
+              message:
+                "Password must contain uppercase, lowercase, number, and special character",
+            },
+          }}
           render={({ field: { onChange, onBlur, value } }) => {
             const [showPassword, setShowPassword] = useState(false);
             return (
@@ -135,7 +154,7 @@ export default function ChangePasswordScreen() {
                   onPress={() => setShowPassword(!showPassword)}
                   style={{
                     position: "absolute",
-                    right: 10, // Position inside the input
+                    right: 10,
                     padding: 10,
                   }}
                 >
@@ -148,14 +167,6 @@ export default function ChangePasswordScreen() {
               </View>
             );
           }}
-          name="newPassword"
-          // rules={{
-          //   required: "New password is required",
-          //   minLength: {
-          //     value: 8,
-          //     message: "Password must be at least 8 characters",
-          //   },
-          // }}
         />
         {errors.newPassword && (
           <ThemedText style={styles.errorText}>
@@ -166,6 +177,26 @@ export default function ChangePasswordScreen() {
         <ThemedText style={styles.paragraph}>Confirm New Password</ThemedText>
         <Controller
           control={control}
+          name="confirmNewPassword"
+          rules={{
+            required: "Confirm new password is required",
+            validate: (value) =>
+              value === newPassword || "Passwords do not match",
+            minLength: {
+              value: 6,
+              message: "Password must be at least 6 characters",
+            },
+            maxLength: {
+              value: 20,
+              message: "Password must be at most 20 characters",
+            },
+            pattern: {
+              value:
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,20}$/,
+              message:
+                "Password must contain uppercase, lowercase, number, and special character",
+            },
+          }}
           render={({ field: { onChange, onBlur, value } }) => {
             const [showPassword, setShowPassword] = useState(false);
             return (
@@ -187,7 +218,7 @@ export default function ChangePasswordScreen() {
                   onPress={() => setShowPassword(!showPassword)}
                   style={{
                     position: "absolute",
-                    right: 10, // Position inside the input
+                    right: 10,
                     padding: 10,
                   }}
                 >
@@ -200,16 +231,6 @@ export default function ChangePasswordScreen() {
               </View>
             );
           }}
-          name="confirmNewPassword"
-          // rules={{
-          //   required: "Confirm new password is required",
-          //   validate: (value) =>
-          //     value === newPassword || "Passwords do not match",
-          //   minLength: {
-          //     value: 8,
-          //     message: "Password must be at least 8 characters",
-          //   },
-          // }}
         />
         {errors.confirmNewPassword && (
           <ThemedText style={styles.errorText}>

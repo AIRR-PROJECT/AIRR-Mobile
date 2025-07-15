@@ -38,7 +38,7 @@ export default function SignUpSecondPage() {
   const dispatch = useAppDispatch();
 
   const password = watch("password");
-  const { isAccountCreated } = useAppSelector(state => state.auth)
+  const { isAccountCreated } = useAppSelector((state) => state.auth);
 
   const [isTermChecked, setTermChecked] = useState(false);
   const handleToggleCheckbox = () => {
@@ -48,11 +48,11 @@ export default function SignUpSecondPage() {
   useEffect(() => {
     if (isAccountCreated) {
       if (router.canDismiss()) {
-        router.dismissTo("/auth/login")
+        router.dismissTo("/auth/login");
       }
     }
   }, [isAccountCreated]);
-  
+
   const onSubmit = (data: FormData) => {
     if (!isTermChecked) {
       Alert.alert("Please accept the terms and conditions");
@@ -73,243 +73,275 @@ export default function SignUpSecondPage() {
   return (
     // change light color to #000 later because figma didn't have a color for light mode
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-    <ThemedView
-      style={[styles.container]}
-      darkColor="#1E1E1E"
-      lightColor="#1E1E1E"
-    >
-      <AuthHeader signUp={false} />
-      <View style={{ alignSelf: "flex-start", padding: 10 }}>
-        <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
-          <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
-            Sign up
-          </GradientText>
-          <Text style={styles.text}> now.</Text>
+      <ThemedView
+        style={[styles.container]}
+        darkColor="#1E1E1E"
+        lightColor="#1E1E1E"
+      >
+        <AuthHeader signUp={false} />
+        <View style={{ alignSelf: "flex-start", padding: 10 }}>
+          <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
+            <GradientText style={[styles.text]} colors={["#B9FF66", "#9DE8EE"]}>
+              Sign up
+            </GradientText>
+            <Text style={styles.text}> now.</Text>
+          </View>
+          <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
+            <Text style={styles.smalltext}>Let's set up your account, </Text>
+            <Text style={[styles.smalltext, { color: "#B9FF66" }]}>
+              {username}
+            </Text>
+            <Text style={styles.smalltext}>!</Text>
+          </View>
         </View>
-        <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
-          <Text style={styles.smalltext}>Let's set up your account, </Text>
-          <Text style={[styles.smalltext, { color: "#B9FF66" }]}>
-            {username}
-          </Text>
-          <Text style={styles.smalltext}>!</Text>
-        </View>
-      </View>
-      <ThemedView style={styles.formContainer}>
-        {/* Email Input */}
-        <Text style={[styles.paragraph]}>Email</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "Email is required",
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Enter a valid email address",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <LinearGradient
-              colors={["#B9FF66", "#9DE8EE"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ borderRadius: 20 }}
-            >
-              <TextInput
-                style={[styles.input, errors.email && styles.errorInput]}
-                placeholder="Email"
-                placeholderTextColor="#999"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            </LinearGradient>
-          )}
-          name="email"
-          defaultValue=""
-        />
-        {errors.email && (
-          <ThemedText style={styles.errorText}>
-            {errors.email.message}
-          </ThemedText>
-        )}
-
-        {/* Password Input */}
-        <Text style={[styles.paragraph]}>Password</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters long",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => {
-            const [showPassword, setShowPassword] = useState(false);
-
-            return (
-              <LinearGradient
-                colors={["#B9FF66", "#9DE8EE"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={{ borderRadius: 20 }}
-              >
-                <View style={{ position: "relative" }}>
-                  <TextInput
-                    style={[styles.input, errors.password && styles.errorInput]}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="Password"
-                    secureTextEntry={!showPassword}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: "absolute",
-                      right: 10,
-                      padding: 10,
-                    }}
-                  >
-                    <Ionicons
-                      name={showPassword ? "eye" : "eye-off"}
-                      size={24}
-                      color="#000"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </LinearGradient>
-            );
-          }}
-          name="password"
-          defaultValue=""
-        />
-        {errors.password && (
-          <ThemedText style={styles.errorText}>
-            {errors.password.message}
-          </ThemedText>
-        )}
-
-        {/* Confirm Password Input */}
-        <Text style={[styles.paragraph]}>Confirm Password</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: "Confirm Password is required",
-            validate: (value) => value === password || "Passwords do not match",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters long",
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => {
-            const [showPassword, setShowPassword] = useState(false);
-
-            return (
-              <LinearGradient
-                colors={["#B9FF66", "#9DE8EE"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={{ borderRadius: 20 }}
-              >
-                <View style={{ position: "relative" }}>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      errors.confirmPassword && styles.errorInput,
-                    ]}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="Confirm Password"
-                    secureTextEntry={!showPassword}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: "absolute",
-                      right: 10,
-                      padding: 10,
-                    }}
-                  >
-                    <Ionicons
-                      name={showPassword ? "eye" : "eye-off"}
-                      size={24}
-                      color="#000"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </LinearGradient>
-            );
-          }}
-          name="confirmPassword"
-          defaultValue=""
-        />
-        {errors.confirmPassword && (
-          <ThemedText style={styles.errorText}>
-            {errors.confirmPassword.message}
-          </ThemedText>
-        )}
-        <TouchableOpacity style={styles.section} onPress={handleToggleCheckbox}>
-          <Checkbox
-            style={styles.checkbox}
-            value={isTermChecked}
-            onValueChange={setTermChecked}
-            color={isTermChecked ? "#B9FF66" : undefined}
-          />
-          <Text style={[styles.paragraph, { paddingHorizontal: 0 }]}>
-            I accept the all terms and conditions
-          </Text>
-        </TouchableOpacity>
-
-        {/* Sign Up Button */}
-        <AuthButtonGradient
-          label="Sign Up"
-          onPress={handleSubmit(onSubmit)}
-          style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
-        />
-
-        {/* Other Options */}
-        <ThemedText
-          type="default"
-          style={[{ color: "#fff", alignSelf: "center" }]}
-        >
-          Or
-        </ThemedText>
-        {/* Or Google or Facebook */}
-        <View style={[styles.section, { justifyContent: "space-between", marginTop: 10 }]}>
-          <AuthButtonTransparent label="Google" style={styles.otherButton} />
-        </View>
-
-        {/* Sign In Link*/}
-        <TouchableOpacity onPress={handleBackToLogin}>
-          <ThemedText
-            type="link"
-            style={[
-              {
-                color: "#fff",
-                alignSelf: "flex-start",
-                marginTop: 5,
-                textDecorationLine: "underline",
+        <ThemedView style={styles.formContainer}>
+          {/* Email Input */}
+          <Text style={[styles.paragraph]}>Email</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Enter a valid email address",
               },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <LinearGradient
+                colors={["#B9FF66", "#9DE8EE"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ borderRadius: 20 }}
+              >
+                <TextInput
+                  style={[styles.input, errors.email && styles.errorInput]}
+                  placeholder="Email"
+                  placeholderTextColor="#999"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
+              </LinearGradient>
+            )}
+            name="email"
+            defaultValue=""
+          />
+          {errors.email && (
+            <ThemedText style={styles.errorText}>
+              {errors.email.message}
+            </ThemedText>
+          )}
+
+          {/* Password Input */}
+          <Text style={[styles.paragraph]}>Password</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+              maxLength: {
+                value: 20,
+                message: "Password must be at most 20 characters long",
+              },
+              pattern: {
+                value:
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,20}$/,
+                message:
+                  "Password must contain uppercase, lowercase, number, and special character",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => {
+              const [showPassword, setShowPassword] = useState(false);
+
+              return (
+                <LinearGradient
+                  colors={["#B9FF66", "#9DE8EE"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ borderRadius: 20 }}
+                >
+                  <View style={{ position: "relative" }}>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        errors.password && styles.errorInput,
+                      ]}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Password"
+                      secureTextEntry={!showPassword}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        right: 10,
+                        padding: 10,
+                      }}
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye" : "eye-off"}
+                        size={24}
+                        color="#000"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </LinearGradient>
+              );
+            }}
+            name="password"
+            defaultValue=""
+          />
+          {errors.password && (
+            <ThemedText style={styles.errorText}>
+              {errors.password.message}
+            </ThemedText>
+          )}
+
+          {/* Confirm Password Input */}
+          <Text style={[styles.paragraph]}>Confirm Password</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "Confirm Password is required",
+              validate: (value) =>
+                value === password || "Passwords do not match",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+              maxLength: {
+                value: 20,
+                message: "Password must be at most 20 characters long",
+              },
+              pattern: {
+                value:
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,20}$/,
+                message:
+                  "Password must contain uppercase, lowercase, number, and special character",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => {
+              const [showPassword, setShowPassword] = useState(false);
+
+              return (
+                <LinearGradient
+                  colors={["#B9FF66", "#9DE8EE"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ borderRadius: 20 }}
+                >
+                  <View style={{ position: "relative" }}>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        errors.confirmPassword && styles.errorInput,
+                      ]}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Confirm Password"
+                      secureTextEntry={!showPassword}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        right: 10,
+                        padding: 10,
+                      }}
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye" : "eye-off"}
+                        size={24}
+                        color="#000"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </LinearGradient>
+              );
+            }}
+            name="confirmPassword"
+            defaultValue=""
+          />
+          {errors.confirmPassword && (
+            <ThemedText style={styles.errorText}>
+              {errors.confirmPassword.message}
+            </ThemedText>
+          )}
+          <TouchableOpacity
+            style={styles.section}
+            onPress={handleToggleCheckbox}
+          >
+            <Checkbox
+              style={styles.checkbox}
+              value={isTermChecked}
+              onValueChange={setTermChecked}
+              color={isTermChecked ? "#B9FF66" : undefined}
+            />
+            <Text style={[styles.paragraph, { paddingHorizontal: 0 }]}>
+              I accept the all terms and conditions
+            </Text>
+          </TouchableOpacity>
+
+          {/* Sign Up Button */}
+          <AuthButtonGradient
+            label="Sign Up"
+            onPress={handleSubmit(onSubmit)}
+            style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
+          />
+
+          {/* Other Options */}
+          <ThemedText
+            type="default"
+            style={[{ color: "#fff", alignSelf: "center" }]}
+          >
+            Or
+          </ThemedText>
+          {/* Or Google or Facebook */}
+          <View
+            style={[
+              styles.section,
+              { justifyContent: "space-between", marginTop: 10 },
             ]}
           >
-            Have an account yet,{" "}
+            <AuthButtonTransparent label="Google" style={styles.otherButton} />
+          </View>
+
+          {/* Sign In Link*/}
+          <TouchableOpacity onPress={handleBackToLogin}>
             <ThemedText
               type="link"
               style={[
                 {
                   color: "#fff",
-
-                  fontWeight: "bold",
+                  alignSelf: "flex-start",
+                  marginTop: 5,
+                  textDecorationLine: "underline",
                 },
               ]}
             >
-              Sign In
+              Have an account yet,{" "}
+              <ThemedText
+                type="link"
+                style={[
+                  {
+                    color: "#fff",
+
+                    fontWeight: "bold",
+                  },
+                ]}
+              >
+                Sign In
+              </ThemedText>
             </ThemedText>
-          </ThemedText>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </ThemedView>
       </ThemedView>
-    </ThemedView>
     </ScrollView>
   );
 }

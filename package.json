@@ -92,7 +92,8 @@
     "react-quill": "^2.0.0",
     "react-redux": "^9.2.0",
     "uri-scheme": "^1.4.7",
-    "zod": "^3.24.4"
+    "zod": "^3.24.4",
+    "@react-native-community/datetimepicker": "8.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -31,12 +31,14 @@ export default function SocialTab({
   link,
   facebookLink,
   linkedInLink,
-  githubLink
+  githubLink,
+  showSignOut
 }: {
   link: string,
   facebookLink: string,
   linkedInLink: string,
-  githubLink: string
+  githubLink: string,
+  showSignOut: boolean
 }) {
   const dispatch = useAppDispatch();
 
@@ -129,7 +131,7 @@ export default function SocialTab({
           <Ionicons name="copy-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </LinearGradient>
-      <View>
+      {showSignOut && <View>
         <TouchableOpacity
           style={styles.signOutButton}
           activeOpacity={0.7}
@@ -138,7 +140,7 @@ export default function SocialTab({
           <Feather name="log-out" size={24} color="#fff" />
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
-      </View>
+      </View>}
     </View>
   );
 }

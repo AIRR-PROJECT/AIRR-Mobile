@@ -38,7 +38,7 @@ import {
   SearchedField,
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
-import { router, useRouter } from "expo-router";
+import { router, useRootNavigationState, useRouter } from "expo-router";
 import BlogTagDropdownComponent from "@/components/blog/BlogTagDropdownListComponent";
 import { setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
 import GroupTagDropdownComponent from "@/components/blog/GroupTagDropdownListComponent";
@@ -47,6 +47,7 @@ const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 export default function CreateGroup() {
   const dispatch = useAppDispatch();
   const route = useRouter();
+  const { routes } = useRootNavigationState();
   const {
     createGroupSubmitted,
     createGroupCurrentTags,
@@ -144,10 +145,11 @@ export default function CreateGroup() {
       formData.append("GroupRules", JSON.stringify(groupRules));
 
       dispatch(createGroup(formData)).then((res) => {
-        console.log(`res.payload`)
-        console.log(res.payload)
         if ((res.payload as string).length != 0) {
-          router.replace(`/group?groupId=${res.payload}`);
+          router.dismiss()
+          router.setParams({
+            newGroupID: res.payload as string
+          })
         }
       });
     }

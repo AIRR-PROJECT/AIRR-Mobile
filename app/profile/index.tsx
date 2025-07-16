@@ -217,12 +217,18 @@ export default function ProfileScreen() {
 
         {/* Readme if tab == readme */}
         <View style={{ padding: 20 }}>
-          {selectedTab === "Social" && user &&
+          {selectedTab === "Social" && user && user.profile && user.profile.link ?
             <SocialTab
               link={""}
               facebookLink={user.profile.link.Facebook}
               linkedInLink={user.profile.link.LinkedIn}
               githubLink={user.profile.link.Github}              
+            /> :
+            <SocialTab
+              link={""}
+              facebookLink={"No information"}
+              linkedInLink={"No information"}
+              githubLink={"No information"}              
             />
           }
           {selectedTab === "Activity" && <ActivityTab />}

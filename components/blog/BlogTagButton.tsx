@@ -3,7 +3,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
-function BlogTagButton({ title }: { title: string }) {
+export function BlogTagButton({ title }: { title: string }) {
   return (
     // change to button later if needed
     <View style={[styles.tagContainer]}>
@@ -14,7 +14,7 @@ function BlogTagButton({ title }: { title: string }) {
   );
 }
 
-function PendingTagButton({ title }: { title: string }) {
+export function PendingTagButton({ title }: { title: string }) {
   return (
     // change to button later if needed
     <View style={[styles.pendingContainer]}>
@@ -25,7 +25,6 @@ function PendingTagButton({ title }: { title: string }) {
     </View>
   );
 }
-export { BlogTagButton, PendingTagButton };
 const styles = StyleSheet.create({
   tagContainer: {
     width: "auto",

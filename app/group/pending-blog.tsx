@@ -13,7 +13,7 @@ import {
 import { Image } from "expo-image";
 import { AIBlogSection, UserBlogDetail, UserBlogGroup, UserBlogTag } from "@/interfaces/blogInterface";
 import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
-import BlogTagButton from "@/components/blog/BlogTagButton";
+import { BlogTagButton } from "@/components/blog/BlogTagButton";
 import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import { useEffect, useState } from "react";
 import { getUserBlogDetail } from "@/redux/slices/blogSlice";

@@ -59,7 +59,8 @@ export default function OwnerLeaveGroup() {
       const result = res.payload as boolean
 
       if (result == true) {
-        router.dismiss(2)
+        router.dismiss()
+        router.dismiss()
         router.setParams({
           groupIDToRemove: groupID
         })
@@ -68,7 +69,7 @@ export default function OwnerLeaveGroup() {
   }
 
   const renderItem = ({ item, index }: { item: GroupMember; index: number }) => {
-    const isSelected = item.MemberInfo.Username === selectedUser;
+    const isSelected = selectedUser != null && item.MemberInfo._id === selectedUser;
     return (
       <TouchableOpacity
         key={index}

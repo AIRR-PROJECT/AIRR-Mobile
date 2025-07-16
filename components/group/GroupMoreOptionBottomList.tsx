@@ -72,6 +72,9 @@ export default function GroupMoreOptionBottomList({
       if (result == true) {
         ToastAndroid.show("Group deleted successfully", ToastAndroid.SHORT);
         route.dismiss();
+        route.setParams({
+          groupIDToRemove: groupID
+        })
         sheetRef.current?.close();
       }
     });

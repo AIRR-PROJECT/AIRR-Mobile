@@ -53,13 +53,14 @@ export default function MoreOptionBottomList({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // console.log(`isUserWrittenBlog: ${isUserWrittenBlog}`)
-    // console.log(`blogId: ${blogId}`)
-    // console.log(`groupId: ${groupId}`)
-    // console.log(`role: ${role}`)
-    // console.log(`blogStatus: ${blogStatus}`)
-    // console.log(`isViewTypePrivateOrInProfile: ${isViewTypePrivateOrInProfile}`)
-    // console.log(`isAlreadyReported: ${isAlreadyReported}`)
+    console.log(`isUserWrittenBlog: ${isUserWrittenBlog}`)
+    console.log(`blogId: ${blogId}`)
+    console.log(`groupId: ${groupId}`)
+    console.log(`role: ${role}`)
+    console.log(`blogStatus: ${blogStatus}`)
+    console.log(`isViewTypePrivateOrInProfile: ${isViewTypePrivateOrInProfile}`)
+    console.log(`isAlreadyReported: ${isAlreadyReported}`)
+    console.log(!isFromFeed && role !== GroupStatusRoleCheck.NOT_MEMBER && role !== GroupStatusRoleCheck.PENDING)
   }, [isUserWrittenBlog, blogId, groupId, role, blogStatus, isViewTypePrivateOrInProfile])
 
   const handleHideBlog = () => {
@@ -79,7 +80,7 @@ export default function MoreOptionBottomList({
     });
   };
   const handleReportBlog = () => {
-    if (isAlreadyReported) {
+    if (isAlreadyReported && role !== GroupStatusRoleCheck.ADMIN && role !== GroupStatusRoleCheck.OWNER) {
       ToastAndroid.show("This blog is already reported", ToastAndroid.LONG)
 
       return
@@ -226,10 +227,12 @@ export default function MoreOptionBottomList({
             >
               {/* Report */}
               <MaterialIcons name="report" size={24} color="black" />
-              {role === GroupStatusRoleCheck.MEMBER && <Text style={styles.bottomOptionText}>Report blog</Text>}
-              {(role === GroupStatusRoleCheck.ADMIN || role === GroupStatusRoleCheck.OWNER) &&
-                <Text style={styles.bottomOptionText}>Ban blog</Text>
-              }
+              {role === GroupStatusRoleCheck.MEMBER
+              ? <Text style={styles.bottomOptionText}>Report blog</Text>
+              : role === GroupStatusRoleCheck.ADMIN || role === GroupStatusRoleCheck.OWNER
+              ? <Text style={styles.bottomOptionText}>Ban blog</Text>
+              : <Text style={styles.bottomOptionText}>Something is wrong</Text>}
+
           </TouchableOpacity>)}  
         </BottomSheetView>
       )}

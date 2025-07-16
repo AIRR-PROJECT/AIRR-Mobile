@@ -28,7 +28,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRootNavigationState, useRouter } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   cancelJoinGroupRequest,
@@ -114,6 +114,7 @@ export default function GroupPageContent({
 
 GroupPageProps) {
   const route = useRouter();
+  const { routes } = useRootNavigationState();
   const dispatch = useAppDispatch();
   const { userCurrentGroupMembershipStage, userCurrentGroupRole } =
     useAppSelector((state) => state.user);

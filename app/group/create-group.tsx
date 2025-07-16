@@ -38,7 +38,7 @@ import {
   SearchedField,
   SearchFieldResult,
 } from "@/interfaces/groupInterface";
-import { router, useRouter } from "expo-router";
+import { router, useRootNavigationState, useRouter } from "expo-router";
 import BlogTagDropdownComponent from "@/components/blog/BlogTagDropdownListComponent";
 import { setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
 import GroupTagDropdownComponent from "@/components/blog/GroupTagDropdownListComponent";
@@ -47,6 +47,7 @@ const avatar_arc = require("@/assets/images/group/avatar_arc_group_props.png");
 export default function CreateGroup() {
   const dispatch = useAppDispatch();
   const route = useRouter();
+  const { routes } = useRootNavigationState();
   const {
     createGroupSubmitted,
     createGroupCurrentTags,
@@ -101,7 +102,7 @@ export default function CreateGroup() {
       if (
         !uploadedImg.current ||
         !groupName ||
-        !groupTags ||
+        (chosenTags.length == 0 && createGroupCreatedTags.length == 0) ||
         !groupField ||
         !groupDescription ||
         !groupRules
@@ -109,6 +110,23 @@ export default function CreateGroup() {
         Alert.alert("Error", "Missing field");
 
         return;
+      }
+
+      if (groupName.length < 10) {
+        Alert.alert("Error", "Name must be at least 10 characters long")
+        return
+      }
+      if (groupDescription.length < 10) {
+        Alert.alert("Error", "Description must be at least 10 characters long")
+        return
+      }
+      let isGroupRuleLengthViolated = false
+      groupRules.forEach((r) => {
+        if (r.RuleDescription.length < 10) isGroupRuleLengthViolated = true
+      })
+      if (isGroupRuleLengthViolated) {
+        Alert.alert("Error", "Rule description must be at least 10 characters long")
+        return
       }
 
       const formData = new FormData();
@@ -127,8 +145,11 @@ export default function CreateGroup() {
       formData.append("GroupRules", JSON.stringify(groupRules));
 
       dispatch(createGroup(formData)).then((res) => {
-        if ((res.payload as boolean) == true) {
-          router.dismiss();
+        if ((res.payload as string).length != 0) {
+          router.dismiss()
+          router.setParams({
+            newGroupID: res.payload as string
+          })
         }
       });
     }

@@ -2,7 +2,7 @@ import { CreateReportBlog } from "@/interfaces/blogInterface";
 import { useAppDispatch } from "@/redux/hook";
 import { createReportBlog } from "@/redux/slices/blogSlice";
 import { AntDesign } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useRootNavigationState } from "expo-router";
 import { useRef, useState } from "react";
 import {
   View,
@@ -23,6 +23,7 @@ const options = [
 ];
 export default function ReportBlog() {
   const dispatch = useAppDispatch()
+  const { routes } = useRootNavigationState()
   const { blogID, groupID } = useLocalSearchParams<{ blogID: string, groupID: string }>()
   
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -41,15 +42,20 @@ export default function ReportBlog() {
       BlogID: blogID,
       GroupID: groupID,
       ReportType: selectedOption!,
-      Details: detail
+      Details: detail ?? ""
     }
     // console.log(data)
 
+    // console.log(routes)
     dispatch(createReportBlog(data)).then((res) => {
       const result = res.payload as boolean
 
       if (result === true) {
-        router.back()
+        router.dismiss()
+        router.dismiss()
+        router.setParams({
+          blogIdToRemove: blogID
+        })
         
         // Check if user check any option in report blog screen
         // If yes, then report the blog
@@ -128,10 +134,10 @@ export default function ReportBlog() {
             padding: 10,
             borderRadius: 20,
           }}
-          disabled={selectedOption == null || detail.length == 0}
+          disabled={selectedOption == null}
           onPress={handleSubmit}
         >
-          <Text style={selectedOption == null || detail.length == 0 ? { color: "#000", fontWeight: "bold" } : { color: "white", fontWeight: "bold" }}>Submit</Text>
+          <Text style={selectedOption == null ? { color: "#000", fontWeight: "bold" } : { color: "white", fontWeight: "bold" }}>Submit</Text>
         </TouchableOpacity>
       </View>
     </View>

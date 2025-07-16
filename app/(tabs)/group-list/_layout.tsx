@@ -1,5 +1,7 @@
 import { MaterialTopTabs } from "@/components/MaterialTopTabs";
 import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 import { Text, View } from "react-native";
 export default function GroupListTabLayout() {
   return (

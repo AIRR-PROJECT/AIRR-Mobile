@@ -1,3 +1,4 @@
+import { GroupRole } from "@/enums/group.enum";
 import { GroupMember } from "@/interfaces/groupInterface";
 import { useAppDispatch } from "@/redux/hook";
 import { getGroupAdmins, getMemberList, leaveGroup } from "@/redux/slices/groupSlice";
@@ -27,10 +28,10 @@ export default function OwnerLeaveGroup() {
     if (groupID) {
       dispatch(getMemberList({ groupID })).then((res) => {
         const data = res.payload as GroupMember[]
-        console.log(data)
+        const noOwnerMemberList = data.filter((m) => m.Role !== GroupRole.Owner)
 
-        setMembers(data)
-        setFilteredMembers(data)
+        setMembers(noOwnerMemberList)
+        setFilteredMembers(noOwnerMemberList)
       })
     }
   }, [groupID])
@@ -58,7 +59,8 @@ export default function OwnerLeaveGroup() {
       const result = res.payload as boolean
 
       if (result == true) {
-        router.dismiss(2)
+        router.dismiss()
+        router.dismiss()
         router.setParams({
           groupIDToRemove: groupID
         })
@@ -67,7 +69,7 @@ export default function OwnerLeaveGroup() {
   }
 
   const renderItem = ({ item, index }: { item: GroupMember; index: number }) => {
-    const isSelected = item.MemberInfo.Username === selectedUser;
+    const isSelected = selectedUser != null && item.MemberInfo._id === selectedUser;
     return (
       <TouchableOpacity
         key={index}

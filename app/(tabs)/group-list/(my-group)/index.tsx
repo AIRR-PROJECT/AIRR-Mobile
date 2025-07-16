@@ -10,7 +10,7 @@ import {
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useGlobalSearchParams, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Text,
@@ -26,7 +26,7 @@ export default function MyGroupTab() {
   const dispatch = useAppDispatch();
   const route = useRouter();
   // const { popularFields } = useAppSelector((state) => state.group);
-  const { groupIDToRemove } = useLocalSearchParams<{ groupIDToRemove: string }>()
+  const { groupIDToRemove, newGroupID } = useLocalSearchParams<{ groupIDToRemove: string, newGroupID: string }>()
 
   const refFields = useRef<FlatList>(null);
   const currentOffset = useRef(0);
@@ -35,6 +35,7 @@ export default function MyGroupTab() {
   const [fields, setFields] = useState<GroupField[]>([])
   const [groups, setGroups] = useState(new Map<string, Group[]>())
   const [isFetching, setIsFetching] = useState(false)
+  const [isNewGroupCreated, setIsNewGroupCreated] = useState<boolean>(false)
 
   const handleCreateButtonPress = () => {
     // Handle create group button press
@@ -92,8 +93,15 @@ export default function MyGroupTab() {
   }, []);
 
   useEffect(() => {
-    setIsFetching(true)
-    if (groupIDToRemove) {
+    console.log(`newGroupID: ${newGroupID}`)
+    console.log(`justCreatedAGroupBool: ${newGroupID !== undefined && newGroupID !== ""}`)
+    setIsNewGroupCreated(newGroupID !== undefined && newGroupID !== "")
+  }, [newGroupID])
+  useEffect(() => {
+    console.log(`groupIDToRemove: ${groupIDToRemove}`)
+    if (groupIDToRemove || isNewGroupCreated) {
+      if (isNewGroupCreated) setIsNewGroupCreated(false)
+      setIsFetching(true)
       dispatch(getCreatedGroups()).then((res) => {
         const data = res.payload as Group[]
   
@@ -125,7 +133,7 @@ export default function MyGroupTab() {
         setIsFetching(false)
       })
     }
-  }, [groupIDToRemove])
+  }, [groupIDToRemove, isNewGroupCreated])
   
   return (
     isFetching ? 

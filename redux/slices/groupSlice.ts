@@ -298,14 +298,15 @@ export const createGroup = createAsyncThunk(
             }) as AxiosResponse
 
             if (res.data.success) {
-                return true
+                return res.data.data.success
             }
             else {
-                return false
+                return ""
             }
         }
         catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+            console.log(error.response ? error.response.data : error.message)
+            return ""
         }
     }
 )

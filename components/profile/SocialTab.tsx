@@ -24,10 +24,20 @@ import { logOut } from "@/redux/slices/authSlice";
 const tags = Array(10).fill("Frontend");
 const chunkedTags = chunkArray(tags, 5);
 const mockLink = "https://dly.to/dfdsc";
-const facebookLink = "https://facebook.com/yourprofile";
-const linkedInLink = "https://linkedin.com/in/yourprofile";
-const githubLink = "https://github.com/yourprofileddddddddddddddddddddddddddddddddddddddddddddddddddd";
-export default function SocialTab() {
+const mockFacebookLink = "https://facebook.com/yourprofile";
+const mockLinkedInLink = "https://linkedin.com/in/yourprofile";
+const mockGithubLink = "https://github.com/yourprofileddddddddddddddddddddddddddddddddddddddddddddddddddd";
+export default function SocialTab({
+  link,
+  facebookLink,
+  linkedInLink,
+  githubLink
+}: {
+  link: string,
+  facebookLink: string,
+  linkedInLink: string,
+  githubLink: string
+}) {
   const dispatch = useAppDispatch();
 
   const handleCopyLink = async ({link}: {link:string}) => {
@@ -47,9 +57,9 @@ export default function SocialTab() {
     // Readme
     <View style={styles.container}>
       {/* Invite friends */}
-      <Text style={styles.inviteFriendTitle}>Profile Links</Text>
+      {/* <Text style={styles.inviteFriendTitle}>Profile Links</Text> */}
       {/* Link */}
-      <LinearGradient
+      {/* <LinearGradient
         colors={["#142c11ff", "#1d1d1dff"]} // dark green to dark
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -61,11 +71,11 @@ export default function SocialTab() {
         <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{mockLink}</Text>
         <TouchableOpacity
           style={styles.copyLinkButton}
-          onPress={() => handleCopyLink({ link: mockLink })}
+          onPress={() => handleCopyLink({ link: link ?? mockLink })}
         >
           <Ionicons name="copy-outline" size={24} color="#fff" />
         </TouchableOpacity>
-      </LinearGradient>
+      </LinearGradient> */}
 
       <Text style={styles.inviteFriendTitle}>Social Links</Text>
       <LinearGradient
@@ -80,7 +90,7 @@ export default function SocialTab() {
         <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{facebookLink}</Text>
         <TouchableOpacity
           style={[styles.copyLinkButton, {}]}
-          onPress={() => handleCopyLink({ link: facebookLink })}
+          onPress={() => handleCopyLink({ link: facebookLink ?? mockFacebookLink })}
         >
           <Ionicons name="copy-outline" size={24} color="#fff" />
         </TouchableOpacity>
@@ -97,7 +107,7 @@ export default function SocialTab() {
         <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{linkedInLink}</Text>
         <TouchableOpacity
           style={styles.copyLinkButton}
-          onPress={() => handleCopyLink({ link: linkedInLink })}
+          onPress={() => handleCopyLink({ link: linkedInLink ?? mockLinkedInLink })}
         >
           <Ionicons name="copy-outline" size={24} color="#fff" />
         </TouchableOpacity>
@@ -114,7 +124,7 @@ export default function SocialTab() {
         <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{githubLink}</Text>
         <TouchableOpacity
           style={styles.copyLinkButton}
-          onPress={() => handleCopyLink({ link: githubLink })}
+          onPress={() => handleCopyLink({ link: githubLink ?? mockGithubLink })}
         >
           <Ionicons name="copy-outline" size={24} color="#fff" />
         </TouchableOpacity>

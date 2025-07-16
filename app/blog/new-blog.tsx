@@ -273,10 +273,12 @@ export default function NewBlog() {
     }
 
     if (title.current.length < 10) {
-      Alert.alert("Error", "Title must be at lease 10 characters long")
+      Alert.alert("Error", "Title must be at least 10 characters long")
+      return
     }
     if (description.current.length < 10) {
       Alert.alert("Error", "Description must be at lease 10 characters long")
+      return
     }
 
     const formData = new FormData();

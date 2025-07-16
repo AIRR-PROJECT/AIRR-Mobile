@@ -101,7 +101,7 @@ export default function CreateGroup() {
       if (
         !uploadedImg.current ||
         !groupName ||
-        !groupTags ||
+        (chosenTags.length == 0 && createGroupCreatedTags.length == 0) ||
         !groupField ||
         !groupDescription ||
         !groupRules
@@ -109,6 +109,23 @@ export default function CreateGroup() {
         Alert.alert("Error", "Missing field");
 
         return;
+      }
+
+      if (groupName.length < 10) {
+        Alert.alert("Error", "Name must be at least 10 characters long")
+        return
+      }
+      if (groupDescription.length < 10) {
+        Alert.alert("Error", "Description must be at least 10 characters long")
+        return
+      }
+      let isGroupRuleLengthViolated = false
+      groupRules.forEach((r) => {
+        if (r.RuleDescription.length < 10) isGroupRuleLengthViolated = true
+      })
+      if (isGroupRuleLengthViolated) {
+        Alert.alert("Error", "Rule description must be at least 10 characters long")
+        return
       }
 
       const formData = new FormData();
@@ -127,8 +144,10 @@ export default function CreateGroup() {
       formData.append("GroupRules", JSON.stringify(groupRules));
 
       dispatch(createGroup(formData)).then((res) => {
-        if ((res.payload as boolean) == true) {
-          router.dismiss();
+        console.log(`res.payload`)
+        console.log(res.payload)
+        if ((res.payload as string).length != 0) {
+          router.replace(`/group?groupId=${res.payload}`);
         }
       });
     }

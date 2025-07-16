@@ -1,3 +1,4 @@
+import { GroupRole } from "@/enums/group.enum";
 import { GroupMember } from "@/interfaces/groupInterface";
 import { useAppDispatch } from "@/redux/hook";
 import { getGroupAdmins, getMemberList, leaveGroup } from "@/redux/slices/groupSlice";
@@ -27,10 +28,10 @@ export default function OwnerLeaveGroup() {
     if (groupID) {
       dispatch(getMemberList({ groupID })).then((res) => {
         const data = res.payload as GroupMember[]
-        console.log(data)
+        const noOwnerMemberList = data.filter((m) => m.Role !== GroupRole.Owner)
 
-        setMembers(data)
-        setFilteredMembers(data)
+        setMembers(noOwnerMemberList)
+        setFilteredMembers(noOwnerMemberList)
       })
     }
   }, [groupID])

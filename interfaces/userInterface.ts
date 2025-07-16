@@ -39,6 +39,7 @@ export interface PartialUser {
     lastName: string;
     dateOfBirth: string;
     profile: UserProfile;
+    joinDate: Date
 }
 
 export interface User {

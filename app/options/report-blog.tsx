@@ -42,7 +42,7 @@ export default function ReportBlog() {
       BlogID: blogID,
       GroupID: groupID,
       ReportType: selectedOption!,
-      Details: detail ?? ""
+      Details: detail
     }
     // console.log(data)
 
@@ -134,10 +134,10 @@ export default function ReportBlog() {
             padding: 10,
             borderRadius: 20,
           }}
-          disabled={selectedOption == null}
+          disabled={selectedOption == null || detail.length == 0}
           onPress={handleSubmit}
         >
-          <Text style={selectedOption == null ? { color: "#000", fontWeight: "bold" } : { color: "white", fontWeight: "bold" }}>Submit</Text>
+          <Text style={selectedOption == null || detail.length == 0 ? { color: "#000", fontWeight: "bold" } : { color: "white", fontWeight: "bold" }}>Submit</Text>
         </TouchableOpacity>
       </View>
     </View>

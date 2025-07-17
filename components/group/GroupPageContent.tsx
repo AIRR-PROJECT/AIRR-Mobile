@@ -136,7 +136,6 @@ GroupPageProps) {
   const [groupInfo, setGroupInfo] = useState<GroupDetailInfo>();
 
   useEffect(() => {
-    console.log(groupID)
     dispatch(
       getGroupInfo({
         groupID,

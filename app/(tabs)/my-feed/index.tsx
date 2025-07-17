@@ -49,7 +49,7 @@ import queryClient from "@/redux/api/queryClient";
 import { FlashList } from "@shopify/flash-list";
 import AIBlogPreviewSkeleton from "@/components/tabs/feed/AIBlogPreviewSkeleton";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
-import { useLocalSearchParams, useSegments } from "expo-router";
+import { router, useLocalSearchParams, useSegments } from "expo-router";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, {
   ICarouselInstance,
@@ -239,6 +239,10 @@ export default function MyFeed() {
     if (blogIdToRemove) {
       setUserBlogReset(true);
       userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
+
+      router.setParams({
+        blogIdToRemove: undefined
+      })
     }
   }, [blogIdToRemove])
   // Color cycle for ai blog previews

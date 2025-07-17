@@ -45,7 +45,9 @@ export default function ReportCardComponent({
   }
   const [isOpenStartDrag, setIsOpenStartDrag] = useState(false);
   const route = useRouter();
-  const handlePress = () => {};
+  const handlePress = () => {
+    route.push(`/blog?userBlogId=${Blog._id}`)
+  };
   return (
     <ReanimatedSwipeable
       containerStyle={styles.swipeable}

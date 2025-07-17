@@ -150,6 +150,7 @@ export default function CreateGroup() {
           router.setParams({
             newGroupID: res.payload as string
           })
+          router.push(`/group?groupId=${res.payload}`)
         }
       });
     }

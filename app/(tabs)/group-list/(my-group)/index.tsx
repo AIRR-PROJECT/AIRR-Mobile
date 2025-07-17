@@ -93,12 +93,12 @@ export default function MyGroupTab() {
   }, []);
 
   useEffect(() => {
-    console.log(`newGroupID: ${newGroupID}`)
-    console.log(`justCreatedAGroupBool: ${newGroupID !== undefined && newGroupID !== ""}`)
     setIsNewGroupCreated(newGroupID !== undefined && newGroupID !== "")
+    route.setParams({
+      newGroupID: undefined
+    })
   }, [newGroupID])
   useEffect(() => {
-    console.log(`groupIDToRemove: ${groupIDToRemove}`)
     if (groupIDToRemove || isNewGroupCreated) {
       if (isNewGroupCreated) setIsNewGroupCreated(false)
       setIsFetching(true)
@@ -131,6 +131,10 @@ export default function MyGroupTab() {
         setSelectedId(fields[0]?._id)
 
         setIsFetching(false)
+      })
+
+      route.setParams({
+        groupIDToRemove: undefined
       })
     }
   }, [groupIDToRemove, isNewGroupCreated])

@@ -8,7 +8,7 @@ import { fetchOtherPersonalBlogs, fetchPersonalBlogs, fetchUserBlogs } from "@/r
 import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction, useEffect, useRef, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { getUserGroupStatus } from "@/redux/slices/groupSlice";
 import { BlogViewType } from "@/enums/blog_properties.enum";
@@ -181,6 +181,10 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
     if (blogIdToRemove) {
       setIsFetching(true)
       personalBlogsReset.mutateAsync().then(() => setIsFetching(false));
+
+      router.setParams({
+        blogIdToRemove: undefined
+      })
     }
   }, [blogIdToRemove])
 

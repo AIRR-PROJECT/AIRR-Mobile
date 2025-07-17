@@ -7,7 +7,7 @@ import {
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Text,
@@ -50,6 +50,10 @@ export default function GroupPopularTab() {
     if (groupIDToRemove) {
       dispatch(getGroupPopularFields()).then(() => {
         setSelectedId("1")
+      })
+
+      router.setParams({
+        groupIDToRemove: undefined
       })
     }
   }, [groupIDToRemove]);

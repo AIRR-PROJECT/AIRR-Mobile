@@ -30,11 +30,13 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useLocalSearchParams } from "expo-router";
 import ReportCardComponent from "@/components/group/ReportCardComponent";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
-
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 
 export default function ReportsApprovalsPage() {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const flatlistRef = useRef<any>();
   const sheetRef = useRef<BottomSheet>(null);
   const { groupID, tagID } = useLocalSearchParams<{
@@ -46,20 +48,21 @@ export default function ReportsApprovalsPage() {
   const [isReportFetching, setIsReportFetching] = useState(false);
 
   // For bottom sheet confirm
-  const [bottomSheetMode, setBottomSheetMode] = useState<"main" | "approve" | "reject">("main");
+  const [bottomSheetMode, setBottomSheetMode] = useState<
+    "main" | "approve" | "reject"
+  >("main");
   const [selectedReportID, setSelectedReportID] = useState<string>("");
 
-
-   useEffect(() => {
+  useEffect(() => {
     if (groupID) {
-      setIsReportFetching(true)
-      dispatch(getPendingReportBlogList(groupID)).then(res => {
-        const list = res.payload as GroupReport[]
-        setDisplayReports(list)
-        setIsReportFetching(false)
-      })
+      setIsReportFetching(true);
+      dispatch(getPendingReportBlogList(groupID)).then((res) => {
+        const list = res.payload as GroupReport[];
+        setDisplayReports(list);
+        setIsReportFetching(false);
+      });
     }
-  }, [groupID])
+  }, [groupID]);
 
   const onApprove = (blogID: string) => {
     setSelectedReportID(blogID);
@@ -69,31 +72,38 @@ export default function ReportsApprovalsPage() {
   const onReject = (blogID: string) => {
     setSelectedReportID(blogID);
     setBottomSheetMode("reject");
-    sheetRef.current?.snapToIndex(0);
   };
-    const handleConfirmApprove = () => {
-    dispatch(actionBlogReport({
-      blogID: selectedReportID,
-      groupID: groupID,
-      action: "Resolve"
-    })).then(res => {
+  const handleConfirmApprove = () => {
+    dispatch(
+      actionBlogReport({
+        blogID: selectedReportID,
+        groupID: groupID,
+        action: "Resolve",
+      })
+    ).then((res) => {
       if (res.payload === true) {
         ToastAndroid.show("Report resolved", ToastAndroid.SHORT);
-        setDisplayReports((prev) => prev.filter((r) => r.Blog._id !== selectedReportID));
+        setDisplayReports((prev) =>
+          prev.filter((r) => r.Blog._id !== selectedReportID)
+        );
       }
       sheetRef.current?.close();
     });
   };
 
   const handleConfirmReject = () => {
-    dispatch(actionBlogReport({
-      blogID: selectedReportID,
-      groupID: groupID,
-      action: "Reject"
-    })).then(res => {
+    dispatch(
+      actionBlogReport({
+        blogID: selectedReportID,
+        groupID: groupID,
+        action: "Reject",
+      })
+    ).then((res) => {
       if (res.payload === true) {
         ToastAndroid.show("Report rejected", ToastAndroid.SHORT);
-        setDisplayReports((prev) => prev.filter((r) => r.Blog._id !== selectedReportID));
+        setDisplayReports((prev) =>
+          prev.filter((r) => r.Blog._id !== selectedReportID)
+        );
       }
       sheetRef.current?.close();
     });
@@ -102,13 +112,13 @@ export default function ReportsApprovalsPage() {
   const renderItem = ({ item }: any) => (
     <ReportCardComponent
       {...item}
-        onApprove={onApprove}
-        onReject={handleConfirmReject}
+      onApprove={onApprove}
+      onReject={onReject}
     />
   );
-  return (
-    isReportFetching ? 
-    <FeedBlogPreviewSkeleton/> : 
+  return isReportFetching ? (
+    <FeedBlogPreviewSkeleton />
+  ) : (
     <GestureHandlerRootView style={styles.container}>
       <Animated.FlatList
         data={displayReports}
@@ -142,17 +152,13 @@ export default function ReportsApprovalsPage() {
         <BottomSheetView style={{ padding: 20, gap: 20 }}>
           {bottomSheetMode === "approve" && (
             <View style={[styles.modalContentContainer]}>
-               <Image
+              <Image
                 style={styles.joinConfirmImage}
                 source={joinConfirmImage}
               />
               <View style={{ flex: 1, gap: 10 }}>
-                <Text style={styles.joinModalTitle}>
-                  Approve this report?
-                </Text>
-                <Text>
-                  This will resolve the report and ban the blog.
-                </Text>
+                <Text style={styles.joinModalTitle}>Approve this report?</Text>
+                <Text>This will resolve the report and ban the blog.</Text>
                 <View style={[styles.rowContainer, { gap: 20 }]}>
                   <TouchableOpacity
                     onPress={() => {

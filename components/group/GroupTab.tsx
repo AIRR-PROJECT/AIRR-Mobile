@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import GroupCardComponent from "@/components/group/GroupCardComponent";
 import { useAppDispatch } from "@/redux/hook";
 import { useEffect, useState } from "react";
-import { getCreatedGroups, getGroupsByFieldId } from "@/redux/slices/groupSlice";
+import { getCreatedGroups, getGroupsByFieldId, getJoinedFields, getJoinedGroupsByFieldId } from "@/redux/slices/groupSlice";
 import { Group } from "@/interfaces/groupInterface";
 import FeedBlogPreviewSkeleton from "../tabs/feed/FeedBlogPreviewSkeleton";
 
@@ -33,7 +33,7 @@ export default function GroupTab(props: {type: string, fieldID?: string}) {
         break
       case "joined":
         if (props.fieldID) {
-          dispatch(getGroupsByFieldId(props.fieldID)).then((val) => {
+          dispatch(getJoinedGroupsByFieldId(props.fieldID)).then((val) => {
             setGroups(val.payload as Group[])
 
             setIsFetching(false)

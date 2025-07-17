@@ -32,7 +32,7 @@ export default function BlogApprovalCardComponent({
   
   useEffect(() => {
     setTitle(Title)
-    setThumbnail(Owner.AvatarURL)
+    setThumbnail("https://res.cloudinary.com/dvjiwyc6g/image/upload/q_auto,f_auto/v1751523534/z4zzyvqnvhutgudzhnn2.webp")
   }, [])
 
   function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {

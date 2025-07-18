@@ -122,6 +122,10 @@ export default function ProfileScreen() {
   }, []);
 
   useEffect(() => {
+    setUserInfo(user)
+  }, [user])
+
+  useEffect(() => {
     // console.log(userGroups);
   }, [userGroups]);
 

@@ -49,7 +49,7 @@ import queryClient from "@/redux/api/queryClient";
 import { FlashList } from "@shopify/flash-list";
 import AIBlogPreviewSkeleton from "@/components/tabs/feed/AIBlogPreviewSkeleton";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
-import { useLocalSearchParams, useSegments } from "expo-router";
+import { router, useLocalSearchParams, useSegments } from "expo-router";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, {
   ICarouselInstance,
@@ -61,6 +61,7 @@ import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 import { getFavoriteBlogs } from "@/redux/slices/blogSlice";
 import { getUserGroupStatus } from "@/redux/slices/groupSlice";
+import { setParams } from "expo-router/build/global-state/routing";
 // TODO:
 // Fetching user favourite blogs only 
 // Also implment refresh control and lazy loading
@@ -165,6 +166,10 @@ export default function FavouriteBlog() {
     if (blogIdToRemove) {
       setBlogReset(true)
       favoriteBlogsReset.mutateAsync().then(() => setBlogReset(false));
+
+      router.setParams({
+        blogIdToRemove: undefined
+      })
     }
   }, [blogIdToRemove])
 

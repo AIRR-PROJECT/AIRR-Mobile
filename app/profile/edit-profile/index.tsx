@@ -15,7 +15,7 @@ import { User } from "@/interfaces/userInterface";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { setUserChange } from "@/redux/slices/userSlice";
 import { router } from "expo-router";
-import { setUserChangeSaved } from "@/redux/slices/authSlice";
+import { getUserInfo, setUserChangeSaved } from "@/redux/slices/authSlice";
 import { wrap } from "lodash";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -115,7 +115,7 @@ export default function EditProfileScreen() {
     if (isUserChangeSaved) {
       dispatch(setUserChangeSaved(false));
 
-      // router.back()
+      router.back()
     }
   }, [isUserChangeSaved]);
 

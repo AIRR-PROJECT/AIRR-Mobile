@@ -270,6 +270,7 @@ export default function BlogsApprovalsPage() {
     else {
       dispatch(getPendingBlogList(groupID)).then((res) => {
         const list = res.payload as PendingBlogRequest[];
+        console.log(list)
         setBlogApprovals(list);
       });
     }

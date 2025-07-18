@@ -9,7 +9,7 @@ import {
   getPopularGroups,
 } from "@/redux/slices/groupSlice";
 import { FontAwesome } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Text,
@@ -62,6 +62,10 @@ export default function JoinedGroupTab() {
 
         setJoinedFields(data)
         if (data.length != 0) setSelectedId(data[0]._id)
+      })
+
+      router.setParams({
+        groupIDToRemove: undefined
       })
     }
   }, [groupIDToRemove]);

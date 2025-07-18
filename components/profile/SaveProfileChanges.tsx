@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, ToastAndroid } from "react-native";
 import ButtonGradient from "../ButtonGradient";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { changeCurrentPassword, getUserInfo, resetChangedPassword, setUserChangeSaved, updateUser } from "@/redux/slices/authSlice";
@@ -8,10 +8,15 @@ import { reset, resetPassword } from "@/redux/slices/userSlice";
 
 export default function SaveProfileChanges() {
   const dispatch = useAppDispatch()
-  const { user, userChange, userCurrentPassword, userNewPassword } = useAppSelector(state => state.user)
+  const { user, userChange, userCurrentPassword, userNewPassword, userChangeValid } = useAppSelector(state => state.user)
 
   // handle on press to save change here
   const handleSaveChanges = () => {
+    if (!userChangeValid) {
+      ToastAndroid.show("Please fill in all required fields", ToastAndroid.SHORT);
+      return;
+    }
+
     if (JSON.stringify(user) == JSON.stringify(userChange)) {
       dispatch(getUserInfo()).then(() => {
         dispatch(setUserChangeSaved(true))

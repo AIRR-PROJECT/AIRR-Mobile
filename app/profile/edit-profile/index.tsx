@@ -8,12 +8,13 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  ToastAndroid,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { User } from "@/interfaces/userInterface";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { setUserChange } from "@/redux/slices/userSlice";
+import { setUserChange, setUserChangeValid } from "@/redux/slices/userSlice";
 import { router } from "expo-router";
 import { getUserInfo, setUserChangeSaved } from "@/redux/slices/authSlice";
 import { wrap } from "lodash";
@@ -23,6 +24,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type PersonalInfoForm = {
@@ -102,8 +104,7 @@ export default function EditProfileScreen() {
   const {
     control,
     watch,
-    formState: { errors },
-    getValues,
+    formState: { errors, isValid },
   } = useForm<UnifiedForm>({
     mode: "onChange",
     defaultValues: defaultFormData,
@@ -124,12 +125,12 @@ export default function EditProfileScreen() {
   const emailWatch = watch("email");
   const dateOfBirthWatch = watch("dateOfBirth");
   const phoneWatch = watch("phone");
-  const startYearWatch = watch("startYear");
   const studentIdWatch = watch("studentId");
   const departmentWatch = watch("department");
   const programWatch = watch("program");
   const gpaWatch = watch("gpa");
-  // const startYearWatch = watch("startYear");
+  const startYearWatch = watch("startYear");
+  console.log("startYearWatch", startYearWatch);
   const linkedinWatch = watch("linkedin");
   const githubWatch = watch("github");
   const facebookWatch = watch("facebook");
@@ -141,8 +142,14 @@ export default function EditProfileScreen() {
     () => () => {} // TRICK to avoid undefined onChange
   );
   const userChange = useAppSelector((state) => state.user.userChange);
-
+  // console.log("userChange", userChange);
   useEffect(() => {
+    console.log(isValid, errors)
+    if (!isValid) {
+      dispatch(setUserChangeValid(false));
+      return;
+    }
+    dispatch(setUserChangeValid(true));
     dispatch(
       setUserChange({
         ...userChange,
@@ -159,7 +166,7 @@ export default function EditProfileScreen() {
           department: departmentWatch,
           program: programWatch,
           gpa: gpaWatch,
-          year: new Date().getFullYear() - startYearWatch,
+          year: startYearWatch,
           link: {
             ...userChange.profile.link,
             LinkedIn: linkedinWatch,
@@ -395,14 +402,12 @@ export default function EditProfileScreen() {
             )}
             name="phone"
             rules={{
-              maxLength: { value: 10, message: "Phone max 10 digits" },
-              pattern: {
-                value: /^\d*$/,
-                message: "Phone must be numbers only",
-              },
+              validate: (v) =>
+                !v ||
+                (/^\d{10}$/.test(v) && v.length === 10) ||
+                "Phone must be 10 digits",
             }}
           />
-
           {errors.phone && (
             <Text style={styles.errorText}>{errors.phone.message}</Text>
           )}
@@ -436,11 +441,10 @@ export default function EditProfileScreen() {
             )}
             name="studentId"
             rules={{
-              maxLength: { value: 8, message: "Student ID max 8 digits" },
-              pattern: {
-                value: /^\d*$/,
-                message: "Student ID must be numbers only",
-              },
+              validate: (v) =>
+                !v ||
+                (/^\d{8}$/.test(v) && v.length === 8) ||
+                "Student ID must be 8 digits",
             }}
           />
           {errors.studentId && (
@@ -575,8 +579,8 @@ export default function EditProfileScreen() {
                 )}
                 name="startYear"
                 rules={{
-                  min: { value: 0, message: "Year must be at least 0" },
-                  max: { value: 4, message: "Year must be at most 4" },
+                  min: { value: 1, message: "Year must be in range 1-4" },
+                  max: { value: 4, message: "Year must be in range 1-4" },
                   pattern: { value: /^\d*$/, message: "Year must be a number" },
                 }}
               />
@@ -590,9 +594,8 @@ export default function EditProfileScreen() {
         <ThemedText style={[styles.title, { marginVertical: 20 }]}>
           Social Media Accounts
         </ThemedText>
-        {/* Social Media Form */}
         <View style={[styles.formSection, { marginBottom: 20 }]}>
-          {/*LinkedIn  */}
+          {/* LinkedIn */}
           <Text style={[styles.paragraph]}>LinkedIn</Text>
           <Controller
             control={control}
@@ -616,18 +619,19 @@ export default function EditProfileScreen() {
             )}
             name="linkedin"
             rules={{
+              validate: (v) =>
+                !v ||
+                /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/.test(
+                  v
+                ) ||
+                "Invalid LinkedIn URL",
               maxLength: { value: 60, message: "LinkedIn max 60 characters" },
-              // Linkedin Regex validation
-              pattern: {
-                value:
-                  /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/,
-                message: "Invalid LinkedIn URL",
-              },
             }}
           />
           {errors.linkedin && (
             <Text style={styles.errorText}>{errors.linkedin.message}</Text>
           )}
+
           {/* Github */}
           <Text style={[styles.paragraph]}>Github</Text>
           <Controller
@@ -637,7 +641,7 @@ export default function EditProfileScreen() {
                 <TextInput
                   style={[
                     styles.input,
-                    errors.linkedin && styles.errorInput,
+                    errors.github && styles.errorInput,
                     { width: "100%", flexWrap: "wrap" },
                   ]}
                   placeholder="Github"
@@ -652,17 +656,19 @@ export default function EditProfileScreen() {
             )}
             name="github"
             rules={{
-              maxLength: { value: 60, message: "LinkedIn max 60 characters" },
-              // Github Regex validation
-              pattern: {
-                value: /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/,
-                message: "Invalid GitHub URL",
-              },
+              validate: (v) =>
+                !v ||
+                /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/.test(
+                  v
+                ) ||
+                "Invalid GitHub URL",
+              maxLength: { value: 60, message: "Github max 60 characters" },
             }}
           />
           {errors.github && (
             <Text style={styles.errorText}>{errors.github.message}</Text>
           )}
+
           {/* Facebook */}
           <Text style={[styles.paragraph]}>Facebook</Text>
           <Controller
@@ -672,7 +678,7 @@ export default function EditProfileScreen() {
                 <TextInput
                   style={[
                     styles.input,
-                    errors.linkedin && styles.errorInput,
+                    errors.facebook && styles.errorInput,
                     { width: "100%", flexWrap: "wrap" },
                   ]}
                   placeholder="Facebook"
@@ -687,13 +693,13 @@ export default function EditProfileScreen() {
             )}
             name="facebook"
             rules={{
-              maxLength: { value: 60, message: "LinkedIn max 60 characters" },
-              // Facebook Regex validation
-              pattern: {
-                value:
-                  /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9._-]+\/?$/,
-                message: "Invalid Facebook URL",
-              },
+              validate: (v) =>
+                !v ||
+                /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9._-]+\/?$/.test(
+                  v
+                ) ||
+                "Invalid Facebook URL",
+              maxLength: { value: 60, message: "Facebook max 60 characters" },
             }}
           />
           {errors.facebook && (

@@ -128,7 +128,7 @@ export default function EditProfileScreen() {
   const departmentWatch = watch("department");
   const programWatch = watch("program");
   const gpaWatch = watch("gpa");
-  const startYearWatch = watch("startYear");
+  // const startYearWatch = watch("startYear");
   const linkedinWatch = watch("linkedin");
   const githubWatch = watch("github");
   const facebookWatch = watch("facebook");
@@ -139,152 +139,48 @@ export default function EditProfileScreen() {
   const [pendingOnChange, setPendingOnChange] = useState<(val: string) => void>(
     () => () => {} // TRICK to avoid undefined onChange
   );
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        firstName: firstNameWatch,
-      })
-    );
-  }, [firstNameWatch]);
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        lastName: lastNameWatch,
-      })
-    );
-  }, [lastNameWatch]);
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        email: emailWatch,
-      })
-    );
-  }, [emailWatch]);
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        dateOfBirth: dateOfBirthWatch,
-      })
-    );
-  }, [dateOfBirthWatch]);
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        phoneNumber: /^-?\d+$/.test(phoneWatch)
-          ? Number(phoneWatch)
-          : undefined,
-      })
-    );
-  }, [phoneWatch]);
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        profile: {
-          ...userChange.profile,
-          studentID: studentIdWatch,
-        },
-      })
-    );
-  }, [studentIdWatch]);
+  const userChange = useAppSelector((state) => state.user.userChange);
 
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        profile: {
-          ...userChange.profile,
-          department: departmentWatch,
+useEffect(() => {
+  dispatch(
+    setUserChange({
+      ...userChange,
+      firstName: firstNameWatch,
+      lastName: lastNameWatch,
+      email: emailWatch,
+      dateOfBirth: dateOfBirthWatch,
+      phoneNumber: /^-?\d+$/.test(phoneWatch) ? Number(phoneWatch) : undefined,
+      profile: {
+        ...userChange.profile,
+        studentID: studentIdWatch,
+        department: departmentWatch,
+        program: programWatch,
+        gpa: gpaWatch,
+        year: new Date().getFullYear() - startYearWatch,
+        link: {
+          ...userChange.profile.link,
+          LinkedIn: linkedinWatch,
+          Github: githubWatch,
+          Facebook: facebookWatch,
         },
-      })
-    );
-  }, [departmentWatch]);
-
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        profile: {
-          ...userChange.profile,
-          program: programWatch,
-        },
-      })
-    );
-  }, [programWatch]);
-
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        profile: {
-          ...userChange.profile,
-          gpa: gpaWatch,
-        },
-      })
-    );
-  }, [gpaWatch]);
-
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        profile: {
-          ...userChange.profile,
-          year: new Date().getFullYear() - startYearWatch,
-        },
-      })
-    );
-  }, [startYearWatch]);
-
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        profile: {
-          ...userChange.profile,
-          link: {
-            ...userChange.profile.link,
-            LinkedIn: linkedinWatch,
-          },
-        },
-      })
-    );
-  }, [linkedinWatch]);
-
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        profile: {
-          ...userChange.profile,
-          link: {
-            ...userChange.profile.link,
-            Github: githubWatch,
-          },
-        },
-      })
-    );
-  }, [githubWatch]);
-
-  useEffect(() => {
-    dispatch(
-      setUserChange({
-        ...userChange,
-        profile: {
-          ...userChange.profile,
-          link: {
-            ...userChange.profile.link,
-            Facebook: facebookWatch,
-          },
-        },
-      })
-    );
-  }, [facebookWatch]);
+      },
+    })
+  );
+}, [
+  firstNameWatch,
+  lastNameWatch,
+  emailWatch,
+  dateOfBirthWatch,
+  phoneWatch,
+  studentIdWatch,
+  departmentWatch,
+  programWatch,
+  gpaWatch,
+  startYearWatch,
+  linkedinWatch,
+  githubWatch,
+  facebookWatch,
+]);
 const [showDatePicker, setShowDatePicker] = useState(false);
   return (
     <GestureHandlerRootView>

@@ -22,7 +22,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type PersonalInfoForm = {
@@ -62,7 +62,7 @@ const mockData: UnifiedForm = {
   github: "",
   facebook: "",
 };
-const PROGRAM_OPTIONS = ["CQ", "CTCC", "CLC"];
+const PROGRAM_OPTIONS = ["CQ", "CTTT", "CLC", "VP"];
 const DEPARTMENT_OPTIONS = [
   "Software Engineering",
   "Information Systems",
@@ -109,13 +109,13 @@ export default function EditProfileScreen() {
     defaultValues: defaultFormData,
   });
 
-  let userChange: User = JSON.parse(JSON.stringify(userData)) as User;
+  // let userChange: User = JSON.parse(JSON.stringify(userData)) as User;
 
   useEffect(() => {
     if (isUserChangeSaved) {
       dispatch(setUserChangeSaved(false));
 
-      router.back()
+      router.back();
     }
   }, [isUserChangeSaved]);
 
@@ -124,6 +124,7 @@ export default function EditProfileScreen() {
   const emailWatch = watch("email");
   const dateOfBirthWatch = watch("dateOfBirth");
   const phoneWatch = watch("phone");
+  const startYearWatch = watch("startYear");
   const studentIdWatch = watch("studentId");
   const departmentWatch = watch("department");
   const programWatch = watch("program");
@@ -141,47 +142,49 @@ export default function EditProfileScreen() {
   );
   const userChange = useAppSelector((state) => state.user.userChange);
 
-useEffect(() => {
-  dispatch(
-    setUserChange({
-      ...userChange,
-      firstName: firstNameWatch,
-      lastName: lastNameWatch,
-      email: emailWatch,
-      dateOfBirth: dateOfBirthWatch,
-      phoneNumber: /^-?\d+$/.test(phoneWatch) ? Number(phoneWatch) : undefined,
-      profile: {
-        ...userChange.profile,
-        studentID: studentIdWatch,
-        department: departmentWatch,
-        program: programWatch,
-        gpa: gpaWatch,
-        year: new Date().getFullYear() - startYearWatch,
-        link: {
-          ...userChange.profile.link,
-          LinkedIn: linkedinWatch,
-          Github: githubWatch,
-          Facebook: facebookWatch,
+  useEffect(() => {
+    dispatch(
+      setUserChange({
+        ...userChange,
+        firstName: firstNameWatch,
+        lastName: lastNameWatch,
+        email: emailWatch,
+        dateOfBirth: dateOfBirthWatch,
+        phoneNumber: /^-?\d+$/.test(phoneWatch)
+          ? Number(phoneWatch)
+          : undefined,
+        profile: {
+          ...userChange.profile,
+          studentID: studentIdWatch,
+          department: departmentWatch,
+          program: programWatch,
+          gpa: gpaWatch,
+          year: new Date().getFullYear() - startYearWatch,
+          link: {
+            ...userChange.profile.link,
+            LinkedIn: linkedinWatch,
+            Github: githubWatch,
+            Facebook: facebookWatch,
+          },
         },
-      },
-    })
-  );
-}, [
-  firstNameWatch,
-  lastNameWatch,
-  emailWatch,
-  dateOfBirthWatch,
-  phoneWatch,
-  studentIdWatch,
-  departmentWatch,
-  programWatch,
-  gpaWatch,
-  startYearWatch,
-  linkedinWatch,
-  githubWatch,
-  facebookWatch,
-]);
-const [showDatePicker, setShowDatePicker] = useState(false);
+      })
+    );
+  }, [
+    firstNameWatch,
+    lastNameWatch,
+    emailWatch,
+    dateOfBirthWatch,
+    phoneWatch,
+    studentIdWatch,
+    departmentWatch,
+    programWatch,
+    gpaWatch,
+    startYearWatch,
+    linkedinWatch,
+    githubWatch,
+    facebookWatch,
+  ]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   return (
     <GestureHandlerRootView>
       <ScrollView style={styles.container}>
@@ -319,9 +322,7 @@ const [showDatePicker, setShowDatePicker] = useState(false);
             render={({ field: { onChange } }) => (
               <>
                 <TouchableOpacity
-                  style={[
-                    styles.viewBoxShadow,
-                  ]}
+                  style={[styles.viewBoxShadow]}
                   onPress={() => setShowDatePicker(true)}
                 >
                   <Text
@@ -338,7 +339,7 @@ const [showDatePicker, setShowDatePicker] = useState(false);
                   </Text>
                 </TouchableOpacity>
                 {showDatePicker && (
-                  <RNDateTimePicker 
+                  <RNDateTimePicker
                     value={
                       dateOfBirthWatch
                         ? new Date(dateOfBirthWatch)

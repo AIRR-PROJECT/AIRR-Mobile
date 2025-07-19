@@ -40,7 +40,7 @@ type StudentInfoForm = {
   department: string;
   program: string;
   gpa: number;
-  startYear: number;
+  yearOfEntry: number;
 };
 type SocialMediaForm = {
   linkedin: string;
@@ -59,7 +59,7 @@ const mockData: UnifiedForm = {
   department: "Software Engineering",
   program: "Bachelor",
   gpa: 3.5,
-  startYear: 2019,
+  yearOfEntry: 1,
   linkedin: "https://www.linkedin.com/",
   github: "",
   facebook: "",
@@ -78,8 +78,8 @@ const DEPARTMENT_OPTIONS = [
 
 export default function EditProfileScreen() {
   const dispatch = useAppDispatch();
-  const MIN_ENTRY_YEAR = new Date().getFullYear() - 4
-  const MAX_ENTRY_YEAR = new Date().getFullYear()
+  const MIN_ENTRY_YEAR = 1;
+  const MAX_ENTRY_YEAR = 4;
   const { isUserChangeSaved } = useAppSelector((state) => state.auth);
   const { user } = useAppSelector((state) => state.user);
   const userData = user as any as User;
@@ -89,15 +89,13 @@ export default function EditProfileScreen() {
     lastName: userData.lastName ?? "",
     username: userData.username,
     email: userData.email ?? "",
-    dateOfBirth: userData.dateOfBirth ?? "",
+    yearOfEntry: userData.yearOfEntry ?? 1,
     phone: userData.phoneNumber?.toString() ?? "",
     studentId: userData.profile.studentID ?? "",
     department: userData.profile.department ?? "",
     program: userData.profile.program ?? "",
+    dateOfBirth: userData.profile.dateOfBirth ?? "",
     gpa: userData.profile.gpa ?? 0,
-    startYear: userData.profile.year
-      ? new Date().getFullYear() - userData.profile.year
-      : 0,
     linkedin: userData.profile.link ? userData.profile.link.LinkedIn ?? "" : "",
     github: userData.profile.link ? userData.profile.link.Github ?? "" : "",
     facebook: userData.profile.link ? userData.profile.link.Facebook ?? "" : "",
@@ -108,7 +106,7 @@ export default function EditProfileScreen() {
     watch,
     formState: { errors, isValid },
   } = useForm<UnifiedForm>({
-    mode: "onChange",
+    mode: "all",
     defaultValues: defaultFormData,
   });
 
@@ -131,8 +129,7 @@ export default function EditProfileScreen() {
   const departmentWatch = watch("department");
   const programWatch = watch("program");
   const gpaWatch = watch("gpa");
-  const startYearWatch = watch("startYear");
-  console.log("startYearWatch", startYearWatch);
+  const yearOfEntryWatch = watch("yearOfEntry");
   const linkedinWatch = watch("linkedin");
   const githubWatch = watch("github");
   const facebookWatch = watch("facebook");
@@ -143,11 +140,15 @@ export default function EditProfileScreen() {
   const [pendingOnChange, setPendingOnChange] = useState<(val: string) => void>(
     () => () => {} // TRICK to avoid undefined onChange
   );
+  
   const userChange = useAppSelector((state) => state.user.userChange);
   // console.log("userChange", userChange);
+  
   useEffect(() => {
-    // T test thấy cái isValid nó false hoài nên chỉnh tạm lại ntn
-    if (Object.keys(errors).length != 0) {
+    console.log("isValid", isValid);
+    if (!isValid && errors != undefined && Object.keys(errors).length > 0) {
+      // console.log which error for me
+      console.log(errors);
       dispatch(setUserChangeValid(false));
       return;
     }
@@ -159,16 +160,14 @@ export default function EditProfileScreen() {
         lastName: lastNameWatch,
         email: emailWatch,
         dateOfBirth: dateOfBirthWatch,
-        phoneNumber: /^-?\d+$/.test(phoneWatch)
-          ? Number(phoneWatch)
-          : undefined,
+        phoneNumber: phoneWatch,
         profile: {
           ...userChange.profile,
           studentID: studentIdWatch,
           department: departmentWatch,
           program: programWatch,
           gpa: gpaWatch,
-          year: startYearWatch,
+          year: yearOfEntryWatch,
           link: {
             ...userChange.profile.link,
             LinkedIn: linkedinWatch,
@@ -188,12 +187,11 @@ export default function EditProfileScreen() {
     departmentWatch,
     programWatch,
     gpaWatch,
-    startYearWatch,
+    yearOfEntryWatch,
     linkedinWatch,
     githubWatch,
     facebookWatch,
   ]);
-
   const [showDatePicker, setShowDatePicker] = useState(false);
   return (
     <GestureHandlerRootView>
@@ -369,9 +367,8 @@ export default function EditProfileScreen() {
               </>
             )}
             rules={{
-              required: "Date of Birth is required",
               validate: (v) => {
-                if (!v) return "Date of Birth is required";
+                if (!v) return true; // Not required
                 const date = new Date(v);
                 if (date > new Date())
                   return "Date of Birth cannot be in the future";
@@ -499,8 +496,8 @@ export default function EditProfileScreen() {
                   style={[styles.viewBoxShadow]}
                   onPress={() => {
                     setSheetMode("program");
-                    setPendingOnChange(() => onChange);
                     sheetRef.current?.snapToIndex(0);
+                    setPendingOnChange(() => onChange);
                   }}
                 >
                   <Text
@@ -569,7 +566,7 @@ export default function EditProfileScreen() {
                     <TextInput
                       style={[
                         styles.input,
-                        errors.startYear && styles.errorInput,
+                        errors.yearOfEntry && styles.errorInput,
                         { width: "100%" },
                       ]}
                       placeholder="Year of Study"
@@ -580,15 +577,23 @@ export default function EditProfileScreen() {
                     />
                   </View>
                 )}
-                name="startYear"
+                name="yearOfEntry"
                 rules={{
-                  min: { value: MIN_ENTRY_YEAR, message: `Year must be in range ${MIN_ENTRY_YEAR}-${MAX_ENTRY_YEAR}` },
-                  max: { value: MAX_ENTRY_YEAR, message: `Year must be in range ${MIN_ENTRY_YEAR}-${MAX_ENTRY_YEAR}` },
+                  min: {
+                    value: MIN_ENTRY_YEAR,
+                    message: `Year must be in range ${MIN_ENTRY_YEAR}-${MAX_ENTRY_YEAR}`,
+                  },
+                  max: {
+                    value: MAX_ENTRY_YEAR,
+                    message: `Year must be in range ${MIN_ENTRY_YEAR}-${MAX_ENTRY_YEAR}`,
+                  },
                   pattern: { value: /^\d*$/, message: "Year must be a number" },
                 }}
               />
-              {errors.startYear && (
-                <Text style={styles.errorText}>{errors.startYear.message}</Text>
+              {errors.yearOfEntry && (
+                <Text style={styles.errorText}>
+                  {errors.yearOfEntry.message}
+                </Text>
               )}
             </View>
           </View>

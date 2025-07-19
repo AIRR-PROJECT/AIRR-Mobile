@@ -13,10 +13,9 @@ export default function SaveProfileChanges() {
   // handle on press to save change here
   const handleSaveChanges = () => {
     if (!userChangeValid) {
-      ToastAndroid.show("Please fill in all required fields", ToastAndroid.SHORT);
+      ToastAndroid.show("There are errors in your form", ToastAndroid.SHORT);
       return;
     }
-
     if (JSON.stringify(user) == JSON.stringify(userChange)) {
       dispatch(getUserInfo()).then(() => {
         dispatch(setUserChangeSaved(true))

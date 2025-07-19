@@ -24,7 +24,7 @@ const initialState = {
     userGroups: null,
     userCurrentGroupMembershipStage: GroupMembershipStage.NOT_JOINED,
     userCurrentGroupRole: null as unknown as GroupRole,
-    userChangeValid: false,
+    userChangeValid: true,
 };
 
 const userSlice = createSlice({
@@ -93,7 +93,7 @@ const userSlice = createSlice({
             state.userChange = null as unknown as User
             state.userGroups = null
             state.userCurrentGroupRole = null as unknown as GroupRole
-            state.userChangeValid = false;
+            state.userChangeValid = true;
         },
 
     },

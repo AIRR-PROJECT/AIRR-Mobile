@@ -50,8 +50,9 @@ export interface User {
     firstName?: string;
     lastName?: string;
     dateOfBirth?: string;
+    yearOfEntry?: number;
     isAuthenticatedWithGoogle?: boolean;
-    phoneNumber?: number;
+    phoneNumber?: string;
     joinDate?: Date;
     survey?: SurveyTag[];
     role?: string;

@@ -337,7 +337,7 @@ export const updateUser = createAsyncThunk(
                 studentID: userData.profile.studentID ?? "",
                 department: userData.profile.department ?? "",
                 program: userData.profile.program?? "",
-                entry_year: userData.profile.year ? new Date().getFullYear() - userData.profile.year : 0,
+                entry_year: userData.profile.yearOfEntry ?? 1,
                 gpa: userData.profile.gpa ?? 0
             }
             if (userData.profile.link.LinkedIn) {

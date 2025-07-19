@@ -17,7 +17,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { setUserChange, setUserChangeValid } from "@/redux/slices/userSlice";
 import { router } from "expo-router";
 import { getUserInfo, setUserChangeSaved } from "@/redux/slices/authSlice";
-import { wrap } from "lodash";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -78,6 +77,8 @@ const DEPARTMENT_OPTIONS = [
 
 export default function EditProfileScreen() {
   const dispatch = useAppDispatch();
+  const MIN_ENTRY_YEAR = new Date().getFullYear() - 4
+  const MAX_ENTRY_YEAR = new Date().getFullYear()
   const { isUserChangeSaved } = useAppSelector((state) => state.auth);
   const { user } = useAppSelector((state) => state.user);
   const userData = user as any as User;
@@ -144,7 +145,6 @@ export default function EditProfileScreen() {
   const userChange = useAppSelector((state) => state.user.userChange);
   // console.log("userChange", userChange);
   useEffect(() => {
-    console.log(isValid, errors)
     if (!isValid) {
       dispatch(setUserChangeValid(false));
       return;
@@ -558,7 +558,7 @@ export default function EditProfileScreen() {
             </View>
             {/* Start Year */}
             <View style={{ width: "48%" }}>
-              <Text style={[styles.paragraph]}>Start Year</Text>
+              <Text style={[styles.paragraph]}>Year of Entry</Text>
               <Controller
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
@@ -579,8 +579,8 @@ export default function EditProfileScreen() {
                 )}
                 name="startYear"
                 rules={{
-                  min: { value: 1, message: "Year must be in range 1-4" },
-                  max: { value: 4, message: "Year must be in range 1-4" },
+                  min: { value: MIN_ENTRY_YEAR, message: `Year must be in range ${MIN_ENTRY_YEAR}-${MAX_ENTRY_YEAR}` },
+                  max: { value: MAX_ENTRY_YEAR, message: `Year must be in range ${MIN_ENTRY_YEAR}-${MAX_ENTRY_YEAR}` },
                   pattern: { value: /^\d*$/, message: "Year must be a number" },
                 }}
               />

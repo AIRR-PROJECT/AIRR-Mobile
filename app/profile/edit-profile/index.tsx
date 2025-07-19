@@ -17,6 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { setUserChange, setUserChangeValid } from "@/redux/slices/userSlice";
 import { router } from "expo-router";
 import { getUserInfo, setUserChangeSaved } from "@/redux/slices/authSlice";
+import { wrap } from "lodash";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -145,7 +146,8 @@ export default function EditProfileScreen() {
   const userChange = useAppSelector((state) => state.user.userChange);
   // console.log("userChange", userChange);
   useEffect(() => {
-    if (!isValid) {
+    // T test thấy cái isValid nó false hoài nên chỉnh tạm lại ntn
+    if (Object.keys(errors).length != 0) {
       dispatch(setUserChangeValid(false));
       return;
     }
@@ -191,6 +193,7 @@ export default function EditProfileScreen() {
     githubWatch,
     facebookWatch,
   ]);
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   return (
     <GestureHandlerRootView>

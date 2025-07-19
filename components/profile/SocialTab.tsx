@@ -19,30 +19,30 @@ import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import { useAppDispatch } from "@/redux/hook";
 import { logOut } from "@/redux/slices/authSlice";
-
+import * as Linking from "expo-linking";
 // Get list of tags [max 10]
 const tags = Array(10).fill("Frontend");
 const chunkedTags = chunkArray(tags, 5);
 const mockLink = "https://dly.to/dfdsc";
 const mockFacebookLink = "https://facebook.com/yourprofile";
 const mockLinkedInLink = "https://linkedin.com/in/yourprofile";
-const mockGithubLink = "https://github.com/yourprofileddddddddddddddddddddddddddddddddddddddddddddddddddd";
+const mockGithubLink = "https://github.com/yourprofile";
 export default function SocialTab({
   link,
   facebookLink,
   linkedInLink,
   githubLink,
-  showSignOut
+  showSignOut,
 }: {
-  link: string,
-  facebookLink: string,
-  linkedInLink: string,
-  githubLink: string,
-  showSignOut: boolean
+  link: string;
+  facebookLink: string;
+  linkedInLink: string;
+  githubLink: string;
+  showSignOut: boolean;
 }) {
   const dispatch = useAppDispatch();
 
-  const handleCopyLink = async ({link}: {link:string}) => {
+  const handleCopyLink = async ({ link }: { link: string }) => {
     await Clipboard.setStringAsync(link);
 
     ToastAndroid.show("Link copied to clipboard", ToastAndroid.SHORT);
@@ -54,6 +54,15 @@ export default function SocialTab({
         route.push("/auth");
       }
     });
+  };
+  const handleOpenFacebook = () => {
+    Linking.openURL(facebookLink ?? mockFacebookLink);
+  };
+  const handleOpenLinkedIn = () => {
+    Linking.openURL(linkedInLink ?? mockLinkedInLink);
+  };
+  const handleOpenGithub = () => {
+    Linking.openURL(githubLink ?? mockGithubLink);
   };
   return (
     // Readme
@@ -80,67 +89,95 @@ export default function SocialTab({
       </LinearGradient> */}
 
       <Text style={styles.inviteFriendTitle}>Social Links</Text>
-      <LinearGradient
-        colors={["#0e1342ff", "#1d1d1dff"]} // dark blue to dark
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.linkContainer}
-      >
-        <View style={[styles.iconContainer, { backgroundColor: "#012e46ff" }]}>
-          <Feather name="facebook" size={24} color="#1977F2" />
+      <TouchableOpacity onPress={handleOpenFacebook} activeOpacity={0.7}>
+        <LinearGradient
+          colors={["#0e1342ff", "#1d1d1dff"]} // dark blue to dark
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.linkContainer}
+        >
+          <View
+            style={[styles.iconContainer, { backgroundColor: "#012e46ff" }]}
+          >
+            <Feather name="facebook" size={24} color="#1977F2" />
+          </View>
+          <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
+            {facebookLink}
+          </Text>
+          <TouchableOpacity
+            style={[styles.copyLinkButton, {}]}
+            onPress={() =>
+              handleCopyLink({ link: facebookLink ?? mockFacebookLink })
+            }
+          >
+            <Ionicons name="copy-outline" size={24} color="#fff" />
+          </TouchableOpacity>
+        </LinearGradient>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleOpenLinkedIn} activeOpacity={0.7}>
+        <LinearGradient
+          colors={["#0e1342ff", "#1d1d1dff"]} // dark blue to dark
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.linkContainer}
+        >
+          <View
+            style={[styles.iconContainer, { backgroundColor: "#012e46ff" }]}
+          >
+            <Feather name="linkedin" size={24} color="#1977F2" />
+          </View>
+          <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
+            {linkedInLink}
+          </Text>
+          <TouchableOpacity
+            style={styles.copyLinkButton}
+            onPress={() =>
+              handleCopyLink({ link: linkedInLink ?? mockLinkedInLink })
+            }
+          >
+            <Ionicons name="copy-outline" size={24} color="#fff" />
+          </TouchableOpacity>
+        </LinearGradient>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleOpenGithub} activeOpacity={0.7}>
+        <LinearGradient
+          colors={["#142c11ff", "#1d1d1dff"]} // dark green to dark
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.linkContainer}
+        >
+          <View style={styles.iconContainer}>
+            <Feather name="github" size={24} color="#B9FF66" />
+          </View>
+          <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
+            {githubLink}
+          </Text>
+          <TouchableOpacity
+            style={styles.copyLinkButton}
+            onPress={() =>
+              handleCopyLink({ link: githubLink ?? mockGithubLink })
+            }
+          >
+            <Ionicons name="copy-outline" size={24} color="#fff" />
+          </TouchableOpacity>
+        </LinearGradient>
+      </TouchableOpacity>
+
+      {/* Top Tags */}
+      {showSignOut && (
+        <View>
+          <TouchableOpacity
+            style={styles.signOutButton}
+            activeOpacity={0.7}
+            onPress={handleSignOut}
+          >
+            <Feather name="log-out" size={24} color="#fff" />
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{facebookLink}</Text>
-        <TouchableOpacity
-          style={[styles.copyLinkButton, {}]}
-          onPress={() => handleCopyLink({ link: facebookLink ?? mockFacebookLink })}
-        >
-          <Ionicons name="copy-outline" size={24} color="#fff" />
-        </TouchableOpacity>
-      </LinearGradient>
-      <LinearGradient
-        colors={["#0e1342ff", "#1d1d1dff"]} // dark blue to dark
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.linkContainer}
-      >
-        <View style={[styles.iconContainer, { backgroundColor: "#012e46ff" }]}>
-          <Feather name="linkedin" size={24} color="#1977F2" />
-        </View>
-        <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{linkedInLink}</Text>
-        <TouchableOpacity
-          style={styles.copyLinkButton}
-          onPress={() => handleCopyLink({ link: linkedInLink ?? mockLinkedInLink })}
-        >
-          <Ionicons name="copy-outline" size={24} color="#fff" />
-        </TouchableOpacity>
-      </LinearGradient>
-      <LinearGradient
-        colors={["#142c11ff", "#1d1d1dff"]} // dark green to dark
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.linkContainer}
-      >
-        <View style={styles.iconContainer}>
-          <Feather name="github" size={24} color="#B9FF66" />
-        </View>
-        <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">{githubLink}</Text>
-        <TouchableOpacity
-          style={styles.copyLinkButton}
-          onPress={() => handleCopyLink({ link: githubLink ?? mockGithubLink })}
-        >
-          <Ionicons name="copy-outline" size={24} color="#fff" />
-        </TouchableOpacity>
-      </LinearGradient>
-      {showSignOut && <View>
-        <TouchableOpacity
-          style={styles.signOutButton}
-          activeOpacity={0.7}
-          onPress={handleSignOut}
-        >
-          <Feather name="log-out" size={24} color="#fff" />
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
-      </View>}
+      )}
     </View>
   );
 }

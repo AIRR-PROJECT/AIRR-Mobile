@@ -154,7 +154,7 @@ export const getGroupsByFieldId = createAsyncThunk(
 )
 
 export const getJoinedGroupsByFieldId = createAsyncThunk(
-    'group/getFieldDetail',
+    'group/getJoinedGroupsByFieldId',
     async (fieldID: string, thunkAPI) => {
         try {
             const res = await api.get(`groups/joined-fields-detail?fieldID=${fieldID}`) as AxiosResponse
@@ -165,6 +165,25 @@ export const getJoinedGroupsByFieldId = createAsyncThunk(
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getAllJoinedGroups = createAsyncThunk(
+    'group/getAllJoinedGroups',
+    async (_, thunkAPI) => {
+        try {
+            const res = await api.get(`groups/joined-groups`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.groups as Group[]
+            }
+            else {
+                return []
             }
         }
         catch (error: any) {

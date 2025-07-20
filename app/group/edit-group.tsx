@@ -178,8 +178,7 @@ export default function EditGroup() {
 
       dispatch(updateGroup(formData)).then((res) => {
         if ((res.payload as boolean) == true) {
-          router.dismiss()
-          router.replace(`/group?groupId=${groupID}`)
+          router.replace(`/(tabs)/group-list/(my-group)?editedGroupID=${groupID}`)
         }
       });
     }

@@ -33,6 +33,8 @@ import { setIsViewingOwnProfile } from "@/redux/slices/userSlice";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { getAllJoinedGroups } from "@/redux/slices/groupSlice";
+import { Group } from "@/interfaces/groupInterface";
 // type UserInfo = {
 //   username: string;
 //   avatar_url: string;
@@ -86,9 +88,10 @@ export default function ProfileScreen() {
   const [selectedTabs, setSelectedTabs] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState("");
 
-  const { user, userGroups, isViewingOwnProfile } = useAppSelector((state) => state.user);
+  const { user, isViewingOwnProfile } = useAppSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState<UserInfo>(user!);
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!);
+  const [joinedGroups, setJoinedGroups] = useState<Group[]>([])
   
   const moreOptionRef = useRef<BottomSheet>(null);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
@@ -118,7 +121,11 @@ export default function ProfileScreen() {
       dispatch(setIsViewingOwnProfile(true))
     }
 
-    dispatch(getUserPreviewGroups(userID ?? user._id));
+    dispatch(getAllJoinedGroups()).then((res) => {
+      const data = res.payload as Group[]
+
+      setJoinedGroups(data)
+    })
   }, []);
 
   useEffect(() => {
@@ -126,8 +133,8 @@ export default function ProfileScreen() {
   }, [user])
 
   useEffect(() => {
-    // console.log(userGroups);
-  }, [userGroups]);
+    console.log(joinedGroups);
+  }, [joinedGroups]);
 
   useEffect(() => {
     if (isViewingOwnProfile) {
@@ -157,9 +164,9 @@ export default function ProfileScreen() {
 
           {/* Active groups */}
           {/* TODO: Integrate API when have */}
-          {/* <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
+          <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
           <FlatList
-            data={userGroups}
+            data={joinedGroups}
             horizontal={true}
             style={styles.groupContainer}
             keyExtractor={(item, index) => index.toString()}
@@ -178,7 +185,7 @@ export default function ProfileScreen() {
             renderItem={({ item }) => {
               return <GroupPreviewInfo group={item} />;
             }}
-          /> */}
+          />
 
           {/* Social , Blog, Activity */}
           <View style={styles.rowContainer}>

@@ -228,3 +228,21 @@ export interface FavoriteBlog {
     Status: string;
     ViewType: string;
 }
+
+export interface RecentPopularBlog {
+    _id: string;
+    Title: string;
+    Author: {
+        _id: string;
+        AvatarURL: string;
+        UserName: string;
+        Name: string
+        CreateDate: string;
+    };
+    Description: string;
+    CoverURL: string;
+    Tags: UserBlogTag[];
+    NumberOfLikes: number;
+    NumberOfComments: number;
+    NumberOfSaves: number;
+}

@@ -84,8 +84,10 @@ export default function LoginScreen() {
         showPlayServicesUpdateDialog: true,
       });
 
-      // Sign out of google to allow re-selection of account
-      await GoogleSignin.revokeAccess();
+      if (GoogleSignin.hasPreviousSignIn()) {
+        // Sign out of google to allow re-selection of account
+        await GoogleSignin.revokeAccess();
+      }
 
       // Get the users ID token
       const signInResult = await GoogleSignin.signIn();

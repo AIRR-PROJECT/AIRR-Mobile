@@ -143,6 +143,7 @@ export default function RequestTagsScreen({
             placeholderTextColor="#888"
             maxLength={20}
             onChange={(e) => onChangeText(e.nativeEvent.text)}
+            numberOfLines={1}
           />
         </View>
         {/* Button to check if existing */}
@@ -313,6 +314,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
+    width: "100%",
   },
   searchText: {
     paddingHorizontal: 10,
@@ -326,6 +328,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 20,
+    flex: 1,
+    marginRight: 10,
   },
   selectTagBox: {
     backgroundColor: "#fff",

@@ -135,6 +135,7 @@ export default function CreateTagsScreen({
             placeholderTextColor="#888"
             maxLength={20}
             onChange={(e) => onChangeText(e.nativeEvent.text)}
+            numberOfLines={1}
           />
         </View>
         {/* Button to check if existing */}
@@ -285,12 +286,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
+    width: "100%",
   },
   searchText: {
     paddingHorizontal: 10,
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    flex: 1,
   },
   searchBar: {
     backgroundColor: "#2E3B40",
@@ -298,6 +301,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 20,
+    flex: 1,
+    marginRight: 10,
   },
   selectTagBox: {
     backgroundColor: "#fff",

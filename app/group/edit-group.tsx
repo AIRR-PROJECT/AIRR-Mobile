@@ -203,6 +203,7 @@ export default function EditGroup() {
   const handleGroupFieldPress = useCallback((field: SearchedField) => {
     console.log("Group field: ", field.FieldName);
     setGroupField(field);
+    setChosenTags([])
 
     setGroupTags(field.DefaultTags);
     dispatch(setCreateGroupCreatedTags([]))

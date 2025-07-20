@@ -7,9 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
   ToastAndroid,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import TagApprovalCardComponent from "@/components/group/TagApprovalCardComponent";
@@ -90,6 +91,7 @@ export default function TagsApprovalsPage() {
   const [tagsApproval, setTagsApproval] = useState<PendingTagRequest[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
   const [isTagFetching, setIsTagFetching] = useState(false);
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     setIsTagFetching(true);
@@ -133,6 +135,55 @@ export default function TagsApprovalsPage() {
       });
     }
   }, [selectedTab]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    
+    setIsTagFetching(true);
+    if (selectedTab == TabOptions.All) {
+      dispatch(getGroupTagsByID({ groupID })).then((res) => {
+        const list = res.payload as GroupTag[];
+
+        let categorizedTags = {};
+        let categorizedTagsList: { id: string; data: GroupTag[] }[] = [];
+        const retrievedTags = res.payload as GroupTag[];
+
+        retrievedTags.forEach((tags) => {
+          const initial = tags.TagName.charAt(0).toLowerCase();
+
+          if (Object.hasOwn(categorizedTags, initial)) {
+            (categorizedTags[initial] as GroupTag[]).push(tags);
+          } else {
+            categorizedTags[initial] = [tags];
+          }
+        });
+
+        Object.entries(categorizedTags).forEach((entry) => {
+          categorizedTagsList.push({
+            id: entry[0] as string,
+            data: entry[1] as GroupTag[],
+          });
+        });
+        categorizedTagsList = categorizedTagsList.sort((a, b) =>
+          a.id.localeCompare(b.id)
+        );
+        setDisplayTags(categorizedTagsList);
+
+        setIsTagFetching(false);
+      });
+    } else {
+      dispatch(getPendingTagList(groupID)).then((res) => {
+        const list = res.payload as PendingTagRequest[];
+        setTagsApproval(list);
+
+        setIsTagFetching(false);
+      });
+    }
+    
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+  }, []);
 
   useEffect(() => {
     // Prevent scroll to member altogether
@@ -231,6 +282,9 @@ export default function TagsApprovalsPage() {
         <FeedBlogPreviewSkeleton />
       ) : selectedTab == TabOptions.All ? (
         <SectionGrid
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           sections={displayTags}
           itemDimension={150} // Controls column width
           spacing={10} // Spacing between items
@@ -248,6 +302,9 @@ export default function TagsApprovalsPage() {
         />
       ) : (
         <Animated.FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           data={tagsApproval}
           renderItem={renderItem}
           keyExtractor={(item) => item.TagName}

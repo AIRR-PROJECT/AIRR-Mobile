@@ -71,7 +71,7 @@ export default function ReportsApprovalsPage() {
   };
   const onReject = (blogID: string) => {
     setSelectedReportID(blogID);
-    setBottomSheetMode("reject");
+    handleConfirmReject();
   };
   const handleConfirmApprove = () => {
     dispatch(

@@ -49,7 +49,7 @@ export interface User {
     avatarURL: string;
     firstName?: string;
     lastName?: string;
-    dob?: string;
+    dateOfBirth?: string;
     graduationStatus?: string;
     isAuthenticatedWithGoogle?: boolean;
     phoneNumber?: string;
@@ -67,7 +67,7 @@ export interface UpdateUser {
     "phone"?: string,
     "studentID": string,
     "department": string,
-    "program": string,
+    // "program": string,
     "graduationStatus": string,
     "gpa": number,
     "facebook"?: string,

@@ -10,6 +10,7 @@ type UserStudentInfoProps = {
 type StudentInfo = Pick<User, "profile">;
 
 export default function UserStudentInfoComponent({ profile }: StudentInfo) {
+  console.log("UserStudentInfoComponent", profile);
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -18,15 +19,15 @@ export default function UserStudentInfoComponent({ profile }: StudentInfo) {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.title}>STUDENT INFORMATION</Text>
+        <Text style={styles.title}>ACADEMIC BACKGROUND</Text>
         <View style={[{ gap: 5 }]}>
           <View style={styles.rowContainer}>
-            <Text style={styles.attribute}>STUDENT ID:</Text>
-            <Text style={styles.info}>{profile.studentID}</Text>
+            <Text style={styles.attribute}>MAJOR</Text>
+            <Text style={styles.info}>{profile.department}</Text>
           </View>
           <View style={styles.rowContainer}>
-            <Text style={styles.attribute}>DEPARTMENT:</Text>
-            <Text style={styles.info}>{profile.department}</Text>
+            <Text style={styles.attribute}>GRADUATION STATUS</Text>
+            <Text style={styles.info}>{profile.graduationStatus}</Text>
           </View>
         </View>
       </LinearGradient>
@@ -46,6 +47,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     paddingBottom: 20,
     fontWeight: "bold",
+    textAlign: "center",
   },
   rowContainer: {
     flexDirection: "row",
@@ -56,6 +58,7 @@ const styles = StyleSheet.create({
     color: "#B9FF66",
     fontWeight: "bold",
     fontSize: 16,
+    flex: 1,
   },
   info: {
     color: "#fff",

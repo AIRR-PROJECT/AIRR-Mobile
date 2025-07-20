@@ -23,10 +23,6 @@ import * as Linking from "expo-linking";
 // Get list of tags [max 10]
 const tags = Array(10).fill("Frontend");
 const chunkedTags = chunkArray(tags, 5);
-const mockLink = "https://dly.to/dfdsc";
-const mockFacebookLink = "https://facebook.com/yourprofile";
-const mockLinkedInLink = "https://linkedin.com/in/yourprofile";
-const mockGithubLink = "https://github.com/yourprofile";
 export default function SocialTab({
   link,
   facebookLink,
@@ -43,6 +39,10 @@ export default function SocialTab({
   const dispatch = useAppDispatch();
 
   const handleCopyLink = async ({ link }: { link: string }) => {
+    if (!link) {
+      ToastAndroid.show("No link to copy", ToastAndroid.SHORT);
+      return;
+    }
     await Clipboard.setStringAsync(link);
 
     ToastAndroid.show("Link copied to clipboard", ToastAndroid.SHORT);
@@ -56,13 +56,19 @@ export default function SocialTab({
     });
   };
   const handleOpenFacebook = () => {
-    Linking.openURL(facebookLink ?? mockFacebookLink);
+    if (!facebookLink) {
+      Linking.openURL(facebookLink);
+    }
   };
   const handleOpenLinkedIn = () => {
-    Linking.openURL(linkedInLink ?? mockLinkedInLink);
+    if (!linkedInLink) {
+    Linking.openURL(linkedInLink);
+    }
   };
   const handleOpenGithub = () => {
-    Linking.openURL(githubLink ?? mockGithubLink);
+    if (!githubLink) {
+      Linking.openURL(githubLink);
+    }
   };
   return (
     // Readme
@@ -102,12 +108,12 @@ export default function SocialTab({
             <Feather name="facebook" size={24} color="#1977F2" />
           </View>
           <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
-            {facebookLink}
+            {facebookLink.length > 0 ? facebookLink : "No Facebook link"}
           </Text>
           <TouchableOpacity
             style={[styles.copyLinkButton, {}]}
             onPress={() =>
-              handleCopyLink({ link: facebookLink ?? mockFacebookLink })
+              handleCopyLink({ link: facebookLink })
             }
           >
             <Ionicons name="copy-outline" size={24} color="#fff" />
@@ -128,12 +134,12 @@ export default function SocialTab({
             <Feather name="linkedin" size={24} color="#1977F2" />
           </View>
           <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
-            {linkedInLink}
+            {linkedInLink.length > 0 ? linkedInLink : "No LinkedIn link"}
           </Text>
           <TouchableOpacity
             style={styles.copyLinkButton}
             onPress={() =>
-              handleCopyLink({ link: linkedInLink ?? mockLinkedInLink })
+              handleCopyLink({ link: linkedInLink  })
             }
           >
             <Ionicons name="copy-outline" size={24} color="#fff" />
@@ -152,12 +158,12 @@ export default function SocialTab({
             <Feather name="github" size={24} color="#B9FF66" />
           </View>
           <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
-            {githubLink}
+            {githubLink.length > 0 ? githubLink : "No Github link"}
           </Text>
           <TouchableOpacity
             style={styles.copyLinkButton}
             onPress={() =>
-              handleCopyLink({ link: githubLink ?? mockGithubLink })
+              handleCopyLink({ link: githubLink })
             }
           >
             <Ionicons name="copy-outline" size={24} color="#fff" />

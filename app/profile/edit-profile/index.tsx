@@ -38,9 +38,9 @@ const DEPARTMENT_OPTIONS = [
   "Data Science",
 ];
 const GRADUATION_OPTIONS = [
-  "Currently studying (1-2 semesters left)",
+  "Currently studying (1–2 semesters left)",
   "Recently graduated (< 1 year)",
-  "Graduated (1-2 years ago)",
+  "Graduated (1–2 years ago)",
   "Self-taught (no formal degree)",
 ];
 
@@ -99,7 +99,7 @@ export default function EditProfileScreen() {
     studentId: userData.profile.studentID ?? "",
     department: userData.profile.department ?? "",
     program: userData.profile.program ?? "",
-    dateOfBirth: userData.profile.dateOfBirth ?? "",
+    dateOfBirth: userData.dateOfBirth ?? "",
     gpa: userData.profile.gpa ?? 0,
     linkedin: userData.profile.link ? userData.profile.link.LinkedIn ?? "" : "",
     github: userData.profile.link ? userData.profile.link.Github ?? "" : "",
@@ -132,7 +132,7 @@ export default function EditProfileScreen() {
   const phoneWatch = watch("phone");
   const studentIdWatch = watch("studentId");
   const departmentWatch = watch("department");
-  const programWatch = watch("program");
+  // const programWatch = watch("program");
   const gpaWatch = watch("gpa");
   const graduationStatusWatch = watch("graduationStatus");
   const linkedinWatch = watch("linkedin");
@@ -153,12 +153,15 @@ export default function EditProfileScreen() {
     console.log("isValid", isValid);
     console.log("dateOfBirthWatch", dateOfBirthWatch);
     console.log(errors);
+    // console.log("gpa", gpaWatch + "type of gpaWatch: " + typeof gpaWatch);
+    // console.log(programWatch);
     if (!isValid && errors != undefined && Object.keys(errors).length > 0) {
       // console.log which error for me
       console.log(errors);
       dispatch(setUserChangeValid(false));
       return;
     }
+    const gpaValue = gpaWatch ? parseFloat(gpaWatch.toString().replace(",", ".")) : 0;
     dispatch(setUserChangeValid(true));
     dispatch(
       setUserChange({
@@ -171,8 +174,8 @@ export default function EditProfileScreen() {
           ...userChange.profile,
           studentID: studentIdWatch,
           department: departmentWatch,
-          program: programWatch,
-          gpa: gpaWatch,
+          // program: programWatch,
+          gpa: gpaValue,
           graduationStatus: graduationStatusWatch,
           link: {
             ...userChange.profile.link,
@@ -191,7 +194,7 @@ export default function EditProfileScreen() {
     phoneWatch,
     studentIdWatch,
     departmentWatch,
-    programWatch,
+    // programWatch,
     gpaWatch,
     graduationStatusWatch,
     linkedinWatch,
@@ -492,7 +495,7 @@ export default function EditProfileScreen() {
           )}
 
           {/* Program */}
-          <Text style={[styles.paragraph]}>Program</Text>
+          {/* <Text style={[styles.paragraph]}>Program</Text>
           <Controller
             control={control}
             name="program"
@@ -523,7 +526,7 @@ export default function EditProfileScreen() {
           />
           {errors.program && (
             <Text style={styles.errorText}>{errors.program.message}</Text>
-          )}
+          )} */}
 
           {/* GPA */}
           <View style={{}}>
@@ -540,8 +543,15 @@ export default function EditProfileScreen() {
                     ]}
                     placeholder="GPA"
                     onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value ? value.toString() : ""}
+                    onChangeText={(text) => {
+                      // Accept both , and . as decimal separator
+                      let normalized = text.replace(",", ".");
+                      // Only allow numbers and one decimal separator
+                      if (/^\d*([.,]\d{0,2})?$/.test(text)) {
+                        onChange(text);
+                      }
+                    }}
+                    value={value ? value.toString().replace(".", ",") : ""}
                     keyboardType="decimal-pad"
                   />
                 </View>
@@ -551,7 +561,7 @@ export default function EditProfileScreen() {
                 min: { value: 0, message: "GPA must be at least 0" },
                 max: { value: 4, message: "GPA must be at most 4" },
                 pattern: {
-                  value: /^(\d(\.\d{1,2})?|4(\.0{1,2})?)$/,
+                  value: /^(\d([.,]\d{1,2})?|4([.,]0{1,2})?)$/,
                   message: "GPA must be a number between 0 and 4",
                 },
               }}

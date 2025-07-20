@@ -256,7 +256,7 @@ export const getUserInfo = createAsyncThunk(
             const payload = jwtDecode(accessToken) as any
 
             const res = await api.get('/users/by-username?username=' + payload.username) as AxiosResponse
-
+            console.log("User info response", res.data)
             if (res.data.success) {
                 thunkAPI.dispatch(setCurrentUser(res.data.data))
                 return res.data.data
@@ -334,7 +334,7 @@ export const updateUser = createAsyncThunk(
                 firstname: userData.firstName ?? "",
                 lastname: userData.lastName ?? "",
                 phone: userData.phoneNumber ?? "",
-                dob: userData.dob ?? "",
+                dob: userData.dateOfBirth ?? "",
                 studentID: userData.profile.studentID ?? "",
                 department: userData.profile.department ?? "",
                 // program: userData.profile.program ?? "",

@@ -38,30 +38,32 @@ export default function DashboardScreen() {
     // correct the darkColor and lightColor values later
     <ParallaxScrollView style={{ flex: 1 }}>
       {/* Title */}
-      <View
-        style={styles.titleContainer}
-   
-      >
-        <Text
-          style={styles.titleText}
-        >
-          Let's Post A New Blog
-        </Text>
+      <View style={styles.titleContainer}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View
+            style={{
+              gap: 10,
+              backgroundColor: "black",
+              padding: 5,
+              paddingHorizontal: 10,
+              borderRadius: 20,
+              flexWrap: "wrap",
+            }}
+          >
+            <Text style={{ color: "white" }}>✨ Create Content</Text>
+          </View>
+        </View>
+        <Text style={styles.titleText}>Let's Post A New Blog</Text>
         <ButtonGradient
-          style={styles.titleButton}
-          label="POST NOW"
+          style={[
+            styles.titleButton,
+            { elevation: 5, alignSelf: "flex-start" },
+          ]}
+          label="Start Writing ↗"
           onPress={() => router.push("/blog/new-blog")}
-        ></ButtonGradient>
+        />
       </View>
       {/*  */}
-      <ThemedView style={styles.longTextContainer}>
-        <ThemedText type="default" lightColor="#fff" darkColor="#fff" style={{textAlign: "justify"}}>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quis non
-          commodi ad, nostrum quod facere magni facilis esse atque dolor
-          doloremque aut corporis optio at praesentium mollitia fuga, pariatur
-          quas.
-        </ThemedText>
-      </ThemedView>
       {/* Blog Preview */}
       <BlogPreview blog={mockBlog} />
       {/* Join Group props */}
@@ -78,9 +80,11 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-evenly",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 20,
+    justifyContent: "space-between",
+    gap: 10,
   },
   titleText: {
     flex: 1,
@@ -88,14 +92,14 @@ const styles = StyleSheet.create({
     width: "100%",
     fontSize: 30,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000",
   },
   titleButton: {
     width: 150,
     height: 70,
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
+    paddingBlock: 10,
   },
   longTextContainer: {
     backgroundColor: "transparent",

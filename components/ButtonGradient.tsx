@@ -1,4 +1,4 @@
-import { StyleSheet, View, type ViewStyle, type TextStyle } from "react-native";
+import { StyleSheet, View, type ViewStyle, type TextStyle, StyleProp } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import { Dimensions,TouchableOpacity } from "react-native";
@@ -12,7 +12,7 @@ import AnimatedPressable from "./AnimatedPressable";
 type ButtonGradientProps = {
   label: string;
   onPress?: () => void;
-  style?: ViewStyle; // Allow custom styles for the button container
+  style?: StyleProp<ViewStyle>; // Allow custom styles for the button container
   buttonStyle?: ViewStyle; // Allow custom button styles
   labelStyle?: TextStyle; // Allow custom label styles
   defaultAction?: () => void; // Fallback action if no onPress is passed

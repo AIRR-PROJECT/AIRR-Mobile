@@ -1,11 +1,11 @@
-import { View, TextInput, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet, Text } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable } from "react-native";
-export default function CareerPathSuggestion() {
+export default function CareerPathSuggestion({isFromCareerPath = false}) {
   const router = useRouter();
 
   const handleClick = () => {
@@ -60,16 +60,10 @@ export default function CareerPathSuggestion() {
         </View>
         {/* Text */}
         <View style={styles.fourthRow}>
-          <ThemedText
-            style={styles.fourthRowText}
-            type="default"
-            darkColor="#fff"
-            lightColor="#fff"
-          >
-            We will discuss your business goals and objectives, target audience,
-            and current marketing efforts. This will allow us to understand your
-            needs.
-          </ThemedText>
+          <Text style={styles.fourthRowText}>
+            Discover personalized career recommendations based on your skills
+            and interests
+          </Text>
         </View>
       </View>
     </Pressable>
@@ -84,7 +78,6 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     padding: 20,
     borderColor: "#1E1E1E",
-    height: 450,
   },
   gradientBackground: {
     position: "absolute",
@@ -144,8 +137,9 @@ const styles = StyleSheet.create({
   },
   fourthRowText: {
     flexWrap: "wrap",
-    fontSize: 16,
+    fontSize: 18,
     color: "#1E1E1E",
     textAlign: "justify",
+    lineHeight: 24,
   },
 });

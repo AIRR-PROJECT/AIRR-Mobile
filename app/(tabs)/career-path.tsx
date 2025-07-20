@@ -1,5 +1,6 @@
 import VerticalFlow from "@/components/dom-components/ReactFlow/ReactFlow";
 import { ExternalLink } from "@/components/ExternalLink";
+import CareerPathSuggestion from "@/components/tabs/CareerPathSuggestion";
 import { useRef } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 
@@ -9,7 +10,8 @@ export default function CareerPath() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.centerContent}>
+      <CareerPathSuggestion />
+      {/* <View style={styles.centerContent}>
         <Text style={styles.title}>Career Path</Text>
         <Text style={styles.text}>
           This feature is currently only available on the web version.
@@ -19,7 +21,7 @@ export default function CareerPath() {
             Open in browser to view the career path workflow.
           </Text>
         </ExternalLink>
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -30,6 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#181A20",
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
   centerContent: {
     flex: 1,

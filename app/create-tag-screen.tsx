@@ -17,7 +17,7 @@ import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { createTag, searchTagCreateGroup, setCreateGroupCreatedTags } from "@/redux/slices/groupSlice";
 import { CreateGroupTag, GroupTag } from "@/interfaces/groupInterface";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useRootNavigationState } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { searchTagCreateBlog, setCreateBlogRequestedTags } from "@/redux/slices/blogSlice";
 const height = Dimensions.get("window").height;
@@ -31,6 +31,7 @@ export default function CreateTagsScreen({
 }: AddTagsComponentProps) {
   const dispatch = useAppDispatch()
   const { fieldID } = useLocalSearchParams<{ fieldID: string }>()
+  const { routes } = useRootNavigationState();
   const { createGroupCurrentTags, createGroupCreatedTags } = useAppSelector(state => state.group)
 
   // State to hold the new tag input by user
@@ -92,6 +93,7 @@ export default function CreateTagsScreen({
   }
   // selectableTags.push(...mockTags); // Add mock tags to selectableTags for testing
   const handleSubmit = () => {
+    console.log(routes)
     if (createdTags.length > 0) {
       // Create a GroupTag object for each selected tag with incrementing _id
       // TODO: CHECK THE API FOR THE _ID HERE, I NOW JUST GENERATE A RANDOM ONE

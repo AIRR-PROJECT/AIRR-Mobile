@@ -26,7 +26,7 @@ export default function MyGroupTab() {
   const dispatch = useAppDispatch();
   const route = useRouter();
   // const { popularFields } = useAppSelector((state) => state.group);
-  const { groupIDToRemove, newGroupID } = useLocalSearchParams<{ groupIDToRemove: string, newGroupID: string }>()
+  const { groupIDToRemove, newGroupID, editedGroupID } = useLocalSearchParams<{ groupIDToRemove: string, newGroupID: string, editedGroupID: string }>()
 
   const refFields = useRef<FlatList>(null);
   const currentOffset = useRef(0);
@@ -96,6 +96,16 @@ export default function MyGroupTab() {
     setIsNewGroupCreated(newGroupID !== undefined && newGroupID !== "")
     if (newGroupID !== undefined && newGroupID.length != 0) {
       route.push(`/group?groupId=${newGroupID}`)
+    }
+  }, [newGroupID])
+  useEffect(() => {
+    setIsNewGroupCreated(editedGroupID !== undefined && editedGroupID !== "")
+    if (editedGroupID !== undefined && editedGroupID.length != 0) {
+      let temp = editedGroupID
+      route.setParams({
+        editedGroupID: undefined
+      })
+      route.push(`/group?groupId=${temp}`)
     }
   }, [newGroupID])
   useEffect(() => {

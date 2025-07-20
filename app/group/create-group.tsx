@@ -145,11 +145,15 @@ export default function CreateGroup() {
       formData.append("GroupRules", JSON.stringify(groupRules));
 
       dispatch(createGroup(formData)).then((res) => {
-        if ((res.payload as string).length != 0) {
-          router.dismiss()
-          router.setParams({
-            newGroupID: res.payload as string
-          })
+        const data = res.payload as string
+        console.log(`res.payload: ${data}`)
+        console.log(`data.length != 0: ${data.length != 0}`)
+        if (data.length != 0) {
+          // router.back()
+          // router.setParams({
+          //   newGroupID: data
+          // })
+          router.replace(`/(tabs)/group-list/(my-group)?newGroupID=${data}`)
           // router.push(`/group?groupId=${res.payload}`)
         }
       });

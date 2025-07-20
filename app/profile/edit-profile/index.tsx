@@ -40,7 +40,7 @@ type StudentInfoForm = {
   department: string;
   program: string;
   gpa: number;
-  yearOfEntry: number;
+  graduationStatus: string;
 };
 type SocialMediaForm = {
   linkedin: string;
@@ -59,7 +59,7 @@ const mockData: UnifiedForm = {
   department: "Software Engineering",
   program: "Bachelor",
   gpa: 3.5,
-  yearOfEntry: 1,
+  graduationStatus: "Graduated (1-2 years ago)",
   linkedin: "https://www.linkedin.com/",
   github: "",
   facebook: "",
@@ -75,7 +75,12 @@ const DEPARTMENT_OPTIONS = [
   "Computer Vision",
   "Data Science",
 ];
-
+const GRADUTION_OPTIONS = [
+  "Currently studying (1-2 semesters left)",
+  "Recently graduated (< 1 year)",
+  "Graduated (1-2 years ago)",
+  "Self-taught (no formal degree)",
+];
 export default function EditProfileScreen() {
   const dispatch = useAppDispatch();
   const MIN_ENTRY_YEAR = 1;
@@ -89,7 +94,7 @@ export default function EditProfileScreen() {
     lastName: userData.lastName ?? "",
     username: userData.username,
     email: userData.email ?? "",
-    yearOfEntry: userData.yearOfEntry ?? 1,
+    graduationStatus: userData.graduationStatus ?? GRADUTION_OPTIONS[0],
     phone: userData.phoneNumber?.toString() ?? "",
     studentId: userData.profile.studentID ?? "",
     department: userData.profile.department ?? "",

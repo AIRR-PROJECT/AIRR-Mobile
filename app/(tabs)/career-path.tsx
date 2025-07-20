@@ -10,7 +10,7 @@ export default function CareerPath() {
 
   return (
     <View style={styles.container}>
-      <CareerPathSuggestion />
+      <CareerPathSuggestion isFromCareerPath={true} />
       {/* <View style={styles.centerContent}>
         <Text style={styles.title}>Career Path</Text>
         <Text style={styles.text}>

@@ -1,19 +1,24 @@
-import { View, TextInput, StyleSheet, Text } from "react-native";
+import { View, TextInput, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable } from "react-native";
-export default function CareerPathSuggestion({isFromCareerPath = false}) {
+import * as Linking from "expo-linking";
+export default function CareerPathSuggestion({ isFromCareerPath = false }) {
   const router = useRouter();
-
+  const webUrl = "https://github.com/SystemErrorWang/White-box-Cartoonization";
   const handleClick = () => {
     // handle click
+    if (isFromCareerPath) {
+      Linking.openURL(webUrl);
+      return;
+    }
     router.navigate("/(tabs)/career-path");
   };
   return (
-    <Pressable onPress={handleClick}>
+    <TouchableOpacity onPress={handleClick} activeOpacity={0.8}>
       {/* gradient background */}
       <LinearGradient
         colors={["#66ff8c", "#9DE8EE"]}
@@ -61,12 +66,11 @@ export default function CareerPathSuggestion({isFromCareerPath = false}) {
         {/* Text */}
         <View style={styles.fourthRow}>
           <Text style={styles.fourthRowText}>
-            Discover personalized career recommendations based on your skills
-            and interests
+            {!isFromCareerPath ? "Discover personalized career recommendations based on your skills and interests" : "This feature is currently only available on the web version. Click to view the career path workflow."}
           </Text>
         </View>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 

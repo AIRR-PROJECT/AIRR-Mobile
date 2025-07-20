@@ -98,7 +98,7 @@ export default function ReportsApprovalsPage() {
       if (res.payload === true) {
         ToastAndroid.show("Report rejected", ToastAndroid.SHORT);
         setDisplayReports((prev) =>
-          prev.filter((r) => r.Blog._id !== selectedReportID)
+          prev.filter((r) => r.Blog._id !== blogID)
         );
       }
       sheetRef.current?.close();

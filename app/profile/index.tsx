@@ -91,18 +91,19 @@ export default function ProfileScreen() {
   const { user, isViewingOwnProfile } = useAppSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState<UserInfo>(user!);
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(user!);
-  const [joinedGroups, setJoinedGroups] = useState<Group[]>([])
-  
+  const [joinedGroups, setJoinedGroups] = useState<Group[]>([]);
+
   const moreOptionRef = useRef<BottomSheet>(null);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
-  const [role, setRole] = useState("")
-  const [blogStatus, setBlogStatus] = useState("")
-  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
-  const [isAlreadyReported, setIsAlreadyReported] = useState(false)
-  const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
-  const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
-  const handleHideBlog = useRef<() => void>(() => {})
-  const handleDeleteBlog = useRef<() => void>(() => {})
+  const [role, setRole] = useState("");
+  const [blogStatus, setBlogStatus] = useState("");
+  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] =
+    useState(false);
+  const [isAlreadyReported, setIsAlreadyReported] = useState(false);
+  const [moreOptionBlogId, setMoreOptionBlogId] = useState("");
+  const [moreOptionGroupId, setMoreOptionGroupId] = useState("");
+  const handleHideBlog = useRef<() => void>(() => {});
+  const handleDeleteBlog = useRef<() => void>(() => {});
 
   const dispatch = useAppDispatch();
 
@@ -116,21 +117,20 @@ export default function ProfileScreen() {
           setStudentInfo(currentUserInfo);
         }
       });
-    }
-    else {
-      dispatch(setIsViewingOwnProfile(true))
+    } else {
+      dispatch(setIsViewingOwnProfile(true));
     }
 
     dispatch(getAllJoinedGroups()).then((res) => {
-      const data = res.payload as Group[]
+      const data = res.payload as Group[];
 
-      setJoinedGroups(data)
-    })
+      setJoinedGroups(data);
+    });
   }, []);
 
   useEffect(() => {
-    setUserInfo(user)
-  }, [user])
+    setUserInfo(user);
+  }, [user]);
 
   useEffect(() => {
     console.log(joinedGroups);
@@ -148,7 +148,7 @@ export default function ProfileScreen() {
   const route = useRouter();
   const handleCreateGroup = () => {
     route.push("/group/create-group");
-  }
+  };
   return (
     // change light color to #fff later because figma of the app is not ready
 
@@ -164,28 +164,49 @@ export default function ProfileScreen() {
 
           {/* Active groups */}
           {/* TODO: Integrate API when have */}
-          <ThemedText style={styles.groupLabel}>Active in these group</ThemedText>
-          <FlatList
-            data={joinedGroups}
-            horizontal={true}
-            style={styles.groupContainer}
-            keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={{ columnGap: 25 }}
-            showsHorizontalScrollIndicator={false}
-            ListHeaderComponent={
+          <ThemedText style={styles.groupLabel}>
+            Active in these group
+          </ThemedText>
+          {joinedGroups.length > 0 ? (
+            <FlatList
+              data={joinedGroups}
+              horizontal={true}
+              style={styles.groupContainer}
+              keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={{ columnGap: 25 }}
+              showsHorizontalScrollIndicator={false}
+              ListHeaderComponent={
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={handleCreateGroup}
+                >
+                  <FontAwesome
+                    name="plus-circle"
+                    size={50}
+                    color="white"
+                    style={styles.plusIcon}
+                  />
+                </TouchableOpacity>
+              }
+              renderItem={({ item }) => {
+                return <GroupPreviewInfo group={item} />;
+              }}
+            />
+          ) : (
+            <View style={{ alignItems: "center", flexDirection: "row", }}>
               <TouchableOpacity activeOpacity={0.7} onPress={handleCreateGroup}>
                 <FontAwesome
-                  name="plus-circle"  
+                  name="plus-circle"
                   size={50}
                   color="white"
                   style={styles.plusIcon}
                 />
               </TouchableOpacity>
-            }
-            renderItem={({ item }) => {
-              return <GroupPreviewInfo group={item} />;
-            }}
-          />
+              <Text style={{ color: "#ACACAC", fontSize: 16, flex: 1 }}>
+                No groups joined. Press the plus icon to create a group.
+              </Text>
+            </View>
+          )}
 
           {/* Social , Blog, Activity */}
           <View style={styles.rowContainer}>
@@ -229,26 +250,27 @@ export default function ProfileScreen() {
         {/* Readme if tab == readme */}
         <View style={{ padding: 20 }}>
           {selectedTab === "Social" &&
-            ((user && user.profile && user.profile.link) ? 
-            <SocialTab
-              link={""}
-              facebookLink={user.profile.link.Facebook}
-              linkedInLink={user.profile.link.LinkedIn}
-              githubLink={user.profile.link.Github}
-              showSignOut={isViewingOwnProfile}
-            /> :
-            <SocialTab
-              link={""}
-              facebookLink={"No information"}
-              linkedInLink={"No information"}
-              githubLink={"No information"}   
-              showSignOut={isViewingOwnProfile}           
-            />)
-          }
+            (user && user.profile && user.profile.link ? (
+              <SocialTab
+                link={""}
+                facebookLink={user.profile.link.Facebook}
+                linkedInLink={user.profile.link.LinkedIn}
+                githubLink={user.profile.link.Github}
+                showSignOut={isViewingOwnProfile}
+              />
+            ) : (
+              <SocialTab
+                link={""}
+                facebookLink={"No information"}
+                linkedInLink={"No information"}
+                githubLink={"No information"}
+                showSignOut={isViewingOwnProfile}
+              />
+            ))}
           {selectedTab === "Activity" && <ActivityTab />}
         </View>
-        {selectedTab === "Blog" && 
-          <BlogTab 
+        {selectedTab === "Blog" && (
+          <BlogTab
             moreOptionRef={moreOptionRef}
             setIsUserWrittenBlog={setIsUserWrittenBlog}
             setRole={setRole}
@@ -260,7 +282,7 @@ export default function ProfileScreen() {
             handleHideBlog={handleHideBlog}
             handleDeleteBlog={handleDeleteBlog}
           />
-        }
+        )}
       </ParallaxFlatList>
 
       <MoreOptionBottomList
@@ -275,7 +297,8 @@ export default function ProfileScreen() {
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
         isAlreadyReported={isAlreadyReported}
         handleHideThisBlog={handleHideBlog.current}
-        handleDeleteThisBlog={handleDeleteBlog.current}/>
+        handleDeleteThisBlog={handleDeleteBlog.current}
+      />
     </GestureHandlerRootView>
   );
 }

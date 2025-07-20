@@ -267,7 +267,7 @@ export default function EditGroup() {
             color="#B9FF66"
           />
           <Text style={[styles.title, { paddingLeft: 5 }]}>
-            Create a New Group
+            Edit Group
           </Text>
         </View>
         {/* description */}
@@ -352,6 +352,8 @@ export default function EditGroup() {
                 {
                   justifyContent: "flex-start",
                   flexWrap: "wrap",
+                  padding: 20,
+                  gap: 10,
                 },
               ]}
               onPress={() => handleTagsSnapPress(0)}
@@ -382,6 +384,8 @@ export default function EditGroup() {
                 {
                   justifyContent: "flex-start",
                   flexWrap: "wrap",
+                  padding: 20,
+                  gap: 10,
                 },
               ]}
               onPress={handleCreateTagPress}
@@ -392,7 +396,6 @@ export default function EditGroup() {
                 size={24}
                 color="#B9FF66"
                 style={{
-                  paddingLeft: 40,
                 }}
               />
               {createGroupCreatedTags.length > 0 ? (
@@ -407,6 +410,7 @@ export default function EditGroup() {
                       styles.buttonText,
                       {
                         paddingLeft: 10,
+                        paddingVertical: 0,
                       },
                     ]}
                   >

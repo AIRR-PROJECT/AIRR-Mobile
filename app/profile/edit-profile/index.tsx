@@ -26,6 +26,23 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 const sample_avatar = require("@/assets/images/sample-avatar.png");
+const PROGRAM_OPTIONS = ["CQ", "CTTT", "CLC", "VP"];
+const DEPARTMENT_OPTIONS = [
+  "Software Engineering",
+  "Information Systems",
+  "Computer Networks",
+  "Knowledge Technology",
+  "Computer Science",
+  "Information Security",
+  "Computer Vision",
+  "Data Science",
+];
+const GRADUATION_OPTIONS = [
+  "Currently studying (1–2 semesters left)",
+  "Recently graduated (< 1 year)",
+  "Graduated (1–2 years ago)",
+  "Self-taught (no formal degree)",
+];
 
 type PersonalInfoForm = {
   firstName: string;
@@ -59,28 +76,11 @@ const mockData: UnifiedForm = {
   department: "Software Engineering",
   program: "Bachelor",
   gpa: 3.5,
-  graduationStatus: "Graduated (1-2 years ago)",
+  graduationStatus: GRADUATION_OPTIONS[0],
   linkedin: "https://www.linkedin.com/",
   github: "",
   facebook: "",
 };
-const PROGRAM_OPTIONS = ["CQ", "CTTT", "CLC", "VP"];
-const DEPARTMENT_OPTIONS = [
-  "Software Engineering",
-  "Information Systems",
-  "Computer Networks",
-  "Knowledge Technology",
-  "Computer Science",
-  "Information Security",
-  "Computer Vision",
-  "Data Science",
-];
-const GRADUTION_OPTIONS = [
-  "Currently studying (1-2 semesters left)",
-  "Recently graduated (< 1 year)",
-  "Graduated (1-2 years ago)",
-  "Self-taught (no formal degree)",
-];
 export default function EditProfileScreen() {
   const dispatch = useAppDispatch();
   const MIN_ENTRY_YEAR = 1;
@@ -94,12 +94,12 @@ export default function EditProfileScreen() {
     lastName: userData.lastName ?? "",
     username: userData.username,
     email: userData.email ?? "",
-    graduationStatus: userData.graduationStatus ?? GRADUTION_OPTIONS[0],
+    graduationStatus: userData.profile.graduationStatus ?? "",
     phone: userData.phoneNumber?.toString() ?? "",
     studentId: userData.profile.studentID ?? "",
     department: userData.profile.department ?? "",
     program: userData.profile.program ?? "",
-    dateOfBirth: userData.profile.dateOfBirth ?? "",
+    dateOfBirth: userData.dateOfBirth ?? "",
     gpa: userData.profile.gpa ?? 0,
     linkedin: userData.profile.link ? userData.profile.link.LinkedIn ?? "" : "",
     github: userData.profile.link ? userData.profile.link.Github ?? "" : "",
@@ -125,24 +125,23 @@ export default function EditProfileScreen() {
     }
   }, [isUserChangeSaved]);
 
-  // const firstNameWatch = watch("firstName");
-  // const lastNameWatch = watch("lastName");
-  // const emailWatch = watch("email");
-  // const dateOfBirthWatch = watch("dateOfBirth");
-  // const phoneWatch = watch("phone");
-  // const studentIdWatch = watch("studentId");
-  // const departmentWatch = watch("department");
+  const firstNameWatch = watch("firstName");
+  const lastNameWatch = watch("lastName");
+  const emailWatch = watch("email");
+  const dateOfBirthWatch = watch("dateOfBirth");
+  const phoneWatch = watch("phone");
+  const studentIdWatch = watch("studentId");
+  const departmentWatch = watch("department");
   // const programWatch = watch("program");
-  // const gpaWatch = watch("gpa");
-  // const yearOfEntryWatch = watch("yearOfEntry");
-  // const linkedinWatch = watch("linkedin");
-  // const githubWatch = watch("github");
-  // const facebookWatch = watch("facebook");
+  const gpaWatch = watch("gpa");
+  const graduationStatusWatch = watch("graduationStatus");
+  const linkedinWatch = watch("linkedin");
+  const githubWatch = watch("github");
+  const facebookWatch = watch("facebook");
   const sheetRef = useRef<BottomSheet>(null);
-  const allFields = watch();
-  const [sheetMode, setSheetMode] = useState<"main" | "program" | "department">(
-    "main"
-  );
+  const [sheetMode, setSheetMode] = useState<
+    "main" | "program" | "department" | "graduationStatus"
+  >("main");
   const [pendingOnChange, setPendingOnChange] = useState<(val: string) => void>(
     () => () => {} // TRICK to avoid undefined onChange
   );
@@ -151,61 +150,58 @@ export default function EditProfileScreen() {
   // console.log("userChange", userChange);
 
   useEffect(() => {
-    const {
-      firstName,
-      lastName,
-      username,
-      email,
-      dateOfBirth,
-      phone,
-      studentId,
-      department,
-      program,
-      gpa,
-      yearOfEntry,
-      linkedin,
-      github,
-      facebook,
-    } = allFields;
     console.log("isValid", isValid);
+    console.log("dateOfBirthWatch", dateOfBirthWatch);
+    console.log(errors);
+    // console.log("gpa", gpaWatch + "type of gpaWatch: " + typeof gpaWatch);
+    // console.log(programWatch);
     if (!isValid && errors != undefined && Object.keys(errors).length > 0) {
       // console.log which error for me
       console.log(errors);
       dispatch(setUserChangeValid(false));
       return;
     }
+    const gpaValue = gpaWatch ? parseFloat(gpaWatch.toString().replace(",", ".")) : 0;
     dispatch(setUserChangeValid(true));
     dispatch(
       setUserChange({
         ...userChange,
-        firstName,
-        lastName,
-        email,
-        dateOfBirth,
-        phoneNumber: phone,
+        firstName: firstNameWatch,
+        lastName: lastNameWatch,
+        dob: dateOfBirthWatch,
+        phoneNumber: phoneWatch,
         profile: {
           ...userChange.profile,
-          studentID: studentId,
-          department: department,
-          program: program,
-          gpa: gpa,
-          year: yearOfEntry,
+          studentID: studentIdWatch,
+          department: departmentWatch,
+          // program: programWatch,
+          gpa: gpaValue,
+          graduationStatus: graduationStatusWatch,
           link: {
             ...userChange.profile.link,
-            LinkedIn: linkedin,
-            Github: github,
-            Facebook: facebook,
+            LinkedIn: linkedinWatch,
+            Github: githubWatch,
+            Facebook: facebookWatch,
           },
         },
       })
     );
-  }, [allFields, errors, isValid]);
+  }, [
+    firstNameWatch,
+    lastNameWatch,
+    emailWatch,
+    dateOfBirthWatch,
+    phoneWatch,
+    studentIdWatch,
+    departmentWatch,
+    // programWatch,
+    gpaWatch,
+    graduationStatusWatch,
+    linkedinWatch,
+    githubWatch,
+    facebookWatch,
+  ]);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  useEffect(() => {
-    if (sheetMode === "department" || sheetMode === "program") {
-      sheetRef.current?.snapToIndex(0);
-    }
-  }, [sheetMode]);
   return (
     <GestureHandlerRootView>
       <ScrollView style={styles.container}>
@@ -475,6 +471,7 @@ export default function EditProfileScreen() {
                   onPress={() => {
                     setSheetMode("department");
                     setPendingOnChange(() => onChange);
+                    sheetRef.current?.snapToIndex(0);
                   }}
                 >
                   <Text
@@ -498,7 +495,7 @@ export default function EditProfileScreen() {
           )}
 
           {/* Program */}
-          <Text style={[styles.paragraph]}>Program</Text>
+          {/* <Text style={[styles.paragraph]}>Program</Text>
           <Controller
             control={control}
             name="program"
@@ -508,6 +505,7 @@ export default function EditProfileScreen() {
                   style={[styles.viewBoxShadow]}
                   onPress={() => {
                     setSheetMode("program");
+                    sheetRef.current?.snapToIndex(0);
                     setPendingOnChange(() => onChange);
                   }}
                 >
@@ -528,87 +526,90 @@ export default function EditProfileScreen() {
           />
           {errors.program && (
             <Text style={styles.errorText}>{errors.program.message}</Text>
-          )}
-          <View
-            style={[styles.rowContainer, { justifyContent: "space-between" }]}
-          >
-            {/* GPA */}
-            <View style={{ width: "48%" }}>
-              <Text style={[styles.paragraph]}>GPA</Text>
-              <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <View style={styles.viewBoxShadow}>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        errors.gpa && styles.errorInput,
-                        { width: "100%" },
-                      ]}
-                      placeholder="GPA"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value ? value.toString() : ""}
-                      keyboardType="decimal-pad"
-                    />
-                  </View>
-                )}
-                name="gpa"
-                rules={{
-                  min: { value: 0, message: "GPA must be at least 0" },
-                  max: { value: 4, message: "GPA must be at most 4" },
-                  pattern: {
-                    value: /^(\d(\.\d{1,2})?|4(\.0{1,2})?)$/,
-                    message: "GPA must be a number between 0 and 4",
-                  },
-                }}
-              />
-              {errors.gpa && (
-                <Text style={styles.errorText}>{errors.gpa.message}</Text>
+          )} */}
+
+          {/* GPA */}
+          <View style={{}}>
+            <Text style={[styles.paragraph]}>GPA</Text>
+            <Controller
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.viewBoxShadow}>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      errors.gpa && styles.errorInput,
+                      { width: "100%" },
+                    ]}
+                    placeholder="GPA"
+                    onBlur={onBlur}
+                    onChangeText={(text) => {
+                      // Accept both , and . as decimal separator
+                      let normalized = text.replace(",", ".");
+                      // Only allow numbers and one decimal separator
+                      if (/^\d*([.,]\d{0,2})?$/.test(text)) {
+                        onChange(text);
+                      }
+                    }}
+                    value={value ? value.toString().replace(".", ",") : ""}
+                    keyboardType="decimal-pad"
+                  />
+                </View>
               )}
-            </View>
-            {/* Start Year */}
-            <View style={{ width: "48%" }}>
-              <Text style={[styles.paragraph]}>Year of Entry</Text>
-              <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <View style={styles.viewBoxShadow}>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        errors.yearOfEntry && styles.errorInput,
-                        { width: "100%" },
-                      ]}
-                      placeholder="Year of Study"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value ? value.toString() : ""}
-                      keyboardType="numeric"
-                    />
-                  </View>
-                )}
-                name="yearOfEntry"
-                rules={{
-                  min: {
-                    value: MIN_ENTRY_YEAR,
-                    message: `Year must be in range ${MIN_ENTRY_YEAR}-${MAX_ENTRY_YEAR}`,
-                  },
-                  max: {
-                    value: MAX_ENTRY_YEAR,
-                    message: `Year must be in range ${MIN_ENTRY_YEAR}-${MAX_ENTRY_YEAR}`,
-                  },
-                  pattern: { value: /^\d*$/, message: "Year must be a number" },
-                }}
-              />
-              {errors.yearOfEntry && (
-                <Text style={styles.errorText}>
-                  {errors.yearOfEntry.message}
-                </Text>
+              name="gpa"
+              rules={{
+                min: { value: 0, message: "GPA must be at least 0" },
+                max: { value: 4, message: "GPA must be at most 4" },
+                pattern: {
+                  value: /^(\d([.,]\d{1,2})?|4([.,]0{1,2})?)$/,
+                  message: "GPA must be a number between 0 and 4",
+                },
+              }}
+            />
+            {errors.gpa && (
+              <Text style={styles.errorText}>{errors.gpa.message}</Text>
+            )}
+          </View>
+          {/* Graduation Status */}
+          <View style={{}}>
+            <Text style={[styles.paragraph]}>Graduation Status</Text>
+            <Controller
+              control={control}
+              name="graduationStatus"
+              render={({ field: { value, onChange } }) => (
+                <>
+                  <TouchableOpacity
+                    style={[styles.viewBoxShadow]}
+                    onPress={() => {
+                      setSheetMode("graduationStatus");
+                      setPendingOnChange(() => onChange);
+                      sheetRef.current?.snapToIndex(0);
+                    }}
+                  >
+                    <Text
+                      style={[styles.input, { color: value ? "#000" : "#888" }]}
+                    >
+                      {value || "Select Graduation Status"}
+                    </Text>
+                  </TouchableOpacity>
+                </>
               )}
-            </View>
+              rules={{
+                validate: (v) =>
+                  v === ""
+                    ? true
+                    : GRADUATION_OPTIONS.includes(v) ||
+                      "Invalid graduation status",
+              }}
+            />
+            {errors.graduationStatus && (
+              <Text style={styles.errorText}>
+                {errors.graduationStatus.message}
+              </Text>
+            )}
           </View>
         </View>
+
         {/* Social Media */}
         <ThemedText style={[styles.title, { marginVertical: 20 }]}>
           Social Media Accounts
@@ -770,6 +771,26 @@ export default function EditProfileScreen() {
         {sheetMode === "department" && (
           <BottomSheetView style={{ padding: 16 }}>
             {DEPARTMENT_OPTIONS.map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={{
+                  padding: 16,
+                  borderBottomWidth: 1,
+                  borderColor: "#ccc",
+                }}
+                onPress={() => {
+                  pendingOnChange(option); // Use the stored onChange
+                  sheetRef.current?.close();
+                }}
+              >
+                <Text style={{ fontSize: 16, color: "#fff" }}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </BottomSheetView>
+        )}
+        {sheetMode === "graduationStatus" && (
+          <BottomSheetView style={{ padding: 16 }}>
+            {GRADUATION_OPTIONS.map((option) => (
               <TouchableOpacity
                 key={option}
                 style={{

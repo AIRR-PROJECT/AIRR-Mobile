@@ -256,7 +256,7 @@ export const getUserInfo = createAsyncThunk(
             const payload = jwtDecode(accessToken) as any
 
             const res = await api.get('/users/by-username?username=' + payload.username) as AxiosResponse
-
+            console.log("User info response", res.data)
             if (res.data.success) {
                 thunkAPI.dispatch(setCurrentUser(res.data.data))
                 return res.data.data
@@ -328,16 +328,17 @@ export const updateUser = createAsyncThunk(
     'user/update',
     async (userData: User, thunkAPI) => {
         try {
+            console.log("Updating user", userData)
             const inputData: UpdateUser = {
                 userID: userData._id,
                 firstname: userData.firstName ?? "",
                 lastname: userData.lastName ?? "",
-                phone: userData.phoneNumber?.toString() ?? "",
+                phone: userData.phoneNumber ?? "",
                 dob: userData.dateOfBirth ?? "",
                 studentID: userData.profile.studentID ?? "",
                 department: userData.profile.department ?? "",
-                program: userData.profile.program?? "",
-                entry_year: userData.profile.yearOfEntry ?? 1,
+                // program: userData.profile.program ?? "",
+                graduationStatus: userData.profile.graduationStatus ?? "",
                 gpa: userData.profile.gpa ?? 0
             }
             if (userData.profile.link.LinkedIn) {
@@ -349,7 +350,7 @@ export const updateUser = createAsyncThunk(
             if (userData.profile.link.Facebook) {
                 inputData.facebook = userData.profile.link.Facebook
             }
-    
+            console.log("Input data for update", inputData)
             const res = await api.post("users/update", inputData)
             
             if (res.data.success) {

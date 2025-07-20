@@ -67,8 +67,8 @@ export interface UpdateUser {
     "phone"?: string,
     "studentID": string,
     "department": string,
-    "program": string,
-    "entry_year": number
+    // "program": string,
+    "graduationStatus": string,
     "gpa": number,
     "facebook"?: string,
     "github"?: string,

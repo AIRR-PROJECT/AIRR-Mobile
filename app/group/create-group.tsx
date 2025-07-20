@@ -357,6 +357,8 @@ export default function CreateGroup() {
                 {
                   justifyContent: "flex-start",
                   flexWrap: "wrap",
+                  padding: 20,
+                  gap: 10,
                 },
               ]}
               onPress={handleCreateTagPress}
@@ -367,7 +369,7 @@ export default function CreateGroup() {
                 size={24}
                 color="#B9FF66"
                 style={{
-                  paddingLeft: 40,
+                  
                 }}
               />
               {createGroupCreatedTags.length > 0 ? (
@@ -382,6 +384,7 @@ export default function CreateGroup() {
                       styles.buttonText,
                       {
                         paddingLeft: 10,
+                        paddingVertical: 0,
                       },
                     ]}
                   >

@@ -12,7 +12,15 @@ export default function GroupPreviewInfo({ group, style }: BlogInGroupProps) {
   return (
     <View style={[styles.container, style]}>
       <Image source={{ uri: group.CoverURL }} style={styles.image} />
-      <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">{group.Name}</Text>
+      <View>
+        <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+          {group.Name?.length > 10 ? group.Name.slice(0, 10) + "…" : group.Name}
+        </Text>
+        <Text style={styles.memberCount}>
+          {group.NumberOfMembers}{" "}
+          {group.NumberOfMembers > 1 ? "members" : "member"}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -20,16 +28,17 @@ export default function GroupPreviewInfo({ group, style }: BlogInGroupProps) {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 100,
-    borderColor: "#fff",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-evenly",
     columnGap: 10,
-    flex: 1,
+    borderWidth: 1,
+    borderColor: "#B9FF66",
+    padding: 20,
+    paddingVertical: 10,
   },
   image: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     borderRadius: 25,
   },
   textContainer: {
@@ -40,9 +49,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     flex: 1,
+    color: "#fff",
   },
   memberCount: {
     flexWrap: "wrap",
     fontSize: 12,
+    color: "#eee",
   },
 });

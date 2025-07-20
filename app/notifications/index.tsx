@@ -1,99 +1,21 @@
+import { EmptyContent } from "@/components/EmptyContent";
 import NotificationsItem from "@/components/notifications/NotificationsItem";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 import { NotificationType, RequestType } from "@/enums/notif_type.enum";
 import { BlogInteractNotification, NotificationResponseData, OtherNotification, PermissionNotification } from "@/interfaces/notifInterface";
 import { useAppDispatch } from "@/redux/hook";
 import { decreaseNotifCount, getAllNotif } from "@/redux/slices/notifSlice";
-import { useEffect, useState } from "react";
+import { FontAwesome } from "@expo/vector-icons";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
   SectionList,
   Text,
   TouchableOpacity,
+  FlatList,
+  RefreshControl,
 } from "react-native";
-
-// enum NotificationType {
-//   REACTION = "REACTION",
-//   COMMENT = "COMMENT",
-//   MENTION = "MENTION",
-//   FOLLOW = "FOLLOW",
-// }
-
-// const mockFollower = {
-//   firstName: "John",
-//   lastName: "Doe",
-//   _id: "123456789",
-//   avatarURL: "https://picsum.photos/200",
-//   description: "Started following you",
-// };
-// const mockReaction = {
-//   firstName: "Jane",
-//   lastName: "Smith",
-//   _id: "987654321",
-//   avatarURL: "https://picsum.photos/200",
-//   description: "Liked your post",
-//   blogImage: "https://picsum.photos/300",
-// };
-// const mockComment = {
-//   firstName: "Alice",
-//   lastName: "Johnson",
-//   _id: "456789123",
-//   avatarURL: "https://picsum.photos/200",
-//   description: "Commented on your post",
-//   blogImage: "https://picsum.photos/300",
-// };
-// const mockData = [
-//   {
-//     ...mockFollower,
-//     type: NotificationType.FOLLOW,
-//     isRead: false,
-//     date: Date.now() / 1000, // Change to ISO or Unix timestamp, which ever you prefer, if
-//     // if ISO, change the function in NotificationsItem to handle ISO date
-//   },
-//   {
-//     ...mockFollower,
-//     type: NotificationType.FOLLOW,
-//     isRead: true,
-//     date: Date.now() / 1000,
-//   },
-//   {
-//     ...mockReaction,
-//     type: NotificationType.REACTION,
-//     isRead: false,
-//     date: Date.now() / 1000,
-//   },
-//   {
-//     ...mockReaction,
-//     type: NotificationType.REACTION,
-//     isRead: true,
-//     date: Date.now() / 1000 - 100000,
-//   },
-//   {
-//     ...mockFollower,
-//     type: NotificationType.FOLLOW,
-//     isRead: true,
-//     date: Date.now() / 1000 - 500000,
-//   },
-//   {
-//     ...mockFollower,
-//     type: NotificationType.FOLLOW,
-//     isRead: false,
-//     date: Date.now() / 1000 - 420000,
-//   },
-//   {
-//     ...mockComment,
-//     type: NotificationType.COMMENT,
-//     isRead: false,
-//     date: Date.now() / 1000 - 1000000,
-//   },
-//   {
-//     ...mockComment,
-//     type: NotificationType.COMMENT,
-//     isRead: true,
-//     date: Date.now() / 1000 - 2000000,
-//   },
-// ];
 
 // Helper to check if a date is today
 const isToday = (date: Date) => {
@@ -104,30 +26,40 @@ const isToday = (date: Date) => {
     input.getFullYear() === now.getFullYear()
 };
 
-const descriptionFromType = (type: NotificationType) => {
-  switch (type) {
-    case NotificationType.INTERACTION:
-      return "Liked your blog"
-    case NotificationType.PERMISSION:
-      return "Gave you permission"
-    case NotificationType.OTHER:
-      return "Sent you a notification"
-  }
-
-  return ""
-}
-
 export default function NotificationsLayout() {
   const dispatch = useAppDispatch()
 
+  const refFields = useRef<FlatList>(null);
+  const currentOffset = useRef(0);
+  
+  const [fetchedData, setFetchedData] = useState<NotificationResponseData[]>([])
   const [sections, setSections] = useState<{ title: string; data: NotificationResponseData[]; }[]>([])
   const [isFetching, setIsFetching] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [selectedTab, setSelectedTab] = useState("All");
+  const tabs = ["All", NotificationType.INTERACTION, NotificationType.PERMISSION, NotificationType.OTHER]
 
   const handleMarkAsRead = (id: string) => {
     // Khoa: Call your API to mark the notification as read
     // For now, just log it
     console.log(`Notification with ID ${id} marked as read`);
   };
+
+  const handleArrowPress = () => {
+    refFields?.current?.scrollToOffset({
+      offset: currentOffset.current + 300, // Adjust as needed
+      animated: true,
+    });
+  };
+
+  // Track scroll position without causing re-render
+  const handleScroll = ({ nativeEvent }: any) => {
+    const offsetX = nativeEvent.contentOffset.x;
+    if (Math.abs(currentOffset.current - offsetX) > 10) {
+      currentOffset.current = offsetX;
+    }
+  };
+
 
   // const todayItems = mockData
   //   .filter((item) => isToday(item.date))
@@ -146,35 +78,94 @@ export default function NotificationsLayout() {
   useEffect(() => {
     setIsFetching(true)
     dispatch(getAllNotif()).then((res) => {
-      const data = res.payload as NotificationResponseData[]
-
-      const todayItems = data
-        .filter((item) => isToday(item.time))
-        .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()); // Descending
-    
-      const earlierItems = data
-        .filter((item) => !isToday(item.time))
-        .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()); // Descending
-
-      // console.log(earlierItems)
-
-      const sections = [];
-      if (todayItems.length > 0)
-        sections.push({ title: "Today", data: todayItems });
-      if (earlierItems.length > 0)
-        sections.push({ title: "Earlier", data: earlierItems });
-
-      setSections(sections)
+      setFetchedData(res.payload as NotificationResponseData[])
 
       setIsFetching(false)
     })
   }, [])
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    setIsFetching(true)
+    dispatch(getAllNotif()).then((res) => {
+      setFetchedData(res.payload as NotificationResponseData[])
+
+      setIsFetching(false)
+    })
+    
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+  }, []);
+
+  useEffect(() => {
+    const data = fetchedData.filter(n => n.type == selectedTab)
+
+    const todayItems = data
+      .filter((item) => isToday(item.time))
+      .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()); // Descending
+  
+    const earlierItems = data
+      .filter((item) => !isToday(item.time))
+      .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()); // Descending
+
+    // console.log(earlierItems)
+
+    const sections = [];
+    if (todayItems.length > 0)
+      sections.push({ title: "Today", data: todayItems });
+    if (earlierItems.length > 0)
+      sections.push({ title: "Earlier", data: earlierItems });
+
+    setSections(sections)
+  }, [selectedTab, fetchedData])
+
   return (
     <View style={styles.container}>
+      {/* list tags */}
+      <View style={styles.rowWrapper}>
+        <FlatList
+          data={tabs}
+          ref={refFields}
+          onScroll={handleScroll}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.tabItem,
+                selectedTab === item && styles.tabItemActive,
+              ]}
+              onPress={() => {
+                setSelectedTab(item);
+              }}
+            >
+              <Text
+                style={{
+                  color: selectedTab === item ? "#fff" : "#8A94AC",
+                  fontWeight: "bold",
+                }}
+              >
+                {item}
+              </Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        />
+        <TouchableOpacity onPress={handleArrowPress} activeOpacity={0.8}>
+          <FontAwesome name="caret-right" size={30} color="white" />
+        </TouchableOpacity>
+      </View>
       {isFetching ?
       <FeedBlogPreviewSkeleton/> :
+      sections.length == 0 ?
+      <EmptyContent/> :
       <SectionList
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         sections={sections}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
@@ -263,14 +254,14 @@ export default function NotificationsLayout() {
         contentContainerStyle={{ padding: 20 }}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-        ListFooterComponent={() => (
-          <TouchableOpacity
-            style={styles.prevNotiContainer}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.prevNotiText}>See previous notifications</Text>
-          </TouchableOpacity>
-        )}
+        // ListFooterComponent={() => (
+        //   <TouchableOpacity
+        //     style={styles.prevNotiContainer}
+        //     activeOpacity={0.7}
+        //   >
+        //     <Text style={styles.prevNotiText}>See previous notifications</Text>
+        //   </TouchableOpacity>
+        // )}
         ListFooterComponentStyle={{ marginTop: 20 }}
       />}
     </View>
@@ -297,5 +288,36 @@ const styles = StyleSheet.create({
   prevNotiText: {
     color: "#fff",
     fontSize: 16,
+  },
+  rowWrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 20,
+    paddingHorizontal: 20,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  tabList: {
+    paddingHorizontal: 16,
+  },
+  tabItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginRight: 8,
+  },
+  tabItemActive: {
+    backgroundColor: "#363B47",
+  },
+  contentContainer: {
+    padding: 20,
+  },
+  content: {
+    color: "#fff",
+    fontSize: 18,
   },
 });

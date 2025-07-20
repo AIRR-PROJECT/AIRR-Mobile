@@ -63,6 +63,7 @@ import BottomSheet, {
 // }));
 import { format, formatRelative } from "date-fns";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
+import { EmptyContent } from "@/components/EmptyContent";
 enum TabOptions {
   All = "all",
   NeedApproval = "need-approval",
@@ -384,7 +385,10 @@ export default function MemberApprovalsPage() {
       {/* Animated FlatList */}
       {isMemberFetching ? (
         <FeedBlogPreviewSkeleton />
-      ) : selectedTab == TabOptions.All ? (
+      ) : selectedTab == TabOptions.All ? 
+      displayMembers && displayMembers.length == 0 ?
+      <EmptyContent/> :
+      (
         <Animated.FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -446,7 +450,10 @@ export default function MemberApprovalsPage() {
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
         />
-      ) : selectedTab == TabOptions.NeedApproval ? (
+      ) : selectedTab == TabOptions.NeedApproval ? 
+      membersApproval && membersApproval.length == 0 ?
+      <EmptyContent/> :
+      (
         <Animated.FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -459,7 +466,10 @@ export default function MemberApprovalsPage() {
           itemLayoutAnimation={LinearTransition}
           ref={memberApprovalsFlatlistRef}
         />
-      ) : (
+      ) : 
+      bannedMembers && bannedMembers.length == 0 ?
+      <EmptyContent/> :
+      (
         <FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

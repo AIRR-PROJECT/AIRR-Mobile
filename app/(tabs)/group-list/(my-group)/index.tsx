@@ -1,3 +1,4 @@
+import { EmptyContent } from "@/components/EmptyContent";
 import GroupCardComponent from "@/components/group/GroupCardComponent";
 import GroupTab from "@/components/group/GroupTab";
 import PopularGroupTab from "@/components/group/PopularGroupTab";
@@ -152,6 +153,8 @@ export default function MyGroupTab() {
   return (
     isFetching ? 
     <FeedBlogPreviewSkeleton/> :
+    groups && groups.size == 0 ?
+    <EmptyContent/> :
     <View style={styles.container}>
       {/* Create Group Button */}
       <TouchableOpacity

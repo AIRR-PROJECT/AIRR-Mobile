@@ -1,3 +1,4 @@
+import { EmptyContent } from "@/components/EmptyContent";
 import GroupTab from "@/components/group/GroupTab";
 import PopularGroupTab from "@/components/group/PopularGroupTab";
 import { GroupField } from "@/interfaces/groupInterface";
@@ -50,7 +51,7 @@ export default function JoinedGroupTab() {
     dispatch(getJoinedFields()).then((res) => {
       const data = res.payload as GroupField[]
 
-      setJoinedFields(data)
+      setJoinedFields(data ?? [])
       if (data.length != 0) setSelectedId(data[0]._id)
     })
   }, []);
@@ -71,6 +72,8 @@ export default function JoinedGroupTab() {
   }, [groupIDToRemove]);
 
   return (
+    joinedFields && joinedFields.length == 0 ?
+    <EmptyContent/> :
     <View style={styles.container}>
       {/* list tags */}
       <View style={styles.rowWrapper}>

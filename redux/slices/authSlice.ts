@@ -337,7 +337,7 @@ export const updateUser = createAsyncThunk(
                 dob: userData.dob ?? "",
                 studentID: userData.profile.studentID ?? "",
                 department: userData.profile.department ?? "",
-                program: userData.profile.program?? "",
+                // program: userData.profile.program ?? "",
                 graduationStatus: userData.profile.graduationStatus ?? "",
                 gpa: userData.profile.gpa ?? 0
             }
@@ -350,7 +350,7 @@ export const updateUser = createAsyncThunk(
             if (userData.profile.link.Facebook) {
                 inputData.facebook = userData.profile.link.Facebook
             }
-    
+            console.log("Input data for update", inputData)
             const res = await api.post("users/update", inputData)
             
             if (res.data.success) {

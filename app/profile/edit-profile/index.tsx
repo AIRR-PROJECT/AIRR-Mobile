@@ -120,31 +120,48 @@ export default function EditProfileScreen() {
     }
   }, [isUserChangeSaved]);
 
-  const firstNameWatch = watch("firstName");
-  const lastNameWatch = watch("lastName");
-  const emailWatch = watch("email");
-  const dateOfBirthWatch = watch("dateOfBirth");
-  const phoneWatch = watch("phone");
-  const studentIdWatch = watch("studentId");
-  const departmentWatch = watch("department");
-  const programWatch = watch("program");
-  const gpaWatch = watch("gpa");
-  const yearOfEntryWatch = watch("yearOfEntry");
-  const linkedinWatch = watch("linkedin");
-  const githubWatch = watch("github");
-  const facebookWatch = watch("facebook");
+  // const firstNameWatch = watch("firstName");
+  // const lastNameWatch = watch("lastName");
+  // const emailWatch = watch("email");
+  // const dateOfBirthWatch = watch("dateOfBirth");
+  // const phoneWatch = watch("phone");
+  // const studentIdWatch = watch("studentId");
+  // const departmentWatch = watch("department");
+  // const programWatch = watch("program");
+  // const gpaWatch = watch("gpa");
+  // const yearOfEntryWatch = watch("yearOfEntry");
+  // const linkedinWatch = watch("linkedin");
+  // const githubWatch = watch("github");
+  // const facebookWatch = watch("facebook");
   const sheetRef = useRef<BottomSheet>(null);
+  const allFields = watch();
   const [sheetMode, setSheetMode] = useState<"main" | "program" | "department">(
     "main"
   );
   const [pendingOnChange, setPendingOnChange] = useState<(val: string) => void>(
     () => () => {} // TRICK to avoid undefined onChange
   );
-  
+
   const userChange = useAppSelector((state) => state.user.userChange);
   // console.log("userChange", userChange);
-  
+
   useEffect(() => {
+    const {
+      firstName,
+      lastName,
+      username,
+      email,
+      dateOfBirth,
+      phone,
+      studentId,
+      department,
+      program,
+      gpa,
+      yearOfEntry,
+      linkedin,
+      github,
+      facebook,
+    } = allFields;
     console.log("isValid", isValid);
     if (!isValid && errors != undefined && Object.keys(errors).length > 0) {
       // console.log which error for me
@@ -156,43 +173,34 @@ export default function EditProfileScreen() {
     dispatch(
       setUserChange({
         ...userChange,
-        firstName: firstNameWatch,
-        lastName: lastNameWatch,
-        email: emailWatch,
-        dateOfBirth: dateOfBirthWatch,
-        phoneNumber: phoneWatch,
+        firstName,
+        lastName,
+        email,
+        dateOfBirth,
+        phoneNumber: phone,
         profile: {
           ...userChange.profile,
-          studentID: studentIdWatch,
-          department: departmentWatch,
-          program: programWatch,
-          gpa: gpaWatch,
-          year: yearOfEntryWatch,
+          studentID: studentId,
+          department: department,
+          program: program,
+          gpa: gpa,
+          year: yearOfEntry,
           link: {
             ...userChange.profile.link,
-            LinkedIn: linkedinWatch,
-            Github: githubWatch,
-            Facebook: facebookWatch,
+            LinkedIn: linkedin,
+            Github: github,
+            Facebook: facebook,
           },
         },
       })
     );
-  }, [
-    firstNameWatch,
-    lastNameWatch,
-    emailWatch,
-    dateOfBirthWatch,
-    phoneWatch,
-    studentIdWatch,
-    departmentWatch,
-    programWatch,
-    gpaWatch,
-    yearOfEntryWatch,
-    linkedinWatch,
-    githubWatch,
-    facebookWatch,
-  ]);
+  }, [allFields, errors, isValid]);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  useEffect(() => {
+    if (sheetMode === "department" || sheetMode === "program") {
+      sheetRef.current?.snapToIndex(0);
+    }
+  }, [sheetMode]);
   return (
     <GestureHandlerRootView>
       <ScrollView style={styles.container}>
@@ -462,7 +470,6 @@ export default function EditProfileScreen() {
                   onPress={() => {
                     setSheetMode("department");
                     setPendingOnChange(() => onChange);
-                    sheetRef.current?.snapToIndex(0);
                   }}
                 >
                   <Text
@@ -496,7 +503,6 @@ export default function EditProfileScreen() {
                   style={[styles.viewBoxShadow]}
                   onPress={() => {
                     setSheetMode("program");
-                    sheetRef.current?.snapToIndex(0);
                     setPendingOnChange(() => onChange);
                   }}
                 >

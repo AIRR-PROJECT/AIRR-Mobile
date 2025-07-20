@@ -94,7 +94,6 @@ export default function MyGroupTab() {
 
   useEffect(() => {
     setIsNewGroupCreated(newGroupID !== undefined && newGroupID !== "")
-    console.log(`temp: ${newGroupID}`)
     if (newGroupID !== undefined && newGroupID.length != 0) {
       route.push(`/group?groupId=${newGroupID}`)
     }

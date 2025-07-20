@@ -150,7 +150,7 @@ export default function CreateGroup() {
           router.setParams({
             newGroupID: res.payload as string
           })
-          router.push(`/group?groupId=${res.payload}`)
+          // router.push(`/group?groupId=${res.payload}`)
         }
       });
     }
@@ -174,6 +174,7 @@ export default function CreateGroup() {
   const handleGroupFieldPress = useCallback((field: SearchedField) => {
     console.log("Group field: ", field.FieldName);
     setGroupField(field);
+    setChosenTags([])
 
     setGroupTags(field.DefaultTags);
     dispatch(setCreateGroupCreatedTags([]))

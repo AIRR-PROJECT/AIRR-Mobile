@@ -94,9 +94,10 @@ export default function MyGroupTab() {
 
   useEffect(() => {
     setIsNewGroupCreated(newGroupID !== undefined && newGroupID !== "")
-    route.setParams({
-      newGroupID: undefined
-    })
+    console.log(`temp: ${newGroupID}`)
+    if (newGroupID !== undefined && newGroupID.length != 0) {
+      route.push(`/group?groupId=${newGroupID}`)
+    }
   }, [newGroupID])
   useEffect(() => {
     if (groupIDToRemove || isNewGroupCreated) {

@@ -69,10 +69,6 @@ export default function ReportsApprovalsPage() {
     setBottomSheetMode("approve");
     sheetRef.current?.snapToIndex(0);
   };
-  const onReject = (blogID: string) => {
-    setSelectedReportID(blogID);
-    handleConfirmReject();
-  };
   const handleConfirmApprove = () => {
     dispatch(
       actionBlogReport({
@@ -91,10 +87,10 @@ export default function ReportsApprovalsPage() {
     });
   };
 
-  const handleConfirmReject = () => {
+  const handleConfirmReject = (blogID:string) => {
     dispatch(
       actionBlogReport({
-        blogID: selectedReportID,
+        blogID: blogID,
         groupID: groupID,
         action: "Reject",
       })
@@ -113,7 +109,7 @@ export default function ReportsApprovalsPage() {
     <ReportCardComponent
       {...item}
       onApprove={onApprove}
-      onReject={onReject}
+      onReject={handleConfirmReject}
     />
   );
   return isReportFetching ? (

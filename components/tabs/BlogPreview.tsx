@@ -1,4 +1,4 @@
-import { UserBlog } from "@/interfaces/blogInterface";
+import { RecentPopularBlog, UserBlog } from "@/interfaces/blogInterface";
 import { ImageBackground, StyleSheet, View, Text } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
@@ -11,14 +11,7 @@ import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import BottomLeftArrowIcon from "../BottomLeftArrowIcon";
 import { color } from "@rneui/base";
 
-const mockGroup = {
-  Name: "Group Name",
-  CoverURL:
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0jQPcLR2zDp6yPjuN6OqywK4v0ybNPxu1kw&s",
-  NumberOfMembers: 100,
-};
-
-export default function BlogPreview({ blog }: { blog: UserBlog }) {
+export default function BlogPreview({ blog }: { blog: RecentPopularBlog }) {
   // default to mock blog for this, but later will be passed as props
   const route = useRouter();
   const handlePress = () => {
@@ -32,7 +25,7 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
       activeOpacity={0.8}
     >
       <ImageBackground
-        source={{ uri: blog.BackgroundURL }}
+        source={{ uri: blog.CoverURL }}
         style={styles.imageBackground}
         imageStyle={styles.imageStyle}
       >
@@ -42,9 +35,10 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
             <View style={styles.userSection}>
               <BlogAuthor
                 author={{
-                  name: "username",
-                  avatar: "https://i.pravatar.cc/150",
+                  name: blog.Author.UserName,
+                  avatar: blog.Author.AvatarURL,
                 }}
+                time={blog.Author.CreateDate}
               />
             </View>
             <Entypo name="dots-three-vertical" size={24} color="white" />
@@ -57,7 +51,7 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
               >
                 Group
               </ThemedText> */}
-              <GroupPreviewInfo style={{}} group={{Name:`Group's name`, CoverURL: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', NumberOfMembers: 123} }/>
+              {/* <GroupPreviewInfo style={{}} group={{Name:`Group's name`, CoverURL: 'https://groupworkandcommunication2018.wordpress.com/wp-content/uploads/2018/10/group.png', NumberOfMembers: 123} }/> */}
             </View>
             {/* Ask later because it take to much space */}
             {/* <View style={styles.buttonSection}>
@@ -73,9 +67,9 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
           </View>
           {/* 2nd Part: List of Tags */}
           <View style={styles.tagsSection}>
-            {blog.tags.map((tag, index) => (
+            {blog.Tags && blog.Tags.map((tag, index) => (
               <Text key={index} style={styles.tag}>
-                #{tag}
+                #{tag.TagName}
               </Text>
             ))}
           </View>
@@ -89,11 +83,11 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
         {/* 4th Part: Preview of Content */}
         <View style={styles.contentSection}>
           <Text style={styles.description}>
-            {blog.content.slice(0, 115)}...
+            {blog.Description.slice(0, 115)}...
           </Text>
         </View>
         {/* 5th Part: Group Info */}
-        <View style={styles.rowContainer}>
+        {/* <View style={styles.rowContainer}>
           <View style={styles.groupSection}>
             <GroupPreviewInfo
               group={{
@@ -106,7 +100,7 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
             style={{ backgroundColor: "black", position: "static" }}
             color="#B9FF66"
           />
-        </View>
+        </View> */}
       </View>
       {/* Divider */}
       <View
@@ -123,20 +117,21 @@ export default function BlogPreview({ blog }: { blog: UserBlog }) {
         {/* Likes */}
         <View style={styles.likeContainer}>
           <FontAwesome name="thumbs-up" size={24} color="#000" />
-          <Text style={styles.text}>123</Text>
+          <Text style={styles.text}>{blog.NumberOfLikes}</Text>
         </View>
         {/* Dislikes */}
-        <View style={styles.dislikeContainer}>
+        {/* <View style={styles.dislikeContainer}>
           <FontAwesome name="thumbs-down" size={24} color="#000" />
-        </View>
+        </View> */}
         {/* Comment */}
         <View style={styles.commentContainer}>
           <MaterialIcons name="comment" size={28} color="#000" />
-          <Text style={styles.text}>123</Text>
+          <Text style={styles.text}>{blog.NumberOfComments}</Text>
         </View>
         {/* Bookmart Button */}
         <View style={styles.bookmarkContainer}>
           <FontAwesome name="bookmark" size={24} color="#000" />
+          <Text style={styles.text}>{blog.NumberOfSaves}</Text>
         </View>
       </View>
     </TouchableOpacity>

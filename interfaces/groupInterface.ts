@@ -210,3 +210,14 @@ export interface InviteMemberToAdmin {
     groupID: string;
     userIDToInvite: string
 }
+
+export interface RecentPopularGroup {
+    _id: string;
+    Name: string;
+    Description: string;
+    CreatedBy: GroupOwner;
+    NumberOfMembers: number;
+    TotalNumberOfBlogsLikes: number;
+    CoverURL: string;
+    NumberOfTag: number;
+}

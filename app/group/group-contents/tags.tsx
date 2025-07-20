@@ -35,6 +35,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { EmptyContent } from "@/components/EmptyContent";
 // Initial mock data
 const mockTag1 = {
   tag: "aimachine",
@@ -280,7 +281,10 @@ export default function TagsApprovalsPage() {
 
       {isTagFetching ? (
         <FeedBlogPreviewSkeleton />
-      ) : selectedTab == TabOptions.All ? (
+      ) : selectedTab == TabOptions.All ? 
+      displayTags && displayTags.length == 0 ?
+      <EmptyContent/> :
+      (
         <SectionGrid
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -300,7 +304,10 @@ export default function TagsApprovalsPage() {
           keyExtractor={(item, index) => item.TagName + index}
           // contentContainerStyle={styles.list}
         />
-      ) : (
+      ) : 
+      tagsApproval && tagsApproval.length == 0 ?
+      <EmptyContent/> :
+      (
         <Animated.FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

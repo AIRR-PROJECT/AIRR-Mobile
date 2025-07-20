@@ -15,6 +15,7 @@ import { BlogViewType } from "@/enums/blog_properties.enum";
 import MoreOptionBottomList from "../blog/MoreOptionBottomList";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FeedBlogPreviewSkeleton from "../tabs/feed/FeedBlogPreviewSkeleton";
+import { EmptyContent } from "../EmptyContent";
 const mockBlog: UserBlog = {
   _id: "123",
   Title: "How to fix clipboard if it isn’t working",
@@ -191,15 +192,18 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
   return (
     isFetching ?
     <FeedBlogPreviewSkeleton/> :
-    <View>
+    personalBlogsQuery.data?.length == 0 ?
+    <EmptyContent/> :
+    user && <View>
       <FlashList
         data={personalBlogsQuery.data}
         scrollEnabled={false}
         keyExtractor={(item, index) => index.toString()}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         renderItem={({ item }) => {
+          console.log(item)
           return <FeedBlogPreview blog={item} onPressMoreButton={
-            () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
+            () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group?._id,
               item.UserGroupStatus,
               item.Status,
               item.ViewType != BlogViewType.IN_GROUP,

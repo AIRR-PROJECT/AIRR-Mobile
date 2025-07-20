@@ -61,6 +61,7 @@ import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import { string } from "zod";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 import { getUserGroupStatus } from "@/redux/slices/groupSlice";
+import { EmptyContent } from "@/components/EmptyContent";
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>()
@@ -252,7 +253,8 @@ export default function MyFeed() {
       {/* Flat list for lazy load */}
       {userBlogsQuery.isFetching || isUserBlogReset ? (
         <FeedBlogPreviewSkeleton />
-      ) : (
+      ) : 
+      (
         <View style={{ flex: 1, width: "100%" }}>
           <FlatList
             refreshControl={

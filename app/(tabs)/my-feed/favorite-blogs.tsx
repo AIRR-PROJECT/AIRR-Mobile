@@ -62,6 +62,7 @@ import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 import { getFavoriteBlogs } from "@/redux/slices/blogSlice";
 import { getUserGroupStatus } from "@/redux/slices/groupSlice";
 import { setParams } from "expo-router/build/global-state/routing";
+import { EmptyContent } from "@/components/EmptyContent";
 // TODO:
 // Fetching user favourite blogs only 
 // Also implment refresh control and lazy loading
@@ -174,6 +175,8 @@ export default function FavouriteBlog() {
   }, [blogIdToRemove])
 
   return (
+    favoriteBlogsQuery.data?.length == 0 ?
+    <EmptyContent/> :
     <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
       {/* {userBlogsQuery.isFetching || isUserBlogReset ? (

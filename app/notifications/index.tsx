@@ -1,3 +1,4 @@
+import { EmptyContent } from "@/components/EmptyContent";
 import NotificationsItem from "@/components/notifications/NotificationsItem";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
 import { NotificationType, RequestType } from "@/enums/notif_type.enum";
@@ -159,6 +160,8 @@ export default function NotificationsLayout() {
       </View>
       {isFetching ?
       <FeedBlogPreviewSkeleton/> :
+      sections.length == 0 ?
+      <EmptyContent/> :
       <SectionList
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

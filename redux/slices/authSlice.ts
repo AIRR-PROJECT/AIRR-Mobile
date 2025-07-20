@@ -328,16 +328,17 @@ export const updateUser = createAsyncThunk(
     'user/update',
     async (userData: User, thunkAPI) => {
         try {
+            console.log("Updating user", userData)
             const inputData: UpdateUser = {
                 userID: userData._id,
                 firstname: userData.firstName ?? "",
                 lastname: userData.lastName ?? "",
-                phone: userData.phoneNumber?.toString() ?? "",
-                dob: userData.dateOfBirth ?? "",
+                phone: userData.phoneNumber ?? "",
+                dob: userData.dob ?? "",
                 studentID: userData.profile.studentID ?? "",
                 department: userData.profile.department ?? "",
                 program: userData.profile.program?? "",
-                entry_year: userData.profile.yearOfEntry ?? 1,
+                graduationStatus: userData.profile.graduationStatus ?? "",
                 gpa: userData.profile.gpa ?? 0
             }
             if (userData.profile.link.LinkedIn) {

@@ -50,7 +50,7 @@ export interface User {
     firstName?: string;
     lastName?: string;
     dateOfBirth?: string;
-    yearOfEntry?: number;
+    graduationStatus?: string;
     isAuthenticatedWithGoogle?: boolean;
     phoneNumber?: string;
     joinDate?: Date;

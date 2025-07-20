@@ -87,7 +87,7 @@ export default function ReportsApprovalsPage() {
     });
   };
 
-  const handleConfirmReject = (blogID:string) => {
+  const handleConfirmReject = (blogID: string) => {
     dispatch(
       actionBlogReport({
         blogID: blogID,
@@ -97,9 +97,7 @@ export default function ReportsApprovalsPage() {
     ).then((res) => {
       if (res.payload === true) {
         ToastAndroid.show("Report rejected", ToastAndroid.SHORT);
-        setDisplayReports((prev) =>
-          prev.filter((r) => r.Blog._id !== blogID)
-        );
+        setDisplayReports((prev) => prev.filter((r) => r.Blog._id !== blogID));
       }
       sheetRef.current?.close();
     });

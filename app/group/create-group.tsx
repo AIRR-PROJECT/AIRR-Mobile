@@ -320,7 +320,8 @@ export default function CreateGroup() {
                 {
                   justifyContent: "flex-start",
                   flexWrap: "wrap",
-                  padding: 10,
+                  padding: 20,
+                  gap: 10,
                 },
               ]}
               onPress={() => handleTagsSnapPress(0)}

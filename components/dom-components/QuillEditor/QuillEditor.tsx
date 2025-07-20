@@ -7,6 +7,7 @@ import "@enzedonline/quill-blot-formatter2";
 import BlotFormatter2 from "@enzedonline/quill-blot-formatter2";
 import "./QuillEditorStyles.css";
 import imageCompression from "browser-image-compression";
+
 // const VITE_CLOUDINARY_CLOUD_NAME = process.env.VITE_CLOUDINARY_CLOUD_NAME;
 // const VITE_CLOUDINARY_PRESET = process.env.VITE_CLOUDINARY_PRESET;
 export default function QuillEditor({
@@ -21,15 +22,14 @@ export default function QuillEditor({
   VITE_CLOUDINARY_PRESET?: string;
   dom: import("expo/dom").DOMProps;
 }) {
-  console.log("VITE_CLOUDINARY_CLOUD_NAME:", VITE_CLOUDINARY_CLOUD_NAME);
-  console.log("VITE_CLOUDINARY_PRESET:", VITE_CLOUDINARY_PRESET);
   const [value, setValue] = useState("");
   const reactQuillRef = useRef<ReactQuill>(null);
   const [editorReady, setEditorReady] = useState(false);
+  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const uploadToCloudinary = async (file: File): Promise<string> => {
     try {
-      const cloudinaryPreset = "blog_images_preset";
-      const cloudinaryCloudName = "dvjiwyc6g";
+      const cloudinaryPreset = VITE_CLOUDINARY_PRESET;
+      const cloudinaryCloudName = VITE_CLOUDINARY_CLOUD_NAME;
       console.log("Uploading to Cloudinary with preset:", cloudinaryPreset);
       console.log("Cloudinary cloud name:", cloudinaryCloudName);
       if (!cloudinaryPreset || !cloudinaryCloudName) {
@@ -87,16 +87,23 @@ export default function QuillEditor({
     Quill.register("modules/blotFormatter2", BlotFormatter2);
     setEditorReady(true);
   }, []);
+  const getQuillInstance = () => {
+    return reactQuillRef.current ? reactQuillRef.current.getEditor() : null;
+  };
 
   useEffect(() => {
     setValue(defaultValue ?? "");
   }, [defaultValue]);
 
   // Fix: Get Quill instance from ref
-  const getQuillInstance = () => {
-    return reactQuillRef.current ? reactQuillRef.current.getEditor() : null;
-  };
 
+  const applyTemplate = (templateContent: string) => {
+    const quillInstance = getQuillInstance();
+    if (quillInstance) {
+      quillInstance.setContents(JSON.parse(templateContent));
+      setIsTemplateDialogOpen(false);
+    }
+  };
   const imageHandler = useCallback(() => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
@@ -148,17 +155,16 @@ export default function QuillEditor({
     blotFormatter2: {
       align: {
         allowAligning: true,
+        // Optionally add className mapping if you want custom CSS classes
+        className: {
+          left: "ql-image-align-left",
+          center: "ql-image-align-center",
+          right: "ql-image-align-right",
+        },
       },
-      resize: {
-        allowResizing: true,
-      },
-      delete: {
-        allowKeyboardDelete: true,
-      },
-      image: {
-        allowAltTitleEdit: true,
-        allowCompressor: true,
-      },
+      resize: { allowResizing: true },
+      delete: { allowKeyboardDelete: true },
+      image: { allowAltTitleEdit: true, allowCompressor: true },
     },
   };
 
@@ -186,7 +192,7 @@ export default function QuillEditor({
   ];
 
   return (
-    <div className="quill-editor-container" style={{ width: "95%" }}>
+    <div className="" style={{ width: "100%" }}>
       {editorReady ? (
         <ReactQuill
           ref={reactQuillRef}

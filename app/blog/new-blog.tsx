@@ -55,7 +55,7 @@ import {
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { BlogViewType } from "@/enums/blog_properties.enum";
-
+import { VITE_CLOUDINARY_CLOUD_NAME, VITE_CLOUDINARY_PRESET } from "@env";
 export function debounce<T extends (...args: any[]) => void>(
   callback: T,
   delay: number
@@ -709,11 +709,13 @@ export default function NewBlog() {
         {/* Content Input */}
         <View style={[styles.rowContainer]}>
           <View style={styles.divider} />
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, width: "100%" }}>
             {/* QuillJS Here */}
             <QuillEditor
               dom={{ matchContents: true }}
               onValueChange={handleContentTextChange}
+              VITE_CLOUDINARY_CLOUD_NAME={VITE_CLOUDINARY_CLOUD_NAME}
+              VITE_CLOUDINARY_PRESET={VITE_CLOUDINARY_PRESET}
             />
           </View>
         </View>

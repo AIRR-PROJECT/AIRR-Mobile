@@ -35,6 +35,7 @@ import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { getAllJoinedGroups } from "@/redux/slices/groupSlice";
 import { Group } from "@/interfaces/groupInterface";
+import ProfileGroupPreviewInfo from "@/components/group/ProfileGroupPreviewInfo";
 // type UserInfo = {
 //   username: string;
 //   avatar_url: string;
@@ -189,7 +190,7 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               }
               renderItem={({ item }) => {
-                return <GroupPreviewInfo group={item} />;
+                return <ProfileGroupPreviewInfo group={item} />;
               }}
             />
           ) : (

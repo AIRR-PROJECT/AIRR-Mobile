@@ -586,7 +586,7 @@ const authSlice = createSlice({
             })
             .addCase(login.rejected, (state, action) => {
                 console.log(action.payload)
-                if (action.payload && (action.payload as APIResponse).message && ((action.payload as APIResponse).failcode !== ResponseFailcode.USER_NOT_FOUND && (action.payload as APIResponse).failcode !== ResponseFailcode.IDENTITY_NOT_MATCHED)) {
+                if (action.payload && (action.payload as APIResponse).message && ((action.payload as APIResponse).failcode !== ResponseFailcode.USER_NOT_FOUND && (action.payload as APIResponse).failcode !== ResponseFailcode.INVALID_CREDENTIALS)) {
                     state.isLoggedIn = true
                 }
 
@@ -788,7 +788,7 @@ const authSlice = createSlice({
                 
             })
             .addCase(changeCurrentPassword.rejected, (state, action) => {
-                if ((action.payload as any).data.failcode == ResponseFailcode.IDENTITY_NOT_MATCHED) {
+                if ((action.payload as any).data.failcode == ResponseFailcode.INVALID_CREDENTIALS) {
                     state.isCurrentPasswordIncorrect = true
                 }
             })

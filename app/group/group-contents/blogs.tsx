@@ -7,11 +7,12 @@ import {
   Text,
   FlatList,
   ToastAndroid,
+  RefreshControl,
 } from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   PendingBlogRequest,
   PendingMemberRequest,
@@ -64,6 +65,7 @@ export default function BlogsApprovalsPage() {
   const [blogApprovals, setBlogApprovals] = useState<PendingBlogRequest[]>([]);
   const [blogPage, setBlogPage] = useState(1);
   const [isBlogReset, setIsBlogReset] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
   // const [blogs, setBlogs] = useState<PendingBlogRequest[]>([]);
@@ -238,6 +240,28 @@ export default function BlogsApprovalsPage() {
   useEffect(() => {
     groupAllBlogsQuery.refetch()
   }, [])
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    
+    if (selectedTab === TabOptions.All) {
+      setIsBlogReset(true)
+      groupAllBlogsReset.mutateAsync().then(() => setIsBlogReset(false));
+    }
+    else if (selectedTab === TabOptions.MyBlogs) {
+      setIsBlogReset(true)
+      groupMyBlogsReset.mutateAsync().then(() => setIsBlogReset(false))
+    }
+    else {
+      dispatch(getPendingBlogList(groupID)).then((res) => {
+        const list = res.payload as PendingBlogRequest[];
+        setBlogApprovals(list);
+      });
+    }
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+  }, []);
 
   useEffect(() => {
     if (groupID) {
@@ -440,6 +464,9 @@ export default function BlogsApprovalsPage() {
       ) : 
         (selectedTab != TabOptions.NeedApproval ? (
           <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
             data={displayBlogs}
             renderItem={({ item }) => {
               return (
@@ -468,6 +495,9 @@ export default function BlogsApprovalsPage() {
         ) : (
           <View style={{ flex: 1, padding: 20 }}>
             <Animated.FlatList
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
               data={blogApprovals}
               renderItem={renderBlogApprovalItem}
               keyExtractor={(item) => item._id}

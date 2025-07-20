@@ -7,9 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
   ToastAndroid,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import TagApprovalCardComponent from "@/components/group/TagApprovalCardComponent";
@@ -46,6 +47,7 @@ export default function ReportsApprovalsPage() {
 
   const [displayReports, setDisplayReports] = useState<GroupReport[]>([]);
   const [isReportFetching, setIsReportFetching] = useState(false);
+  const [refreshing, setRefreshing] = useState(false)
 
   // For bottom sheet confirm
   const [bottomSheetMode, setBottomSheetMode] = useState<
@@ -63,6 +65,23 @@ export default function ReportsApprovalsPage() {
       });
     }
   }, [groupID]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    
+    if (groupID) {
+      setIsReportFetching(true);
+      dispatch(getPendingReportBlogList(groupID)).then((res) => {
+        const list = res.payload as GroupReport[];
+        setDisplayReports(list);
+        setIsReportFetching(false);
+      });
+    }
+    
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+  }, []);
 
   const onApprove = (blogID: string) => {
     setSelectedReportID(blogID);
@@ -115,6 +134,9 @@ export default function ReportsApprovalsPage() {
   ) : (
     <GestureHandlerRootView style={styles.container}>
       <Animated.FlatList
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         data={displayReports}
         renderItem={renderItem}
         keyExtractor={(item) => item.Blog._id}

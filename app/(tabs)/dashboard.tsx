@@ -4,13 +4,18 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import ButtonGradient from "@/components/ButtonGradient";
 import BlogPreview from "@/components/tabs/BlogPreview";
-import { UserBlog } from "@/interfaces/blogInterface";
+import { AIBlog, RecentPopularBlog, UserBlog } from "@/interfaces/blogInterface";
 import { loremIpsum } from "lorem-ipsum";
 import GroupSearch from "@/components/tabs/GroupSearch";
 import GroupJoin from "@/components/tabs/GroupJoinComponent";
 import CareerPathSuggestion from "@/components/tabs/CareerPathSuggestion";
 import AITrendingRecommendation from "@/components/tabs/AITrendingRecommendation";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "@/redux/hook";
+import { getRecentPopularBlogAndGroup } from "@/redux/slices/feedSlice";
+import { RecentPopularBlogAndGroup } from "@/interfaces/feedInterface";
+import { RecentPopularGroup } from "@/interfaces/groupInterface";
 
 const mockBlog: UserBlog = {
   Title: "How to fix clipboard if it isn’t working",
@@ -34,6 +39,23 @@ const mockBlog: UserBlog = {
   tags: ["Frontend", "Backend", "React", "NodeJS", "Express"],
 };
 export default function DashboardScreen() {
+  const dispatch = useAppDispatch()
+  
+  const [aiBlog, setAiBlog] = useState<AIBlog>()
+  const [popularBlog, setPopularBlog] = useState<RecentPopularBlog>()
+  const [popularGroup, setPopularGroup] = useState<RecentPopularGroup>()
+
+  useEffect(() => {
+    dispatch(getRecentPopularBlogAndGroup()).then((res) => {
+      const data = res.payload as RecentPopularBlogAndGroup
+
+      console.log(data.popularBlog.Author)
+      setAiBlog(data.AIBlog)
+      setPopularBlog(data.popularBlog)
+      setPopularGroup(data.popularGroup)
+    })
+  }, [])
+
   return (
     // correct the darkColor and lightColor values later
     <ParallaxScrollView style={{ flex: 1 }}>
@@ -65,7 +87,7 @@ export default function DashboardScreen() {
       </View>
       {/*  */}
       {/* Blog Preview */}
-      <BlogPreview blog={mockBlog} />
+      {popularBlog && <BlogPreview blog={popularBlog} />}
       {/* Join Group props */}
       <GroupJoin url1="" url2="" url3="" />
       {/* Find group search bar */}

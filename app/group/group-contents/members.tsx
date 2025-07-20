@@ -12,11 +12,12 @@ import {
   Text,
   ToastAndroid,
   Alert,
+  RefreshControl,
 } from "react-native";
 import BlogApprovalCardComponent from "@/components/group/BlogApprovalCardComponent";
 import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import MemberApprovalCardComponent from "@/components/group/MemberApprovalCardComponent";
 import { RequestOwner } from "@/interfaces/notifInterface";
 import {
@@ -62,7 +63,6 @@ import BottomSheet, {
 // }));
 import { format, formatRelative } from "date-fns";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
-import { set } from "lodash";
 enum TabOptions {
   All = "all",
   NeedApproval = "need-approval",
@@ -86,6 +86,7 @@ export default function MemberApprovalsPage() {
   const [bannedMembers, setBannedMembers] = useState<GroupBannedMember[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
   const [isMemberFetching, setIsMemberFetching] = useState(false);
+  const [refreshing, setRefreshing] = useState(false)
   const memberIDToScroll = useRef<string | null>(memberIDNotif);
   const [bottomSheetMode, setBottomSheetMode] = useState<
     "main" | "kick" | "ban" | "admin" | "unban" | "approve" | "reject"
@@ -123,6 +124,43 @@ export default function MemberApprovalsPage() {
       });
     }
   }, [selectedTab, groupID]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    
+    setIsMemberFetching(true)
+    if (selectedTab == TabOptions.All) {
+      dispatch(getMemberList({ groupID })).then((res) => {
+        let sortOrder = ["Owner", "Admin", "Member"];
+        const groupMembers = res.payload as GroupMember[];
+        const sortedGroupMembers = groupMembers.sort(
+          (a, b) => sortOrder.indexOf(a.Role) - sortOrder.indexOf(b.Role)
+        );
+
+        setDisplayMembers(sortedGroupMembers);
+
+        setIsMemberFetching(false);
+      });
+    } else if (selectedTab == TabOptions.NeedApproval) {
+      dispatch(getPendingMemberList(groupID)).then((res) => {
+        const list = res.payload as PendingMemberRequest[];
+        setMembersApproval(list);
+
+        setIsMemberFetching(false);
+      });
+    } else {
+      dispatch(getBannedMemberList(groupID)).then((res) => {
+        const list = res.payload as GroupBannedMember[];
+        setBannedMembers(list);
+
+        setIsMemberFetching(false);
+      });
+    }
+    
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // 2 seconds refresh
+  }, []);
 
   useEffect(() => {
     // Prevent scroll to member altogether
@@ -347,7 +385,10 @@ export default function MemberApprovalsPage() {
       {isMemberFetching ? (
         <FeedBlogPreviewSkeleton />
       ) : selectedTab == TabOptions.All ? (
-        <FlatList
+        <Animated.FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           data={displayMembers}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -407,6 +448,9 @@ export default function MemberApprovalsPage() {
         />
       ) : selectedTab == TabOptions.NeedApproval ? (
         <Animated.FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           data={membersApproval}
           renderItem={renderItem}
           keyExtractor={(item) => item._id}
@@ -417,6 +461,9 @@ export default function MemberApprovalsPage() {
         />
       ) : (
         <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           data={bannedMembers}
           renderItem={({ item }) => (
             <TouchableOpacity

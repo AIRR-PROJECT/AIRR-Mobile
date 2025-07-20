@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../api/axiosInstance"
 import { AxiosResponse } from "axios"
 import { SurveyTag } from "@/interfaces/userInterface"
-import { SearchBarResult } from "@/interfaces/feedInterface"
+import { RecentPopularBlogAndGroup, SearchBarResult } from "@/interfaces/feedInterface"
 
 const initialState = {
     recommendedBlogs: null,
@@ -116,6 +116,25 @@ export const searchFromSearchBar = createAsyncThunk(
             if (res.data.success) {
                 console.log(res.data.data)
                 return res.data.data as SearchBarResult
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data)
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
+export const getRecentPopularBlogAndGroup = createAsyncThunk(
+    'feed/getRecentPopularBlogAndGroup',
+    async (_, thunkAPI) => {
+        try {
+            const res = await api.get(`util/get-recent-popular-blog-and-group`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data as RecentPopularBlogAndGroup
             }
             else {
                 return thunkAPI.rejectWithValue(res.data)

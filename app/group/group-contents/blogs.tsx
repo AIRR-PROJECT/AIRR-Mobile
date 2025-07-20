@@ -42,6 +42,7 @@ import BottomSheet, {
 import { BlogViewType } from "@/enums/blog_properties.enum";
 import { Image } from "expo-image";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
+import { EmptyContent } from "@/components/EmptyContent";
 enum TabOptions {
   All = "all",
   MyBlogs = "my-blogs",
@@ -462,8 +463,10 @@ export default function BlogsApprovalsPage() {
       {groupAllBlogsQuery.isFetching || groupMyBlogsQuery.isFetching || isBlogReset ? (
         <FeedBlogPreviewSkeleton />
       ) : 
-        (selectedTab != TabOptions.NeedApproval ? (
-          <FlatList
+        (selectedTab != TabOptions.NeedApproval ? 
+          displayBlogs && displayBlogs.length == 0 ?
+          <EmptyContent/> :
+          (<FlatList
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
@@ -492,7 +495,10 @@ export default function BlogsApprovalsPage() {
             onEndReached={handleBlogListEndReached}
             ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
           />
-        ) : (
+        ) : 
+        blogApprovals && blogApprovals.length == 0 ? 
+        <EmptyContent/> :
+        (
           <View style={{ flex: 1, padding: 20 }}>
             <Animated.FlatList
               refreshControl={

@@ -35,6 +35,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { EmptyContent } from "@/components/EmptyContent";
 
 export default function ReportsApprovalsPage() {
   const dispatch = useAppDispatch();
@@ -131,7 +132,10 @@ export default function ReportsApprovalsPage() {
   );
   return isReportFetching ? (
     <FeedBlogPreviewSkeleton />
-  ) : (
+  ) : 
+  displayReports && displayReports.length == 0 ?
+  <EmptyContent/> :
+  (
     <GestureHandlerRootView style={styles.container}>
       <Animated.FlatList
         refreshControl={

@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 40,
+    borderRadius: 20,
     padding: 20,
     borderColor: "#1E1E1E",
   },
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
-    borderRadius: 40,
+    borderRadius: 20,
   },
   firstRow: {
     flexDirection: "row",

@@ -248,6 +248,13 @@ export default function MyFeed() {
   }, [blogIdToRemove])
   // Color cycle for ai blog previews
   const colorCycle = ["#e45febff", "#20b0e9ff", "#15d3adff", "#ff5c2fff"];
+  // Thumbnail for ai blog previews
+  const thumbnails = [
+    "https://plus.unsplash.com/premium_photo-1725907643567-1694c2737432?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1725907643701-9ba38affe7bb?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1725985758251-b49c6b581d17?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://plus.unsplash.com/premium_photo-1727535680864-06e5d8feb18e?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  ]
   return (
     <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
@@ -326,7 +333,13 @@ export default function MyFeed() {
                         parallaxScrollingScale: 0.9,
                         parallaxScrollingOffset: 50,
                       }}
-                      renderItem={({ item, index }) => <AIBlogPreview blog={item} color={colorCycle[index % colorCycle.length]} />}
+                      renderItem={({ item, index }) => 
+                        <AIBlogPreview
+                          blog={item}
+                          color={colorCycle[index % colorCycle.length]}
+                          thumbnail={thumbnails[index % thumbnails.length]}
+                        />
+                      }
                     />
                   </View>
                 )}

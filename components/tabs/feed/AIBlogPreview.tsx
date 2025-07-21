@@ -5,7 +5,7 @@ import { Image, ImageBackground } from "expo-image";
 import { useRouter } from "expo-router";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 // TODO:  add thumbnail to the AI Blog interface
 const mockThumbnail = "https://picsum.photos/400/200";
@@ -14,9 +14,11 @@ const mockThumbnail = "https://picsum.photos/400/200";
 export default function AIBlogPreview({
   blog,
   color,
+  thumbnail
 }: {
   blog: AIBlog;
   color?: string;
+  thumbnail?: string
 }) {
   const route = useRouter();
   const handlePress = () => {
@@ -25,6 +27,8 @@ export default function AIBlogPreview({
       pathname: `/blog/ai-blog?aiBlogId=${blog._id}`,
     });
   };
+
+  const index = useRef(0)
 
   return (
     <View style={styles.outerContainer}>
@@ -35,7 +39,7 @@ export default function AIBlogPreview({
       >
         {/* 1st Part: Title */}
         <ImageBackground
-          source={mockThumbnail}
+          source={thumbnail}
           imageStyle={styles.thumbnailStyle}
           style={styles.thumbnail}
         >

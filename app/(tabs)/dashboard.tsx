@@ -33,7 +33,8 @@ import {
 import { ImageBackground, Image } from "expo-image";
 import BlogAuthor from "@/components/tabs/BlogAuthor";
 import AIBlogPreview from "@/components/tabs/feed/AIBlogPreview";
-
+const VITE_CLOUDINARY_CLOUD_NAME = "your_cloudinary_cloud_name"; // replace with your actual cloud name
+const VITE_CLOUDINARY_PRESET = "your_cloudinary_preset"; // replace with
 const ai_agent = require("@/assets/images/tabs/index/ai_agent.jpg");
 export default function DashboardScreen() {
   const dispatch = useAppDispatch();

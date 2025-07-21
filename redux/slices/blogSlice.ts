@@ -533,7 +533,9 @@ export const getFavoriteBlogs = createAsyncThunk(
     'blog/getFavoriteBlogs',
     async (data: { page: number }, thunkAPI) => {
         try {
-            const res = await api.get(`blogs/favorite-blogs?page=${data.page}`) as AxiosResponse
+            const res = await api.get(`blogs/favorite-blogs?page=${data.page}`, {
+                "noLoadingScreen": true
+            }) as AxiosResponse
 
             if (res.data.success) {
                 return res.data.data.favoriteBlogs.blogs as FavoriteBlog[]

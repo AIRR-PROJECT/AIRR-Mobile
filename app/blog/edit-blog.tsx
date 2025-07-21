@@ -55,6 +55,8 @@ import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { Image } from "react-native";
 import { BlogViewType } from "@/enums/blog_properties.enum";
+const VITE_CLOUDINARY_CLOUD_NAME = "your_cloudinary_cloud_name"; // Replace with your actual cloud name
+const VITE_CLOUDINARY_PRESET = "your_cloudinary_preset"; // Replace with
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -808,6 +810,8 @@ export default function Editblog() {
               dom={{ matchContents: true }}
               defaultValue={content.current}
               onValueChange={handleContentTextChange}
+              VITE_CLOUDINARY_CLOUD_NAME={VITE_CLOUDINARY_CLOUD_NAME}
+              VITE_CLOUDINARY_PRESET={VITE_CLOUDINARY_PRESET}
             />
           </View>
         </View>

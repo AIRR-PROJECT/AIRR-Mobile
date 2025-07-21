@@ -16,7 +16,9 @@ export const fetchRecommendedBlogs = createAsyncThunk(
     'feed/fetchRecommended',
     async (page: number, thunkAPI) => {
         try {
-            const res = await api.get(`blogs/preview-recommend-blogs?page=${page}`)
+            const res = await api.get(`blogs/preview-recommend-blogs?page=${page}`, {
+                "noLoadingScreen": true
+            })
 
             if (res.data.success) {
                 return res.data.data
@@ -35,7 +37,9 @@ export const fetchUserBlogs = createAsyncThunk(
     'feed/fetchUser',
     async (page: number, thunkAPI) => {
         try {
-            const res = await api.get(`blogs/preview-user-blogs?page=${page}`)
+            const res = await api.get(`blogs/preview-user-blogs?page=${page}`, {
+                "noLoadingScreen": true
+            })
 
             if (res.data.success) {
                 return res.data.data

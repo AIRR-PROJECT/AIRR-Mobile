@@ -20,7 +20,7 @@ export default function UserStudentInfoComponent({ profile }: StudentInfo) {
         end={{ x: 1, y: 1 }}
       >
         <Text style={styles.title}>ACADEMIC BACKGROUND</Text>
-        <View style={[{ gap: 5 }]}>
+        <View style={[{ gap: 10, flex: 1}]}>
           <View style={styles.rowContainer}>
             <Text style={styles.attribute}>MAJOR</Text>
             <Text style={styles.info}>{profile.department}</Text>
@@ -38,8 +38,6 @@ export default function UserStudentInfoComponent({ profile }: StudentInfo) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#000",
-    height: 150,
-
     borderRadius: 20,
   },
   title: {
@@ -48,6 +46,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     fontWeight: "bold",
     textAlign: "center",
+    flex: 1,
   },
   rowContainer: {
     flexDirection: "row",
@@ -64,5 +63,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "500",
+    flex: 1,
+    textAlign: "right",
   },
 });

@@ -34,8 +34,10 @@ api.interceptors.request.use(async (config) => {
     // Create new abort signal to be used to cancel the request at any time (as long as it is still being processed)
     abortSignal = new AbortController()
     config.signal = abortSignal.signal
-
-    store.dispatch(showLoading("Now sending request..."))
+    
+    // console.log(`noLoadingScrene: ${config["noLoadingScreen"]} - route: ${config.url}`)
+    if (!config["noLoadingScreen"])
+        store.dispatch(showLoading("Now sending request..."))
 
     const accessToken = await SecureStore.getItemAsync('accessToken');
     // const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im90dGVyLm9saXZlLjQ1OCIsInN1YiI6IjY3OGQwNmRlNjcyMjBlZTFjOWRlZDdkYiIsInJvbGUiOiJNZW1iZXIiLCJpYXQiOjE3NDE2OTg5NzQsImV4cCI6MTc0MTY5OTg3NH0.gfuXsPa2XR97yqYNNRZmn0R85MBSKPIK_L3L-yudDas"

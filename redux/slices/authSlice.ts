@@ -428,7 +428,9 @@ export const getUserBlogLikeActivities = createAsyncThunk(
     'auth/getUserLikeActivity', 
     async (blogId: string, thunkAPI) => {
         try {
-            const res = await api.get(`users/get-activity-by-type-blog?type=Like&blogId=${blogId}`)
+            const res = await api.get(`users/get-activity-by-type-blog?type=Like&blogId=${blogId}`, {
+                "noLoadingScreen": true
+            })
 
             if (res.data.success) {
                 if (res.data.data.activities.length > 0) {
@@ -456,7 +458,9 @@ export const getUserBlogDislikeActivities = createAsyncThunk(
     'auth/getUserDislikeActivity', 
     async (blogId: string, thunkAPI) => {
         try {
-            const res = await api.get(`users/get-activity-by-type-blog?type=Dislike&blogId=${blogId}`)
+            const res = await api.get(`users/get-activity-by-type-blog?type=Dislike&blogId=${blogId}`, {
+                "noLoadingScreen": true
+            })
 
             if (res.data.success) {
                 if (res.data.data.activities.length > 0) {
@@ -484,7 +488,9 @@ export const getUserBlogSaveActivities = createAsyncThunk(
     'auth/getUserSaveActivity', 
     async (blogId: string, thunkAPI) => {
         try {
-            const res = await api.get(`users/get-activity-by-type-blog?type=Save&blogId=${blogId}`)
+            const res = await api.get(`users/get-activity-by-type-blog?type=Save&blogId=${blogId}`, {
+                "noLoadingScreen": true
+            })
 
             if (res.data.success) {
                 if (res.data.data.activities.length > 0) {

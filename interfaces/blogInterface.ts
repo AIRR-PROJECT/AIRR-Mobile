@@ -8,6 +8,7 @@ export interface AIBlog {
     Title: string;
     Description: string;
     Tags: GroupTag[]
+    BackgroundURL: string
 }
 export interface AIBlogDetail {
     _id: string;

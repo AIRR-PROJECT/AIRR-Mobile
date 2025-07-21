@@ -8,7 +8,7 @@ import { Pressable } from "react-native";
 import * as Linking from "expo-linking";
 export default function CareerPathSuggestion({ isFromCareerPath = false }) {
   const router = useRouter();
-  const webUrl = "https://github.com/SystemErrorWang/White-box-Cartoonization";
+  const webUrl = "https://airr-fe.vercel.app/career";
   const handleClick = () => {
     // handle click
     if (isFromCareerPath) {

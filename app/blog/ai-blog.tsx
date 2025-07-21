@@ -3,63 +3,21 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   ScrollView,
-  Button,
 } from "react-native";
 import { Image } from "expo-image";
-import { router, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  AntDesign,
   Entypo,
-  Feather,
-  FontAwesome,
-  FontAwesome6,
-  Fontisto,
-  MaterialIcons,
 } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
-import BlogAuthorComponent from "@/components/blog/BlogAuthorComponent";
 import {BlogTagButton} from "@/components/blog/BlogTagButton";
-import { ThemedText } from "@/components/ThemedText";
-import QuillRenderer from "@/components/dom-components/QuillRenderer/QuillRenderer";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
-  commentOnBlog,
-  dislikeBlog,
-  dislikeToLikeBlog,
   getAIBlogDetail,
   getBlogComment,
-  getUserBlogDetail,
-  likeBlog,
-  likeToDislikeBlog,
-  removeDislikeBlog,
-  removeLikeBlog,
-  saveBlog,
-  setCommentAdded,
-  unsaveBlog,
 } from "@/redux/slices/blogSlice";
-import {
-  AIBlogSection,
-  PostComment,
-  UserBlogComment,
-  UserBlogGroup,
-  UserBlogTag,
-} from "@/interfaces/blogInterface";
-import {
-  getUserBlogDislikeActivities,
-  getUserBlogLikeActivities,
-  getUserBlogSaveActivities,
-} from "@/redux/slices/authSlice";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
-import { formatDistanceToNow } from "date-fns";
-import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, {
   ICarouselInstance,
@@ -90,7 +48,6 @@ import { Dimensions } from "react-native";
 import AIBlogSectionComponent from "@/components/blog/AIBlogSectionComponent";
 import { GroupTag } from "@/interfaces/groupInterface";
 const window = Dimensions.get("window");
-let isReactOnTimeout = false;
 
 type SubDetailGroupCardComponentProps = {
   SubHeading: string;
@@ -102,43 +59,17 @@ type DetailGroupCardComponentProps = {
   Heading: string;
   Content: SubDetailGroupCardComponentProps[];
 };
-const mockData: DetailGroupCardComponentProps = {
-  Heading: "AI Blog Section",
-  Content: [
-    {
-      SubHeading: "Introduction to AI",
-      Details:
-        "AI is a branch of computer science that aims to create intelligent machines capable of performing tasks that typically require human intelligence.",
-      Source: "https://en.wikipedia.org/wiki/Artificial_intelligence",
-      Code: "console.log('Hello, AI!');",
-    },
-    {
-      SubHeading: "Applications of AI",
-      Details:
-        "AI has applications in various fields such as healthcare, finance, and transportation.",
-      Source: "https://www.ibm.com/cloud/learn/what-is-artificial-intelligence",
-      Code: "function aiApplication() {\n  return 'AI in action';\n}",
-    },
-  ],
-};
 export default function BlogScreen() {
   const searchParams = useLocalSearchParams<{
     aiBlogId: string;
     userBlogId: string;
     userBlogCommentId: string;
   }>();
-  // if (searchParams.aiBlogId) {
 
   const route = useRouter();
   const dispatch = useAppDispatch();
   const {
     currentAIBlog,
-    currentUserBlog,
-    currentBlogComments,
-    isCurrentBlogLiked,
-    isCurrentBlogDisliked,
-    isCurrentBlogSaved,
-    commentAdded,
   } = useAppSelector((state) => state.blog);
   const { user } = useAppSelector((state) => state.user);
 
@@ -170,16 +101,6 @@ export default function BlogScreen() {
     }
   }, [currentAIBlog]);
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    // Simulate fetching data
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000); // 2 seconds refresh
-
-    dispatch(getAIBlogDetail(searchParams.aiBlogId));
-    dispatch(getBlogComment(searchParams.aiBlogId));
-  };
 
   const handleBack = () => {
     route.back();

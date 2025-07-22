@@ -186,66 +186,6 @@ export default function ActivityTab() {
 
   return (
     <View style={styles.container}>
-      {/* Time bar graph */}
-      <View style={styles.chartContainer}>
-        <LinearGradient
-          colors={["#cef0c5", "#a8e063"]}
-          style={styles.background}
-        />
-        <ThemedText style={styles.label}>Average time spent</ThemedText>
-        <ThemedText style={styles.averageTime}>{timeSumText}</ThemedText>
-        <Divider
-          orientation="vertical"
-          style={{ width: "100%", borderColor: "#fff", borderWidth: 1 }}
-        />
-
-        <BarChart
-          backgroundColor={"transparent"}
-          focusedBarConfig={{ color: "green" }}
-          focusBarOnPress={true}
-          data={chartData}
-          frontColor={"#fff"}
-          barWidth={14}
-          height={250}
-          maxValue={360}
-          barBorderTopRightRadius={6}
-          barBorderTopLeftRadius={6}
-          isAnimated={true}
-          onPress={(value: any) => console.log(value)}
-          xAxisLabelTextStyle={{ color: "#000" }}
-          xAxisColor={"#fff"}
-          yAxisLabelTexts={yAxisLabels}
-          yAxisThickness={0}
-          noOfSections={2}
-          rulesColor={"#fff"}
-          rulesThickness={2}
-          initialSpacing={25}
-          renderTooltip={(item: any) => {
-            return (
-              <View
-                style={{
-                  backgroundColor: "#1E1B39",
-                  padding: 10,
-                  paddingBlock: 5,
-                  borderRadius: 10,
-                }}
-              >
-                <ThemedText
-                  style={{
-                    color: "#fff",
-                    alignContent: "center",
-                    fontSize: 12,
-                  }}
-                >
-                  {minutesToHoursAndMinutes(item.value)}
-                </ThemedText>
-              </View>
-            );
-          }}
-          autoCenterTooltip={true}
-        />
-      </View>
-
       {/* User Action History */}
       <View style={{width: "100%"}}>
         {isListFetching ?

@@ -187,6 +187,7 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
                 <TabButton
                   key={index}
                   title={tag.TagName}
+                  field="Tap to remove tag"
                   onPress={() => {
                     // New suggested tags show list
                     const tagIndex = suggestedTags.indexOf(selectedTags[index]);

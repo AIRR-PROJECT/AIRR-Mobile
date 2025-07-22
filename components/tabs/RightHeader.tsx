@@ -41,7 +41,18 @@ let suggestedTags: SurveyTag[] = [];
 let selectedTags: SurveyTag[] = [];
 let originalSuggestedTags: SurveyTag[];
 let originalSelectedTags: SurveyTag[];
-
+ const mockSearchTags = [
+    { _id: "1", TagName: "React" },
+    { _id: "2", TagName: "JavaScript" },
+    { _id: "3", TagName: "CSS" },
+    { _id: "4", TagName: "Python" },
+    { _id: "5", TagName: "Java" },
+    { _id: "6", TagName: "C++" },
+    { _id: "7", TagName: "Ruby" },
+    { _id: "8", TagName: "Swift" },
+    { _id: "9", TagName: "Kotlin" },
+    { _id: "10", TagName: "TypeScript" },
+  ];
 export default function RightHeader({ avatar }: RightHeaderProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
@@ -86,8 +97,8 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
 
       const initSuggestedTagsShow = suggestedTags.map(() => true);
       setSuggestedTagsShow(initSuggestedTagsShow);
-    })
-    
+    });
+
     // Get selected tags
     selectedTags = user
       ? ((user as User).survey as SurveyTag[]).map((tag, index) => tag)
@@ -212,7 +223,7 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
       </ScrollView>
     );
   }
-
+  const [searchResults, setSearchResults] = useState<SurveyTag[]>(mockSearchTags);
   return (
     <View style={styles.container}>
       {/* Feed Settings Button */}
@@ -318,6 +329,33 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
                 }}
               />
             </View>
+            {/* Search Results */}
+            {isSearchFocused && searchResults.length > 0 && (
+              <ScrollView style={{ maxHeight: 120, width: "100%" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: 8,
+                    padding: 8,
+                    backgroundColor: "#eeee",
+                    marginTop: 5,
+                    borderRadius: 10,
+                  }}
+                >
+                  {searchResults.map((tag, idx) => (
+                    <TabButton
+                      key={tag._id}
+                      title={tag.TagName}
+                      onPress={() => {
+                        /* handle tag select */
+                      }}
+                      userSelected={false}
+                    />
+                  ))}
+                </View>
+              </ScrollView>
+            )}
             {/* Tags Row and sort button */}
             <View style={[styles.searchOptionsContainer]}>
               {/* Suggested and My Tags */}

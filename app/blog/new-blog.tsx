@@ -56,8 +56,6 @@ import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { BlogViewType } from "@/enums/blog_properties.enum";
 
-const VITE_CLOUDINARY_CLOUD_NAME = "";
-const VITE_CLOUDINARY_PRESET = "";
 export function debounce<T extends (...args: any[]) => void>(
   callback: T,
   delay: number

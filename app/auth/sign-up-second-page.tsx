@@ -68,7 +68,6 @@ export default function SignUpSecondPage() {
         password: data.password,
       };
 
-      console.log("test");
       dispatch(signup(signUpData));
     }
   };

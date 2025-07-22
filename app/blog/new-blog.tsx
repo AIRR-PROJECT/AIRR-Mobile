@@ -116,10 +116,6 @@ const OnlyInMyProfile: Group = {
   IsAdminOrOwner: false,
 };
 
-// TODO: remove this after fixing
-const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g"
-const VITE_CLOUDINARY_PRESET = "blog_images_preset"
-
 export default function NewBlog() {
   const dispatch = useAppDispatch();
   const { groupID } = useLocalSearchParams<{ groupID: string }>();

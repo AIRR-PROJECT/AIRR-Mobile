@@ -300,6 +300,7 @@ export const getUserInfo = createAsyncThunk(
             return thunkAPI.rejectWithValue("No access token found")
         }
         catch (err: any) {
+            console.log(err)
             return thunkAPI.rejectWithValue(err.response)
         }
     }

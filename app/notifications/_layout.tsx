@@ -21,7 +21,7 @@ export default function NotificationsLayout() {
         name="index"
         options={{
           headerTitle: "Notifications",
-          headerRight: () => <SettingsIcon />,
+          // headerRight: () => <SettingsIcon />,
         }}
       />
     </Stack>

@@ -479,6 +479,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
     marginVertical: 10,
+    gap: 8,
   },
   tag: {
     padding: 2,

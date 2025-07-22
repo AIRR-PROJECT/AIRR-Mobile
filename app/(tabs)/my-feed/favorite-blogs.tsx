@@ -175,8 +175,6 @@ export default function FavouriteBlog() {
   }, [blogIdToRemove])
 
   return (
-    favoriteBlogsQuery.data?.length == 0 ?
-    <EmptyContent/> :
     <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
       {/* {userBlogsQuery.isFetching || isUserBlogReset ? (
@@ -207,7 +205,9 @@ export default function FavouriteBlog() {
       )} */}
       
       <View style={{ flex: 1, width: "100%" }}>
-        <FlatList
+        {favoriteBlogsQuery.data?.length == 0 ?
+          <EmptyContent/> :
+          <FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -223,6 +223,7 @@ export default function FavouriteBlog() {
           }}
           onEndReachedThreshold={0.5}
         />
+        }
       </View>
       {/* <MoreOptionBottomList
         sheetRef={moreOptionRef}

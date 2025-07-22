@@ -1,4 +1,5 @@
 
+import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, Image } from "react-native";
 
 export function EmptyContent() {
@@ -6,8 +7,8 @@ export function EmptyContent() {
 
     return (
         <View style={styles.container}>
-            <Image style={styles.image} src={image}></Image>
-            <Text style={styles.title}>Where da kontent</Text>
+            <MaterialCommunityIcons name="skull" size={60} color="white" />
+            <Text style={styles.title}>No data available</Text>
         </View>
     )
 }
@@ -30,6 +31,6 @@ const styles = StyleSheet.create({
     },
     title: { 
         color: "#fff",
-        fontSize: 30
+        fontSize: 24
     }
 })

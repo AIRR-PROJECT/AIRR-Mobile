@@ -465,7 +465,18 @@ export default function BlogsApprovalsPage() {
       ) : 
         (selectedTab != TabOptions.NeedApproval ? 
           displayBlogs && displayBlogs.length == 0 ?
-          <EmptyContent/> :
+          (<FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            data={["1"]}
+            renderItem={() => <EmptyContent/>}
+            showsVerticalScrollIndicator={false}
+            // contentContainerStyle={[styles.list, {}]}
+            style={{ paddingBottom: 80 }}
+            onEndReached={handleBlogListEndReached}
+            ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          />) :
           (<FlatList
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -494,10 +505,23 @@ export default function BlogsApprovalsPage() {
             style={{ paddingBottom: 80 }}
             onEndReached={handleBlogListEndReached}
             ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-          />
-        ) : 
+          />) : 
         blogApprovals && blogApprovals.length == 0 ? 
-        <EmptyContent/> :
+        (
+          <View style={{ flex: 1, padding: 20 }}>
+            <Animated.FlatList
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              data={["1"]}
+              renderItem={() => <EmptyContent/>}
+              showsVerticalScrollIndicator={false}
+              ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+              itemLayoutAnimation={LinearTransition}
+              ref={blogApprovalFlatlistRef}
+            />
+          </View>
+        ) :
         (
           <View style={{ flex: 1, padding: 20 }}>
             <Animated.FlatList

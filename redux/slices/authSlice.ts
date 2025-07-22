@@ -589,6 +589,10 @@ const authSlice = createSlice({
             state.isLoading = action.payload
         },
 
+        setLoggedIn(state, action) {
+            state.isLoggedIn = action.payload
+        },
+
         resetLoggedIn(state, _) {
             state.isLoggedIn = false
         },
@@ -713,7 +717,6 @@ const authSlice = createSlice({
             })
             .addCase(signup.fulfilled, (state, action) => {
                 state.isAccountCreated = true
-                state.isLoggedIn = true
             })
             .addCase(signup.rejected, (state, action) => {
                 /* Handling this somewhere else */
@@ -849,5 +852,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { setLoading, resetLoggedIn, resetAccountCreated, resetPasswordVerified, setCurrentPasswordIncorrect, setUserChangeSaved, resetChangedPassword, logout } = authSlice.actions;
+export const { setLoading, resetLoggedIn, resetAccountCreated, resetPasswordVerified, setCurrentPasswordIncorrect, setUserChangeSaved, resetChangedPassword, logout, setLoggedIn } = authSlice.actions;
 export default authSlice.reducer;

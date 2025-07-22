@@ -133,21 +133,31 @@ export default function ReportsApprovalsPage() {
   return isReportFetching ? (
     <FeedBlogPreviewSkeleton />
   ) : 
-  displayReports && displayReports.length == 0 ?
-  <EmptyContent/> :
   (
     <GestureHandlerRootView style={styles.container}>
-      <Animated.FlatList
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        data={displayReports}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.Blog._id}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-        itemLayoutAnimation={LinearTransition}
-      />
+      {displayReports && displayReports.length == 0 ?
+        <Animated.FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={["1"]}
+          renderItem={() => <EmptyContent/>}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          itemLayoutAnimation={LinearTransition}
+        /> :
+        <Animated.FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={displayReports}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.Blog._id}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          itemLayoutAnimation={LinearTransition}
+        />
+      }
       <BottomSheet
         ref={sheetRef}
         index={-1}

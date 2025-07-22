@@ -206,23 +206,35 @@ export default function FavouriteBlog() {
       
       <View style={{ flex: 1, width: "100%" }}>
         {favoriteBlogsQuery.data?.length == 0 ?
-          <EmptyContent/> :
           <FlatList
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          data={favoriteBlogsQuery.data}
-          style={styles.userBlogContainer}
-          scrollEnabled={true}
-          keyExtractor={(item, index) => index.toString()}
-          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
-          showsVerticalScrollIndicator={false}
-          onEndReached={handleOnUserBlogListEndReached}
-          renderItem={({ item }) => {
-            return <FeedBlogPreview blog={item as any} onPressUnsave={handleRemoveFavoriteBlog}/>;
-          }}
-          onEndReachedThreshold={0.5}
-        />
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            data={["1"]}
+            style={styles.userBlogContainer}
+            scrollEnabled={true}
+            ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+            showsVerticalScrollIndicator={false}
+            onEndReached={handleOnUserBlogListEndReached}
+            renderItem={() => <EmptyContent/>}
+            onEndReachedThreshold={0.5}
+          /> :
+          <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            data={favoriteBlogsQuery.data}
+            style={styles.userBlogContainer}
+            scrollEnabled={true}
+            keyExtractor={(item, index) => index.toString()}
+            ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+            showsVerticalScrollIndicator={false}
+            onEndReached={handleOnUserBlogListEndReached}
+            renderItem={({ item }) => {
+              return <FeedBlogPreview blog={item as any} onPressUnsave={handleRemoveFavoriteBlog}/>;
+            }}
+            onEndReachedThreshold={0.5}
+          />
         }
       </View>
       {/* <MoreOptionBottomList

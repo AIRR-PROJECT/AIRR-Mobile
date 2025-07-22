@@ -172,7 +172,6 @@ export default function EditProfileScreen() {
         phoneNumber: phoneWatch,
         profile: {
           ...userChange.profile,
-          studentID: studentIdWatch,
           department: departmentWatch,
           // program: programWatch,
           gpa: gpaValue,
@@ -429,38 +428,6 @@ export default function EditProfileScreen() {
         </ThemedText>
         {/* Student Form */}
         <View style={styles.formSection}>
-          {/* Student ID */}
-          <Text style={[styles.paragraph]}>Student ID</Text>
-          <Controller
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.viewBoxShadow}>
-                <TextInput
-                  style={[
-                    styles.input,
-                    errors.studentId && styles.errorInput,
-                    { width: "100%" },
-                  ]}
-                  placeholder="Student ID"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                  maxLength={8}
-                  keyboardType="numeric"
-                />
-              </View>
-            )}
-            name="studentId"
-            rules={{
-              validate: (v) =>
-                !v ||
-                (/^\d{8}$/.test(v) && v.length === 8) ||
-                "Student ID must be 8 digits",
-            }}
-          />
-          {errors.studentId && (
-            <Text style={styles.errorText}>{errors.studentId.message}</Text>
-          )}
           {/* Department */}
           <Text style={[styles.paragraph]}>Department</Text>
           <Controller

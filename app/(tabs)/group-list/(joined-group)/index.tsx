@@ -29,6 +29,7 @@ export default function JoinedGroupTab() {
   
   const [selectedId, setSelectedId] = useState("1");
   const [joinedFields, setJoinedFields] = useState<GroupField[]>([]);
+  const [isFetching, setIsFetching] = useState(false)
   const refFields = useRef<FlatList>(null);
   const currentOffset = useRef(0);
 
@@ -46,6 +47,16 @@ export default function JoinedGroupTab() {
       currentOffset.current = offsetX;
     }
   };
+
+  const handleRefresh = () => {
+    setIsFetching(true)
+    dispatch(getJoinedFields()).then((res) => {
+      const data = res.payload as GroupField[]
+
+      setJoinedFields(data ?? [])
+      if (data.length != 0) setSelectedId(data[0]._id)
+    })
+  }
 
   useEffect(() => {
     dispatch(getJoinedFields()).then((res) => {
@@ -73,8 +84,20 @@ export default function JoinedGroupTab() {
 
   return (
     joinedFields && joinedFields.length == 0 ?
-    <EmptyContent/> :
     <View style={styles.container}>
+      {/* Refresh group */}
+      <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
+        <Text style={styles.refreshText}>Refresh Fields</Text>
+      </TouchableOpacity>
+
+      <EmptyContent/>
+    </View> :
+    <View style={styles.container}>
+      {/* Refresh group */}
+      <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
+        <Text style={styles.refreshText}>Refresh Group Fields</Text>
+      </TouchableOpacity>
+
       {/* list tags */}
       <View style={styles.rowWrapper}>
         <FlatList
@@ -153,5 +176,17 @@ const styles = StyleSheet.create({
   content: {
     color: "#fff",
     fontSize: 18,
+  },
+  refreshButton: {
+    backgroundColor: "#B9FF66",
+    marginHorizontal: 30,
+    marginVertical: 20,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  refreshText: {
+    color: "#000",
+    fontWeight: "bold",
   },
 });

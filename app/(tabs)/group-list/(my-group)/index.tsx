@@ -59,6 +59,40 @@ export default function MyGroupTab() {
     }
   };
 
+  const handleRefresh = () => {
+    setIsFetching(true)
+    dispatch(getCreatedGroups()).then((res) => {
+      const data = res.payload as Group[]
+
+      let fields: GroupField[] = []
+      let groups = new Map<string, Group[]>()
+      data.forEach((g) => {
+        // Add to fields
+        if (fields.find(f => f._id == g.FieldID) === undefined) {
+          fields.push({
+            _id: g.FieldID,
+            FieldName: g.FieldName
+          })
+        }
+
+        // Add to groups
+        if (groups.has(g.FieldID)) {
+          let temp = groups.get(g.FieldID)
+          temp!.push(g)
+          groups.set(g.FieldID, temp!)
+        }
+        else {
+          groups.set(g.FieldID, [g])
+        }
+      })
+      setFields(fields)
+      setGroups(groups)
+      setSelectedId(fields[0]?._id)
+
+      setIsFetching(false)
+    })
+  }
+
   useEffect(() => {
     setIsFetching(true)
     dispatch(getCreatedGroups()).then((res) => {
@@ -162,6 +196,11 @@ export default function MyGroupTab() {
       >
         <FontAwesome name="plus" size={24} color="#000" />
         <Text style={styles.createGroupButtonText}>Create Group</Text>
+      </TouchableOpacity>
+      
+      {/* Refresh group */}
+      <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
+        <Text style={styles.refreshText}>Refresh Groups</Text>
       </TouchableOpacity>
 
       {groups && groups.size == 0 ?
@@ -274,6 +313,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   createGroupButtonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  refreshButton: {
+    backgroundColor: "#B9FF66",
+    marginHorizontal: 20,
+    marginVertical: 20,
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  refreshText: {
     color: "#000",
     fontSize: 16,
     fontWeight: "bold",

@@ -283,7 +283,24 @@ export default function TagsApprovalsPage() {
         <FeedBlogPreviewSkeleton />
       ) : selectedTab == TabOptions.All ? 
       displayTags && displayTags.length == 0 ?
-      <EmptyContent/> :
+      (
+        <SectionGrid
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          sections={[{
+            data: []
+          }]}
+          itemDimension={150} // Controls column width
+          spacing={10} // Spacing between items
+          style={styles.gridView}
+          renderItem={() => <EmptyContent/>}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.title}>{section.id}</Text>
+          )}
+          // contentContainerStyle={styles.list}
+        />
+      ) :
       (
         <SectionGrid
           refreshControl={
@@ -306,7 +323,18 @@ export default function TagsApprovalsPage() {
         />
       ) : 
       tagsApproval && tagsApproval.length == 0 ?
-      <EmptyContent/> :
+      (
+        <Animated.FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={["1"]}
+          renderItem={() => <EmptyContent/>}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          itemLayoutAnimation={LinearTransition}
+        />
+      ) :
       (
         <Animated.FlatList
           refreshControl={

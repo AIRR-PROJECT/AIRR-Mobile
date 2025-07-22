@@ -168,7 +168,7 @@ export default function EditProfileScreen() {
         ...userChange,
         firstName: firstNameWatch,
         lastName: lastNameWatch,
-        dob: dateOfBirthWatch,
+        dateOfBirth: dateOfBirthWatch,
         phoneNumber: phoneWatch,
         profile: {
           ...userChange.profile,
@@ -360,7 +360,9 @@ export default function EditProfileScreen() {
                     value={
                       dateOfBirthWatch
                         ? new Date(dateOfBirthWatch)
-                        : new Date(2000, 0, 1)
+                        : user.dateOfBirth
+                        ? new Date(user.dateOfBirth)
+                        : new Date(2000, 0, 1) 
                     }
                     mode="date"
                     display="default"

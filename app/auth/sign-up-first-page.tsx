@@ -170,18 +170,6 @@ export default function SignUpFirstPage() {
           style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
         />
 
-        {/* Other Options */}
-        <ThemedText
-          type="default"
-          style={[{ color: "#fff", alignSelf: "center" }]}
-        >
-          Or
-        </ThemedText>
-        {/* Or Google or Facebook */}
-        <View style={[styles.section, { justifyContent: "space-between", marginTop: 10 }]}>
-          <AuthButtonTransparent label="Google" style={styles.otherButton} />
-        </View>
-
         {/* Sign In Link*/}
         <TouchableOpacity onPress={handleBackToLogin}>
           <ThemedText

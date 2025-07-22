@@ -37,7 +37,7 @@ export default function SignUpScreen() {
   
   useEffect(() => {
     if (isLoggedIn && isAccountVerified) {
-      router.back()
+      router.dismissTo("/auth/login");
     }
   }, [isLoggedIn, isAccountVerified])
   const onSubmit = (data: any) => {

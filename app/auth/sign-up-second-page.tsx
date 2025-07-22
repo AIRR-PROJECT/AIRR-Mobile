@@ -7,14 +7,14 @@ import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity, ScrollView } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AuthButtonGradient from "@/components/auth/AuthButtonGradient";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 import { router, useLocalSearchParams } from "expo-router";
 import Checkbox from "expo-checkbox";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { SignUpCredentials } from "@/interfaces/authInterface";
-import { signup } from "@/redux/slices/authSlice";
+import { setLoggedIn, signup } from "@/redux/slices/authSlice";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -40,6 +40,7 @@ export default function SignUpSecondPage() {
   const password = watch("password");
   const { isAccountCreated } = useAppSelector((state) => state.auth);
 
+  const emailToSendOTP = useRef("")
   const [isTermChecked, setTermChecked] = useState(false);
   const handleToggleCheckbox = () => {
     setTermChecked(!isTermChecked);
@@ -48,7 +49,10 @@ export default function SignUpSecondPage() {
   useEffect(() => {
     if (isAccountCreated) {
       if (router.canDismiss()) {
-        router.dismissTo("/auth/login");
+        router.dismiss()
+        router.dismiss()
+        router.push(`/auth/verify-account-otp?resendEmail=${emailToSendOTP.current}`);
+        dispatch(setLoggedIn(true))
       }
     }
   }, [isAccountCreated]);
@@ -57,6 +61,7 @@ export default function SignUpSecondPage() {
     if (!isTermChecked) {
       Alert.alert("Please accept the terms and conditions");
     } else {
+      emailToSendOTP.current = data.email
       const signUpData: SignUpCredentials = {
         email: data.email,
         username: username,
@@ -294,23 +299,6 @@ export default function SignUpSecondPage() {
             onPress={handleSubmit(onSubmit)}
             style={{ marginTop: 20, marginHorizontal: 0, width: "100%" }}
           />
-
-          {/* Other Options */}
-          <ThemedText
-            type="default"
-            style={[{ color: "#fff", alignSelf: "center" }]}
-          >
-            Or
-          </ThemedText>
-          {/* Or Google or Facebook */}
-          <View
-            style={[
-              styles.section,
-              { justifyContent: "space-between", marginTop: 10 },
-            ]}
-          >
-            <AuthButtonTransparent label="Google" style={styles.otherButton} />
-          </View>
 
           {/* Sign In Link*/}
           <TouchableOpacity onPress={handleBackToLogin}>

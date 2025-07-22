@@ -184,65 +184,95 @@ export const signup = createAsyncThunk(
 
 export const sendAccountOTP = createAsyncThunk(
     'auth/send-account-otp', 
-    async (data: { email: string }) => {
-        await api.get(`auth/resend-account-otp?email=${data.email}`)
+    async (data: { email: string }, thunkAPI) => {
+        try {
+            await api.get(`auth/resend-account-otp?email=${data.email}`)
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
     }
 )
 
 export const sendPasswordOTP = createAsyncThunk(
     'auth/send-password-otp', 
-    async (data: { email: string }) => {
-        await api.get(`auth/forget-password?email=${data.email}`)
+    async (data: { email: string }, thunkAPI) => {
+        try {
+            await api.get(`auth/forget-password?email=${data.email}`)
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
     }
 )
 
 export const verifyAccountOTP = createAsyncThunk<APIResponse, VerifyAccountCredentials>(
     'auth/verify-account-otp',
-    async (data: VerifyAccountCredentials) => {
-        const verify = await api.post('auth/verify-account-otp', data) as AxiosResponse
-        
-        return verify.data
+    async (data: VerifyAccountCredentials, thunkAPI) => {
+        try {
+            const verify = await api.post('auth/verify-account-otp', data) as AxiosResponse
+            
+            return verify.data
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
     }
 )
 
 export const verifyPasswordOTP = createAsyncThunk<APIResponse, VerifyPasswordCredentials>(
     'auth/verify-password-otp',
-    async (data: VerifyPasswordCredentials) => {
-        const verify = await api.post('auth/verify-password-otp', data) as AxiosResponse
-        
-        return verify.data
+    async (data: VerifyPasswordCredentials, thunkAPI) => {
+        try {
+            const verify = await api.post('auth/verify-password-otp', data) as AxiosResponse
+            
+            return verify.data
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
     }
 )
 
 export const setPassword = createAsyncThunk<APIResponse, SetPasswordCredentials>(
     'auth/change-password',
-    async (data: SetPasswordCredentials) => {
-        // const token = await SecureStore.getItemAsync('passwordToken')
-
-        const set = await api.post('auth/change-password', data, {
-            headers: {
-                Authorization: `Bearer ${token}`
-              }
-        }) as AxiosResponse
-
-        return set.data
+    async (data: SetPasswordCredentials, thunkAPI) => {
+        try {
+            // const token = await SecureStore.getItemAsync('passwordToken')
+    
+            const set = await api.post('auth/change-password', data, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+            }) as AxiosResponse
+    
+            return set.data
+        }
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
     }
 )
 
 export const loadToken = createAsyncThunk(
     'auth/loadToken',
     async (_, thunkAPI) => {
-        // Perform async operation here
-        const accessToken = await SecureStore.getItemAsync('accessToken');
-        const refreshToken = await SecureStore.getItemAsync('refreshToken');
-        
-        if (accessToken && refreshToken) {
-            thunkAPI.dispatch(setTokens({ accessToken, refreshToken }))
-
-            return { accessToken, refreshToken };
+        try {
+            // Perform async operation here
+            const accessToken = await SecureStore.getItemAsync('accessToken');
+            const refreshToken = await SecureStore.getItemAsync('refreshToken');
+            
+            if (accessToken && refreshToken) {
+                thunkAPI.dispatch(setTokens({ accessToken, refreshToken }))
+    
+                return { accessToken, refreshToken };
+            }
+            else {
+                return thunkAPI.rejectWithValue(null)
+            }
         }
-        else {
-            return thunkAPI.rejectWithValue(null)
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
         }
     }
 )
@@ -250,23 +280,28 @@ export const loadToken = createAsyncThunk(
 export const getUserInfo = createAsyncThunk(
     'auth/userInfo',
     async (_, thunkAPI) => {
-        let accessToken =  await SecureStore.getItemAsync('accessToken');
-
-        if (accessToken) {
-            const payload = jwtDecode(accessToken) as any
-
-            const res = await api.get('/users/by-username?username=' + payload.username) as AxiosResponse
-            console.log("User info response", res.data)
-            if (res.data.success) {
-                thunkAPI.dispatch(setCurrentUser(res.data.data))
-                return res.data.data
+        try {
+            let accessToken =  await SecureStore.getItemAsync('accessToken');
+    
+            if (accessToken) {
+                const payload = jwtDecode(accessToken) as any
+    
+                const res = await api.get('/users/by-username?username=' + payload.username) as AxiosResponse
+                console.log("User info response", res.data)
+                if (res.data.success) {
+                    thunkAPI.dispatch(setCurrentUser(res.data.data))
+                    return res.data.data
+                }
+                else {
+                    return thunkAPI.rejectWithValue(res.data)
+                }
             }
-            else {
-                return thunkAPI.rejectWithValue(res.data)
-            }
+    
+            return thunkAPI.rejectWithValue("No access token found")
         }
-
-        return thunkAPI.rejectWithValue("No access token found")
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
+        }
     }
 )
 
@@ -274,13 +309,18 @@ export const getUserInfo = createAsyncThunk(
 export const getUserPreviewGroups = createAsyncThunk(
     'user/previewGroups',
     async (user_id: string, thunkAPI) => {
-        const res = await api.get(`groups/get-preview-group-by-user-id?userID=${user_id}`)
-
-        if (res.data.success) {
-            thunkAPI.dispatch(setUserPreviewGroup(res.data.data))
+        try {
+            const res = await api.get(`groups/get-preview-group-by-user-id?userID=${user_id}`)
+    
+            if (res.data.success) {
+                thunkAPI.dispatch(setUserPreviewGroup(res.data.data))
+            }
+            else {
+                return thunkAPI.rejectWithValue(res.data.message)
+            }
         }
-        else {
-            return thunkAPI.rejectWithValue(res.data.message)
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
         }
     }
 )
@@ -369,19 +409,24 @@ export const updateUser = createAsyncThunk(
 export const updateAvatar = createAsyncThunk(
     'user/updateAvatar',
     async (file: FormData, thunkAPI) => {
-        const res = await api.post('users/update-avatar', file, {
-            headers: {
-                "Content-Type": "multipart/form-data"
+        try {
+            const res = await api.post('users/update-avatar', file, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            })
+    
+            if (res.data.success) {
+                thunkAPI.dispatch(setUserAvatar(file.get("avatar")["uri"]))
+    
+                ToastAndroid.showWithGravity("Avatar updated successfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
             }
-        })
-
-        if (res.data.success) {
-            thunkAPI.dispatch(setUserAvatar(file.get("avatar")["uri"]))
-
-            ToastAndroid.showWithGravity("Avatar updated successfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            else {
+                return thunkAPI.rejectWithValue(res.data.message)
+            }
         }
-        else {
-            return thunkAPI.rejectWithValue(res.data.message)
+        catch (err: any) {
+            return thunkAPI.rejectWithValue(err.response)
         }
     }
 )

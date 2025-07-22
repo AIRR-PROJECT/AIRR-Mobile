@@ -108,7 +108,7 @@ export default function SocialTab({
             <Feather name="facebook" size={24} color="#1977F2" />
           </View>
           <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
-            {facebookLink.length > 0 ? facebookLink : "No Facebook link"}
+            {facebookLink && facebookLink.length > 0 ? facebookLink : "No Facebook link"}
           </Text>
           <TouchableOpacity
             style={[styles.copyLinkButton, {}]}
@@ -134,7 +134,7 @@ export default function SocialTab({
             <Feather name="linkedin" size={24} color="#1977F2" />
           </View>
           <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
-            {linkedInLink.length > 0 ? linkedInLink : "No LinkedIn link"}
+            {linkedInLink && linkedInLink.length > 0 ? linkedInLink : "No LinkedIn link"}
           </Text>
           <TouchableOpacity
             style={styles.copyLinkButton}
@@ -158,7 +158,7 @@ export default function SocialTab({
             <Feather name="github" size={24} color="#B9FF66" />
           </View>
           <Text style={styles.linkText} numberOfLines={2} ellipsizeMode="tail">
-            {githubLink.length > 0 ? githubLink : "No Github link"}
+            {githubLink && githubLink.length > 0 ? githubLink : "No Github link"}
           </Text>
           <TouchableOpacity
             style={styles.copyLinkButton}

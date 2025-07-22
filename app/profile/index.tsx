@@ -168,7 +168,7 @@ export default function ProfileScreen() {
           <ThemedText style={styles.groupLabel}>
             Active in these group
           </ThemedText>
-          {joinedGroups.length > 0 ? (
+          {joinedGroups && joinedGroups.length > 0 ? (
             <FlatList
               data={joinedGroups}
               horizontal={true}
@@ -211,7 +211,7 @@ export default function ProfileScreen() {
 
           {/* Social , Blog, Activity */}
           <View style={styles.rowContainer}>
-            {selectedTabs.length != 0 &&
+            {selectedTab && selectedTabs.length != 0 &&
               selectedTabs.map((tab) => {
                 return (
                   <TouchableOpacity

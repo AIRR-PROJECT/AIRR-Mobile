@@ -260,7 +260,86 @@ export default function MyFeed() {
       {/* Flat list for lazy load */}
       {userBlogsQuery.isFetching || isUserBlogReset ? (
         <FeedBlogPreviewSkeleton />
-      ) : 
+      ) :
+      userBlogsQuery.data?.length == 0 ?
+      (
+        <View style={{ flex: 1, width: "100%" }}>
+          <View>
+            <View style={styles.headerContainer}>
+              <GradientText
+                style={{
+                  fontSize: 24,
+                  fontWeight: "bold",
+                  fontStyle: "italic",
+                }}
+                colors={["#B9FF66", "#9DE8EE"]}
+              >
+                AI-Recommended Blogs
+              </GradientText>
+              {/* <Ionicons
+                name="play-forward-circle-outline"
+                size={30}
+                color="#fff"
+              /> */}
+            </View>
+
+            {/* Change to carousel for better ux*/}
+            {recommendedBlogsQuery.isFetching || isRecommendedBlogReset ? (
+              <AIBlogPreviewSkeleton />
+            ) : (
+              <View
+                id="carousel-ai-blog-component"
+                // dataSet={{ kind: "utils", name: "pagination" }}
+                style={{ gap: 10 }}
+              >
+                <Carousel
+                  ref={carouselRef}
+                  autoPlayInterval={2000}
+                  autoPlay={true}
+                  data={recommendedBlogsQuery.data as AIBlog[]}
+                  loop={true}
+                  width={Dimensions.get("window").width}
+                  height={Dimensions.get("window").height / 3}
+                  pagingEnabled={true}
+                  snapEnabled={true}
+                  style={{
+                    width: Dimensions.get("window").width,
+                  }}
+                  mode="parallax"
+                  modeConfig={{
+                    parallaxScrollingScale: 0.9,
+                    parallaxScrollingOffset: 50,
+                  }}
+                  renderItem={({ item, index }) => 
+                    <AIBlogPreview
+                      blog={item}
+                      color={colorCycle[index % colorCycle.length]}
+                      thumbnail={thumbnails[index % thumbnails.length]}
+                    />
+                  }
+                />
+              </View>
+            )}
+            {/* Popular Group */}
+            {/* Section list for each section */}
+            {/* User Blogs and Button*/}
+            <View style={styles.headerContainer}>
+              <GradientText
+                style={{
+                  fontSize: 24,
+                  fontWeight: "bold",
+                  fontStyle: "italic",
+                }}
+                colors={["#B9FF66", "#9DE8EE"]}
+              >
+                User Blogs
+              </GradientText>
+            </View>
+
+            <EmptyContent/>
+          </View>
+        </View> 
+      ) :
       (
         <View style={{ flex: 1, width: "100%" }}>
           <FlatList

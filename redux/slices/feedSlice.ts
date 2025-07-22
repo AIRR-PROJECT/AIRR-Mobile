@@ -141,7 +141,11 @@ export const getRecentPopularBlogAndGroup = createAsyncThunk(
                 return res.data.data as RecentPopularBlogAndGroup
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                return {
+                    AIBlog: undefined,
+                    popularBlog: undefined,
+                    popularGroup: undefined
+                }
             }
         }
         catch (error: any) {

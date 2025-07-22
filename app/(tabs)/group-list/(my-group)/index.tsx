@@ -153,8 +153,6 @@ export default function MyGroupTab() {
   return (
     isFetching ? 
     <FeedBlogPreviewSkeleton/> :
-    groups && groups.size == 0 ?
-    <EmptyContent/> :
     <View style={styles.container}>
       {/* Create Group Button */}
       <TouchableOpacity
@@ -166,62 +164,65 @@ export default function MyGroupTab() {
         <Text style={styles.createGroupButtonText}>Create Group</Text>
       </TouchableOpacity>
 
-      <View style={styles.container}>
-        {/* list tags */}
-        <View style={styles.rowWrapper}>
-          <FlatList
-            data={fields}
-            ref={refFields}
-            onScroll={handleScroll}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[
-                  styles.tabItem,
-                  selectedId === item._id && styles.tabItemActive,
-                ]}
-                onPress={() => {
-                  setSelectedId(item._id);
-                }}
-              >
-                <Text
-                  style={{
-                    color: selectedId === item._id ? "#fff" : "#8A94AC",
-                    fontWeight: "bold",
+      {groups && groups.size == 0 ?
+        <EmptyContent/> :
+        <View style={styles.container}>
+          {/* list tags */}
+          <View style={styles.rowWrapper}>
+            <FlatList
+              data={fields}
+              ref={refFields}
+              onScroll={handleScroll}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.tabItem,
+                    selectedId === item._id && styles.tabItemActive,
+                  ]}
+                  onPress={() => {
+                    setSelectedId(item._id);
                   }}
                 >
-                  {item.FieldName}
-                </Text>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-          />
-          <TouchableOpacity onPress={handleArrowPress} activeOpacity={0.8}>
-            <FontAwesome name="caret-right" size={30} color="white" />
-          </TouchableOpacity>
-        </View>
+                  <Text
+                    style={{
+                      color: selectedId === item._id ? "#fff" : "#8A94AC",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {item.FieldName}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            />
+            <TouchableOpacity onPress={handleArrowPress} activeOpacity={0.8}>
+              <FontAwesome name="caret-right" size={30} color="white" />
+            </TouchableOpacity>
+          </View>
 
-        <View style={[styles.container, {paddingHorizontal: 20}]}>
-          <FlatList
-            data={groups.get(selectedId)}
-            renderItem={({ item }) => (
-              <GroupCardComponent
-                image={item.CoverURL}
-                name={item.Name}
-                id={item._id}
-                members={item.NumberOfMembers}
-                isJoined={true}
-              />
-            )}
-            keyExtractor={(item, index) => item._id + index}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            ItemSeparatorComponent={() => <View style={{ height: 20 }} />} // Add space between items
-          />
+          <View style={[styles.container, {paddingHorizontal: 20}]}>
+            <FlatList
+              data={groups.get(selectedId)}
+              renderItem={({ item }) => (
+                <GroupCardComponent
+                  image={item.CoverURL}
+                  name={item.Name}
+                  id={item._id}
+                  members={item.NumberOfMembers}
+                  isJoined={true}
+                />
+              )}
+              keyExtractor={(item, index) => item._id + index}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              ItemSeparatorComponent={() => <View style={{ height: 20 }} />} // Add space between items
+            />
+          </View>
         </View>
-      </View>
+      }
     </View>
   );
 }

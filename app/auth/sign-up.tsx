@@ -65,7 +65,6 @@ export default function SignUpScreen() {
         password: data.password,
       };
 
-      console.log("test");
       dispatch(signup(signUpData));
     }
   };

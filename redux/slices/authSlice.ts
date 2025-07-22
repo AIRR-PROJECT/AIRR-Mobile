@@ -713,6 +713,7 @@ const authSlice = createSlice({
             })
             .addCase(signup.fulfilled, (state, action) => {
                 state.isAccountCreated = true
+                state.isLoggedIn = true
             })
             .addCase(signup.rejected, (state, action) => {
                 /* Handling this somewhere else */

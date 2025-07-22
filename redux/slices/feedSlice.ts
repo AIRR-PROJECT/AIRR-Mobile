@@ -111,6 +111,25 @@ export const saveTags = createAsyncThunk(
     }
 )
 
+export const searchTags = createAsyncThunk(
+    'feed/searchTags',
+    async (keyword: string, thunkAPI) => {
+        try {
+            const res = await api.get(`tag/search-tag?keyword=${keyword}`) as AxiosResponse
+
+            if (res.data.success) {
+                return res.data.data.tagList as SurveyTag[]
+            }
+            else {
+                return []
+            }
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+)
+
 export const searchFromSearchBar = createAsyncThunk(
     'feed/searchFromSearchBar',
     async (keyword: string, thunkAPI) => {

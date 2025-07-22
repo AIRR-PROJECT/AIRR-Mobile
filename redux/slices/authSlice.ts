@@ -287,7 +287,6 @@ export const getUserInfo = createAsyncThunk(
                 const payload = jwtDecode(accessToken) as any
     
                 const res = await api.get('/users/by-username?username=' + payload.username) as AxiosResponse
-                console.log("User info response", res.data)
                 if (res.data.success) {
                     thunkAPI.dispatch(setCurrentUser(res.data.data))
                     return res.data.data
@@ -300,7 +299,6 @@ export const getUserInfo = createAsyncThunk(
             return thunkAPI.rejectWithValue("No access token found")
         }
         catch (err: any) {
-            console.log(err)
             return thunkAPI.rejectWithValue(err.response)
         }
     }

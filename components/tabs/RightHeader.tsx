@@ -13,14 +13,14 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Divider } from "@rneui/themed";
 import { ThemedText } from "../ThemedText";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ButtonGradient from "../ButtonGradient";
 import AnimatedPressable from "../AnimatedPressable";
 import { Pressable } from "react-native";
 import { Collapsible } from "../Collapsible";
 import TabButton from "./feed/TabButton";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { saveTags } from "@/redux/slices/feedSlice";
+import { saveTags, searchTags } from "@/redux/slices/feedSlice";
 import { getUserInfo, getUserRelatedTags } from "@/redux/slices/authSlice";
 import { countUnseenNotif } from "@/redux/slices/notifSlice";
 import { SurveyTag, User } from "@/interfaces/userInterface";
@@ -72,6 +72,10 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
   const [selectedTab, setSelectedTab] = useState("Suggested");
   const modalButtons = ["Suggested", "My Tags"];
 
+  const [searchText, setSearchText] = useState<string>("")
+  const [searchResults, setSearchResults] = useState<SurveyTag[]>([]);
+  const searchTimerIdRef = useRef<NodeJS.Timeout>()
+
   useEffect(() => {
     refreshTags();
 
@@ -86,6 +90,31 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
       setModalVisible(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    searchTimerIdRef.current = setTimeout(() => {
+      console.log("test")
+      dispatch(searchTags(searchText)).then((res) => {
+        const data = res.payload as SurveyTag[]
+
+        setSearchResults(data)
+      })
+    }, 1000)
+
+    return () => {
+      clearTimeout(searchTimerIdRef.current)
+    }
+  }, [searchText])
+
+  const handleSearchSubmit  = () => {
+    clearTimeout(searchTimerIdRef.current)
+
+    dispatch(searchTags(searchText)).then((res) => {
+      const data = res.payload as SurveyTag[]
+
+      setSearchResults(data)
+    })
+  }
 
   const refreshTags = () => {
     // Get suggested tags
@@ -147,6 +176,7 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
                 <TabButton
                   key={index}
                   title={tag.TagName}
+                  field={tag.FieldName}
                   onPress={() => {
                     const tag = suggestedTags[index];
 
@@ -198,7 +228,6 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
                 <TabButton
                   key={index}
                   title={tag.TagName}
-                  field="Tap to remove tag"
                   onPress={() => {
                     // New suggested tags show list
                     const tagIndex = suggestedTags.indexOf(selectedTags[index]);
@@ -223,7 +252,6 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
       </ScrollView>
     );
   }
-  const [searchResults, setSearchResults] = useState<SurveyTag[]>(mockSearchTags);
   return (
     <View style={styles.container}>
       {/* Feed Settings Button */}
@@ -319,6 +347,10 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
                 style={styles.searchBar}
                 placeholder="Search Tags"
                 placeholderTextColor="#fff"
+                onChangeText={(val: string) => {
+                  setSearchText(val)
+                }}
+                onSubmitEditing={handleSearchSubmit}
                 onFocus={() => {
                   setSearchFocused(true);
                   console.log("Search bar focused");
@@ -347,8 +379,28 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
                     <TabButton
                       key={tag._id}
                       title={tag.TagName}
+                      field={tag.FieldName}
                       onPress={() => {
                         /* handle tag select */
+                        const findIndex = selectedTags.findIndex((t) => t._id == tag._id)
+                        if (findIndex == -1) {
+                          selectedTags = [...selectedTags, tag]
+
+                          // New selected tags show list
+                          const newSelectedTagsShow = [...selectedTagsShow];
+                          newSelectedTagsShow.push(true);
+                          setSelectedTagsShow(newSelectedTagsShow);
+                        }
+                        else {
+                          if (!selectedTagsShow[findIndex]) {
+                            const newSelectedTagsShow = [...selectedTagsShow];
+                            newSelectedTagsShow[findIndex] = true;
+                            setSelectedTagsShow(newSelectedTagsShow);
+                          }
+                          else {
+                            ToastAndroid.show("Tag already selected", ToastAndroid.LONG)
+                          }
+                        }
                       }}
                       userSelected={false}
                     />

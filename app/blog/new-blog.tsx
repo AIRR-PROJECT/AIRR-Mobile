@@ -114,7 +114,7 @@ const OnlyInMyProfile: Group = {
   IsAdminOrOwner: false,
 };
 
-// TODO: remove this after fixing
+// TODO: remove this in prod
 const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g"
 const VITE_CLOUDINARY_PRESET = "blog_images_preset"
 

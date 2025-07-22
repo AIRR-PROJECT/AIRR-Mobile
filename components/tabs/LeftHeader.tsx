@@ -170,28 +170,26 @@ function SearchScreen({
   }, []);
 
   const handleSearchSubmit  = () => {
-    if (searchText.length > 0) {
-      clearTimeout(timerIdRef.current)
+    clearTimeout(timerIdRef.current)
 
-      dispatch(searchFromSearchBar(searchText)).then((res) => {
-        const data = res.payload as SearchBarResult
+    dispatch(searchFromSearchBar(searchText)).then((res) => {
+      const data = res.payload as SearchBarResult
 
-        let result: SearchItem[] = []
-        data.searchBlogs.forEach((i) => {
-          result.push({
-            type: "blog",
-            blogItem: i
-          })
+      let result: SearchItem[] = []
+      data.searchBlogs.forEach((i) => {
+        result.push({
+          type: "blog",
+          blogItem: i
         })
-        data.searchGroups.forEach((i) => {
-          result.push({
-            type: "group",
-            groupItem: i
-          })
-        })
-        setItems(result)
       })
-    }
+      data.searchGroups.forEach((i) => {
+        result.push({
+          type: "group",
+          groupItem: i
+        })
+      })
+      setItems(result)
+    })
   }
 
   useEffect(() => {

@@ -55,8 +55,6 @@ import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { Image } from "react-native";
 import { BlogViewType } from "@/enums/blog_properties.enum";
-const VITE_CLOUDINARY_CLOUD_NAME = "your_cloudinary_cloud_name"; // Replace with your actual cloud name
-const VITE_CLOUDINARY_PRESET = "your_cloudinary_preset"; // Replace with
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -157,6 +155,11 @@ const OnlyInMyProfile: Group = {
   FieldID: "",
   IsAdminOrOwner: false,
 };
+
+// TODO: remove this in prod
+const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g"
+const VITE_CLOUDINARY_PRESET = "blog_images_preset"
+
 export default function Editblog() {
   const dispatch = useAppDispatch();
   const { groupID, blogID } = useLocalSearchParams<{

@@ -17,6 +17,7 @@ export interface User1 {
 export interface SurveyTag {
     _id: string;
     TagName: string;
+    FieldName: string
 }
 
 export interface UserProfile {

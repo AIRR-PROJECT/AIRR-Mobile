@@ -2,6 +2,7 @@ import { View, StyleSheet, Text } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { User } from "@/interfaces/userInterface";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAppSelector } from "@/redux/hook";
 
 type UserStudentInfoProps = {
   studentId: string;
@@ -9,8 +10,10 @@ type UserStudentInfoProps = {
 };
 type StudentInfo = Pick<User, "profile">;
 
-export default function UserStudentInfoComponent({ profile }: StudentInfo) {
-  console.log("UserStudentInfoComponent", profile);
+export default function UserStudentInfoComponent() {
+  const { user } = useAppSelector(state => state.user)
+
+  console.log("UserStudentInfoComponent", user.profile);
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -23,11 +26,11 @@ export default function UserStudentInfoComponent({ profile }: StudentInfo) {
         <View style={[{ gap: 10, flex: 1}]}>
           <View style={styles.rowContainer}>
             <Text style={styles.attribute}>MAJOR</Text>
-            <Text style={styles.info}>{profile.department ?? "NO INFORMATION"}</Text>
+            <Text style={styles.info}>{user.profile ? user.profile.department ?? "No information" : "No information"}</Text>
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.attribute}>GRADUATION STATUS</Text>
-            <Text style={styles.info}>{profile.graduationStatus ?? "NO INFORMATION"}</Text>
+            <Text style={styles.info}>{user.profile ? user.profile.graduationStatus ?? "No information" : "No information"}</Text>
           </View>
         </View>
       </LinearGradient>

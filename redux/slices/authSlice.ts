@@ -288,7 +288,6 @@ export const getUserInfo = createAsyncThunk(
     
                 const res = await api.get('/users/by-username?username=' + payload.username) as AxiosResponse
                 if (res.data.success) {
-                    console.log(res.data.data)
                     thunkAPI.dispatch(setCurrentUser(res.data.data))
                     return res.data.data
                 }

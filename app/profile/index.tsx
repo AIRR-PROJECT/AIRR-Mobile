@@ -161,7 +161,7 @@ export default function ProfileScreen() {
 
           {/* User student info */}
 
-          <UserStudentInfoComponent {...studentInfo} />
+          <UserStudentInfoComponent/>
 
           {/* Active groups */}
           {/* TODO: Integrate API when have */}
@@ -262,9 +262,9 @@ export default function ProfileScreen() {
             ) : (
               <SocialTab
                 link={""}
-                facebookLink={"No information"}
-                linkedInLink={"No information"}
-                githubLink={"No information"}
+                facebookLink={"No Facebook link"}
+                linkedInLink={"No LinkedIn link"}
+                githubLink={"No Github link"}
                 showSignOut={isViewingOwnProfile}
               />
             ))}

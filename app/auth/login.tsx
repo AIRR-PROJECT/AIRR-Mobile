@@ -173,7 +173,7 @@ export default function LoginScreen() {
   };
 
   const handleSignUp = () => {
-    router.push("/auth/sign-up-first-page");
+    router.push("/auth/sign-up-second-page");
   };
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>

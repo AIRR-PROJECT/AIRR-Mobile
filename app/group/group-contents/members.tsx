@@ -387,7 +387,17 @@ export default function MemberApprovalsPage() {
         <FeedBlogPreviewSkeleton />
       ) : selectedTab == TabOptions.All ? 
       displayMembers && displayMembers.length == 0 ?
-      <EmptyContent/> :
+      (
+        <Animated.FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={[]}
+          renderItem={() => <EmptyContent/>}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+        />
+      ) :
       (
         <Animated.FlatList
           refreshControl={
@@ -452,7 +462,19 @@ export default function MemberApprovalsPage() {
         />
       ) : selectedTab == TabOptions.NeedApproval ? 
       membersApproval && membersApproval.length == 0 ?
-      <EmptyContent/> :
+      (
+        <Animated.FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={["1"]}
+          renderItem={() => <EmptyContent/>}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          itemLayoutAnimation={LinearTransition}
+          ref={memberApprovalsFlatlistRef}
+        />
+      ) :
       (
         <Animated.FlatList
           refreshControl={
@@ -468,7 +490,18 @@ export default function MemberApprovalsPage() {
         />
       ) : 
       bannedMembers && bannedMembers.length == 0 ?
-      <EmptyContent/> :
+      (
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={["1"]}
+          renderItem={() => <EmptyContent/>}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+        />
+      ) :
       (
         <FlatList
           refreshControl={

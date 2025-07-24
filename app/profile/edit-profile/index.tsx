@@ -168,11 +168,10 @@ export default function EditProfileScreen() {
         ...userChange,
         firstName: firstNameWatch,
         lastName: lastNameWatch,
-        dob: dateOfBirthWatch,
+        dateOfBirth: dateOfBirthWatch,
         phoneNumber: phoneWatch,
         profile: {
           ...userChange.profile,
-          studentID: studentIdWatch,
           department: departmentWatch,
           // program: programWatch,
           gpa: gpaValue,
@@ -360,7 +359,9 @@ export default function EditProfileScreen() {
                     value={
                       dateOfBirthWatch
                         ? new Date(dateOfBirthWatch)
-                        : new Date(2000, 0, 1)
+                        : user.dateOfBirth
+                        ? new Date(user.dateOfBirth)
+                        : new Date(2000, 0, 1) 
                     }
                     mode="date"
                     display="default"
@@ -427,38 +428,6 @@ export default function EditProfileScreen() {
         </ThemedText>
         {/* Student Form */}
         <View style={styles.formSection}>
-          {/* Student ID */}
-          <Text style={[styles.paragraph]}>Student ID</Text>
-          <Controller
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={styles.viewBoxShadow}>
-                <TextInput
-                  style={[
-                    styles.input,
-                    errors.studentId && styles.errorInput,
-                    { width: "100%" },
-                  ]}
-                  placeholder="Student ID"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                  maxLength={8}
-                  keyboardType="numeric"
-                />
-              </View>
-            )}
-            name="studentId"
-            rules={{
-              validate: (v) =>
-                !v ||
-                (/^\d{8}$/.test(v) && v.length === 8) ||
-                "Student ID must be 8 digits",
-            }}
-          />
-          {errors.studentId && (
-            <Text style={styles.errorText}>{errors.studentId.message}</Text>
-          )}
           {/* Department */}
           <Text style={[styles.paragraph]}>Department</Text>
           <Controller

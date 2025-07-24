@@ -367,7 +367,6 @@ export const updateUser = createAsyncThunk(
     'user/update',
     async (userData: User, thunkAPI) => {
         try {
-            console.log("Updating user", userData)
             const inputData: UpdateUser = {
                 userID: userData._id,
                 firstname: userData.firstName ?? "",
@@ -389,7 +388,6 @@ export const updateUser = createAsyncThunk(
             if (userData.profile.link.Facebook) {
                 inputData.facebook = userData.profile.link.Facebook
             }
-            console.log("Input data for update", inputData)
             const res = await api.post("users/update", inputData)
             
             if (res.data.success) {

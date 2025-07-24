@@ -176,6 +176,11 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
     setIsFetching(true)
     personalBlogsReset.mutateAsync().then(() => setIsFetching(false))
   }, [])
+
+  const handleRefresh = () => {
+    setIsFetching(true)
+    personalBlogsReset.mutateAsync().then(() => setIsFetching(false))
+  }
   
   // Handle hiding or deleting blog while viewing that blog
   useEffect(() => {
@@ -193,7 +198,12 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
     isFetching ?
     <FeedBlogPreviewSkeleton/> :
     personalBlogsQuery.data?.length == 0 ?
-    <EmptyContent/> :
+    <View>
+      <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
+        <Text style={styles.refreshText}>Refresh Blogs</Text>
+      </TouchableOpacity>
+      <EmptyContent/>
+    </View> :
     user && <View>
       <FlashList
         data={personalBlogsQuery.data}
@@ -222,6 +232,18 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
 }
 
 const styles = StyleSheet.create({
+  refreshButton: {
+    backgroundColor: "#B9FF66",
+    marginHorizontal: 30,
+    marginVertical: 20,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  refreshText: {
+    color: "#000",
+    fontWeight: "bold",
+  },
   loadMoreButton: {
     backgroundColor: "#B9FF66",
     marginHorizontal: 30,

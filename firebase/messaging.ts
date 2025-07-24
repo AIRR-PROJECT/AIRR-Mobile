@@ -4,14 +4,19 @@ import { Alert, Platform } from 'react-native';
 
 // Request permission for iOS devices
 export async function requestUserPermission() {
-  if (Platform.OS === 'ios') {
-    const authStatus = await getMessaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  // if (Platform.OS === 'ios') {
+  //   const authStatus = await getMessaging().requestPermission();
+  //   const enabled =
+  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-    return enabled;
-  }
+  //   return enabled;
+  // }
+  const authStatus = await getMessaging().requestPermission();
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  console.log(enabled)
   
   return true; // Android doesn't need explicit permission for FCM
 }

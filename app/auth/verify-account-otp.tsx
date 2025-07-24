@@ -48,8 +48,8 @@ export default function SignUpScreen() {
 
     dispatch(verifyAccountOTP(verifyData))
   };
-  const handleBackToLogin = () => {
-    router.push("/auth/login");
+  const handleBack = () => {
+    router.back()
   };
   const handleResend = () => {
     dispatch(sendAccountOTP({ email: searchParams.resendEmail }))
@@ -64,11 +64,11 @@ export default function SignUpScreen() {
     >
       <AuthHeader />
       <Pressable
-        onPress={handleBackToLogin}
+        onPress={handleBack}
         style={{ alignSelf: "flex-start", padding: 10 }}
       >
         <ThemedText style={[{ color: "white" }]}>
-          {" < "}Back to login
+          {" < "}Back
         </ThemedText>
       </Pressable>
 

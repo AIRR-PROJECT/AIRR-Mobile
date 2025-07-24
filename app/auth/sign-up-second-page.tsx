@@ -27,7 +27,7 @@ type FormData = {
 export default function SignUpSecondPage() {
   // get the data from the previous page
   const { data } = useLocalSearchParams();
-  const { firstName, lastName, username } = JSON.parse(data as string);
+  // const { firstName, lastName, username } = JSON.parse(data as string);
 
   const {
     control,
@@ -49,8 +49,7 @@ export default function SignUpSecondPage() {
   useEffect(() => {
     if (isAccountCreated) {
       if (router.canDismiss()) {
-        router.dismiss()
-        router.dismiss()
+        router.back()
         router.push(`/auth/verify-account-otp?resendEmail=${emailToSendOTP.current}`);
         dispatch(setLoggedIn(true))
       }
@@ -64,7 +63,7 @@ export default function SignUpSecondPage() {
       emailToSendOTP.current = data.email
       const signUpData: SignUpCredentials = {
         email: data.email,
-        username: username,
+        username: data.username,
         password: data.password,
       };
 
@@ -91,14 +90,46 @@ export default function SignUpSecondPage() {
             <Text style={styles.text}> now.</Text>
           </View>
           <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
-            <Text style={styles.smalltext}>Let's set up your account, </Text>
-            <Text style={[styles.smalltext, { color: "#B9FF66" }]}>
-              {username}
-            </Text>
-            <Text style={styles.smalltext}>!</Text>
+            <Text style={styles.smalltext}>Let's set up your account, new user!</Text>
           </View>
         </View>
         <ThemedView style={styles.formContainer}>
+          {/* Username Input */}
+          <Text style={[styles.paragraph]}>Username</Text>
+          <Controller
+            control={control}
+            rules={{
+              required: "Username is required",
+              minLength: {
+                value: 6,
+                message: "Username must be at least 6 characters",
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <LinearGradient
+                colors={["#B9FF66", "#9DE8EE"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ borderRadius: 20 }}
+              >
+                <TextInput
+                  style={[styles.input, errors.username && styles.errorInput]}
+                  placeholder="Username"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
+              </LinearGradient>
+            )}
+            name="username"
+            defaultValue=""
+          />
+          {errors.username && (
+            <ThemedText style={styles.errorText}>
+              {errors.username.message}
+            </ThemedText>
+          )}
+
           {/* Email Input */}
           <Text style={[styles.paragraph]}>Email</Text>
           <Controller

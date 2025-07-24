@@ -53,7 +53,8 @@ export default function SignUpScreen() {
   };
   const handleResend = () => {
     dispatch(sendAccountOTP({ email: searchParams.resendEmail }))
-    // Toast here
+    // TODO: IF successfully resent OTP
+    // Show a toast message
     ToastAndroid.show("OTP resent successfully", ToastAndroid.SHORT);
   }
 

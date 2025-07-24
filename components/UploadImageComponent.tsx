@@ -13,7 +13,6 @@ type imageProps = {
 
 
 export default function UploadImageComponent({ imgSource }: imageProps) {
-
   // Image picker
   const [image, setImage] = useState<ImageSource>(imgSource);
   console.log(image);

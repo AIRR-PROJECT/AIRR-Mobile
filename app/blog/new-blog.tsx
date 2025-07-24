@@ -715,6 +715,8 @@ export default function NewBlog() {
         <View style={[styles.rowContainer]}>
           <View style={styles.divider} />
           <View style={{ flex: 1, width: "100%" }}>
+            {/* Choose template button */}
+            
             {/* QuillJS Here */}
             <QuillEditor
               dom={{ matchContents: true }}

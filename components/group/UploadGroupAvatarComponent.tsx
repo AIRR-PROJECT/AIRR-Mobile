@@ -9,11 +9,15 @@ import { useAppDispatch } from "@/redux/hook";
 
 type imageProps = {
   imgSource?: ImageSource;
-  disabled?: boolean
-  onSetImg: (imgSource: ImageSource) => void
+  disabled?: boolean;
+  onSetImg: (imgSource: ImageSource) => void;
 };
 
-export default function UploadGroupAvatarComponent({ imgSource, disabled = false, onSetImg }: imageProps) {
+export default function UploadGroupAvatarComponent({
+  imgSource,
+  disabled = false,
+  onSetImg,
+}: imageProps) {
   const dispatch = useAppDispatch();
 
   // Image picker
@@ -21,30 +25,42 @@ export default function UploadGroupAvatarComponent({ imgSource, disabled = false
 
   useEffect(() => {
     if (imgSource) {
-      setImage(imgSource)
+      setImage(imgSource);
     }
-  }, [imgSource])
+  }, [imgSource]);
 
   console.log(image);
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage({ uri: result.assets[0].uri });
-      onSetImg(result.assets[0])
+      const asset = result.assets[0];
+      setImage({ uri: asset.uri });
+      onSetImg(asset);
     }
   };
 
   return (
-    <TouchableOpacity disabled={disabled} style={styles.container} onPress={pickImage}>
+    <TouchableOpacity
+      disabled={disabled}
+      style={styles.container}
+      onPress={pickImage}
+    >
       {image != null ? (
-        <ImageViewer imgSource={image} style={styles.image} contentFit="cover"/>
+        <ImageViewer
+          imgSource={image}
+          style={styles.image}
+          contentFit="cover"
+        />
       ) : (
         <View style={styles.placeholder}>
           <SimpleLineIcons name="cloud-upload" size={50} color="#8D98AA" />
@@ -76,7 +92,7 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   tooltip: {
-    color: "#8D98AA"
+    color: "#8D98AA",
   },
   placeholder: {
     width: 100,
@@ -90,5 +106,5 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     padding: 20,
     marginRight: 10,
-  }
+  },
 });

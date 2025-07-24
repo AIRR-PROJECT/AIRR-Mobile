@@ -17,13 +17,19 @@ type imageProps = {
 };
 
 export default function UploadProfileComponent({ imgSource }: imageProps) {
-  const dispatch = useAppDispatch()
-  const { userAvatar } = useAppSelector(state => state.user)
-  
+  const dispatch = useAppDispatch();
+  const { userAvatar } = useAppSelector((state) => state.user);
+
   const [image, setImage] = useState<ImageSource>(imgSource);
-  
+
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
+    // Ask for permission first
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -32,21 +38,25 @@ export default function UploadProfileComponent({ imgSource }: imageProps) {
     });
 
     if (!result.canceled) {
-      setImage({ uri: result.assets[0].uri });
-      const asset = result.assets[0]
-      const avatarFormData = new FormData()
+      const asset = result.assets[0];
+      setImage({ uri: asset.uri });
+
+      const avatarFormData = new FormData();
       avatarFormData.append("avatar", {
         uri: asset.uri,
-        name: asset.fileName,
-        type: asset.mimeType
-      })
-      dispatch(updateAvatar(avatarFormData))
+        name: asset.fileName ?? "avatar.jpg",
+        type: asset.mimeType ?? "image/jpeg",
+      });
+
+      dispatch(updateAvatar(avatarFormData));
     }
   };
 
   return (
     <TouchableOpacity style={styles.container} onPress={pickImage}>
-      {(userAvatar || image) && <ImageViewer imgSource={userAvatar ?? image} style={styles.image} />}
+      {(userAvatar || image) && (
+        <ImageViewer imgSource={userAvatar ?? image} style={styles.image} />
+      )}
       <Entypo name="camera" size={40} color="#fff" />
       <ThemedText style={styles.description}>Upload Your Photo</ThemedText>
     </TouchableOpacity>

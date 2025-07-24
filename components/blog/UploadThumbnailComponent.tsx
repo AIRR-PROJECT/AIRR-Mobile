@@ -19,6 +19,16 @@ export default function UploadThumbnailComponent({
   const [image, setImage] = useState<ImageSource | null>(imgSource || null);
   // console.log(image);
   const pickImage = async () => {
+  // Request permission to access media library
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== "granted") {
+    Alert.alert(
+      "Permission Denied",
+      "You need to grant media library access to upload an image."
+    );
+    return;
+  }
+
   let result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ["images"],
     quality: 1,
@@ -29,7 +39,6 @@ export default function UploadThumbnailComponent({
     // asset.fileSize is available in some environments, otherwise fetch it
     let fileSize = asset.fileSize;
     if (fileSize === undefined && asset.uri) {
-      // Try to get file size using fetch (works on Expo Go)
       try {
         const response = await fetch(asset.uri);
         const blob = await response.blob();

@@ -17,7 +17,7 @@ export default function UploadThumbnailComponent({
 }: imageProps) {
   // Image picker
   const [image, setImage] = useState<ImageSource | null>(imgSource || null);
-  console.log(image);
+  // console.log(image);
   const pickImage = async () => {
   let result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ["images"],

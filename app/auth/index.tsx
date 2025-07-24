@@ -65,7 +65,7 @@ export default function AuthScreen() {
     router.push("/auth/login");
   };
   const handleSignUp = () => {
-    router.push("/auth/sign-up-first-page");
+    router.push("/auth/sign-up-second-page");
   };
   const handleGuest = () => {
     router.push("/(tabs)/dashboard");

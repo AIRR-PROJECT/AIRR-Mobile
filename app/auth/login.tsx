@@ -68,14 +68,15 @@ export default function LoginScreen() {
     if (isRememberChecked) {
       dispatch(setRememberedSignUpUser(data.email));
     }
-
+    
+    // Reset
+    dispatch(resetLoggedIn(false));
+    
     dispatch(login(data)).then((res) => {
       if ((res.payload as any).success === true) {
         dispatch(getUserInfo());
       }
     });
-    // Alert.alert("Login Successful", `Welcome, ${data.email}`);
-    // router.replace("/(tabs)");
   };
 
   const handleOnGoogleIconPress = async () => {
@@ -140,6 +141,8 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (!init) return;
+    console.log(isLoggedIn)
+    console.log(isAccountVerified)
 
     if (isLoggedIn && !isAccountVerified) {
       router.push({

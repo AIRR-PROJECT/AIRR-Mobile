@@ -39,7 +39,7 @@ api.interceptors.request.use(async (config) => {
     if (!config["noLoadingScreen"])
         store.dispatch(showLoading("Now sending request..."))
 
-    const accessToken = await SecureStore.getItemAsync('accessToken');
+    const accessToken = store.getState().user.userAccessToken ?? await SecureStore.getItemAsync('accessToken');
     // const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im90dGVyLm9saXZlLjQ1OCIsInN1YiI6IjY3OGQwNmRlNjcyMjBlZTFjOWRlZDdkYiIsInJvbGUiOiJNZW1iZXIiLCJpYXQiOjE3NDE2OTg5NzQsImV4cCI6MTc0MTY5OTg3NH0.gfuXsPa2XR97yqYNNRZmn0R85MBSKPIK_L3L-yudDas"
     // If already has a token in auth header, that is the refresh token => skip this
     if (accessToken) {

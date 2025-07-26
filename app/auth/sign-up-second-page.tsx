@@ -14,7 +14,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import Checkbox from "expo-checkbox";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { SignUpCredentials } from "@/interfaces/authInterface";
-import { setLoggedIn, signup } from "@/redux/slices/authSlice";
+import { resetAccountCreated, setLoggedIn, signup } from "@/redux/slices/authSlice";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -47,11 +47,17 @@ export default function SignUpSecondPage() {
   };
 
   useEffect(() => {
+    dispatch(resetAccountCreated(false));
+    dispatch(setLoggedIn(false))
+  }, []);
+
+  useEffect(() => {
     if (isAccountCreated) {
       if (router.canDismiss()) {
         router.back()
         router.push(`/auth/verify-account-otp?resendEmail=${emailToSendOTP.current}`);
         dispatch(setLoggedIn(true))
+        dispatch(resetAccountCreated(false));
       }
     }
   }, [isAccountCreated]);

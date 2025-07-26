@@ -84,7 +84,9 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
 
   // Handle on tags saved
   useEffect(() => {
-    refreshTags();
+    if (user) {
+      refreshTags();
+    }
     // ToastAndroid.showWithGravity(`Selected tags saved`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
     if (isModalVisible) {
       setModalVisible(false);

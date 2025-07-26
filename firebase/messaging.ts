@@ -16,7 +16,6 @@ export async function requestUserPermission() {
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-  console.log(enabled)
   
   return true; // Android doesn't need explicit permission for FCM
 }

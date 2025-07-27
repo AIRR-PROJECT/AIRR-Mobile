@@ -11,7 +11,8 @@ import { ScrollView } from "react-native-gesture-handler";
 import { Image, ImageSource } from "expo-image";
 import {
   AntDesign,
-  Feather, FontAwesome,
+  Feather,
+  FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import UploadGroupAvatarComponent from "@/components/group/UploadGroupAvatarComponent";
@@ -62,7 +63,7 @@ export default function CreateGroup() {
   const [groupFields, setGroupFields] = useState<SearchedField[]>([]);
   const [groupTags, setGroupTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
-  const fieldSearchText = useRef("")
+  const fieldSearchText = useRef("");
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["100%"], []);
 
@@ -84,16 +85,16 @@ export default function CreateGroup() {
   }, [groupFields]);
 
   useEffect(() => {
-    console.log(groupRules)
-  }, [groupRules])
+    console.log(groupRules);
+  }, [groupRules]);
 
   useEffect(() => {
-    let currentTagsString: string[] = []
+    let currentTagsString: string[] = [];
     chosenTags.forEach((t) => {
-      currentTagsString.push(t.TagName)
-    })
-    dispatch(setCreateGroupCurrentTags(currentTagsString))
-  }, [chosenTags])
+      currentTagsString.push(t.TagName);
+    });
+    dispatch(setCreateGroupCurrentTags(currentTagsString));
+  }, [chosenTags]);
 
   useEffect(() => {
     if (createGroupSubmitted) {
@@ -113,20 +114,23 @@ export default function CreateGroup() {
       }
 
       if (groupName.length < 10) {
-        Alert.alert("Error", "Name must be at least 10 characters long")
-        return
+        Alert.alert("Error", "Name must be at least 10 characters long");
+        return;
       }
       if (groupDescription.length < 10) {
-        Alert.alert("Error", "Description must be at least 10 characters long")
-        return
+        Alert.alert("Error", "Description must be at least 10 characters long");
+        return;
       }
-      let isGroupRuleLengthViolated = false
+      let isGroupRuleLengthViolated = false;
       groupRules.forEach((r) => {
-        if (r.RuleDescription.length < 10) isGroupRuleLengthViolated = true
-      })
+        if (r.RuleDescription.length < 10) isGroupRuleLengthViolated = true;
+      });
       if (isGroupRuleLengthViolated) {
-        Alert.alert("Error", "Rule description must be at least 10 characters long")
-        return
+        Alert.alert(
+          "Error",
+          "Rule description must be at least 10 characters long"
+        );
+        return;
       }
 
       const formData = new FormData();
@@ -145,15 +149,15 @@ export default function CreateGroup() {
       formData.append("GroupRules", JSON.stringify(groupRules));
 
       dispatch(createGroup(formData)).then((res) => {
-        const data = res.payload as string
-        console.log(`res.payload: ${data}`)
-        console.log(`data.length != 0: ${data.length != 0}`)
+        const data = res.payload as string;
+        console.log(`res.payload: ${data}`);
+        console.log(`data.length != 0: ${data.length != 0}`);
         if (data.length != 0) {
           // router.back()
           // router.setParams({
           //   newGroupID: data
           // })
-          router.replace(`/(tabs)/group-list/(my-group)?newGroupID=${data}`)
+          router.replace(`/(tabs)/group-list/(my-group)?newGroupID=${data}`);
           // router.push(`/group?groupId=${res.payload}`)
         }
       });
@@ -164,31 +168,33 @@ export default function CreateGroup() {
     fieldRef.current?.snapToIndex(index);
   }, []);
   const handleFieldSearchChangeText = (val: string) => {
-    fieldSearchText.current = val
-  }
+    fieldSearchText.current = val;
+  };
   const handleFieldSearchSubmit = () => {
     dispatch(searchFields(fieldSearchText.current)).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
-      console.log((res.payload as SearchFieldResult).Fields);
+      // setTimeout(() => {
+      //   searchInputRef.current?.focus();
+      // }, 100); // Small delay to ensure re-render is done
     });
-  }
+  };
   const handleFieldSheetChange = useCallback((index: any) => {
     console.log("handleGroupSheetChange", index);
   }, []);
   const handleGroupFieldPress = useCallback((field: SearchedField) => {
     console.log("Group field: ", field.FieldName);
     setGroupField(field);
-    setChosenTags([])
+    setChosenTags([]);
 
     setGroupTags(field.DefaultTags);
-    dispatch(setCreateGroupCreatedTags([]))
+    dispatch(setCreateGroupCreatedTags([]));
 
     fieldRef.current?.close();
   }, []);
   const handleTagsSnapPress = useCallback((index: number) => {
     tagsSheetRef.current?.snapToIndex(index);
   }, []);
-  
+
   const onPressTag = (listTags: GroupTag[]) => {
     console.log("List tags selected:", listTags);
     setChosenTags(listTags);
@@ -207,23 +213,6 @@ export default function CreateGroup() {
       return [...(prevRules || []), newRule];
     });
   };
-  // const renderFieldsFooter = useCallback((props: BottomSheetFooterProps) => {
-  //   return (
-  //     <BottomSheetFooter {...props} style={styles.searchBar}>
-  //       <TextInput
-  //         style={styles.searchText}
-  //         placeholder="Search Fields"
-  //         placeholderTextColor="#888"
-  //       />
-  //       <FontAwesome
-  //         name="search"
-  //         size={24}
-  //         color="#fff"
-  //         style={{ paddingRight: 10 }}
-  //       />
-  //     </BottomSheetFooter>
-  //   );
-  // }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -335,64 +324,64 @@ export default function CreateGroup() {
                 chosenTags.map((tag) => (
                   <TagWrapper key={tag._id} tag={tag.TagName} />
                 ))
-              ) :
-                <Text
-                    style={[
-                      styles.headingTitle,
-                      {
-                        alignSelf: "center",
-                        color: "#fff",
-                        textAlign: "justify",
-                        marginLeft: 5,
-                      },
-                    ]}
-                  >
-                    Select Tags for group
-                  </Text>
-              }
-            </TouchableOpacity>
-            {groupField && <TouchableOpacity
-              style={[
-                styles.heading,
-                {
-                  justifyContent: "flex-start",
-                  flexWrap: "wrap",
-                  padding: 20,
-                  gap: 10,
-                },
-              ]}
-              onPress={handleCreateTagPress}
-              activeOpacity={0.8}
-            >
-              <AntDesign
-                name="pluscircleo"
-                size={24}
-                color="#B9FF66"
-                style={{
-                  
-                }}
-              />
-              {createGroupCreatedTags.length > 0 ? (
-                createGroupCreatedTags.map((tag) => (
-                  // TODO: Check the API for the what should the _id be before request it
-                  <TagWrapper key={tag._id} tag={tag.TagName} />
-                ))
               ) : (
-                <View style={{}}>
-                  <Text
-                    style={[
-                      styles.buttonText,
-                      {
-                        paddingLeft: 10,
-                        paddingVertical: 0,
-                      },
-                    ]}
-                  >
-                    Create New Tags
-                  </Text>
-                </View>
+                <Text
+                  style={[
+                    styles.headingTitle,
+                    {
+                      alignSelf: "center",
+                      color: "#fff",
+                      textAlign: "justify",
+                      marginLeft: 5,
+                    },
+                  ]}
+                >
+                  Select Tags for group
+                </Text>
               )}
-            </TouchableOpacity>}
+            </TouchableOpacity>
+            {groupField && (
+              <TouchableOpacity
+                style={[
+                  styles.heading,
+                  {
+                    justifyContent: "flex-start",
+                    flexWrap: "wrap",
+                    padding: 20,
+                    gap: 10,
+                  },
+                ]}
+                onPress={handleCreateTagPress}
+                activeOpacity={0.8}
+              >
+                <AntDesign
+                  name="pluscircleo"
+                  size={24}
+                  color="#B9FF66"
+                  style={{}}
+                />
+                {createGroupCreatedTags.length > 0 ? (
+                  createGroupCreatedTags.map((tag) => (
+                    // TODO: Check the API for the what should the _id be before request it
+                    <TagWrapper key={tag._id} tag={tag.TagName} />
+                  ))
+                ) : (
+                  <View style={{}}>
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        {
+                          paddingLeft: 10,
+                          paddingVertical: 0,
+                        },
+                      ]}
+                    >
+                      Create New Tags
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -526,69 +515,63 @@ export default function CreateGroup() {
             </Text>
           </TouchableOpacity>
         </View>
+      </ScrollView>
 
-        {/* Group Selection Bottom Sheet */}
-        <BottomSheet
-          ref={fieldRef}
-          index={-1} // Start closed
-          snapPoints={fieldSnapPoints}
-          enablePanDownToClose={true}
-          backgroundStyle={{ backgroundColor: "#212531" }}
-          handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
-          onChange={handleFieldSheetChange}
-          maxDynamicContentSize={700}
-          backdropComponent={(props) => (
-            <BottomSheetBackdrop
-              {...props}
-              opacity={0.5}
-              disappearsOnIndex={-1}
-              appearsOnIndex={0}
-            />
-          )}
-        >
-          {/* 
-              try to use something that can store the list of field
-              and use it to render the list of field
-              we can store it in redux as group field list is static
-              (? ask the team if it is static or dynamic) 
-              if dynamic, use api to get the list of field
-              and use it to render the list of field with flatlist
-              else use the static list of field to render the list of field
-            */}
-          <View style={styles.searchBar}>
-            <TextInput
-              style={styles.searchText}
-              placeholder="Search Fields"
-              placeholderTextColor="#888"
-              numberOfLines={1}
-              onChangeText={handleFieldSearchChangeText}
-              onSubmitEditing={handleFieldSearchSubmit}
-              // Handle search o day 
-            />
-            <TouchableOpacity activeOpacity={0.8} 
-            // Va o day
-            >
-              <FontAwesome
-                name="search"
-                size={24}
-                color="#fff"
-                style={{ paddingRight: 10 }}
-              />
-            </TouchableOpacity>
-          </View>
-          <BottomSheetScrollView
-            contentContainerStyle={styles.groupListContent}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-            overScrollMode="never"
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="on-drag"
-            nestedScrollEnabled={true}
+      {/* Group Selection Bottom Sheet */}
+      <BottomSheet
+        ref={fieldRef}
+        index={-1} // Start closed
+        snapPoints={fieldSnapPoints}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: "#212531" }}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        onChange={handleFieldSheetChange}
+        maxDynamicContentSize={700}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+        footerComponent={() => <View style={{ height: 40 }} />}
+      >
+        <View style={styles.searchBar}>
+          <TextInput
+            style={styles.searchText}
+            placeholder="Search Fields"
+            placeholderTextColor="#888"
+            numberOfLines={1}
+            onChangeText={handleFieldSearchChangeText}
+            onSubmitEditing={handleFieldSearchSubmit}
+          />
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleFieldSearchSubmit}
           >
-            {/* Group List */}
-            {/* Change to actual field later */}
+            <FontAwesome
+              name="search"
+              size={24}
+              color="#fff"
+              style={{ paddingRight: 10 }}
+            />
+          </TouchableOpacity>
+        </View>
+        <BottomSheetScrollView
+          contentContainerStyle={styles.groupListContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          overScrollMode="never"
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          nestedScrollEnabled={true}
+        >
+          {/* Group List */}
+          {/* Change to actual field later */}
 
-            {groupFields.length != 0 && groupFields.map((item, index) => (
+          {groupFields.length != 0 &&
+            groupFields.map((item, index) => (
               <Pressable
                 key={index}
                 onPress={() => handleGroupFieldPress(item)}
@@ -612,9 +595,28 @@ export default function CreateGroup() {
                 </Text>
               </Pressable>
             ))}
-          </BottomSheetScrollView>
-        </BottomSheet>
-      </ScrollView>
+          {groupFields.length == 0 && (
+            <View style={styles.heading}>
+              <Text
+                style={[
+                  styles.buttonText,
+                  {
+                    color: "#fff",
+                    borderWidth: 1,
+                    borderColor: "red",
+                    borderRadius: 20,
+                    paddingHorizontal: 15,
+                  },
+                ]}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
+                No fields found.
+              </Text>
+            </View>
+          )}
+        </BottomSheetScrollView>
+      </BottomSheet>
       <BottomSheet
         ref={tagsSheetRef}
         index={-1} // Start closed
@@ -632,7 +634,7 @@ export default function CreateGroup() {
           />
         )}
       >
-        <GroupTagDropdownComponent tags={groupTags} onPress={onPressTag}/>
+        <GroupTagDropdownComponent tags={groupTags} onPress={onPressTag} />
       </BottomSheet>
     </GestureHandlerRootView>
   );
@@ -722,6 +724,7 @@ const styles = StyleSheet.create({
   groupListContent: {
     padding: 16,
     backgroundColor: "#212531",
+    paddingBottom: 60,
   },
   heading: {
     flexDirection: "row",

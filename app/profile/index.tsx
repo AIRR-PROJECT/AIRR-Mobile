@@ -165,10 +165,10 @@ export default function ProfileScreen() {
 
           {/* Active groups */}
           {/* TODO: Integrate API when have */}
-          <ThemedText style={styles.groupLabel}>
+          {isViewingOwnProfile && <ThemedText style={styles.groupLabel}>
             Active in these group
-          </ThemedText>
-          {joinedGroups && joinedGroups.length > 0 ? (
+          </ThemedText>}
+          {isViewingOwnProfile && (joinedGroups && joinedGroups.length > 0 ? (
             <FlatList
               data={joinedGroups}
               horizontal={true}
@@ -207,7 +207,7 @@ export default function ProfileScreen() {
                 No groups joined. Press the plus icon to create a group.
               </Text>
             </View>
-          )}
+          ))}
 
           {/* Social , Blog, Activity */}
           <View style={styles.rowContainer}>

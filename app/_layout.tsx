@@ -148,6 +148,21 @@ export default function RootLayout() {
                   },
                 }}
               />
+              <Stack.Screen
+                name="feed-setting"
+                options={{
+                  headerTitle: "",
+                   headerStyle: {
+                    backgroundColor: "#1E1E1E",
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="search-screen"
+                options={{
+                  headerShown: false,
+                }}
+              />
             </Stack>
             {userLoggedIn ? (
               <Redirect href="/(tabs)/dashboard" />

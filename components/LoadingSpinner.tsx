@@ -9,7 +9,7 @@ export default function LoadingSpinner() {
     const { loading, message } = useAppSelector(state => state.loading)
 
     return (
-      <View style={styles.overlay}>
+      <View style={loading ? styles.overlay : styles.overlayDisabled}>
         <Spinner 
           visible={loading}
           size={"large"}
@@ -41,7 +41,14 @@ const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
     width: '100%',
-    height: '100%'
+    height: '100%',
+    zIndex: 9999
+  },
+  overlayDisabled: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    display: 'none'
   },
   frame: {
     backgroundColor: "#878487CC",

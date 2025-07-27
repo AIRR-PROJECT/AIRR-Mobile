@@ -116,10 +116,10 @@ export default function ForgotPasswordScreen() {
             Or
           </ThemedText>
           {/* Or Google or Facebook */}
-          <View style={[styles.section, { justifyContent: "space-between", marginTop: 10 }]}>
+          {/* <View style={[styles.section, { justifyContent: "space-between", marginTop: 10 }]}>
             <AuthButtonTransparent label="Google" style={styles.otherButton} />
 
-          </View>
+          </View> */}
 
           <ThemedText
             type="link"

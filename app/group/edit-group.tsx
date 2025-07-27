@@ -184,7 +184,7 @@ export default function EditGroup() {
       });
     }
   }, [createGroupSubmitted]);
-
+  const searchInputRef = useRef<TextInput>(null);
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
   }, []);
@@ -195,9 +195,8 @@ export default function EditGroup() {
   const handleFieldSearchSubmit = () => {
     dispatch(searchFields(fieldSearchText.current)).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
-      // setTimeout(() => {
-      //   searchInputRef.current?.focus();
-      // }, 100); // Small delay to ensure re-render is done
+
+      searchInputRef.current?.focus();
     });
   };
   const handleFieldSheetChange = useCallback((index: any) => {
@@ -588,6 +587,7 @@ export default function EditGroup() {
       >
         <View style={styles.searchBar}>
           <TextInput
+            ref={searchInputRef}
             style={styles.searchText}
             placeholder="Search Fields"
             placeholderTextColor="#888"

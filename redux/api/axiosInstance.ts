@@ -33,7 +33,9 @@ const api = axios.create({
 // Attach access token to every request
 api.interceptors.request.use(async (config) => {
     // Create new abort signal to be used to cancel the request at any time (as long as it is still being processed)
-    abortSignal = new AbortController()
+    // ONLY WHEN THE PREVIOUS SIGNAL HAS BEEN SET TO 'ABORTED'
+    if (abortSignal === undefined || abortSignal?.signal.aborted)
+        abortSignal = new AbortController()
     config.signal = abortSignal.signal
     
     // console.log(`noLoadingScrene: ${config["noLoadingScreen"]} - route: ${config.url}`)

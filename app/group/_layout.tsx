@@ -99,12 +99,12 @@ export default function GroupLayout() {
             headerTitle: "Create New Group Tag",
           }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="approvals"
           options={{
             headerTitle: "Approvals",
           }}
-        />
+        /> */}
         <Stack.Screen
           name="pending-blog"
           options={{

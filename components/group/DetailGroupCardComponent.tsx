@@ -5,7 +5,9 @@ import { Image } from "expo-image";
 import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import { GroupDetailInfo } from "@/interfaces/groupInterface";
 import { GroupRole } from "@/enums/group.enum";
-
+import { Dimensions } from "react-native";
+const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 type DetailGroupCardComponentProps = GroupDetailInfo & {
   userRole: GroupRole;
   moreOptionPress: (index: number) => void;
@@ -32,7 +34,7 @@ export default function DetailGroupCardComponent({
     >
       {/* Avatar */}
       <View style={styles.groupMainDetail}>
-        <Image style={styles.avatar} source={CoverURL} />
+        <Image style={styles.avatar} source={CoverURL} contentFit="fill" />
         <View style={{ paddingLeft: 5, gap: 5, width: "70%" }}>
           {/* Title */}
           <View style={styles.textWrap}>
@@ -83,18 +85,14 @@ export default function DetailGroupCardComponent({
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    overflow: "hidden",
-    gap: 10,
     width: "100%",
     borderRadius: 20,
-    flex: 1,
   },
   groupMainDetail: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 5,
-    flex: 1,
     width: "100%",
   },
   rowContainer: {
@@ -106,8 +104,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    width: 90,
-    height: 90,
+    width: width * 0.25,
+    height: width * 0.25,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "#303030",

@@ -338,11 +338,7 @@ GroupPageProps) {
   
   return (
     <GestureHandlerRootView style={styles.container}>
-      <View
-        style={{
-          height: height * 0.2,
-        }}
-      >
+      <View>
         <DetailGroupCardComponent
           {...(groupInfo ? { ...groupInfo } : mockGroupDetail)}
           moreOptionPress={() => handleMoreOptionPress(0)}
@@ -352,7 +348,7 @@ GroupPageProps) {
       <View style={{ marginTop: 20 }} />
       {/* There should only one of this appear on the screen, if multiple of this appear, then database is wrong */}
       {userCurrentGroupRole == GroupRole.Owner && (
-        <TouchableOpacity style={styles.welcomContainer} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.welcomeContainer} activeOpacity={0.8}>
           <LinearGradient
             colors={["#1327", "#111A1A"]}
             start={{ x: 0, y: 0 }}
@@ -1145,7 +1141,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginRight: 20,
   },
-  welcomContainer: {
+  welcomeContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,

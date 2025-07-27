@@ -29,29 +29,34 @@ const api = axios.create({
       "Content-Type": "application/json",
     }
 })
+let accessTokenCache: string | null = null;
 
 // Attach access token to every request
 api.interceptors.request.use(async (config) => {
-    // Create new abort signal to be used to cancel the request at any time (as long as it is still being processed)
-    // ONLY WHEN THE PREVIOUS SIGNAL HAS BEEN SET TO 'ABORTED'
-    if (abortSignal === undefined || abortSignal?.signal.aborted)
-        abortSignal = new AbortController()
-    config.signal = abortSignal.signal
-    
-    // console.log(`noLoadingScrene: ${config["noLoadingScreen"]} - route: ${config.url}`)
-    if (!config["noLoadingScreen"])
-        store.dispatch(showLoading("Now sending request..."))
+  if (abortSignal === undefined || abortSignal?.signal.aborted)
+    abortSignal = new AbortController();
+  config.signal = abortSignal.signal;
 
-    const accessToken = store.getState().user.userAccessToken ?? await SecureStore.getItemAsync('accessToken');
-    // const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im90dGVyLm9saXZlLjQ1OCIsInN1YiI6IjY3OGQwNmRlNjcyMjBlZTFjOWRlZDdkYiIsInJvbGUiOiJNZW1iZXIiLCJpYXQiOjE3NDE2OTg5NzQsImV4cCI6MTc0MTY5OTg3NH0.gfuXsPa2XR97yqYNNRZmn0R85MBSKPIK_L3L-yudDas"
-    // If already has a token in auth header, that is the refresh token => skip this
-    if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+  if (!config["noLoadingScreen"])
+    store.dispatch(showLoading("Now sending request..."));
+
+  // Use in-memory cache to avoid repeated SecureStore reads
+  // FIX access token by using a cache
+  let accessToken = store.getState().user.userAccessToken;
+  if (!accessToken) {
+    if (!accessTokenCache) {
+      accessTokenCache = await SecureStore.getItemAsync("accessToken");
     }
-    return config;
-}, (error) => {
-    Promise.reject(error)
-});
+    accessToken = accessTokenCache;
+  }
+
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  return config;
+}, (error) => Promise.reject(error));
+
 
 // Handle expired tokens automatically  x
 api.interceptors.response.use(

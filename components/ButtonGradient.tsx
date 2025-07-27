@@ -1,24 +1,28 @@
-import { StyleSheet, View, type ViewStyle, type TextStyle, StyleProp } from "react-native";
-import { ThemedText } from "./ThemedText";
+import {
+  StyleSheet,
+  View,
+  type ViewStyle,
+  type TextStyle,
+  StyleProp,
+  Text, // <-- Import Text
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Dimensions,TouchableOpacity } from "react-native";
-import { useThemeColor } from "@/hooks/useThemeColor";
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
-
-import AnimatedPressable from "./AnimatedPressable";
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
 type ButtonGradientProps = {
   label: string;
   onPress?: () => void;
-  style?: StyleProp<ViewStyle>; // Allow custom styles for the button container
-  buttonStyle?: ViewStyle; // Allow custom button styles
-  labelStyle?: TextStyle; // Allow custom label styles
-  defaultAction?: () => void; // Fallback action if no onPress is passed
+  style?: StyleProp<ViewStyle>;
+  buttonStyle?: ViewStyle;
+  labelStyle?: TextStyle;
+  defaultAction?: () => void;
   lightColor?: string;
   darkColor?: string;
-  disabled?: boolean
+  disabled?: boolean;
 };
 
 export default function ButtonGradient({
@@ -28,49 +32,45 @@ export default function ButtonGradient({
   buttonStyle,
   labelStyle,
   defaultAction,
-  lightColor,
-  darkColor,
-  disabled
+  disabled,
 }: ButtonGradientProps) {
-  const handlePress = onPress || defaultAction || (() => alert("You pressed a button."));
- 
-
+  const handlePress =
+    onPress || defaultAction || (() => alert("You pressed a button."));
   return (
-    <View style={[styles.buttonContainer, style, {  }]}>
-      <LinearGradient 
-        colors={['#B9FF66', '#9DE8EE']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={[styles.button, buttonStyle]}
+    <View style={[styles.buttonContainer, style]}>
+      <TouchableOpacity
+        onPress={handlePress}
+        disabled={disabled}
+        activeOpacity={0.7}
       >
-        <TouchableOpacity style={[styles.button, buttonStyle]} onPress={handlePress} disabled={disabled}>
-          <ThemedText style={[styles.buttonLabel, labelStyle]} type="defaultSemiBold" lightColor={lightColor} darkColor={darkColor}>
-            {label}
-          </ThemedText>
-        </TouchableOpacity>
-      </LinearGradient>
+        <LinearGradient
+          colors={["#B9FF66", "#9DE8EE"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.button, buttonStyle]}
+        >
+          <Text style={[styles.buttonLabel, labelStyle]}>{label}</Text>
+        </LinearGradient>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: 320,
-    height: windowHeight * 0.08, // 8% of height device screen
     alignItems: "center",
     justifyContent: "center",
-    padding: 3,
   },
   button: {
     borderRadius: 80,
-    width: "100%",
-    height: "100%",
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: "row",
+    overflow: "hidden",
+    paddingVertical: 12,
+    paddingHorizontal: 24, // Add horizontal padding for width
   },
   buttonLabel: {
     color: "#000000",
-    fontSize: 16,
+    fontWeight: "bold",
   },
 });

@@ -14,6 +14,7 @@ const SettingsIcon = ({ isOwnProfile }: { isOwnProfile: boolean }) => (
     }}
     style={styles.editProfileButton}
     labelStyle={styles.editProfileButtonText}
+    buttonStyle={styles.editButtonStyle}
   /> : null
 );
 
@@ -96,15 +97,13 @@ const styles = StyleSheet.create({
     color: "#CBCCCE",
   },
   editProfileButton: {
-    width: 110,
-    height: 50,
-    borderRadius: 25,
-    paddingBlock: 8,
-    alignSelf: "flex-start",
-    paddingHorizontal: 5,
   },
   editProfileButtonText: {
     fontSize: 14,
     color: "#000",
   },
+  editButtonStyle: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  }
 });

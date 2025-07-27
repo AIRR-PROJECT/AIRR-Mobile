@@ -75,7 +75,7 @@ export default function UploadThumbnailComponent({
         </View>
       )}
       <Entypo name="camera" size={20} color="#fff" />
-      <Text style={styles.description}>Upload Thumbnail</Text>
+      <Text style={styles.description} >Upload Thumbnail</Text>
     </TouchableOpacity>
   );
 }
@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
   },
   description: {
     color: "#fff",
+    flex: 1,
   },
   tooltip: {
     color: "#8D98AA",

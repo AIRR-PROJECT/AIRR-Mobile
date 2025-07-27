@@ -6,19 +6,19 @@ import { useRouter } from "expo-router";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import BottomLeftArrowIcon from "@/components/BottomLeftArrowIcon";
 import { useRef, useState } from "react";
-
+import { min } from "lodash";
 // TODO:  add thumbnail to the AI Blog interface
 const mockThumbnail = "https://picsum.photos/400/200";
 // TODO: there are 4 colors in the cycle => coressponding to 4 different AI blogs thumbnails => check ticket
-
+const { width, height } = Dimensions.get("window");
 export default function AIBlogPreview({
   blog,
   color,
-  thumbnail
+  thumbnail,
 }: {
   blog: AIBlog;
   color?: string;
-  thumbnail?: string
+  thumbnail?: string;
 }) {
   const route = useRouter();
   const handlePress = () => {
@@ -27,8 +27,7 @@ export default function AIBlogPreview({
       pathname: `/blog/ai-blog?aiBlogId=${blog._id}`,
     });
   };
-
-  const index = useRef(0)
+  const index = useRef(0);
 
   return (
     <View style={styles.outerContainer}>

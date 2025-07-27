@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
       overflow: "hidden",
       borderWidth: 2,
       width: 300,
-      height: 250,
+      height: 280,
       backgroundColor: "#adadad"
     },
     titleSection: {

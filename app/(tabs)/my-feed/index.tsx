@@ -62,9 +62,11 @@ import { string } from "zod";
 import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
 import { getUserGroupStatus } from "@/redux/slices/groupSlice";
 import { EmptyContent } from "@/components/EmptyContent";
+import { min } from "lodash";
+const { width, height } = Dimensions.get("window");
 export default function MyFeed() {
   const dispatch = useAppDispatch();
-  const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>()
+  const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>();
   const [recommendedPage, setRecommendedPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
   const [isRecommendedBlogReset, setRecommendedBlogReset] = useState(false);
@@ -107,7 +109,7 @@ export default function MyFeed() {
       queryClient.setQueryData(["feed-recommended"], (oldData: any) => {
         return [...data] as AIBlog[];
       });
-      setRecommendedPage(1)
+      setRecommendedPage(1);
     },
   });
   const handleOnRecommendedBlogListEndReached = () => {
@@ -147,7 +149,7 @@ export default function MyFeed() {
       queryClient.setQueryData(["feed-user"], (oldData: any) => {
         return [...data] as UserBlog[];
       });
-      setUserPage(1)
+      setUserPage(1);
     },
   });
   const handleOnUserBlogListEndReached = () => {
@@ -182,7 +184,7 @@ export default function MyFeed() {
     setTimeout(() => {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
-  }, [])
+  }, []);
 
   useEffect(() => {
     console.log("Refetching");
@@ -208,20 +210,29 @@ export default function MyFeed() {
 
   const moreOptionRef = useRef<BottomSheet>(null);
   const [isUserWrittenBlog, setIsUserWrittenBlog] = useState(false);
-  const [role, setRole] = useState("")
-  const [blogStatus, setBlogStatus] = useState("")
-  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] = useState(false)
-  const [isAlreadyReported, setIsAlreadyReported] = useState(false)
-  const [moreOptionBlogId, setMoreOptionBlogId] = useState("")
-  const [moreOptionGroupId, setMoreOptionGroupId] = useState("")
-  const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean, isAlreadyReported: boolean) => {
+  const [role, setRole] = useState("");
+  const [blogStatus, setBlogStatus] = useState("");
+  const [isViewTypePrivateOrInProfile, setIsViewTypePrivateOrInProfile] =
+    useState(false);
+  const [isAlreadyReported, setIsAlreadyReported] = useState(false);
+  const [moreOptionBlogId, setMoreOptionBlogId] = useState("");
+  const [moreOptionGroupId, setMoreOptionGroupId] = useState("");
+  const handlePressMoreOption = (
+    isUserWritten: boolean,
+    blogId: string,
+    groupId: string,
+    role: string,
+    blogStatus: string,
+    isViewTypePrivateOrInProfile: boolean,
+    isAlreadyReported: boolean
+  ) => {
     setIsUserWrittenBlog(isUserWritten);
-    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile)
-    setIsAlreadyReported(isAlreadyReported)
-    setMoreOptionBlogId(blogId)
-    setMoreOptionGroupId(groupId)
-    setRole(role)
-    setBlogStatus(blogStatus)
+    setIsViewTypePrivateOrInProfile(isViewTypePrivateOrInProfile);
+    setIsAlreadyReported(isAlreadyReported);
+    setMoreOptionBlogId(blogId);
+    setMoreOptionGroupId(groupId);
+    setRole(role);
+    setBlogStatus(blogStatus);
     if (moreOptionRef.current) {
       moreOptionRef.current.snapToIndex(0);
     }
@@ -230,11 +241,11 @@ export default function MyFeed() {
   const handleHideBlog = () => {
     setUserBlogReset(true);
     userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
-  }
+  };
   const handleDeleteBlog = () => {
     setUserBlogReset(true);
     userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
-  }
+  };
   // Handle hiding or deleting blog while viewing that blog
   useEffect(() => {
     if (blogIdToRemove) {
@@ -242,10 +253,10 @@ export default function MyFeed() {
       userBlogsReset.mutateAsync().then(() => setUserBlogReset(false));
 
       router.setParams({
-        blogIdToRemove: undefined
-      })
+        blogIdToRemove: undefined,
+      });
     }
-  }, [blogIdToRemove])
+  }, [blogIdToRemove]);
   // Color cycle for ai blog previews
   const colorCycle = ["#e45febff", "#20b0e9ff", "#15d3adff", "#ff5c2fff"];
   // Thumbnail for ai blog previews
@@ -253,16 +264,14 @@ export default function MyFeed() {
     "https://plus.unsplash.com/premium_photo-1725907643567-1694c2737432?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "https://plus.unsplash.com/premium_photo-1725907643701-9ba38affe7bb?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "https://plus.unsplash.com/premium_photo-1725985758251-b49c6b581d17?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://plus.unsplash.com/premium_photo-1727535680864-06e5d8feb18e?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-  ]
+    "https://plus.unsplash.com/premium_photo-1727535680864-06e5d8feb18e?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  ];
   return (
     <GestureHandlerRootView style={styles.container}>
       {/* Flat list for lazy load */}
       {userBlogsQuery.isFetching || isUserBlogReset ? (
         <FeedBlogPreviewSkeleton />
-      ) :
-      userBlogsQuery.data?.length == 0 ?
-      (
+      ) : userBlogsQuery.data?.length == 0 ? (
         <View style={{ flex: 1, width: "100%" }}>
           <FlatList
             refreshControl={
@@ -274,7 +283,7 @@ export default function MyFeed() {
             keyExtractor={(item, index) => index.toString()}
             ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => <EmptyContent/>}
+            renderItem={({ item }) => <EmptyContent />}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={
               <View>
@@ -301,11 +310,7 @@ export default function MyFeed() {
                 {recommendedBlogsQuery.isFetching || isRecommendedBlogReset ? (
                   <AIBlogPreviewSkeleton />
                 ) : (
-                  <View
-                    id="carousel-ai-blog-component"
-                    // dataSet={{ kind: "utils", name: "pagination" }}
-                    style={{ gap: 10 }}
-                  >
+                  <View id="carousel-ai-blog-component" style={{ gap: 10 }}>
                     <Carousel
                       ref={carouselRef}
                       autoPlayInterval={2000}
@@ -313,7 +318,7 @@ export default function MyFeed() {
                       data={recommendedBlogsQuery.data as AIBlog[]}
                       loop={true}
                       width={Dimensions.get("window").width}
-                      height={Dimensions.get("window").height / 3}
+                      height={280}
                       pagingEnabled={true}
                       snapEnabled={true}
                       style={{
@@ -324,13 +329,13 @@ export default function MyFeed() {
                         parallaxScrollingScale: 0.9,
                         parallaxScrollingOffset: 50,
                       }}
-                      renderItem={({ item, index }) => 
+                      renderItem={({ item, index }) => (
                         <AIBlogPreview
                           blog={item}
                           color={colorCycle[index % colorCycle.length]}
                           thumbnail={thumbnails[index % thumbnails.length]}
                         />
-                      }
+                      )}
                     />
                   </View>
                 )}
@@ -352,9 +357,8 @@ export default function MyFeed() {
               </View>
             }
           />
-        </View> 
-      ) :
-      (
+        </View>
+      ) : (
         <View style={{ flex: 1, width: "100%" }}>
           <FlatList
             refreshControl={
@@ -368,14 +372,22 @@ export default function MyFeed() {
             showsVerticalScrollIndicator={false}
             onEndReached={handleOnUserBlogListEndReached}
             renderItem={({ item }) => {
-              return <FeedBlogPreview blog={item} onPressMoreButton={
-                () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group._id,
-                  item.UserGroupStatus,
-                  item.Status,
-                  item.ViewType != BlogViewType.IN_GROUP,
-                  item.IsReportedByUser
-                )
-              }/>;
+              return (
+                <FeedBlogPreview
+                  blog={item}
+                  onPressMoreButton={() =>
+                    handlePressMoreOption(
+                      item.Author._id === user._id,
+                      item._id,
+                      item.Group._id,
+                      item.UserGroupStatus,
+                      item.Status,
+                      item.ViewType != BlogViewType.IN_GROUP,
+                      item.IsReportedByUser
+                    )
+                  }
+                />
+              );
             }}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={
@@ -415,7 +427,7 @@ export default function MyFeed() {
                       data={recommendedBlogsQuery.data as AIBlog[]}
                       loop={true}
                       width={Dimensions.get("window").width}
-                      height={Dimensions.get("window").height / 3}
+                      height={280}
                       pagingEnabled={true}
                       snapEnabled={true}
                       style={{
@@ -426,13 +438,13 @@ export default function MyFeed() {
                         parallaxScrollingScale: 0.9,
                         parallaxScrollingOffset: 50,
                       }}
-                      renderItem={({ item, index }) => 
+                      renderItem={({ item, index }) => (
                         <AIBlogPreview
                           blog={item}
                           color={colorCycle[index % colorCycle.length]}
                           thumbnail={thumbnails[index % thumbnails.length]}
                         />
-                      }
+                      )}
                     />
                   </View>
                 )}
@@ -468,7 +480,8 @@ export default function MyFeed() {
         isViewTypePrivateOrInProfile={isViewTypePrivateOrInProfile}
         isAlreadyReported={isAlreadyReported}
         handleHideThisBlog={handleHideBlog}
-        handleDeleteThisBlog={handleDeleteBlog}/>
+        handleDeleteThisBlog={handleDeleteBlog}
+      />
     </GestureHandlerRootView>
   );
 }

@@ -37,7 +37,7 @@ export default function GroupListTabLayout() {
               style={{
                 borderRadius: 8,
                 paddingVertical: 6,
-                paddingHorizontal: 12,
+                paddingHorizontal: 8,
                 margin: 4,
               }}
             >

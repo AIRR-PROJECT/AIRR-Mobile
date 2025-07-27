@@ -425,10 +425,7 @@ export default function BlogsApprovalsPage() {
           onPress={() => setSelectedTab(TabOptions.All)}
         >
           <Text style={styles.optionText}>
-            {userCurrentGroupRole === GroupRole.Owner ||
-            userCurrentGroupRole === GroupRole.Admin
-              ? "All Published Blogs"
-              : "All Blogs"}
+            All Blogs
           </Text>
         </TouchableOpacity>
 

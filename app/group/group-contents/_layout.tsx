@@ -18,9 +18,10 @@ export default function ContentsPageTabLayout() {
     <MaterialTopTabs
       style={{ flex: 1 }}
       screenOptions={({ route }) => ({
-        tabBarStyle: { height: "auto", backgroundColor: "#1E1E1E" }, // Adjust the height of the tab bar
+        tabBarStyle: { height: "auto", backgroundColor: "#1E1E1E", }, // Adjust the height of the tab bar
         tabBarLabelStyle: { fontSize: 12 }, // Adjust the font size of tab labels
         tabBarIndicatorStyle: { display: "none" }, // Change the indicator thickness
+        tabBarItemStyle: { width: "auto" }, // Adjust the width of the tab bar items
         tabBarLabel: ({ focused }) => {
           const title =
             route.name === "blogs"

@@ -166,18 +166,16 @@ export default function CreateGroup() {
   const searchInputRef = useRef<TextInput>(null);
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
-   
   }, []);
   const handleFieldSearchChangeText = (val: string) => {
     fieldSearchText.current = val;
-     handleFieldSearchSubmit();
+    handleFieldSearchSubmit();
   };
   const handleFieldSearchSubmit = () => {
     dispatch(searchFields(fieldSearchText.current)).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
-      
+
       searchInputRef.current?.focus();
-     
     });
   };
   const handleFieldSheetChange = useCallback((index: any) => {

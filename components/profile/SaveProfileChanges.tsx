@@ -52,12 +52,10 @@ export default function SaveProfileChanges() {
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: 150,
-    height: 40,
-    borderRadius: 20,
+    paddingVertical: 8,
   },
   buttonLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
   },
 });

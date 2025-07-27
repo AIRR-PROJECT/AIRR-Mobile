@@ -55,7 +55,7 @@ export default function UploadProfileComponent({ imgSource }: imageProps) {
   return (
     <TouchableOpacity style={styles.container} onPress={pickImage}>
       {(userAvatar || image) && (
-        <ImageViewer imgSource={userAvatar ?? image} style={styles.image} />
+        <ImageViewer imgSource={userAvatar ?? image} style={styles.image} contentFit="cover"/>
       )}
       <Entypo name="camera" size={40} color="#fff" />
       <ThemedText style={styles.description}>Upload Your Photo</ThemedText>
@@ -79,5 +79,6 @@ const styles = StyleSheet.create({
   },
   description: {
     color: "#fff",
+    flex: 1,
   },
 });

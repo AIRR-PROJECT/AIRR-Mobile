@@ -1,0 +1,30 @@
+import { ResponseFailcode } from "@/enums/failcode.enum";
+
+export const AuthFailcodes = [
+    ResponseFailcode.HTTP_EXCEPTION,
+    ResponseFailcode.OTP_NOT_EXIST,
+    ResponseFailcode.OTP_EXPIRED,
+    ResponseFailcode.VERIFICATION_CREATE_FAILED,
+    ResponseFailcode.VERIFICATION_UPDATE_FAILED,
+    ResponseFailcode.VERIFICATION_NOT_FOUND,
+    ResponseFailcode.OTP_INVALID,
+    ResponseFailcode.TOKEN_INVALID,
+    ResponseFailcode.TOKEN_EXPIRED,
+    ResponseFailcode.IDENTITY_NOT_MATCHED,
+    ResponseFailcode.AUTH_METHOD_OBSOLETE,
+    ResponseFailcode.USER_TOKEN_PAYLOAD_INVALID,
+    ResponseFailcode.USER_NOT_FOUND,
+    ResponseFailcode.USER_UNVERIFIED,
+    ResponseFailcode.USER_UPDATE_FAILED,
+    ResponseFailcode.USER_CREATE_FAILED,
+    ResponseFailcode.USER_PROFILE_PROVIDE_FAILED,
+    ResponseFailcode.USER_PROFILE_UPDATE_FAILED,
+    ResponseFailcode.USER_SKILLSET_UPDATE_FAILED,
+    ResponseFailcode.USER_ALREADY_VERIFIED,
+    ResponseFailcode.EMAIL_ALREADY_EXISTS,
+    ResponseFailcode.USERNAME_ALREADY_EXISTS,
+    ResponseFailcode.ACCOUNT_NOT_FOUND,
+    ResponseFailcode.INVALID_CREDENTIALS,
+    ResponseFailcode.EMAIL_NOT_VERIFIED,
+    ResponseFailcode.GOOGLE_AUTH_REQUIRED
+]

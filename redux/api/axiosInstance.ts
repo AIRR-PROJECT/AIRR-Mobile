@@ -9,6 +9,7 @@ import { Store } from '@reduxjs/toolkit';
 import { router } from 'expo-router';
 import { hideLoading, showLoading } from '../slices/loadingSlice';
 import { logout } from '../slices/authSlice';
+import { AuthFailcodes } from '@/constants/AuthFailcodes';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 let store: Store
@@ -62,11 +63,11 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         const exception_data = error.response?.data
-        let exception_status: number = error.status ?? ""
-        let exception_failcode: number = -1
+        let exception_status: number = exception_data.status ?? ""
+        let exception_failcode: number = exception_data.failcode ?? -1
         let exception_message: string = exception_data ? exception_data.message : error.message
 
-        if (error.response?.status === 401) {
+        if (exception_data.status === 401) {
             // Don't refresh token if the error is not related to access token's expiration
             if (error.response?.data.failcode === ResponseFailcode.ACCESS_EXPIRED || error.response?.data.failcode === ResponseFailcode.JWT_NOT_FOUND) {
                 try {
@@ -151,21 +152,10 @@ api.interceptors.response.use(
             }
         }
     
-        // if (exception_data) {
-        //     if ((exception_data as APIResponse).message) {
-        //         Alert.alert("Error: " + error.status, (exception_data as APIResponse).message)
-        //     }
-        //     else {
-        //         Alert.alert("Error" + error.status, exception_data as string)
-        //     }
-        // }
-        // else {
-        //     Alert.alert("Error" + error.status, getReasonPhrase(error.status))
-        // }
         store.dispatch(hideLoading())
         abortSignal = undefined
-        if (exception_failcode != -1) {
-            ToastAndroid.showWithGravity(`(${exception_status}) (${exception_failcode}) ${exception_message}`, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+        if (!AuthFailcodes.includes(exception_failcode)) {
+            ToastAndroid.show(`(${exception_status}) (${exception_failcode}) ${exception_message}`, ToastAndroid.LONG)
         }
         else {
             Alert.alert("Error:", exception_message)

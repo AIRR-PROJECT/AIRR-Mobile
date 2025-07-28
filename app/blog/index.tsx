@@ -593,7 +593,7 @@ export default function BlogScreen() {
             </View>
           </View>
           {/* List of tags */}
-          <Text style={{ fontWeight: "bold", color: "#fff" }}>Tags</Text>
+          {tags.length > 0 && <Text style={{ fontWeight: "bold", color: "#fff" }}>Tags</Text>}
           {searchParams.userBlogId && (
             <View style={styles.tagsContainer}>
               {tags.map((tag, index) => (

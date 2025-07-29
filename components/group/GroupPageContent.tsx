@@ -28,7 +28,11 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { useLocalSearchParams, useRootNavigationState, useRouter } from "expo-router";
+import {
+  useLocalSearchParams,
+  useRootNavigationState,
+  useRouter,
+} from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
   cancelJoinGroupRequest,
@@ -93,8 +97,8 @@ type GroupPageProps = {
   setSelectedId: (id: number) => void;
   groupID: string;
   sheetRef: React.RefObject<BottomSheet>;
-  memberIDNotif?: string
-  tagIDNotif?: string
+  memberIDNotif?: string;
+  tagIDNotif?: string;
   // selectedBlogFilter: string;
   // setSelectedBlogFilter: (filter: string) => void;
   // selectedTagFilter: string;
@@ -106,7 +110,7 @@ export default function GroupPageContent({
   groupID,
   sheetRef,
   memberIDNotif,
-  tagIDNotif
+  tagIDNotif,
 }: // selectedBlogFilter,
 // setSelectedBlogFilter,
 // selectedTagFilter,
@@ -120,7 +124,7 @@ GroupPageProps) {
     useAppSelector((state) => state.user);
 
   const [isShowRules, setIsShowRules] = useState(false);
-  const [isOwnerTheLastMember, setIsOwnerTheLastMember] = useState(false)
+  const [isOwnerTheLastMember, setIsOwnerTheLastMember] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Join Group");
   const [isGroupJoinModalVisible, setIsGroupJoinModalVisible] = useState(false);
   const [isCancelRequestModalVisible, setIsCancelRequestModalVisible] =
@@ -142,15 +146,20 @@ GroupPageProps) {
       })
     ).then((res) => {
       const groupInfo = res.payload as GroupDetailInfo;
-      
-      if (groupInfo == null) {
-        ToastAndroid.show("This group doesn't exist or is already deleted", ToastAndroid.LONG)
 
-        route.dismiss()
+      if (groupInfo == null) {
+        ToastAndroid.show(
+          "This group doesn't exist or is already deleted",
+          ToastAndroid.LONG
+        );
+
+        route.dismiss();
       }
 
       setGroupInfo(groupInfo);
-      setIsOwnerTheLastMember(groupInfo.NumberOfMembers == 1 && groupInfo.Role == GroupRole.Owner)
+      setIsOwnerTheLastMember(
+        groupInfo.NumberOfMembers == 1 && groupInfo.Role == GroupRole.Owner
+      );
       const membershipStage =
         groupInfo.UserStatus == "Active"
           ? GroupMembershipStage.JOINED
@@ -158,7 +167,7 @@ GroupPageProps) {
           ? GroupMembershipStage.REQUESTED
           : groupInfo.UserStatus == "Banned"
           ? GroupMembershipStage.BANNED
-          : GroupMembershipStage.NOT_JOINED
+          : GroupMembershipStage.NOT_JOINED;
 
       dispatch(setUserMembershipStageInCurrentGroup(membershipStage));
       dispatch(setUserRoleInCurrentGroup(groupInfo.Role));
@@ -178,23 +187,33 @@ GroupPageProps) {
   }, [userCurrentGroupMembershipStage]);
 
   useEffect(() => {
-    if (!groupInfo) return
+    if (!groupInfo) return;
 
-    const memberIDCheck = memberIDNotif !== undefined && memberIDNotif.length != 0
-    const tagIDCheck = tagIDNotif !== undefined && tagIDNotif.length != 0
+    const memberIDCheck =
+      memberIDNotif !== undefined && memberIDNotif.length != 0;
+    const tagIDCheck = tagIDNotif !== undefined && tagIDNotif.length != 0;
     if (memberIDCheck || tagIDCheck) {
-      if (userCurrentGroupRole != null && userCurrentGroupRole !== GroupRole.Admin && userCurrentGroupRole !== GroupRole.Owner) {
-        Alert.alert("Missing role", 
-          "Cannot view this because you are currently not an admin or the owner of this group")
-        return
-      }
-      else {
+      if (
+        userCurrentGroupRole != null &&
+        userCurrentGroupRole !== GroupRole.Admin &&
+        userCurrentGroupRole !== GroupRole.Owner
+      ) {
+        Alert.alert(
+          "Missing role",
+          "Cannot view this because you are currently not an admin or the owner of this group"
+        );
+        return;
+      } else {
         if (memberIDCheck) {
-          route.push(`/group/group-contents/members?groupID=${groupID}&memberIDNotif=${memberIDNotif}`)
+          route.push(
+            `/group/group-contents/members?groupID=${groupID}&memberIDNotif=${memberIDNotif}`
+          );
         }
 
         if (tagIDCheck) {
-          route.push(`/group/group-contents/tags?groupID=${groupID}&tagIDNotif=${tagIDNotif}`);
+          route.push(
+            `/group/group-contents/tags?groupID=${groupID}&tagIDNotif=${tagIDNotif}`
+          );
         }
       }
     }
@@ -292,30 +311,27 @@ GroupPageProps) {
   const handleLeaveGroupConfirm = () => {
     if (groupInfo?.NumberOfMembers != 1) {
       dispatch(leaveGroup({ groupID })).then((res) => {
-        const result = res.payload as boolean
+        const result = res.payload as boolean;
         if (result == true) {
-          route.dismiss()
+          route.dismiss();
           route.setParams({
-            groupIDToRemove: groupID
-          })
+            groupIDToRemove: groupID,
+          });
         }
-      })
-    }
-    else {
+      });
+    } else {
       dispatch(deleteGroup(groupID)).then((res) => {
-        const result = res.payload as boolean
+        const result = res.payload as boolean;
         if (result == true) {
-          route.dismiss()
+          route.dismiss();
           route.setParams({
-            groupIDToRemove: groupID
-          })
+            groupIDToRemove: groupID,
+          });
         }
-      })
+      });
     }
   };
-  const handleLeaveGroupOwnerConfirm = () => {
-
-  };
+  const handleLeaveGroupOwnerConfirm = () => {};
 
   const handleMoreOptionPress = useCallback((index: number) => {
     sheetRef.current?.snapToIndex(index);
@@ -326,16 +342,17 @@ GroupPageProps) {
   };
   const ownSheetRef = useRef<BottomSheet>(null);
   const handleActionButtonPress = () => {
-    console.log(userCurrentGroupRole === GroupRole.Owner)
-    if (groupInfo?.NumberOfMembers! > 1 && userCurrentGroupRole === GroupRole.Owner){
-      route.push(`/group/owner-leave?groupID=${groupID}`)
-    }
-    else{
+    console.log(userCurrentGroupRole === GroupRole.Owner);
+    if (
+      groupInfo?.NumberOfMembers! > 1 &&
+      userCurrentGroupRole === GroupRole.Owner
+    ) {
+      route.push(`/group/owner-leave?groupID=${groupID}`);
+    } else {
       ownSheetRef.current?.snapToIndex(1);
     }
   };
 
-  
   return (
     <GestureHandlerRootView style={styles.container}>
       <View>
@@ -369,7 +386,8 @@ GroupPageProps) {
         </TouchableOpacity>
       )}
       {userCurrentGroupRole == GroupRole.Member &&
-        userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED && userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && (
+        userCurrentGroupMembershipStage != GroupMembershipStage.REQUESTED &&
+        userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && (
           <TouchableOpacity
             style={styles.moderatorContainer}
             activeOpacity={0.8}
@@ -612,19 +630,28 @@ GroupPageProps) {
                   source={{ uri: groupInfo.CreatedBy.AvatarURL }}
                   style={styles.moderatorImage}
                 />
-                <Text style={styles.moderatorName}>
+                <Text
+                  style={[
+                    styles.moderatorName,
+                    { maxWidth: width * 0.3, flexShrink: 1 },
+                  ]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
                   @{groupInfo.CreatedBy.Username}
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
           )}
 
-          {userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && <ButtonGradient
-            label={buttonLabel}
-            labelStyle={styles.tabButtonText}
-            style={styles.tabButton}
-            onPress={handleActionButtonPress}
-          />}
+          {userCurrentGroupMembershipStage != GroupMembershipStage.BANNED && (
+            <ButtonGradient
+              label={buttonLabel}
+              labelStyle={styles.tabButtonText}
+              style={styles.tabButton}
+              onPress={handleActionButtonPress}
+            />
+          )}
         </View>
       </View>
       <View>
@@ -657,13 +684,14 @@ GroupPageProps) {
         >
           <Text
             style={{
-            color: "#000",
-            fontWeight: "bold",
-          }}
-        >
-          See Group Content
-        </Text>
-      </TouchableOpacity>)}
+              color: "#000",
+              fontWeight: "bold",
+            }}
+          >
+            See Group Content
+          </Text>
+        </TouchableOpacity>
+      )}
       <BottomSheet
         ref={ownSheetRef}
         index={-1}
@@ -838,7 +866,10 @@ GroupPageProps) {
                       Let me rethink
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.joinConfirmButton} onPress={handleLeaveGroupConfirm}>
+                  <TouchableOpacity
+                    style={styles.joinConfirmButton}
+                    onPress={handleLeaveGroupConfirm}
+                  >
                     <Text style={styles.joinConfirmButtonText}>
                       Delete Group
                     </Text>
@@ -868,7 +899,7 @@ GroupPageProps) {
                   </Text>
                 </View>
                 {/* Search bar */}
-                
+
                 <View style={[styles.rowContainer, { gap: 20 }]}>
                   <TouchableOpacity
                     style={styles.joinCancelButton}
@@ -938,8 +969,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tabButton: {
-    width: width * 0.32,
-    height: 40,
     borderRadius: 80,
     justifyContent: "center",
     alignItems: "center",
@@ -1140,6 +1169,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginRight: 20,
+    overflow: "hidden",
   },
   welcomeContainer: {
     flexDirection: "row",

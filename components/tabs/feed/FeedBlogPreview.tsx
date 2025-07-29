@@ -410,6 +410,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
+    marginBottom: 16,
   },
   text: {
     color: "#000",

@@ -213,6 +213,32 @@ export default function CreateGroup() {
       return [...(prevRules || []), newRule];
     });
   };
+  const renderSearchFieldFooter = useCallback((props: BottomSheetFooterProps) => {
+     return (
+          <BottomSheetFooter {...props} style={styles.searchBar}>
+            <TextInput
+            ref={searchInputRef}
+            style={styles.searchText}
+            placeholder="Search Fields"
+            placeholderTextColor="#888"
+            numberOfLines={1}
+            onChangeText={handleFieldSearchChangeText}
+            onSubmitEditing={handleFieldSearchSubmit}
+          />
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleFieldSearchSubmit}
+          >
+            <FontAwesome
+              name="search"
+              size={24}
+              color="#fff"
+              style={{ paddingRight: 10 }}
+            />
+          </TouchableOpacity>
+          </BottomSheetFooter>
+        );
+  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -535,9 +561,9 @@ export default function CreateGroup() {
             appearsOnIndex={0}
           />
         )}
-        footerComponent={() => <View style={{ height: 40 }} />}
+        footerComponent={renderSearchFieldFooter}
       >
-        <View style={styles.searchBar}>
+        {/* <View style={styles.searchBar}>
           <TextInput
             ref={searchInputRef}
             style={styles.searchText}
@@ -558,7 +584,7 @@ export default function CreateGroup() {
               style={{ paddingRight: 10 }}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <BottomSheetScrollView
           contentContainerStyle={styles.groupListContent}
           showsVerticalScrollIndicator={false}
@@ -776,9 +802,8 @@ const styles = StyleSheet.create({
     padding: 10,
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: 20,
-    borderRadius: 10,
-    paddingBottom: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   searchText: {
     paddingHorizontal: 10,

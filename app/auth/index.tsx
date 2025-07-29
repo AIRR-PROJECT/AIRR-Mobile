@@ -48,8 +48,10 @@ export default function AuthScreen() {
       dispatch(logout());
     }
 
-    dispatch(loadToken()).then(() => {
-      dispatch(getUserInfo());
+    dispatch(loadToken()).then((res) => {
+      if (res.payload != null) {
+        dispatch(getUserInfo());
+      }
     });
   }, []);
 

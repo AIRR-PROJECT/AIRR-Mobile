@@ -75,7 +75,6 @@ export const loginGoogle = createAsyncThunk(
             await SecureStore.setItemAsync('accessToken', data.token)
 
             const response = await api.post('auth/sign-in-gg');
-            console.log(response)
             const { access_token, refresh_token } = response.data.data;
 
             if (access_token === undefined) {
@@ -268,7 +267,7 @@ export const loadToken = createAsyncThunk(
                 return { accessToken, refreshToken };
             }
             else {
-                return thunkAPI.rejectWithValue(null)
+                return null
             }
         }
         catch (err: any) {
@@ -329,7 +328,6 @@ export const getPartialUserInfo = createAsyncThunk(
     async (user_id: string, thunkAPI) => {
         try {
             const res = await api.get(`users/partial-info-by-user-id?userID=${user_id}`)
-            console.log(res.data)
 
             if (res.data.success) {
                 return res.data.data.user as PartialUser

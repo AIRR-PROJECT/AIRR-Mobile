@@ -63,13 +63,14 @@ export default function CreateGroup() {
   const [groupFields, setGroupFields] = useState<SearchedField[]>([]);
   const [groupTags, setGroupTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
-  const fieldSearchText = useRef("");
+  const fieldSearchTextRef = useRef("");
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["100%"], []);
 
   const tagsSheetRef = useRef<BottomSheet>(null);
   const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
 
+  const timerIdRef = useRef<NodeJS.Timeout>();
   useEffect(() => {
     dispatch(searchFields("Development")).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
@@ -167,12 +168,28 @@ export default function CreateGroup() {
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
   }, []);
+  const [fieldSearchText, setFieldSearchText] = useState("");
   const handleFieldSearchChangeText = (val: string) => {
-    fieldSearchText.current = val;
-    handleFieldSearchSubmit();
+    fieldSearchTextRef.current = val;
+    setFieldSearchText(val);
   };
+
+  useEffect(() => {
+    timerIdRef.current = setTimeout(() => {
+      dispatch(searchFields(fieldSearchText)).then((res) => {
+        setGroupFields((res.payload as SearchFieldResult).Fields);
+
+        searchInputRef.current?.focus();
+      });
+    }, 500);
+
+    return () => {
+      clearTimeout(timerIdRef.current);
+    };
+  }, [fieldSearchText]);
+
   const handleFieldSearchSubmit = () => {
-    dispatch(searchFields(fieldSearchText.current)).then((res) => {
+    dispatch(searchFields(fieldSearchTextRef.current)).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
 
       searchInputRef.current?.focus();
@@ -213,10 +230,11 @@ export default function CreateGroup() {
       return [...(prevRules || []), newRule];
     });
   };
-  const renderSearchFieldFooter = useCallback((props: BottomSheetFooterProps) => {
-     return (
-          <BottomSheetFooter {...props} style={styles.searchBar}>
-            <TextInput
+  const renderSearchFieldFooter = useCallback(
+    (props: BottomSheetFooterProps) => {
+      return (
+        <BottomSheetFooter {...props} style={styles.searchBar}>
+          <TextInput
             ref={searchInputRef}
             style={styles.searchText}
             placeholder="Search Fields"
@@ -236,9 +254,11 @@ export default function CreateGroup() {
               style={{ paddingRight: 10 }}
             />
           </TouchableOpacity>
-          </BottomSheetFooter>
-        );
-  }, []);
+        </BottomSheetFooter>
+      );
+    },
+    []
+  );
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView

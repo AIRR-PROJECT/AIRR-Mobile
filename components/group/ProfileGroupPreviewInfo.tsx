@@ -1,4 +1,4 @@
-import { View, Image, StyleSheet, ViewStyle, Text } from "react-native";
+import { View, Image, StyleSheet, ViewStyle, Text, TouchableOpacity } from "react-native";
 import { Group } from "@/interfaces/groupInterface";
 import { memo } from "react";
 
@@ -11,7 +11,7 @@ interface BlogInGroupProps {
 
 function ProfileGroupPreviewInfo({ group, style }: BlogInGroupProps) {
   return (
-    <View style={[styles.container, style]}>
+    <TouchableOpacity style={[styles.container, style]} activeOpacity={0.7}>
       <Image source={{ uri: group.CoverURL }} style={styles.image} />
       <View>
         <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
@@ -22,7 +22,7 @@ function ProfileGroupPreviewInfo({ group, style }: BlogInGroupProps) {
           {group.NumberOfMembers > 1 ? "members" : "member"}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 export default memo(ProfileGroupPreviewInfo);

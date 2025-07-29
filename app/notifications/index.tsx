@@ -108,6 +108,8 @@ export default function NotificationsLayout() {
     dispatch(getAllNotif()).then((res) => {
       setFetchedData(res.payload as NotificationResponseData[]);
 
+      setSelectedTab(tabs[0])
+
       setIsFetching(false);
     });
 
@@ -229,7 +231,19 @@ export default function NotificationsLayout() {
       {isFetching ? (
         <FeedBlogPreviewSkeleton />
       ) : sections.length == 0 ? (
-        <EmptyContent />
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={["1"]}
+          scrollEnabled={true}
+          keyExtractor={(item, index) => index.toString()}
+          ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => <EmptyContent />}
+          onEndReachedThreshold={0.5}
+        >
+        </FlatList>
       ) : (
         <SectionList
           refreshControl={

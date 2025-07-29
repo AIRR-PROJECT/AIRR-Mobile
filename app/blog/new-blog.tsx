@@ -23,7 +23,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { AntDesign, Feather, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
 import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -115,17 +115,16 @@ const OnlyInMyProfile: Group = {
 };
 
 // TODO: remove this in prod
-const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g"
-const VITE_CLOUDINARY_PRESET = "blog_images_preset"
+const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g";
+const VITE_CLOUDINARY_PRESET = "blog_images_preset";
 
 export default function NewBlog() {
   const dispatch = useAppDispatch();
   const { groupID } = useLocalSearchParams<{ groupID: string }>();
   const route = useRouter();
 
-  const { createBlogCurrentTags, createBlogRequestedTags, createBlogTagCount } = useAppSelector(
-    (state) => state.blog
-  );
+  const { createBlogCurrentTags, createBlogRequestedTags, createBlogTagCount } =
+    useAppSelector((state) => state.blog);
 
   const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true);
   const [chosenGroup, setChosenGroup] = useState<Group | GroupDetailInfo>();
@@ -150,7 +149,7 @@ export default function NewBlog() {
   useEffect(() => {
     dispatch(setCreateBlogCurrentTags([]));
     dispatch(setCreateBlogRequestedTags([]));
-    dispatch(setCreateBlogTagCount(0))
+    dispatch(setCreateBlogTagCount(0));
   }, []);
 
   useEffect(() => {
@@ -175,9 +174,9 @@ export default function NewBlog() {
     if (chosenGroup) {
       setFoundTags(chosenGroup?.Tags);
       setChosenTags([]);
-      
-      setRequestedTags([])
-      dispatch(setCreateBlogRequestedTags([]))
+
+      setRequestedTags([]);
+      dispatch(setCreateBlogRequestedTags([]));
     }
   }, [chosenGroup]);
 
@@ -272,18 +271,30 @@ export default function NewBlog() {
       !description.current ||
       !content.current
     ) {
-      Alert.alert("Error", "Missing field");
+      if (!uploadedImg.current) {
+        Alert.alert("Error", "Please upload a thumbnail image");
+      } else if (!chosenGroup) {
+        Alert.alert("Error", "Please select a group for your blog");
+      } else if (chosenTags.length == 0) {
+        Alert.alert("Error", "Please select at least one tag for your blog");
+      } else if (!title.current) {
+        Alert.alert("Error", "Please enter a title for your blog");
+      } else if (!description.current) {
+        Alert.alert("Error", "Please enter a description for your blog");
+      } else if (!content.current) {
+        Alert.alert("Error", "Please enter content for your blog");
+      }
 
       return;
     }
 
     if (title.current.length < 10) {
-      Alert.alert("Error", "Title must be at least 10 characters long")
-      return
+      Alert.alert("Error", "Title must be at least 10 characters long");
+      return;
     }
     if (description.current.length < 10) {
-      Alert.alert("Error", "Description must be at lease 10 characters long")
-      return
+      Alert.alert("Error", "Description must be at lease 10 characters long");
+      return;
     }
 
     const formData = new FormData();
@@ -294,7 +305,8 @@ export default function NewBlog() {
     });
     formData.append(
       "group",
-      chosenGroup.Name != Private.Name && chosenGroup.Name != OnlyInMyProfile.Name
+      chosenGroup.Name != Private.Name &&
+        chosenGroup.Name != OnlyInMyProfile.Name
         ? JSON.stringify(chosenGroup)
         : null
     );
@@ -307,7 +319,8 @@ export default function NewBlog() {
     });
     formData.append(
       "tags",
-      chosenGroup.Name != Private.Name && chosenGroup.Name != OnlyInMyProfile.Name
+      chosenGroup.Name != Private.Name &&
+        chosenGroup.Name != OnlyInMyProfile.Name
         ? JSON.stringify([...chosenTagsReformatted, ...createBlogRequestedTags])
         : null
     );
@@ -325,12 +338,11 @@ export default function NewBlog() {
 
     dispatch(createBlog(formData)).then((res) => {
       const data = res.payload as CreateBlogResult;
-      console.log(res.payload)
+      console.log(res.payload);
       if (res.payload != null) {
         router.replace(`/blog?userBlogId=${data.blogID}`);
-      }
-      else {
-        Alert.alert("Error", "Could not post blog")
+      } else {
+        Alert.alert("Error", "Could not post blog");
       }
     });
   };
@@ -419,6 +431,7 @@ export default function NewBlog() {
       }&currentTagCount=${createBlogTagCount}`
     );
   };
+  const templateSheetRef = useRef<BottomSheet>(null);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -709,6 +722,22 @@ export default function NewBlog() {
             <Text style={styles.section}>6</Text>
           </View>
           <Text style={styles.title}>Content</Text>
+          {/* Choose template */}
+          <TouchableOpacity
+            style={[styles.heading, { marginLeft: "auto" }]}
+            onPress={() => {
+              templateSheetRef.current?.snapToIndex(0);
+            }}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.headingTitle}>Choose Template</Text>
+            <IconSymbol
+              name="chevron.right"
+              size={24}
+              weight="medium"
+              color={"#fff"}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Content Input */}
@@ -716,7 +745,7 @@ export default function NewBlog() {
           <View style={styles.divider} />
           <View style={{ flex: 1, width: "100%" }}>
             {/* Choose template button */}
-            
+
             {/* QuillJS Here */}
             <QuillEditor
               dom={{ matchContents: true }}
@@ -755,13 +784,6 @@ export default function NewBlog() {
         )}
         footerComponent={renderGroupFooter}
       >
-        {/* <TouchableOpacity
-          onPress={handleCreateGroup}
-          style={styles.createGroupButton}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.createGroupButtonText}>Create New Group</Text>
-        </TouchableOpacity> */}
         <View>
           <BottomSheetFlatList
             data={searchFoundGroups}
@@ -793,6 +815,94 @@ export default function NewBlog() {
         footerComponent={renderTagsFooter}
       >
         <BlogTagDropdownComponent tags={foundTags} onPress={onPressTag} />
+      </BottomSheet>
+
+      {/* Template Selection Bottom Sheet */}
+      <BottomSheet
+        ref={templateSheetRef}
+        index={-1} // Start closed
+        enableDynamicSizing={true}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: "#212531" }}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        onChange={handleGroupSheetChange}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+      >
+        {/* Template Selection Content */}
+        <BottomSheetView style={{ padding: 20 }}>
+          <Text
+            style={[styles.headingTitle, { fontSize: 20, marginBottom: 8 }]}
+          >
+            Choose a Template
+          </Text>
+          <Text style={[styles.smallText, { marginBottom: 8 }]}>
+            Select a template to start with. You can customize it later.
+          </Text>
+          {/* Warning: This will override */}
+          <Text style={[styles.smallText, { marginBottom: 16, color: "#FF6B6B" }]}>
+            Note: This will override your current content.
+          </Text>
+          <View style={{ gap: 16 }}>
+            <TouchableOpacity
+              style={styles.templateCard}
+              onPress={() => {
+                // Handle template selection
+                console.log("Template 1 selected");
+                templateSheetRef.current?.close();
+              }}
+              activeOpacity={0.85}
+            >
+              <AntDesign
+                name="filetext1"
+                size={28}
+                color="#B9FF66"
+                style={{ marginRight: 16 }}
+              />
+              <Text style={styles.templateCardText}>Blog Post</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.templateCard}
+              onPress={() => {
+                // Handle template selection
+                console.log("Template 2 selected");
+                templateSheetRef.current?.close();
+              }}
+              activeOpacity={0.85}
+            >
+              <Feather
+                name="package"
+                size={28}
+                color="#B9FF66"
+                style={{ marginRight: 16 }}
+              />
+              <Text style={styles.templateCardText}>Product Description</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.templateCard}
+              onPress={() => {
+                // Handle template selection
+                console.log("Template 3 selected");
+                templateSheetRef.current?.close();
+              }}
+              activeOpacity={0.85}
+            >
+              <MaterialCommunityIcons
+                name="email-newsletter"
+                size={28}
+                color="#B9FF66"
+                style={{ marginRight: 16 }}
+              />
+              <Text style={styles.templateCardText}>Newsletter</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheetView>
       </BottomSheet>
     </GestureHandlerRootView>
   );
@@ -938,5 +1048,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     flex: 1,
+  },
+  templateCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#23272F",
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    marginBottom: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  templateCardText: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "600",
   },
 });

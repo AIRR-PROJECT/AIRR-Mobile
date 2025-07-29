@@ -10,7 +10,7 @@ type UserStudentInfoProps = {
 };
 type StudentInfo = Pick<User, "profile">;
 
-export default function UserStudentInfoComponent() {
+export default function UserStudentInfoComponent({ studentInfo }: { studentInfo?: StudentInfo }) {
   const { user } = useAppSelector(state => state.user)
 
   // console.log("UserStudentInfoComponent", user.profile);
@@ -26,11 +26,25 @@ export default function UserStudentInfoComponent() {
         <View style={[{ gap: 10, flex: 1}]}>
           <View style={styles.rowContainer}>
             <Text style={styles.attribute}>MAJOR</Text>
-            <Text style={styles.info}>{user && user.profile ? user.profile.department ?? "No information" : "No information"}</Text>
+            {studentInfo ?
+              <Text style={styles.info}>
+                {studentInfo.profile ? studentInfo.profile.department ?? "No information" : "No information"}
+              </Text> :
+              <Text style={styles.info}>
+                {user && user.profile ? user.profile.department ?? "No information" : "No information"}
+              </Text>
+            }
           </View>
           <View style={styles.rowContainer}>
             <Text style={styles.attribute}>GRADUATION STATUS</Text>
-            <Text style={styles.info}>{user && user.profile ? user.profile.graduationStatus ?? "No information" : "No information"}</Text>
+            {studentInfo ?
+              <Text style={styles.info}>
+                {studentInfo.profile ? studentInfo.profile.graduationStatus ?? "No information" : "No information"}
+              </Text> :
+              <Text style={styles.info}>
+                {user && user.profile ? user.profile.graduationStatus ?? "No information" : "No information"}
+              </Text>
+            }
           </View>
         </View>
       </LinearGradient>

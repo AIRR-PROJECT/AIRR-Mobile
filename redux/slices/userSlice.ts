@@ -25,6 +25,7 @@ const initialState = {
     userCurrentGroupMembershipStage: GroupMembershipStage.NOT_JOINED,
     userCurrentGroupRole: null as unknown as GroupRole,
     userChangeValid: true,
+    isRefreshingToken: false
 };
 
 const userSlice = createSlice({
@@ -83,6 +84,10 @@ const userSlice = createSlice({
             state.userNewPassword = ""
         },
 
+        setIsRefreshingToken(state, action) {
+            state.isRefreshingToken = action.payload
+        },
+
         reset(state) {
             state.userAccessToken = "";
             state.userRefreshToken = "";
@@ -94,10 +99,11 @@ const userSlice = createSlice({
             state.userGroups = null
             state.userCurrentGroupRole = null as unknown as GroupRole
             state.userChangeValid = true;
+            state.isRefreshingToken = false
         },
 
     },
 });
 
-export const { reset, resetPassword, setCurrentUser, setIsViewingOwnProfile, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup, setCurrentPassword, setNewPassword, setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup, setUserChangeValid } = userSlice.actions;
+export const { reset, resetPassword, setCurrentUser, setIsViewingOwnProfile, setUserChange, setUserAvatar, setTokens, setUserPreviewGroup, setCurrentPassword, setNewPassword, setUserMembershipStageInCurrentGroup, setUserRoleInCurrentGroup, setUserChangeValid, setIsRefreshingToken } = userSlice.actions;
 export default userSlice.reducer;

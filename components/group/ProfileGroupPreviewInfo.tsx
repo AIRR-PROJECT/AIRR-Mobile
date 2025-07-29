@@ -1,5 +1,6 @@
 import { View, Image, StyleSheet, ViewStyle, Text } from "react-native";
 import { Group } from "@/interfaces/groupInterface";
+import { memo } from "react";
 
 type BlogGroup = Pick<Group, "Name" | "CoverURL" | "NumberOfMembers">;
 
@@ -8,7 +9,7 @@ interface BlogInGroupProps {
   style?: ViewStyle;
 }
 
-export default function ProfileGroupPreviewInfo({ group, style }: BlogInGroupProps) {
+function ProfileGroupPreviewInfo({ group, style }: BlogInGroupProps) {
   return (
     <View style={[styles.container, style]}>
       <Image source={{ uri: group.CoverURL }} style={styles.image} />
@@ -24,6 +25,7 @@ export default function ProfileGroupPreviewInfo({ group, style }: BlogInGroupPro
     </View>
   );
 }
+export default memo(ProfileGroupPreviewInfo);
 
 const styles = StyleSheet.create({
   container: {

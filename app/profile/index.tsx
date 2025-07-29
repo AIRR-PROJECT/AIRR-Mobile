@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -36,30 +37,6 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { getAllJoinedGroups } from "@/redux/slices/groupSlice";
 import { Group } from "@/interfaces/groupInterface";
 import ProfileGroupPreviewInfo from "@/components/group/ProfileGroupPreviewInfo";
-// type UserInfo = {
-//   username: string;
-//   avatar_url: string;
-//   firstName: string;
-//   lastName: string;
-//   // followers: number;
-//   // following: number;
-// };
-// const mockUserInfo: UserInfo = {
-//   username: "john_doe",
-//   avatar_url: "https://picsum.photos/600",
-//   firstName: "John Doe",
-//   lastName: "Joined November 2021",
-//   // followers: 100,
-//   // following: 200,
-// };
-// type StudentInfo = {
-//   studentID: string;
-//   department: string;
-// };
-// const mockStudentInfo: StudentInfo = {
-//   studentID: "21121234",
-//   department: "Software Engineering",
-// };
 
 type UserInfo = Pick<
   User,
@@ -67,22 +44,6 @@ type UserInfo = Pick<
 >;
 type StudentInfo = Pick<User, "profile">;
 
-const mockGroup = {
-  name: "Group's name",
-  avatar: "https://picsum.photos/300",
-  numberOfMembers: 123,
-};
-const Data = [
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-  mockGroup,
-];
 export default function ProfileScreen() {
   const { userID } = useLocalSearchParams<{ userID: string }>();
 
@@ -108,34 +69,33 @@ export default function ProfileScreen() {
 
   const dispatch = useAppDispatch();
 
+  const [loading, setLoading] = useState(true); // Add loading state
+
   useEffect(() => {
+    setLoading(true);
+    const promises: Promise<any>[] = [];
     if (userID) {
       dispatch(setIsViewingOwnProfile(false));
-      dispatch(getPartialUserInfo(userID)).then((res) => {
-        const currentUserInfo = res.payload as PartialUser;
-        if (res.payload) {
-          setUserInfo(currentUserInfo);
-          setStudentInfo(currentUserInfo);
-        }
-      });
+      promises.push(
+        dispatch(getPartialUserInfo(userID)).then((res) => {
+          const currentUserInfo = res.payload as PartialUser;
+          if (res.payload) {
+            setUserInfo(currentUserInfo);
+            setStudentInfo(currentUserInfo);
+          }
+        })
+      );
     } else {
       dispatch(setIsViewingOwnProfile(true));
     }
-
-    dispatch(getAllJoinedGroups()).then((res) => {
-      const data = res.payload as Group[];
-
-      setJoinedGroups(data);
-    });
-  }, []);
-
-  useEffect(() => {
-    setUserInfo(user);
-  }, [user]);
-
-  useEffect(() => {
-    console.log(joinedGroups);
-  }, [joinedGroups]);
+    promises.push(
+      dispatch(getAllJoinedGroups()).then((res) => {
+        const data = res.payload as Group[];
+        setJoinedGroups(data);
+      })
+    );
+    Promise.all(promises).finally(() => setLoading(false));
+  }, [userID, dispatch]);
 
   useEffect(() => {
     if (isViewingOwnProfile) {
@@ -150,6 +110,18 @@ export default function ProfileScreen() {
   const handleCreateGroup = () => {
     route.push("/group/create-group");
   };
+  if (loading) {
+    return (
+      <GestureHandlerRootView style={styles.container}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={{ color: "#fff", marginTop: 10 }}>Loading...</Text>
+        </View>
+      </GestureHandlerRootView>
+    );
+  }
   return (
     // change light color to #fff later because figma of the app is not ready
 
@@ -161,22 +133,44 @@ export default function ProfileScreen() {
 
           {/* User student info */}
 
-          <UserStudentInfoComponent/>
+          <UserStudentInfoComponent />
 
           {/* Active groups */}
           {/* TODO: Integrate API when have */}
-          {isViewingOwnProfile && <ThemedText style={styles.groupLabel}>
-            Active in these group
-          </ThemedText>}
-          {isViewingOwnProfile && (joinedGroups && joinedGroups.length > 0 ? (
-            <FlatList
-              data={joinedGroups}
-              horizontal={true}
-              style={styles.groupContainer}
-              keyExtractor={(item, index) => index.toString()}
-              contentContainerStyle={{ columnGap: 25 }}
-              showsHorizontalScrollIndicator={false}
-              ListHeaderComponent={
+          {isViewingOwnProfile && (
+            <ThemedText style={styles.groupLabel}>
+              Active in these group
+            </ThemedText>
+          )}
+          {isViewingOwnProfile &&
+            (joinedGroups && joinedGroups.length > 0 ? (
+              <FlatList
+                data={joinedGroups}
+                horizontal={true}
+                style={styles.groupContainer}
+                keyExtractor={(item, index) => index.toString()}
+                initialNumToRender={3}
+                contentContainerStyle={{ columnGap: 25 }}
+                showsHorizontalScrollIndicator={false}
+                ListHeaderComponent={
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={handleCreateGroup}
+                  >
+                    <FontAwesome
+                      name="plus-circle"
+                      size={50}
+                      color="white"
+                      style={styles.plusIcon}
+                    />
+                  </TouchableOpacity>
+                }
+                renderItem={({ item }) => {
+                  return <ProfileGroupPreviewInfo group={item} />;
+                }}
+              />
+            ) : (
+              <View style={{ alignItems: "center", flexDirection: "row" }}>
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={handleCreateGroup}
@@ -188,30 +182,16 @@ export default function ProfileScreen() {
                     style={styles.plusIcon}
                   />
                 </TouchableOpacity>
-              }
-              renderItem={({ item }) => {
-                return <ProfileGroupPreviewInfo group={item} />;
-              }}
-            />
-          ) : (
-            <View style={{ alignItems: "center", flexDirection: "row", }}>
-              <TouchableOpacity activeOpacity={0.7} onPress={handleCreateGroup}>
-                <FontAwesome
-                  name="plus-circle"
-                  size={50}
-                  color="white"
-                  style={styles.plusIcon}
-                />
-              </TouchableOpacity>
-              <Text style={{ color: "#ACACAC", fontSize: 16, flex: 1 }}>
-                No groups joined. Press the plus icon to create a group.
-              </Text>
-            </View>
-          ))}
+                <Text style={{ color: "#ACACAC", fontSize: 16, flex: 1 }}>
+                  No groups joined. Press the plus icon to create a group.
+                </Text>
+              </View>
+            ))}
 
           {/* Social , Blog, Activity */}
           <View style={styles.rowContainer}>
-            {selectedTab && selectedTabs.length != 0 &&
+            {selectedTab &&
+              selectedTabs.length != 0 &&
               selectedTabs.map((tab) => {
                 return (
                   <TouchableOpacity

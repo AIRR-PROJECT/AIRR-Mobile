@@ -11,7 +11,18 @@ import careerPathReducer from './slices/careerPathSlice';
 
 // Ignore action paths to avoid "non-serializable" error
 const serializableMiddleware = createSerializableStateInvariantMiddleware({
-    ignoredActionPaths: ["payload.headers", "meta.arg", "payload.config.transformRequest.0"]
+    ignoredActionPaths: [
+        "payload.headers",
+        "payload.request",
+        "meta.arg",
+        "payload.config.transformRequest.0",
+        "payload.config.transformResponse.0",
+        "payload.config.env.FormData",
+        "payload.config.env.Blob",
+        "payload.config.validateStatus",
+        "payload.config.headers",
+        "payload.config.signal"
+    ]
   })
 
 const store = configureStore({

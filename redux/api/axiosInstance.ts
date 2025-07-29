@@ -132,6 +132,17 @@ api.interceptors.response.use(
                     else {
                         exception_status = -1
                         exception_message = "Refresh token not found"
+
+                        store.dispatch(reset())
+                        await SecureStore.deleteItemAsync("accessToken")
+                        await SecureStore.deleteItemAsync("refreshToken")
+                        console.log("dismissed to first screen (1)")
+
+                        router.dismissTo("/auth")
+                        try {
+                            router.reload()
+                        }
+                        catch {}
                     }
                 }
                 catch (error: any) {
@@ -171,11 +182,21 @@ api.interceptors.response.use(
     
         store.dispatch(hideLoading())
         abortSignal = undefined
-        if (!AuthFailcodes.includes(exception_failcode)) {
-            ToastAndroid.show(`(${exception_status}) (${exception_failcode}) ${exception_message}`, ToastAndroid.LONG)
-        }
-        else {
-            Alert.alert("Error:", exception_message)
+        if (justRefreshed || isRefreshing) {
+            if (!AuthFailcodes.includes(exception_failcode)) {
+                if (exception_status == -1) {
+                    ToastAndroid.show(`(${exception_failcode}) ${exception_message}`, ToastAndroid.LONG)
+                }
+                else if (exception_failcode == -1) {
+                    ToastAndroid.show(`(${exception_status}) ${exception_message}`, ToastAndroid.LONG)
+                }
+                else {
+                    ToastAndroid.show(`(${exception_failcode}) (${exception_status}) ${exception_message}`, ToastAndroid.LONG)
+                }
+            }
+            else {
+                Alert.alert("Error:", exception_message)
+            }
         }
         return Promise.reject(error);
     }

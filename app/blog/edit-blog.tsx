@@ -23,12 +23,16 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { AntDesign, Feather, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
 import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
 import BlogTagDropdownComponent from "@/components/blog/BlogTagDropdownListComponent";
-import { getGroupInfo, getPreviewGroups, searchGroupsForCreateUpdateBlog } from "@/redux/slices/groupSlice";
+import {
+  getGroupInfo,
+  getPreviewGroups,
+  searchGroupsForCreateUpdateBlog,
+} from "@/redux/slices/groupSlice";
 import {
   Group,
   GroupDetailInfo,
@@ -55,6 +59,7 @@ import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { Image } from "react-native";
 import { BlogViewType } from "@/enums/blog_properties.enum";
+import { templates } from "@/components/blog/EditorTemplates";
 const mockGroup: Group = {
   Name: "Group's name",
   avatar: "",
@@ -157,8 +162,8 @@ const OnlyInMyProfile: Group = {
 };
 
 // TODO: remove this in prod
-const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g"
-const VITE_CLOUDINARY_PRESET = "blog_images_preset"
+const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g";
+const VITE_CLOUDINARY_PRESET = "blog_images_preset";
 
 export default function Editblog() {
   const dispatch = useAppDispatch();
@@ -168,9 +173,8 @@ export default function Editblog() {
   }>();
   const route = useRouter();
 
-  const { createBlogCurrentTags, createBlogRequestedTags, createBlogTagCount } = useAppSelector(
-    (state) => state.blog
-  );
+  const { createBlogCurrentTags, createBlogRequestedTags, createBlogTagCount } =
+    useAppSelector((state) => state.blog);
 
   const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true);
   const [chosenGroup, setChosenGroup] = useState<Group | GroupDetailInfo>();
@@ -180,7 +184,9 @@ export default function Editblog() {
     useState<Group[]>(defaultSearchGroups);
   const [foundTags, setFoundTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
-  const [displayRequestedTags, setDisplayRequestedTags] = useState<GroupTag[]>([])
+  const [displayRequestedTags, setDisplayRequestedTags] = useState<GroupTag[]>(
+    []
+  );
   const [chosenGroupTags, setChosenGroupTags] = useState<string[]>([]);
   const uploadedImg = useRef<ImageSource>();
   const title = useRef("");
@@ -199,12 +205,16 @@ export default function Editblog() {
   useEffect(() => {
     dispatch(setCreateBlogCurrentTags([]));
     dispatch(setCreateBlogRequestedTags([]));
-    dispatch(setCreateBlogTagCount(0))
+    dispatch(setCreateBlogTagCount(0));
   }, []);
 
   useEffect(() => {
     if (groupID !== undefined && groupID.length > 0) {
-      console.log(`can enter with current group ID: ${groupID !== undefined && groupID.length > 0}`)
+      console.log(
+        `can enter with current group ID: ${
+          groupID !== undefined && groupID.length > 0
+        }`
+      );
       dispatch(getGroupInfo({ groupID })).then((res) => {
         const chosenGroup = res.payload as GroupDetailInfo;
         setChosenGroup(chosenGroup);
@@ -237,7 +247,9 @@ export default function Editblog() {
 
         setChosenTags(data.Tags);
         dispatch(setCreateBlogRequestedTags(data.PendingTags));
-        dispatch(setCreateBlogTagCount(data.Tags.length + data.PendingTags.length))
+        dispatch(
+          setCreateBlogTagCount(data.Tags.length + data.PendingTags.length)
+        );
 
         uploadedImg.current = Image.resolveAssetSource({
           uri: data.BackgroundURL,
@@ -257,9 +269,9 @@ export default function Editblog() {
     if (chosenGroup) {
       setFoundTags(chosenGroup?.Tags);
       // setChosenTags([]);
-      
-      setRequestedTags([])
-      dispatch(setCreateBlogRequestedTags([]))
+
+      setRequestedTags([]);
+      dispatch(setCreateBlogRequestedTags([]));
     }
   }, [chosenGroup]);
 
@@ -281,7 +293,7 @@ export default function Editblog() {
     console.log(
       `createBlogRequestedTags: ${JSON.stringify(createBlogRequestedTags)}`
     );
-    setDisplayRequestedTags(createBlogRequestedTags)
+    setDisplayRequestedTags(createBlogRequestedTags);
   }, [createBlogRequestedTags]);
 
   // Callbacks
@@ -309,11 +321,13 @@ export default function Editblog() {
   };
   const handleGroupSearchSubmit = () => {
     if (groupSearchText.current.length != 0) {
-      dispatch(searchGroupsForCreateUpdateBlog(groupSearchText.current)).then((res) => {
-        setSearchFoundGroups(
-          defaultSearchGroups.concat(res.payload as Group[])
-        );
-      });
+      dispatch(searchGroupsForCreateUpdateBlog(groupSearchText.current)).then(
+        (res) => {
+          setSearchFoundGroups(
+            defaultSearchGroups.concat(res.payload as Group[])
+          );
+        }
+      );
     } else {
       setSearchFoundGroups(defaultSearchGroups);
     }
@@ -339,10 +353,18 @@ export default function Editblog() {
     description.current = val;
   };
 
+  const [editorContent, setEditorContent] = useState<string>("");
+
   const handleContentTextChange = (val: string) => {
+    setEditorContent(val);
     content.current = val;
   };
-
+  // When user selects a template
+  const handleTemplateSelect = (index: number) => {
+    const parsedContent = JSON.parse(templates[index].content);
+    handleContentTextChange(parsedContent);
+    templateSheetRef.current?.close();
+  };
   const handlePostBlogPress = () => {
     if (
       !uploadedImg.current ||
@@ -358,10 +380,10 @@ export default function Editblog() {
     }
 
     if (title.current.length < 10) {
-      Alert.alert("Error", "Title must be at lease 10 characters long")
+      Alert.alert("Error", "Title must be at lease 10 characters long");
     }
     if (description.current.length < 10) {
-      Alert.alert("Error", "Description must be at lease 10 characters long")
+      Alert.alert("Error", "Description must be at lease 10 characters long");
     }
 
     const formData = new FormData();
@@ -392,7 +414,7 @@ export default function Editblog() {
     ) as CreateBlogTag[];
     requestedTagsReformatted.forEach((t) => {
       if (t.OperationType === undefined && t.OperationType != "new-tag")
-      t.OperationType = "pending-tag-in-group";
+        t.OperationType = "pending-tag-in-group";
     });
     formData.append(
       "tags",
@@ -423,7 +445,7 @@ export default function Editblog() {
       }
     });
   };
-
+  const templateSheetRef = useRef<BottomSheet>(null);
   // Render Item
   const renderGroupItem = useCallback(
     ({ item }: { item: Group }) => (
@@ -431,7 +453,7 @@ export default function Editblog() {
         groupData={item}
         onPress={(data) => {
           setChosenGroup(data.groupData);
-          setChosenTags([])
+          setChosenTags([]);
           setIsUserMember(!data.groupData.IsAdminOrOwner);
 
           let chosenGroupTagsString: string[] = [];
@@ -663,8 +685,7 @@ export default function Editblog() {
                       {displayRequestedTags.length > 0 &&
                         displayRequestedTags.map((tag) => (
                           <TagWrapper key={tag._id} tag={tag} />
-                        ))
-                      }
+                        ))}
 
                       <AntDesign
                         name="pluscircleo"
@@ -802,6 +823,22 @@ export default function Editblog() {
             <Text style={styles.section}>6</Text>
           </View>
           <Text style={styles.title}>Content</Text>
+          {/* Choose template */}
+          <TouchableOpacity
+            style={[styles.heading, { marginLeft: "auto" }]}
+            onPress={() => {
+              templateSheetRef.current?.snapToIndex(0);
+            }}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.headingTitle}>Choose Template</Text>
+            <IconSymbol
+              name="chevron.right"
+              size={24}
+              weight="medium"
+              color={"#fff"}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Content Input */}
@@ -884,7 +921,94 @@ export default function Editblog() {
         )}
         footerComponent={renderTagsFooter}
       >
-        <BlogTagDropdownComponent tags={foundTags} preSelectedTags={chosenTags} onPress={onPressTag}/>
+        <BlogTagDropdownComponent
+          tags={foundTags}
+          preSelectedTags={chosenTags}
+          onPress={onPressTag}
+        />
+      </BottomSheet>
+      {/* Template Selection Bottom Sheet */}
+      <BottomSheet
+        ref={templateSheetRef}
+        index={-1} // Start closed
+        enableDynamicSizing={true}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: "#212531" }}
+        handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
+        onChange={handleGroupSheetChange}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            opacity={0.5}
+            disappearsOnIndex={-1}
+            appearsOnIndex={0}
+          />
+        )}
+      >
+        {/* Template Selection Content */}
+        <BottomSheetView style={{ padding: 20 }}>
+          <Text
+            style={[styles.headingTitle, { fontSize: 20, marginBottom: 8 }]}
+          >
+            Choose a Template
+          </Text>
+          <Text style={[styles.smallText, { marginBottom: 8 }]}>
+            Select a template to start with. You can customize it later.
+          </Text>
+          {/* Warning: This will override */}
+          <Text
+            style={[styles.smallText, { marginBottom: 16, color: "#FF6B6B" }]}
+          >
+            Note: This will override your current content.
+          </Text>
+          <View style={{ gap: 16 }}>
+            <TouchableOpacity
+              style={styles.templateCard}
+              onPress={() => {
+                handleTemplateSelect(0); // Blog Post
+              }}
+              activeOpacity={0.85}
+            >
+              <AntDesign
+                name="filetext1"
+                size={28}
+                color="#B9FF66"
+                style={{ marginRight: 16 }}
+              />
+              <Text style={styles.templateCardText}>Blog Post</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.templateCard}
+              onPress={() => {
+                handleTemplateSelect(1); // Product Description
+              }}
+              activeOpacity={0.85}
+            >
+              <Feather
+                name="package"
+                size={28}
+                color="#B9FF66"
+                style={{ marginRight: 16 }}
+              />
+              <Text style={styles.templateCardText}>Product Description</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.templateCard}
+              onPress={() => {
+                handleTemplateSelect(2); // Newsletter
+              }}
+              activeOpacity={0.85}
+            >
+              <MaterialCommunityIcons
+                name="email-newsletter"
+                size={28}
+                color="#B9FF66"
+                style={{ marginRight: 16 }}
+              />
+              <Text style={styles.templateCardText}>Newsletter</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheetView>
       </BottomSheet>
     </GestureHandlerRootView>
   );
@@ -1030,5 +1154,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     flex: 1,
+  },
+  templateCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#23272F",
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    marginBottom: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  templateCardText: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "600",
   },
 });

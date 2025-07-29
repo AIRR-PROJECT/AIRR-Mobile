@@ -23,7 +23,12 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { AntDesign, Feather, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
 import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -55,6 +60,7 @@ import {
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { GroupRole } from "@/enums/group.enum";
 import { BlogViewType } from "@/enums/blog_properties.enum";
+import { templates } from "@/components/blog/EditorTemplates";
 
 export function debounce<T extends (...args: any[]) => void>(
   callback: T,
@@ -258,7 +264,10 @@ export default function NewBlog() {
     description.current = val;
   };
 
+  const [editorContent, setEditorContent] = useState<string>("");
+
   const handleContentTextChange = (val: string) => {
+    setEditorContent(val);
     content.current = val;
   };
 
@@ -346,7 +355,12 @@ export default function NewBlog() {
       }
     });
   };
-
+  // When user selects a template
+  const handleTemplateSelect = (index: number) => {
+    const parsedContent = JSON.parse(templates[index].content);
+    handleContentTextChange(parsedContent);
+    templateSheetRef.current?.close();
+  };
   // Render Item
   const renderGroupItem = useCallback(
     ({ item }: { item: Group }) => (
@@ -372,10 +386,6 @@ export default function NewBlog() {
   const onPressTag = (listTags: GroupTag[]) => {
     console.log("List tags selected:", listTags);
     setChosenTags(listTags);
-  };
-  const handleCreateGroup = () => {
-    // Handle create group logic here
-    console.log("Create Group Pressed");
   };
   const renderGroupFooter = useCallback((props: BottomSheetFooterProps) => {
     return (
@@ -752,6 +762,7 @@ export default function NewBlog() {
               onValueChange={handleContentTextChange}
               VITE_CLOUDINARY_CLOUD_NAME={VITE_CLOUDINARY_CLOUD_NAME}
               VITE_CLOUDINARY_PRESET={VITE_CLOUDINARY_PRESET}
+              defaultValue={editorContent}
             />
           </View>
         </View>
@@ -846,16 +857,16 @@ export default function NewBlog() {
             Select a template to start with. You can customize it later.
           </Text>
           {/* Warning: This will override */}
-          <Text style={[styles.smallText, { marginBottom: 16, color: "#FF6B6B" }]}>
+          <Text
+            style={[styles.smallText, { marginBottom: 16, color: "#FF6B6B" }]}
+          >
             Note: This will override your current content.
           </Text>
           <View style={{ gap: 16 }}>
             <TouchableOpacity
               style={styles.templateCard}
               onPress={() => {
-                // Handle template selection
-                console.log("Template 1 selected");
-                templateSheetRef.current?.close();
+                handleTemplateSelect(0); // Blog Post
               }}
               activeOpacity={0.85}
             >
@@ -870,9 +881,7 @@ export default function NewBlog() {
             <TouchableOpacity
               style={styles.templateCard}
               onPress={() => {
-                // Handle template selection
-                console.log("Template 2 selected");
-                templateSheetRef.current?.close();
+                handleTemplateSelect(1); // Product Description
               }}
               activeOpacity={0.85}
             >
@@ -887,9 +896,7 @@ export default function NewBlog() {
             <TouchableOpacity
               style={styles.templateCard}
               onPress={() => {
-                // Handle template selection
-                console.log("Template 3 selected");
-                templateSheetRef.current?.close();
+                handleTemplateSelect(2); // Newsletter
               }}
               activeOpacity={0.85}
             >

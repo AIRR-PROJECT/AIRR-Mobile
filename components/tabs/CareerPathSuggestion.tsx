@@ -12,7 +12,11 @@ export default function CareerPathSuggestion({ isFromCareerPath = false }) {
   const handleClick = () => {
     // handle click
     if (isFromCareerPath) {
-      Linking.openURL(webUrl);
+      // Linking.openURL(webUrl);
+      router.push({
+        pathname: "/webview-screen",
+        params: { url: webUrl },
+      });
       return;
     }
     router.navigate("/(tabs)/career-path");

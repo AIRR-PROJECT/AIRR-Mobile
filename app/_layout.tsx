@@ -163,6 +163,16 @@ export default function RootLayout() {
                   headerShown: false,
                 }}
               />
+              <Stack.Screen
+                name="webview-screen"
+                options={{
+                  headerShown: true,
+                  headerStyle: {
+                    backgroundColor: "#1E1E1E",
+                  },
+                  headerTitle: "Airr",
+                }}
+              />
             </Stack>
             {userLoggedIn ? (
               <Redirect href="/(tabs)/dashboard" />

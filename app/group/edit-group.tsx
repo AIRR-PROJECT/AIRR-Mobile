@@ -286,8 +286,7 @@ export default function EditGroup() {
         </View>
         {/* description */}
         <Text style={styles.description}>
-          Innovation thrives in collaboration. Create a new group and connect
-          with like-minded tech enthusiasts to shape the future together
+          Edit your group information below.
         </Text>
         {/* Group avatar */}
         <Text

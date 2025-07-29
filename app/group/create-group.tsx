@@ -189,7 +189,7 @@ export default function CreateGroup() {
   }, [fieldSearchText]);
 
   const handleFieldSearchSubmit = () => {
-    dispatch(searchFields(fieldSearchTextRef.current)).then((res) => {
+    dispatch(searchFields(fieldSearchText)).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
 
       searchInputRef.current?.focus();

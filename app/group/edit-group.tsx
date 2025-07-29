@@ -70,13 +70,14 @@ export default function EditGroup() {
   const [groupFields, setGroupFields] = useState<SearchedField[]>([]);
   const [groupTags, setGroupTags] = useState<GroupTag[]>([]);
   const [chosenTags, setChosenTags] = useState<GroupTag[]>([]);
-  const fieldSearchText = useRef("");
+  const fieldSearchTextRef = useRef("");
   const fieldRef = useRef<BottomSheet>(null);
   const fieldSnapPoints = useMemo(() => ["100%"], []);
 
   const tagsSheetRef = useRef<BottomSheet>(null);
   const tagsSnapPoints = useMemo(() => ["50%", "90%"], []);
 
+  const timerIdRef = useRef<NodeJS.Timeout>();
   useEffect(() => {
     dispatch(searchFields("Development")).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
@@ -188,12 +189,29 @@ export default function EditGroup() {
   const handleFieldSnapPress = useCallback((index: number) => {
     fieldRef.current?.snapToIndex(index);
   }, []);
+  const [fieldSearchText, setFieldSearchText] = useState("");
   const handleFieldSearchChangeText = (val: string) => {
-    fieldSearchText.current = val;
-    handleFieldSearchSubmit();
+    fieldSearchTextRef.current = val;
+    setFieldSearchText(val);
   };
+  useEffect(() => {
+    if (timerIdRef.current) {
+      clearTimeout(timerIdRef.current);
+    }
+    timerIdRef.current = setTimeout(() => {
+      dispatch(searchFields(fieldSearchText)).then((res) => {
+        setGroupFields((res.payload as SearchFieldResult).Fields);
+
+        searchInputRef.current?.focus();
+      });
+    }, 500);
+
+    return () => {
+      clearTimeout(timerIdRef.current);
+    };
+  }, [fieldSearchText]);
   const handleFieldSearchSubmit = () => {
-    dispatch(searchFields(fieldSearchText.current)).then((res) => {
+    dispatch(searchFields(fieldSearchText)).then((res) => {
       setGroupFields((res.payload as SearchFieldResult).Fields);
 
       searchInputRef.current?.focus();

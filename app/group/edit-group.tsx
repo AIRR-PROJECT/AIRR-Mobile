@@ -152,8 +152,8 @@ export default function EditGroup() {
         !groupName ||
         !groupTags ||
         !groupField ||
-        !groupDescription ||
-        !groupRules
+        !groupDescription
+        // !groupRules
       ) {
         Alert.alert("Error", "Missing field");
 
@@ -174,7 +174,7 @@ export default function EditGroup() {
       );
       formData.append("GroupField", JSON.stringify(groupField));
       formData.append("Description", groupDescription);
-      formData.append("GroupRules", JSON.stringify(groupRules));
+      formData.append("GroupRules", groupRules ? JSON.stringify(groupRules) : JSON.stringify([]));
 
       dispatch(updateGroup(formData)).then((res) => {
         if ((res.payload as boolean) == true) {

@@ -668,10 +668,6 @@ export const searchGroupsForCreateUpdateBlog = createAsyncThunk(
             }
         }
         catch (error: any) {
-            if (error.response.data.failcode == ResponseFailcode.GROUP_NOT_FOUND) {
-                return []
-            }
-            
             return []
         }
     }

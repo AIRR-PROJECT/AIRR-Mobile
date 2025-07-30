@@ -123,7 +123,7 @@ api.interceptors.response.use(
       if (!config["noLoadingScreen"]) {
         store.dispatch(hideLoading());
       }
-      Alert.alert("Error", "The request took too long and was aborted.");
+      Alert.alert("Error", "Request timed out.");
       return Promise.reject(error);
     }
 
@@ -218,7 +218,7 @@ api.interceptors.response.use(
           // Handle refresh failure - logout user
           exception_message = "Session expired. Please re-login";
           store.dispatch(reset());
-          store.dispatch(logout());
+        //   store.dispatch(logout());
 
           try {
             await SecureStore.deleteItemAsync("accessToken");

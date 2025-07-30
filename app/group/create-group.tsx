@@ -106,8 +106,8 @@ export default function CreateGroup() {
         !groupName ||
         (chosenTags.length == 0 && createGroupCreatedTags.length == 0) ||
         !groupField ||
-        !groupDescription ||
-        !groupRules
+        !groupDescription
+        // !groupRules
       ) {
         Alert.alert("Error", "Missing field");
 
@@ -123,9 +123,11 @@ export default function CreateGroup() {
         return;
       }
       let isGroupRuleLengthViolated = false;
-      groupRules.forEach((r) => {
-        if (r.RuleDescription.length < 10) isGroupRuleLengthViolated = true;
-      });
+      if (groupRules && groupRules.length != 0) {
+        groupRules.forEach((r) => {
+          if (r.RuleDescription.length < 10) isGroupRuleLengthViolated = true;
+        });
+      }
       if (isGroupRuleLengthViolated) {
         Alert.alert(
           "Error",
@@ -147,12 +149,10 @@ export default function CreateGroup() {
       );
       formData.append("GroupField", JSON.stringify(groupField));
       formData.append("Description", groupDescription);
-      formData.append("GroupRules", JSON.stringify(groupRules));
+      formData.append("GroupRules", groupRules ? JSON.stringify(groupRules) : JSON.stringify([]));
 
       dispatch(createGroup(formData)).then((res) => {
         const data = res.payload as string;
-        console.log(`res.payload: ${data}`);
-        console.log(`data.length != 0: ${data.length != 0}`);
         if (data.length != 0) {
           // router.back()
           // router.setParams({

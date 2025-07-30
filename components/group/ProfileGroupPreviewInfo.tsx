@@ -1,17 +1,24 @@
 import { View, Image, StyleSheet, ViewStyle, Text, TouchableOpacity } from "react-native";
 import { Group } from "@/interfaces/groupInterface";
 import { memo } from "react";
+import { router } from "expo-router";
 
 type BlogGroup = Pick<Group, "Name" | "CoverURL" | "NumberOfMembers">;
 
 interface BlogInGroupProps {
-  group: BlogGroup;
+  group: Group;
   style?: ViewStyle;
 }
 
 function ProfileGroupPreviewInfo({ group, style }: BlogInGroupProps) {
   return (
-    <TouchableOpacity style={[styles.container, style]} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={[styles.container, style]}
+      activeOpacity={0.7}
+      onPress={() => {
+        router.push(`/group?groupId=${group._id}`)
+      }}
+    >
       <Image source={{ uri: group.CoverURL }} style={styles.image} />
       <View>
         <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">

@@ -135,6 +135,7 @@ export default function NewBlog() {
   const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true);
   const [chosenGroup, setChosenGroup] = useState<Group | GroupDetailInfo>();
   const groupSearchText = useRef("");
+  const [groupSearchTextState, setGroupSearchTextState] = useState("")
   const defaultSearchGroups: Group[] = [Private, OnlyInMyProfile];
   const [searchFoundGroups, setSearchFoundGroups] =
     useState<Group[]>(defaultSearchGroups);
@@ -175,6 +176,27 @@ export default function NewBlog() {
       });
     }
   }, [groupID]);
+
+  const timerIdRef = useRef<NodeJS.Timeout>();
+  useEffect(() => {
+    timerIdRef.current = setTimeout(() => {
+      if (groupSearchTextState.length != 0) {
+        dispatch(searchGroupsForCreateUpdateBlog(groupSearchTextState)).then(
+          (res) => {
+            setSearchFoundGroups(
+              defaultSearchGroups.concat(res.payload as Group[])
+            );
+          }
+        );
+      } else {
+        setSearchFoundGroups(defaultSearchGroups);
+      }
+    }, 500);
+
+    return () => {
+      clearTimeout(timerIdRef.current);
+    };
+  }, [groupSearchTextState]);
 
   useEffect(() => {
     if (chosenGroup) {
@@ -227,6 +249,7 @@ export default function NewBlog() {
   }, []);
 
   const handleGroupSearchTextChange = (val: string) => {
+    setGroupSearchTextState(val)
     groupSearchText.current = val;
   };
   const handleGroupSearchSubmit = () => {

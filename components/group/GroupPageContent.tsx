@@ -495,7 +495,7 @@ GroupPageProps) {
           {groupInfo ? groupInfo.Description : mockGroupDetail.Description}
         </Text>
         {/* Rules */}
-        {groupInfo?.Rules?.length! > 0 && (
+        {groupInfo?.Rules && (
           <TouchableOpacity
             style={{
               flexDirection: "row",

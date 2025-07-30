@@ -124,6 +124,13 @@ const OnlyInMyProfile: Group = {
 const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g";
 const VITE_CLOUDINARY_PRESET = "blog_images_preset";
 
+const parsedContents = templates.map((template) => {
+  return {
+    ...template,
+    content: JSON.parse(template.content),
+  };
+});
+
 export default function NewBlog() {
   const dispatch = useAppDispatch();
   const { groupID } = useLocalSearchParams<{ groupID: string }>();
@@ -135,7 +142,8 @@ export default function NewBlog() {
   const [isSelectGroupAllowed, setSelectGroupAllowed] = useState(true);
   const [chosenGroup, setChosenGroup] = useState<Group | GroupDetailInfo>();
   const groupSearchText = useRef("");
-  const [groupSearchTextState, setGroupSearchTextState] = useState("")
+  const groupSearchTextFieldRef = useRef<TextInput>(null);
+  const [groupSearchTextState, setGroupSearchTextState] = useState("");
   const defaultSearchGroups: Group[] = [Private, OnlyInMyProfile];
   const [searchFoundGroups, setSearchFoundGroups] =
     useState<Group[]>(defaultSearchGroups);
@@ -192,7 +200,7 @@ export default function NewBlog() {
         setSearchFoundGroups(defaultSearchGroups);
       }
     }, 500);
-
+    groupSearchTextFieldRef.current?.focus();
     return () => {
       clearTimeout(timerIdRef.current);
     };
@@ -239,7 +247,6 @@ export default function NewBlog() {
 
     groupSheetRef.current?.snapToIndex(index);
   }, []);
-
   const handleGroupSnapClose = useCallback(() => {
     groupSheetRef.current?.close();
   }, []);
@@ -249,7 +256,7 @@ export default function NewBlog() {
   }, []);
 
   const handleGroupSearchTextChange = (val: string) => {
-    setGroupSearchTextState(val)
+    setGroupSearchTextState(val);
     groupSearchText.current = val;
   };
   const handleGroupSearchSubmit = () => {
@@ -380,10 +387,18 @@ export default function NewBlog() {
   };
   // When user selects a template
   const handleTemplateSelect = (index: number) => {
-    const parsedContent = JSON.parse(templates[index].content);
-    handleContentTextChange(parsedContent);
+    handleContentTextChange(parsedContents[index].content);
     templateSheetRef.current?.close();
   };
+  // Add a separate change handler for template sheet
+  const handleTemplateSheetChange = useCallback((index: any) => {
+    console.log("handleTemplateSheetChange", index);
+  }, []);
+
+  const handleTemplateSnapPress = useCallback(() => {
+    console.log("Template snap press");
+    templateSheetRef.current?.snapToIndex(0);
+  }, []);
   // Render Item
   const renderGroupItem = useCallback(
     ({ item }: { item: Group }) => (
@@ -414,6 +429,7 @@ export default function NewBlog() {
     return (
       <BottomSheetFooter {...props} style={styles.searchBar}>
         <TextInput
+          ref={groupSearchTextFieldRef}
           onChangeText={handleGroupSearchTextChange}
           style={styles.searchText}
           placeholder="Search Groups"
@@ -758,9 +774,7 @@ export default function NewBlog() {
           {/* Choose template */}
           <TouchableOpacity
             style={[styles.heading, { marginLeft: "auto" }]}
-            onPress={() => {
-              templateSheetRef.current?.snapToIndex(0);
-            }}
+            onPress={handleTemplateSnapPress}
             activeOpacity={0.8}
           >
             <Text style={styles.headingTitle}>Choose Template</Text>
@@ -859,7 +873,7 @@ export default function NewBlog() {
         enablePanDownToClose={true}
         backgroundStyle={{ backgroundColor: "#212531" }}
         handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
-        onChange={handleGroupSheetChange}
+        onChange={handleTemplateSheetChange} // Use separate handler
         backdropComponent={(props) => (
           <BottomSheetBackdrop
             {...props}
@@ -870,7 +884,7 @@ export default function NewBlog() {
         )}
       >
         {/* Template Selection Content */}
-        <BottomSheetView style={{ padding: 20 }}>
+        <BottomSheetView style={{ padding: 20}}>
           <Text
             style={[styles.headingTitle, { fontSize: 20, marginBottom: 8 }]}
           >
@@ -885,52 +899,57 @@ export default function NewBlog() {
           >
             Note: This will override your current content.
           </Text>
-          <View style={{ gap: 16 }}>
-            <TouchableOpacity
-              style={styles.templateCard}
-              onPress={() => {
-                handleTemplateSelect(0); // Blog Post
-              }}
-              activeOpacity={0.85}
-            >
-              <AntDesign
-                name="filetext1"
-                size={28}
-                color="#B9FF66"
-                style={{ marginRight: 16 }}
-              />
-              <Text style={styles.templateCardText}>Blog Post</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.templateCard}
-              onPress={() => {
-                handleTemplateSelect(1); // Product Description
-              }}
-              activeOpacity={0.85}
-            >
-              <Feather
-                name="package"
-                size={28}
-                color="#B9FF66"
-                style={{ marginRight: 16 }}
-              />
-              <Text style={styles.templateCardText}>Product Description</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.templateCard}
-              onPress={() => {
-                handleTemplateSelect(2); // Newsletter
-              }}
-              activeOpacity={0.85}
-            >
-              <MaterialCommunityIcons
-                name="email-newsletter"
-                size={28}
-                color="#B9FF66"
-                style={{ marginRight: 16 }}
-              />
-              <Text style={styles.templateCardText}>Newsletter</Text>
-            </TouchableOpacity>
+
+          <View >
+            <View style={{ gap: 16, paddingBottom: 20 }}>
+              <TouchableOpacity
+                style={styles.templateCard}
+                onPress={() => {
+                  handleTemplateSelect(0); // Blog Post
+                }}
+                activeOpacity={0.85}
+              >
+                <AntDesign
+                  name="filetext1"
+                  size={28}
+                  color="#B9FF66"
+                  style={{ marginRight: 16 }}
+                />
+                <Text style={styles.templateCardText}>Blog Post</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.templateCard}
+                onPress={() => {
+                  handleTemplateSelect(1); // Product Description
+                }}
+                activeOpacity={0.85}
+              >
+                <Feather
+                  name="package"
+                  size={28}
+                  color="#B9FF66"
+                  style={{ marginRight: 16 }}
+                />
+                <Text style={styles.templateCardText}>Product Description</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.templateCard}
+                onPress={() => {
+                  handleTemplateSelect(2); // Newsletter
+                }}
+                activeOpacity={0.85}
+              >
+                <MaterialCommunityIcons
+                  name="email-newsletter"
+                  size={28}
+                  color="#B9FF66"
+                  style={{ marginRight: 16 }}
+                />
+                <Text style={styles.templateCardText}>Newsletter</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </BottomSheetView>
       </BottomSheet>

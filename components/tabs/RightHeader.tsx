@@ -5,31 +5,41 @@ import { Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
 import { useRouter } from "expo-router";
 import { useAppSelector } from "@/redux/hook";
+import { memo, useCallback } from "react";
+
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 
 type RightHeaderProps = {
   avatar?: string;
 };
 
-export default function RightHeader({ avatar }: RightHeaderProps) {
-  const route = useRouter();
+function RightHeader({ avatar }: RightHeaderProps) {
+  const router = useRouter();
   const { userAvatar } = useAppSelector((state) => state.user);
   const { notifCount } = useAppSelector((state) => state.notif);
 
-  const handleAvatarPress = () => {
-    route.push("/profile");
-  };
+  // Memoize event handlers to prevent unnecessary re-renders
+  const handleAvatarPress = useCallback(() => {
+    console.log("Avatar pressed");
+    router.push("/profile");
+  }, [router]);
 
-  const handleNotificationPress = () => {
-    route.push("/notifications");
-  };
+  const handleNotificationPress = useCallback(() => {
+    console.log("Notification pressed");
+    router.push("/notifications");
+  }, [router]);
+
+  const handleFeedSettingsPress = useCallback(() => {
+    router.push("/feed-setting");
+  }, [router]);
 
   return (
     <View style={styles.container}>
       {/* Feed Settings Button */}
       <TouchableOpacity
         style={styles.feed_settings_icon}
-        onPress={() => route.push("/feed-setting")}
+        activeOpacity={0.7}
+        onPress={handleFeedSettingsPress}
       >
         <Ionicons name="filter" size={18} color="#fff" />
       </TouchableOpacity>
@@ -49,15 +59,23 @@ export default function RightHeader({ avatar }: RightHeaderProps) {
       <Divider orientation="vertical" width={1} />
 
       {/* Avatar (Circle Container) */}
-      <Pressable style={styles.avatar_container} onPress={handleAvatarPress}>
+      <TouchableOpacity 
+        style={styles.avatar_container} 
+        activeOpacity={0.7}
+        onPress={handleAvatarPress}
+      >
         <Image
           source={userAvatar ? { uri: userAvatar } : sample_avatar}
           style={styles.avatar}
+          contentFit="cover"
+          transition={200}
         />
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }
+
+export default memo(RightHeader);
 
 const styles = StyleSheet.create({
   container: {

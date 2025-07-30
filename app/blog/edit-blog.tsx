@@ -23,7 +23,12 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import GroupDropdownComponent from "@/components/blog/GroupDropdownComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { AntDesign, Feather, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import UploadThumbnailComponent from "@/components/blog/UploadThumbnailComponent";
 import QuillEditor from "@/components/dom-components/QuillEditor/QuillEditor";
 import ButtonGradient from "@/components/ButtonGradient";
@@ -60,49 +65,13 @@ import { GroupRole } from "@/enums/group.enum";
 import { Image } from "react-native";
 import { BlogViewType } from "@/enums/blog_properties.enum";
 import { templates } from "@/components/blog/EditorTemplates";
-const mockGroup: Group = {
-  Name: "Group's name",
-  avatar: "",
-  _id: "123",
-  Description: "",
-  Owner: {
-    _id: "",
-    Username: "",
-    AvatarURL: "",
-  },
-  NumberOfMembers: 0,
-  FieldName: "",
-  CoverURL: "https://picsum.photos/300",
-  Tags: [],
-  members: [],
-  timestamp: "",
-  FieldID: "",
-  IsAdminOrOwner: false,
-};
-const mockGroupList = Array(25).fill(mockGroup);
-const mockTags = [
-  "aimachine",
-  "web3",
-  "blockchain",
-  "crypto",
-  "nft",
-  "ai",
-  "machine learning",
-  "artificial intelligence",
-  "technology",
-  "innovation",
-  "future",
-  "science",
-  "data science",
-  "big data",
-  "cloud computing",
-  "internet of things",
-  "iot",
-  "augmented reality",
-  "virtual reality",
-  "mixed reality",
-];
 
+const parsedContents = templates.map((template) => {
+  return {
+    ...template,
+    content: JSON.parse(template.content),
+  };
+});
 export function debounce<T extends (...args: any[]) => void>(
   callback: T,
   delay: number
@@ -352,7 +321,12 @@ export default function Editblog() {
     setDescriptionText(val);
     description.current = val;
   };
-
+  const handleTemplateSnapPress = useCallback((index: number) => {
+    templateSheetRef.current?.snapToIndex(index);
+  }, []);
+  const handleTemplateSheetChange = useCallback((index: any) => {
+    console.log("handleTemplateSheetChange", index);
+  }, []);
   const [editorContent, setEditorContent] = useState<string>("");
 
   const handleContentTextChange = (val: string) => {
@@ -361,8 +335,7 @@ export default function Editblog() {
   };
   // When user selects a template
   const handleTemplateSelect = (index: number) => {
-    const parsedContent = JSON.parse(templates[index].content);
-    handleContentTextChange(parsedContent);
+    handleContentTextChange(parsedContents[index].content);
     templateSheetRef.current?.close();
   };
   const handlePostBlogPress = () => {
@@ -374,7 +347,19 @@ export default function Editblog() {
       !description.current ||
       !content.current
     ) {
-      Alert.alert("Error", "Missing field");
+      if (!uploadedImg.current) {
+        Alert.alert("Error", "Please upload a thumbnail image");
+      } else if (!chosenGroup) {
+        Alert.alert("Error", "Please select a group for your blog");
+      } else if (chosenTags.length == 0) {
+        Alert.alert("Error", "Please select at least one tag for your blog");
+      } else if (!title.current) {
+        Alert.alert("Error", "Please enter a title for your blog");
+      } else if (!description.current) {
+        Alert.alert("Error", "Please enter a description for your blog");
+      } else if (!content.current) {
+        Alert.alert("Error", "Please enter content for your blog");
+      }
 
       return;
     }
@@ -827,7 +812,7 @@ export default function Editblog() {
           <TouchableOpacity
             style={[styles.heading, { marginLeft: "auto" }]}
             onPress={() => {
-              templateSheetRef.current?.snapToIndex(0);
+              handleTemplateSnapPress(0);
             }}
             activeOpacity={0.8}
           >
@@ -935,7 +920,7 @@ export default function Editblog() {
         enablePanDownToClose={true}
         backgroundStyle={{ backgroundColor: "#212531" }}
         handleIndicatorStyle={{ backgroundColor: "#B9FF66" }}
-        onChange={handleGroupSheetChange}
+        onChange={handleTemplateSheetChange}
         backdropComponent={(props) => (
           <BottomSheetBackdrop
             {...props}

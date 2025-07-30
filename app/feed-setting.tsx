@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, ToastAndroid, TouchableOpacity, Keyboard } from "react-native";
 import { Divider } from "@rneui/themed";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,7 +17,7 @@ let selectedTags: SurveyTag[] = [];
 let originalSuggestedTags: SurveyTag[];
 let originalSelectedTags: SurveyTag[];
 
-export default function FeedSettingScreen() {
+function FeedSettingScreen() {
   const route = useRouter();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.user);
@@ -271,7 +271,7 @@ export default function FeedSettingScreen() {
     </View>
   );
 }
-
+export default memo(FeedSettingScreen);
 const styles = StyleSheet.create({
   pageContainer: {
     flex: 1,

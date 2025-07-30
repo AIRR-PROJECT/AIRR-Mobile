@@ -8,7 +8,7 @@ import {
   Text,
   Dimensions,
 } from "react-native";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { useRouter } from "expo-router";
 import {
   SearchBlogComponent,
@@ -20,6 +20,7 @@ import { searchFromSearchBar } from "@/redux/slices/feedSlice";
 import { SearchBarResult } from "@/interfaces/feedInterface";
 import { UserBlog } from "@/interfaces/blogInterface";
 import { Group } from "@/interfaces/groupInterface";
+import { use } from "i18next";
 
 type BlogItem = {
   type: "blog";
@@ -38,7 +39,7 @@ type Section = {
   data: SearchItem[];
 };
 
-export default function SearchScreen() {
+function SearchScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -176,7 +177,7 @@ export default function SearchScreen() {
     </View>
   );
 }
-
+export default memo(SearchScreen);
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,

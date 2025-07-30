@@ -11,7 +11,7 @@ import {
 import { useAppDispatch } from "@/redux/hook";
 import { decreaseNotifCount, getAllNotif } from "@/redux/slices/notifSlice";
 import { FontAwesome } from "@expo/vector-icons";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -35,7 +35,7 @@ const isToday = (date: Date) => {
   );
 };
 
-export default function NotificationsLayout() {
+function NotificationsLayout() {
   const dispatch = useAppDispatch();
 
   const refFields = useRef<FlatList>(null);
@@ -354,7 +354,7 @@ export default function NotificationsLayout() {
     </View>
   );
 }
-
+export default memo(NotificationsLayout);
 const styles = StyleSheet.create({
   container: {
     flex: 1,

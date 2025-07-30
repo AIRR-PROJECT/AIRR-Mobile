@@ -19,6 +19,7 @@ export const injectStoreToAxiosInterceptor = (_store: Store) => {
 }
 
 let abortSignal: AbortController | undefined
+let abortTimeout: NodeJS.Timeout | undefined
 export let abortRequest = () => {
     abortSignal?.abort()
 }
@@ -42,12 +43,18 @@ api.interceptors.request.use(async (config) => {
   // Use in-memory cache to avoid repeated SecureStore reads
   // FIX access token by using a cache
   let accessToken = store.getState().user.userAccessToken ?? await SecureStore.getItemAsync("accessToken");
-  console.log(`Current access token: ${accessToken}`)
-  console.log(`Current request url: ${config.url}`)
+//   console.log(`Current access token: ${accessToken}`)
+//   console.log(`Current request url: ${config.url}`)
 
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+
+  // Abort timeout
+  abortTimeout = setTimeout(() => {
+    console.log(`Aborted: ${config.url}`)
+    abortSignal?.abort()
+  }, 20000)
 
   return config;
 }, (error) => Promise.reject(error));
@@ -57,15 +64,32 @@ let justRefreshed = false
 // Handle expired tokens automatically  x
 api.interceptors.response.use(
     (response) => {
-        console.log(`url: ${response.request.responseURL}`)
-        console.log(`success`)
-        store.dispatch(hideLoading())
+        // Stop abort timeout
+        clearTimeout(abortTimeout)
+        abortTimeout = undefined
 
+        // console.log(`url: ${response.request.responseURL}`)
+        // console.log(`success`)
+        store.dispatch(hideLoading())
         abortSignal = undefined
-        
+
         return response
     }, 
     async (error) => {
+        // Stop abort timeout
+        clearTimeout(abortTimeout)
+        abortTimeout = undefined
+
+        // On abort
+        if (error.name && error.name == "CanceledError") {
+            store.dispatch(hideLoading())
+            abortSignal = undefined
+
+            Alert.alert("Error", "The request took too long and was aborted.")
+
+            return Promise.reject(error);
+        }
+
         const originalRequest = error.config;
         const exception_data = error.response?.data
         let exception_status: number = exception_data.status ?? error.response.status ?? ""
@@ -182,7 +206,7 @@ api.interceptors.response.use(
     
         store.dispatch(hideLoading())
         abortSignal = undefined
-        if (justRefreshed || isRefreshing) {
+        if (!justRefreshed && !isRefreshing) {
             if (!AuthFailcodes.includes(exception_failcode)) {
                 if (exception_status == -1) {
                     ToastAndroid.show(`(${exception_failcode}) ${exception_message}`, ToastAndroid.LONG)

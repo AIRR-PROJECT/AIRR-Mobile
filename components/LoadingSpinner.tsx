@@ -22,14 +22,16 @@ export default function LoadingSpinner() {
               <ActivityIndicator size={"large"} color={"#b9ff66"}/>
               <Text style={styles.loadingSpinnerText}>{message}</Text>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.cancelButton}
-                onPress={() => { abortRequest() }}
+                onPress={() => {
+                  abortRequest()
+                }}
               >
                 <Text style={styles.cancelButtonText}>
                   Cancel
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           }
         />
@@ -52,7 +54,7 @@ const styles = StyleSheet.create({
   },
   frame: {
     backgroundColor: "#878487CC",
-    padding: 15,
+    padding: 30,
     paddingTop: 45,
     borderRadius: 10
   },

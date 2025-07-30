@@ -119,7 +119,7 @@ export default function NotificationsLayout() {
   }, []);
 
   useEffect(() => {
-    const data = fetchedData.filter((n) => n.type == selectedTab);
+    const data = selectedTab == "All" ? fetchedData : fetchedData.filter((n) => n.type == selectedTab);
 
     const todayItems = data
       .filter((item) => isToday(item.time))

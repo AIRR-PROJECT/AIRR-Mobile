@@ -311,7 +311,9 @@ export const searchFields = createAsyncThunk(
    'group/searchFields',
    async (keyword: string, thunkAPI) => {
         try {
-            const res = await api.get(`groups/search-fields?keyword=${keyword}`) as AxiosResponse
+            const res = await api.get(`groups/search-fields?keyword=${keyword}`, {
+                "noLoadingScreen": true
+            }) as AxiosResponse
 
             if (res.data.success) {
                 return res.data.data as SearchFieldResult
@@ -670,7 +672,7 @@ export const searchGroupsForCreateUpdateBlog = createAsyncThunk(
                 return []
             }
             
-            return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
+            return []
         }
     }
 )

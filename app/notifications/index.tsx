@@ -78,20 +78,6 @@ function NotificationsLayout() {
     }
   };
 
-  // const todayItems = mockData
-  //   .filter((item) => isToday(item.date))
-  //   .sort((a, b) => b.date - a.date); // Descending
-
-  // const earlierItems = mockData
-  //   .filter((item) => !isToday(item.date))
-  //   .sort((a, b) => b.date - a.date); // Descending
-
-  // const sections = [];
-  // if (todayItems.length > 0)
-  //   sections.push({ title: "Today", data: todayItems });
-  // if (earlierItems.length > 0)
-  //   sections.push({ title: "Earlier", data: earlierItems });
-
   useEffect(() => {
     setIsFetching(true);
     dispatch(getAllNotif()).then((res) => {
@@ -160,10 +146,10 @@ function NotificationsLayout() {
           return;
         }
 
-        const tokenData = await Notifications.getExpoPushTokenAsync();
-        const expoPushToken = tokenData.data;
+        // const tokenData = await Notifications.getExpoPushTokenAsync();
+        // const expoPushToken = tokenData.data;
 
-        console.log("Expo Push Token:", expoPushToken);
+        // console.log("Expo Push Token:", expoPushToken);
         // 🔔 Optional: Send this token to your server to send notifications later.
       } else {
         Alert.alert(

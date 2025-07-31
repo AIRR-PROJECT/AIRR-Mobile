@@ -42,6 +42,8 @@ export default function AIBlogPreview({
           imageStyle={styles.thumbnailStyle}
           style={styles.thumbnail}
         >
+          {/* Dark overlay */}
+          <View style={styles.darkOverlay} />
           <View style={styles.titleSection}>
             <Text style={styles.title}>{blog.Title}</Text>
           </View>
@@ -153,6 +155,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "90%",
     justifyContent: "center",
+    zIndex: 1,
   },
   contentSection: {
     justifyContent: "center",
@@ -181,13 +184,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 19,
-    fontWeight: "bold",
+    fontWeight: "700",
     color: "#fff",
   },
   description: {
     fontSize: 16,
     color: "#000",
     textAlign: "justify",
+    fontWeight: "400",
   },
   tag: {
     marginVertical: 5,
@@ -210,5 +214,13 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  darkOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.4)", // Adjust opacity (0.4 = 40% dark)
   },
 });

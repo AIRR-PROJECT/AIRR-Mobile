@@ -85,9 +85,7 @@ export default function NotificationsItem({
             // TODO: route to report page
             break;
           case RequestType.REQUEST_POST_BLOG:
-            route.push(
-              `/group/pending-blog?blogID=${permissionData.blog_id}`
-            );
+            route.push(`/group/pending-blog?blogID=${permissionData.blog_id}`);
 
             break;
           case RequestType.REQUEST_JOIN_GROUP:
@@ -151,10 +149,12 @@ export default function NotificationsItem({
           placeholderContentFit="cover"
         />
         <View style={styles.innerContainer}>
-          <View style={{ 
-            // TODO: make this dynamic based on type of notification
-            width: type !== NotificationType.OTHER ? "75%" : "100%",
-             }}>
+          <View
+            style={{
+              // TODO: make this dynamic based on type of notification
+              width: type !== NotificationType.OTHER ? "100%" : "100%",
+            }}
+          >
             <Text style={[styles.name, { color: seen ? "#000" : "#fff" }]}>
               {/* {from.firstName} {from.lastName} */}
               {from.username}
@@ -164,12 +164,6 @@ export default function NotificationsItem({
                 style={[styles.description, { color: seen ? "#000" : "#fff" }]}
               >
                 {description}.
-                <Text
-                  style={[styles.date, { color: seen ? "#9E9E9E" : "#9E9E9E" }]}
-                >
-                  {" "}
-                  {new Date(date).toDateString()}
-                </Text>
               </Text>
             </View>
             <Text
@@ -182,9 +176,9 @@ export default function NotificationsItem({
             </Text>
           </View>
 
-          {type !== NotificationType.OTHER && (
-            <View style={{ marginLeft: 4 }}>
-              {/* {type === NotificationType.OTHER && (
+          {/* {type !== NotificationType.OTHER && (
+            <View style={{ marginLeft: 4 }}> */}
+          {/* {type === NotificationType.OTHER && (
               <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.7}>
                   <Text style={styles.buttonText}>Follow</Text>
@@ -192,7 +186,7 @@ export default function NotificationsItem({
               </View>
             )} */}
 
-              <View>
+          {/* <View>
                 <Image
                   source={blogImage}
                   style={styles.blogImage}
@@ -203,7 +197,7 @@ export default function NotificationsItem({
                 />
               </View>
             </View>
-          )}
+          )} */}
         </View>
       </View>
     </TouchableOpacity>

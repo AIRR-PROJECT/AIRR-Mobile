@@ -36,10 +36,10 @@ export default function UserStudentInfoComponent({ studentInfo, isViewingOwnProf
           <View style={styles.rowContainer}>
             <Text style={styles.attribute}>GRADUATION STATUS</Text>
             {!isViewingOwnProfile && studentInfo && <Text style={styles.info}>
-            {studentInfo.profile ? studentInfo.profile.graduationStatus ?? "No information" : "No information"}
+              {studentInfo.profile ? studentInfo.profile.graduationStatus ?? "No information" : "No information"}
             </Text>}
             {isViewingOwnProfile && user && <Text style={styles.info}>
-            {user && user.profile ? user.profile.graduationStatus ?? "No information" : "No information"}
+              {user && user.profile ? user.profile.graduationStatus ?? "No information" : "No information"}
             </Text>}
           </View>
         </View>

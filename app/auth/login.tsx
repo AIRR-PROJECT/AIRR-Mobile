@@ -100,6 +100,7 @@ export default function LoginScreen() {
           googleCredential
         );
         const firebaseIdToken = await userCredential.user.getIdToken();
+        console.log(firebaseIdToken)
 
         if (idToken)
           dispatch(

@@ -181,13 +181,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 19,
-    fontWeight: "bold",
+    fontWeight: "700",
     color: "#fff",
   },
   description: {
     fontSize: 16,
     color: "#000",
     textAlign: "justify",
+    fontWeight: "400"
   },
   tag: {
     marginVertical: 5,

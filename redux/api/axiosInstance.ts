@@ -1,15 +1,15 @@
-import { ResponseFailcode } from "@/enums/failcode.enum";
-import axios, { AxiosRequestConfig, HttpStatusCode } from "axios";
-import * as SecureStore from "expo-secure-store";
-import { getReasonPhrase } from "http-status-codes";
-import { Alert, ToastAndroid } from "react-native";
-import { useAppDispatch } from "../hook";
-import { reset, setIsRefreshingToken, setTokens } from "../slices/userSlice";
-import { Store } from "@reduxjs/toolkit";
-import { router } from "expo-router";
-import { hideLoading, showLoading } from "../slices/loadingSlice";
-import { logout } from "../slices/authSlice";
-import { AuthFailcodes } from "@/constants/AuthFailcodes";
+import { ResponseFailcode } from '@/enums/failcode.enum';
+import axios, { AxiosRequestConfig, HttpStatusCode } from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import { getReasonPhrase } from 'http-status-codes';
+import { Alert, ToastAndroid } from 'react-native';
+import { useAppDispatch } from '../hook';
+import { reset, setIsRefreshingToken, setTokens } from '../slices/userSlice';
+import { Store } from '@reduxjs/toolkit';
+import { router } from 'expo-router';
+import { hideLoading, showLoading } from '../slices/loadingSlice';
+import { logout } from '../slices/authSlice';
+import { AuthFailcodes } from '@/constants/AuthFailcodes';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -34,7 +34,7 @@ const api = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
-  },
+  }
 });
 
 // Queue for failed requests during token refresh
@@ -44,63 +44,109 @@ let failedQueue: Array<{
   config: any;
 }> = [];
 
+let isRefreshing = false;
+
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach(({ resolve, reject, config }) => {
     if (error) {
       reject(error);
     } else {
       if (token) {
-        config.headers["Authorization"] = `Bearer ${token}`;
+        config.headers['Authorization'] = `Bearer ${token}`;
       }
       resolve(api.request(config));
     }
   });
-
+  
   failedQueue = [];
 };
 
-// Attach access token to every request
-api.interceptors.request.use(
-  async (config: CustomAxiosRequestConfig) => {
-    // Log every outgoing request
-    console.log(
-      `[API REQUEST] ${config.method?.toUpperCase() || "GET"} ${
-        config.baseURL
-      }${config.url}`,
-      config
-    );
-
-    const controller = new AbortController();
-    config.signal = controller.signal;
-    config._abortController = controller; // Attach for later use
-
-    if (!config["noLoadingScreen"])
-      store.dispatch(showLoading("Now sending request..."));
-
-    // Use in-memory cache to avoid repeated SecureStore reads
-    let accessToken =
-      store.getState().user.userAccessToken ??
-      (await SecureStore.getItemAsync("accessToken"));
-
-    if (accessToken) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${accessToken}`,
-      };
+// Centralized logout function to ensure consistent cleanup
+const performLogout = async (message: string = "Session expired. Please re-login") => {
+  try {
+    // Always hide loading first
+    store.dispatch(hideLoading());
+    
+    // Reset flags
+    isRefreshing = false;
+    store.dispatch(setIsRefreshingToken(false));
+    
+    // Clear failed queue
+    processQueue(new Error(message), null);
+    
+    // Clear Redux state
+    store.dispatch(reset());
+    store.dispatch(logout());
+    
+    // Clear secure storage
+    try {
+      await SecureStore.deleteItemAsync("accessToken");
+      await SecureStore.deleteItemAsync("refreshToken");
+    } catch (deleteError) {
+      console.error('Error deleting tokens:', deleteError);
     }
+    
+    // Navigate to auth
+    try {
+      router.dismissTo("/auth");
+      // Add a small delay before reload to avoid timing conflicts
+      setTimeout(() => {
+        try {
+          router.reload();
+        } catch (reloadError) {
+          console.error('Router reload failed:', reloadError);
+          // Reload failure is not critical - user can manually refresh
+        }
+      }, 100);
+    } catch (routerError) {
+      console.error('Router dismissTo failed:', routerError);
+      // Fallback navigation
+      try {
+        router.replace("/auth");
+      } catch (replaceError) {
+        console.error('Router replace also failed:', replaceError);
+      }
+    }
+  } catch (logoutError) {
+    console.error('Error during logout:', logoutError);
+    // Ensure loading is hidden even if logout fails
+    store.dispatch(hideLoading());
+  }
+};
 
-    // Abort timeout
-    config._abortTimeout = setTimeout(() => {
-      console.log(`Aborted: ${config.url}`);
-      config._abortController?.abort();
-    }, 20000); // Increased to 20 seconds
+// Attach access token to every request
+api.interceptors.request.use(async (config: CustomAxiosRequestConfig) => {
+  // Log every outgoing request
+  console.log(
+    `[API REQUEST] ${config.method?.toUpperCase() || "GET"} ${config.baseURL}${config.url}`,
+    config
+  );
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  const controller = new AbortController();
+  config.signal = controller.signal;
+  config._abortController = controller; // Attach for later use
 
-let isRefreshing = false;
+  if (!config["noLoadingScreen"])
+    store.dispatch(showLoading("Now sending request..."));
+
+  // Use in-memory cache to avoid repeated SecureStore reads
+  let accessToken = store.getState().user.userAccessToken ?? await SecureStore.getItemAsync("accessToken");
+
+  if (accessToken) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
+  }
+
+  // Abort timeout
+  config._abortTimeout = setTimeout(() => {
+    console.log(`Aborted: ${config.url}`);
+    config._abortController?.abort();
+  }, 20000); // 20 seconds timeout
+
+  return config;
+}, (error) => Promise.reject(error));
 
 // Handle expired tokens automatically
 api.interceptors.response.use(
@@ -129,23 +175,18 @@ api.interceptors.response.use(
 
     const originalRequest = error.config;
     const exception_data = error.response?.data;
-    let exception_status: number =
-      exception_data?.status ?? error.response?.status ?? -1;
+    let exception_status: number = exception_data?.status ?? error.response?.status ?? -1;
     let exception_failcode: number = exception_data?.failcode ?? -1;
-    let exception_message: string = exception_data
-      ? exception_data.message
-      : error.message;
+    let exception_message: string = exception_data ? exception_data.message : error.message;
 
     // Handle token refresh logic
-    if (
-      exception_status === HttpStatusCode.Unauthorized &&
-      !originalRequest._retry
-    ) {
+    if (exception_status === HttpStatusCode.Unauthorized && !originalRequest._retry) {
       // Don't refresh token if the error is not related to access token's expiration
       if (
         error.response?.data?.failcode === ResponseFailcode.ACCESS_EXPIRED ||
         error.response?.data?.failcode === ResponseFailcode.JWT_NOT_FOUND
       ) {
+        
         if (isRefreshing) {
           // If already refreshing, queue this request
           return new Promise((resolve, reject) => {
@@ -160,30 +201,38 @@ api.interceptors.response.use(
         try {
           const refreshToken =
             store.getState().user.userRefreshToken ??
-            (await SecureStore.getItemAsync("refreshToken"));
+            await SecureStore.getItemAsync('refreshToken');
 
           if (!refreshToken) {
-            throw new Error("No refresh token available");
+            console.error('No refresh token available');
+            await performLogout("Session expired. Please re-login");
+            return Promise.reject(new Error('No refresh token available'));
           }
 
-          // Get new access token
-          const response = await axios.post(
+          // Create a separate axios instance for refresh to avoid interceptor loops
+          const refreshResponse = await axios.post(
             `${API_URL}/auth/refresh-auth`,
             undefined,
             {
               headers: {
                 Authorization: "Bearer " + refreshToken,
               },
+              timeout: 10000, // 10 second timeout for refresh
             }
           );
 
-          if (response.status === 200) {
-            const newAccessToken = response.data.data.tokens.access_token;
-            const newRefreshToken = response.data.data.tokens.refresh_token;
-
-            await SecureStore.setItemAsync("accessToken", newAccessToken);
-            await SecureStore.setItemAsync("refreshToken", newRefreshToken);
-
+          if (refreshResponse.status === 200 && refreshResponse.data?.data?.tokens) {
+            const newAccessToken = refreshResponse.data.data.tokens.access_token;
+            const newRefreshToken = refreshResponse.data.data.tokens.refresh_token;
+            
+            if (!newAccessToken || !newRefreshToken) {
+              throw new Error('Invalid token response structure');
+            }
+            
+            // Store new tokens
+            await SecureStore.setItemAsync('accessToken', newAccessToken);
+            await SecureStore.setItemAsync('refreshToken', newRefreshToken);
+            
             store.dispatch(
               setTokens({
                 accessToken: newAccessToken,
@@ -192,53 +241,47 @@ api.interceptors.response.use(
             );
 
             // Update the original request with new token
-            originalRequest.headers[
-              "Authorization"
-            ] = `Bearer ${newAccessToken}`;
-
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+            
             // Process queued requests
             processQueue(null, newAccessToken);
-
+            
+            // Reset flags
             isRefreshing = false;
             store.dispatch(setIsRefreshingToken(false));
-
+            
             return api.request(originalRequest);
           } else {
-            throw new Error("Token refresh failed");
+            throw new Error(`Token refresh failed with status: ${refreshResponse.status}`);
           }
         } catch (refreshError: any) {
-          console.error("Token refresh failed:", refreshError);
-
-          // Process queued requests with error
-          processQueue(refreshError, null);
-
-          isRefreshing = false;
-          store.dispatch(setIsRefreshingToken(false));
-
-          // Handle refresh failure - logout user
-          exception_message = "Session expired. Please re-login";
-          store.dispatch(reset());
-        //   store.dispatch(logout());
-
-          try {
-            await SecureStore.deleteItemAsync("accessToken");
-            await SecureStore.deleteItemAsync("refreshToken");
-          } catch (deleteError) {
-            console.error("Error deleting tokens:", deleteError);
+          console.error('Token refresh failed:', refreshError);
+          
+          // Determine if this is a network error or auth error
+          const isNetworkError = !refreshError.response;
+          const isAuthError = refreshError.response?.status === 401;
+          
+          if (isAuthError || refreshError.response?.data?.failcode === ResponseFailcode.TOKEN_INVALID) {
+            // Refresh token is invalid - logout
+            await performLogout("Session expired. Please re-login");
+          } else if (isNetworkError) {
+            // Network error - don't logout, just fail the request
+            isRefreshing = false;
+            store.dispatch(setIsRefreshingToken(false));
+            store.dispatch(hideLoading());
+            processQueue(refreshError, null);
+          } else {
+            // Other error - logout to be safe
+            await performLogout("Authentication error. Please re-login");
           }
-
-          router.dismissTo("/auth");
-          try {
-            router.reload();
-          } catch (routerError) {
-            console.error("Router reload failed:", routerError);
-          }
-
+          
           return Promise.reject(refreshError);
         }
       }
     }
 
+    // Hide loading screen for non-refresh errors
     if (!config["noLoadingScreen"]) {
       store.dispatch(hideLoading());
     }
@@ -246,7 +289,7 @@ api.interceptors.response.use(
     // Show error messages only if not currently refreshing tokens
     if (!isRefreshing) {
       if (!AuthFailcodes.includes(exception_failcode)) {
-        let errorMessage = "";
+        let errorMessage = '';
         if (exception_status === -1) {
           errorMessage = `(${exception_failcode}) ${exception_message}`;
         } else if (exception_failcode === -1) {
@@ -259,7 +302,7 @@ api.interceptors.response.use(
         Alert.alert("Error", exception_message);
       }
     }
-
+    
     return Promise.reject(error);
   }
 );

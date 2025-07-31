@@ -76,6 +76,17 @@ function SearchScreen() {
   };
 
   useEffect(() => {
+    // Only search if searchText is not empty and has meaningful content
+    if (!searchText.trim()) {
+      // Clear results when search text is empty
+      setItems([]);
+      return;
+    }
+
+    // Clear any existing timeout
+    clearTimeout(timerIdRef.current);
+
+    // Set new timeout for search
     timerIdRef.current = setTimeout(() => {
       dispatch(searchFromSearchBar(searchText)).then((res) => {
         const data = res.payload as SearchBarResult;
@@ -100,7 +111,7 @@ function SearchScreen() {
     return () => {
       clearTimeout(timerIdRef.current);
     };
-  }, [searchText]);
+  }, [searchText, dispatch]);
 
   useEffect(() => {
     const filtered = items.filter((item) =>

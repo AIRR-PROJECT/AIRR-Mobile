@@ -1,7 +1,11 @@
 import { BlogStatus } from "@/enums/blog_properties.enum";
 import { GroupStatusRoleCheck } from "@/enums/group.enum";
 import { useAppDispatch } from "@/redux/hook";
-import { deleteBlog, unsaveBlog, updateHideBlog } from "@/redux/slices/blogSlice";
+import {
+  deleteBlog,
+  unsaveBlog,
+  updateHideBlog,
+} from "@/redux/slices/blogSlice";
 import {
   Entypo,
   FontAwesome,
@@ -21,13 +25,13 @@ type MoreOptionComponentProps = {
   isUserWrittenBlog: boolean;
   blogId: string;
   groupId?: string;
-  role: string
-  blogStatus: string
+  role: string;
+  blogStatus: string;
   isFromFeed?: boolean; // Optional prop to indicate if the blog is from feed
   isFromFavourites?: boolean; // Optional prop to indicate if the blog is from favourites
   isFromDetail: boolean; // Optional prop to indicate if the blog is from detail
-  isViewTypePrivateOrInProfile: boolean,
-  isAlreadyReported: boolean
+  isViewTypePrivateOrInProfile: boolean;
+  isAlreadyReported: boolean;
   handleHideThisBlog: () => void;
   handleDeleteThisBlog: () => void;
   handleRemoveFavoriteThisBlog?: () => void;
@@ -46,22 +50,34 @@ export default function MoreOptionBottomList({
   isAlreadyReported = false,
   handleHideThisBlog,
   handleDeleteThisBlog,
-  handleRemoveFavoriteThisBlog
-
+  handleRemoveFavoriteThisBlog,
 }: MoreOptionComponentProps) {
   const route = useRouter();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log(`isUserWrittenBlog: ${isUserWrittenBlog}`)
-    console.log(`blogId: ${blogId}`)
-    console.log(`groupId: ${groupId}`)
-    console.log(`role: ${role}`)
-    console.log(`blogStatus: ${blogStatus}`)
-    console.log(`isViewTypePrivateOrInProfile: ${isViewTypePrivateOrInProfile}`)
-    console.log(`isAlreadyReported: ${isAlreadyReported}`)
-    console.log(!isFromFeed && role !== GroupStatusRoleCheck.NOT_MEMBER && role !== GroupStatusRoleCheck.PENDING)
-  }, [isUserWrittenBlog, blogId, groupId, role, blogStatus, isViewTypePrivateOrInProfile])
+    console.log(`isUserWrittenBlog: ${isUserWrittenBlog}`);
+    console.log(`blogId: ${blogId}`);
+    console.log(`groupId: ${groupId}`);
+    console.log(`role: ${role}`);
+    console.log(`blogStatus: ${blogStatus}`);
+    console.log(
+      `isViewTypePrivateOrInProfile: ${isViewTypePrivateOrInProfile}`
+    );
+    console.log(`isAlreadyReported: ${isAlreadyReported}`);
+    console.log(
+      !isFromFeed &&
+        role !== GroupStatusRoleCheck.NOT_MEMBER &&
+        role !== GroupStatusRoleCheck.PENDING
+    );
+  }, [
+    isUserWrittenBlog,
+    blogId,
+    groupId,
+    role,
+    blogStatus,
+    isViewTypePrivateOrInProfile,
+  ]);
 
   const handleHideBlog = () => {
     dispatch(
@@ -80,17 +96,20 @@ export default function MoreOptionBottomList({
     });
   };
   const handleReportBlog = () => {
-    if (isAlreadyReported && role !== GroupStatusRoleCheck.ADMIN && role !== GroupStatusRoleCheck.OWNER) {
-      ToastAndroid.show("This blog is already reported", ToastAndroid.LONG)
+    if (
+      isAlreadyReported &&
+      role !== GroupStatusRoleCheck.ADMIN &&
+      role !== GroupStatusRoleCheck.OWNER
+    ) {
+      ToastAndroid.show("This blog is already reported", ToastAndroid.LONG);
 
-      return
+      return;
     }
 
     // Handle reporting the blog
     if (groupId) {
       route.push(`/options/report-blog?blogID=${blogId}&groupID=${groupId}`);
-    }
-    else {
+    } else {
       route.push(`/options/report-blog?blogID=${blogId}`);
     }
   };
@@ -98,8 +117,7 @@ export default function MoreOptionBottomList({
     // Handle editing the blog
     if (groupId) {
       route.push(`/blog/edit-blog?blogID=${blogId}&groupID=${groupId}`);
-    }
-    else {
+    } else {
       route.push(`/blog/edit-blog?blogID=${blogId}`);
     }
     // Pass the blogId to the edit blog screen
@@ -119,20 +137,40 @@ export default function MoreOptionBottomList({
   const hanleRemoveFromFavourites = () => {
     // Handle removing the blog from favourites
     dispatch(unsaveBlog(blogId)).then((res) => {
-      const result = res.payload as boolean
+      const result = res.payload as boolean;
       if (result == true) {
-        handleRemoveFavoriteThisBlog!()
+        handleRemoveFavoriteThisBlog!();
       }
-    })
+    });
   };
-  const handleBanBlog = () => {
-    
-  }
+  const handleBanBlog = () => {};
+  const hasEditAction =
+    ((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) &&
+      (isUserWrittenBlog || role !== GroupStatusRoleCheck.NOT_MEMBER)) ||
+    isViewTypePrivateOrInProfile;
+
+  const hasDeleteAction =
+    ((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) &&
+      (isUserWrittenBlog || role !== GroupStatusRoleCheck.NOT_MEMBER)) ||
+    isViewTypePrivateOrInProfile ||
+    blogStatus === BlogStatus.REJECTED ||
+    blogStatus === BlogStatus.BANNED;
+
+  const hasUserActions = hasEditAction || hasDeleteAction;
+
+  // Calculate if any actions are available for other user's blog
+  const hasHideAction = !isFromDetail;
+  const hasReportAction =
+    !isFromFeed &&
+    role !== GroupStatusRoleCheck.NOT_MEMBER &&
+    role !== GroupStatusRoleCheck.PENDING;
+
+  const hasOtherUserActions = hasHideAction || hasReportAction;
 
   return (
     <BottomSheet
       ref={sheetRef}
-      index={-1} // Start closed
+      index={-1}
       enableDynamicSizing
       enablePanDownToClose={true}
       backgroundStyle={{ backgroundColor: "#1E1E1E" }}
@@ -149,91 +187,72 @@ export default function MoreOptionBottomList({
     >
       {isUserWrittenBlog ? (
         <BottomSheetView style={styles.contentContainer}>
-          {/* {isFromFavourites && (
-            <TouchableOpacity
-              style={styles.bottomOptionButton}
-              onPress={hanleRemoveFromFavourites}
-              activeOpacity={0.8}
-            >
-              <MaterialCommunityIcons
-                name="bookmark-remove"
-                size={24}
-                color="black"
-              />
-              <Text style={styles.bottomOptionText}>
-                Remove from favourites
-              </Text>
-            </TouchableOpacity>
-          )} */}
-          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupStatusRoleCheck.NOT_MEMBER)) 
-            || isViewTypePrivateOrInProfile) && 
-            <TouchableOpacity
-              style={styles.bottomOptionButton}
-              onPress={handleEditBlog}
-              activeOpacity={0.8}
-            >
-              {/* Edit */}
-              <FontAwesome name="edit" size={24} color="black" />
-              <Text style={styles.bottomOptionText}>Edit blog</Text>
-            </TouchableOpacity>
-          }
-          {(((blogStatus === BlogStatus.ACTIVE || blogStatus === BlogStatus.PENDING) && (isUserWrittenBlog || role !== GroupStatusRoleCheck.NOT_MEMBER)) 
-            || isViewTypePrivateOrInProfile || blogStatus === BlogStatus.REJECTED || blogStatus === BlogStatus.BANNED) &&
-            <TouchableOpacity
-              style={styles.bottomOptionButton}
-              onPress={handleDeleteBlog}
-              activeOpacity={0.8}
-            >
-              {/* delete */}
-              <MaterialIcons name="delete" size={24} color="black" />
-              <Text style={styles.bottomOptionText}>Delete blog</Text>
-            </TouchableOpacity>
-          }
+          {!hasUserActions ? (
+            // Show "No actions available" when user has no actions
+            <Text style={styles.noActionText}>No actions available</Text>
+          ) : (
+            <>
+              {hasEditAction && (
+                <TouchableOpacity
+                  style={styles.bottomOptionButton}
+                  onPress={handleEditBlog}
+                  activeOpacity={0.8}
+                >
+                  <FontAwesome name="edit" size={24} color="black" />
+                  <Text style={styles.bottomOptionText}>Edit blog</Text>
+                </TouchableOpacity>
+              )}
+              {hasDeleteAction && (
+                <TouchableOpacity
+                  style={styles.bottomOptionButton}
+                  onPress={handleDeleteBlog}
+                  activeOpacity={0.8}
+                >
+                  <MaterialIcons name="delete" size={24} color="black" />
+                  <Text style={styles.bottomOptionText}>Delete blog</Text>
+                </TouchableOpacity>
+              )}
+            </>
+          )}
         </BottomSheetView>
       ) : (
         <BottomSheetView style={styles.contentContainer}>
-          {/* {isFromFavourites && (
-            <TouchableOpacity
-              style={styles.bottomOptionButton}
-              onPress={hanleRemoveFromFavourites}
-              activeOpacity={0.8}
-            >
-              <MaterialCommunityIcons
-                name="bookmark-remove"
-                size={24}
-                color="black"
-              />
-              <Text style={styles.bottomOptionText}>
-                Remove from favourites
-              </Text>
-            </TouchableOpacity>
-          )} */}
-          {!isFromDetail && (
-            <TouchableOpacity
-              style={styles.bottomOptionButton}
-              onPress={handleHideBlog}
-              activeOpacity={0.8}
-            >
-              {/* Hide */}
-              <Entypo name="circle-with-minus" size={24} color="black" />
-              <Text style={styles.bottomOptionText}>Hide blog</Text>
-            </TouchableOpacity>
+          {!hasOtherUserActions ? (
+            // Show "No actions available" when user has no actions
+            <Text style={styles.noActionText}>No actions available</Text>
+          ) : (
+            <>
+              {hasHideAction && (
+                <TouchableOpacity
+                  style={styles.bottomOptionButton}
+                  onPress={handleHideBlog}
+                  activeOpacity={0.8}
+                >
+                  <Entypo name="circle-with-minus" size={24} color="black" />
+                  <Text style={styles.bottomOptionText}>Hide blog</Text>
+                </TouchableOpacity>
+              )}
+              {hasReportAction && (
+                <TouchableOpacity
+                  style={styles.bottomOptionButton}
+                  onPress={handleReportBlog}
+                  activeOpacity={0.8}
+                >
+                  <MaterialIcons name="report" size={24} color="black" />
+                  {role === GroupStatusRoleCheck.MEMBER ? (
+                    <Text style={styles.bottomOptionText}>Report blog</Text>
+                  ) : role === GroupStatusRoleCheck.ADMIN ||
+                    role === GroupStatusRoleCheck.OWNER ? (
+                    <Text style={styles.bottomOptionText}>Ban blog</Text>
+                  ) : (
+                    <Text style={styles.bottomOptionText}>
+                      Something is wrong
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              )}
+            </>
           )}
-          {!isFromFeed && role !== GroupStatusRoleCheck.NOT_MEMBER && role !== GroupStatusRoleCheck.PENDING && (
-            <TouchableOpacity
-              style={styles.bottomOptionButton}
-              onPress={handleReportBlog}
-              activeOpacity={0.8}
-            >
-              {/* Report */}
-              <MaterialIcons name="report" size={24} color="black" />
-              {role === GroupStatusRoleCheck.MEMBER
-              ? <Text style={styles.bottomOptionText}>Report blog</Text>
-              : role === GroupStatusRoleCheck.ADMIN || role === GroupStatusRoleCheck.OWNER
-              ? <Text style={styles.bottomOptionText}>Ban blog</Text>
-              : <Text style={styles.bottomOptionText}>Something is wrong</Text>}
-
-          </TouchableOpacity>)}  
         </BottomSheetView>
       )}
     </BottomSheet>
@@ -260,5 +279,12 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  noActionText: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
+    padding: 20,
+    fontStyle: "italic",
   },
 });

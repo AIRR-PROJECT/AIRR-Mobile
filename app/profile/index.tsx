@@ -133,7 +133,7 @@ export default function ProfileScreen() {
 
           {/* User student info */}
 
-          <UserStudentInfoComponent studentInfo={studentInfo}/>
+          <UserStudentInfoComponent studentInfo={studentInfo} isViewingOwnProfile={isViewingOwnProfile}/>
 
           {/* Active groups */}
           {/* TODO: Integrate API when have */}

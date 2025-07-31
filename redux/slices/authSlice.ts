@@ -74,8 +74,8 @@ export const loginGoogle = createAsyncThunk(
         try {
             await SecureStore.setItemAsync('accessToken', data.token)
 
-            const response = await api.post('auth/sign-in-gg', {
-                'loginGoogle': '1'
+            const response = await api.post('auth/sign-in-gg', undefined, {
+                'loginGoogle': true
             });
             const { access_token, refresh_token } = response.data.data;
 

@@ -79,8 +79,10 @@ api.interceptors.request.use(
 
     // Use in-memory cache to avoid repeated SecureStore reads
     let accessToken =
-      store.getState().user.userAccessToken ??
-      (await SecureStore.getItemAsync("accessToken"));
+      config["loginGoogle"] ?
+      await SecureStore.getItemAsync("accessToken") :
+      (store.getState().user.userAccessToken ??
+      await SecureStore.getItemAsync("accessToken"));
 
     if (accessToken) {
       config.headers = {
@@ -239,9 +241,7 @@ api.interceptors.response.use(
       }
     }
 
-    if (!config["noLoadingScreen"]) {
-      store.dispatch(hideLoading());
-    }
+    store.dispatch(hideLoading());
 
     // Show error messages only if not currently refreshing tokens
     if (!isRefreshing && exception_failcode !== ResponseFailcode.GROUP_PARAM_INVALID) {

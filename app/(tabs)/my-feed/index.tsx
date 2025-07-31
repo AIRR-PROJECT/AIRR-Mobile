@@ -64,6 +64,7 @@ import { getUserGroupStatus } from "@/redux/slices/groupSlice";
 import { EmptyContent } from "@/components/EmptyContent";
 import { min } from "lodash";
 const { width, height } = Dimensions.get("window");
+const carouselHeight = 280;
 export default function MyFeed() {
   const dispatch = useAppDispatch();
   const { blogIdToRemove } = useLocalSearchParams<{ blogIdToRemove: string }>();
@@ -318,7 +319,7 @@ export default function MyFeed() {
                       data={recommendedBlogsQuery.data as AIBlog[]}
                       loop={true}
                       width={Dimensions.get("window").width}
-                      height={280}
+                      height={carouselHeight}
                       pagingEnabled={true}
                       snapEnabled={true}
                       style={{
@@ -427,7 +428,7 @@ export default function MyFeed() {
                       data={recommendedBlogsQuery.data as AIBlog[]}
                       loop={true}
                       width={Dimensions.get("window").width}
-                      height={280}
+                      height={carouselHeight}
                       pagingEnabled={true}
                       snapEnabled={true}
                       style={{

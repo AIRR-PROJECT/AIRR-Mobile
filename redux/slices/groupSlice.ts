@@ -657,7 +657,9 @@ export const searchGroupsForCreateUpdateBlog = createAsyncThunk(
     'blog/searchTagCreateBlog',
     async (keyword: string, thunkAPI) => {
         try {
-            const res = await api.get(`groups/search-groups-for-create-update-blog?keyword=${keyword}`) as AxiosResponse
+            const res = await api.get(`groups/search-groups-for-create-update-blog?keyword=${keyword}`, {
+                "noLoadingScreen": true
+            }) as AxiosResponse
             console.log(res.data.data.groups)
 
             if (res.data.success) {

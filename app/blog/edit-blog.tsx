@@ -130,6 +130,9 @@ const OnlyInMyProfile: Group = {
   IsAdminOrOwner: false,
 };
 
+const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g"
+const VITE_CLOUDINARY_PRESET = "blog_images_preset"
+
 export default function Editblog() {
   const dispatch = useAppDispatch();
   const { groupID, blogID } = useLocalSearchParams<{
@@ -831,8 +834,8 @@ export default function Editblog() {
               dom={{ matchContents: true }}
               defaultValue={content.current}
               onValueChange={handleContentTextChange}
-              VITE_CLOUDINARY_CLOUD_NAME={process.env.VITE_CLOUDINARY_CLOUD_NAME}
-              VITE_CLOUDINARY_PRESET={process.env.VITE_CLOUDINARY_PRESET}
+              VITE_CLOUDINARY_CLOUD_NAME={VITE_CLOUDINARY_CLOUD_NAME}
+              VITE_CLOUDINARY_PRESET={VITE_CLOUDINARY_PRESET}
             />
           </View>
         </View>

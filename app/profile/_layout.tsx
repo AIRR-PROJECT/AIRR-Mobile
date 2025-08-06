@@ -9,7 +9,7 @@ const SettingsIcon = ({ isOwnProfile }: { isOwnProfile: boolean }) => (
   isOwnProfile ?
   <ButtonGradient
     label="Edit profile"
-    onPress={() => {
+    onPressOut={() => {
       router.push("/profile/edit-profile");
     }}
     style={styles.editProfileButton}

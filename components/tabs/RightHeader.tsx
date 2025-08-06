@@ -39,7 +39,7 @@ function RightHeader({ avatar }: RightHeaderProps) {
       <TouchableOpacity
         style={styles.feed_settings_icon}
         activeOpacity={0.7}
-        onPress={handleFeedSettingsPress}
+        onPressOut={handleFeedSettingsPress}
       >
         <Ionicons name="filter" size={18} color="#fff" />
       </TouchableOpacity>
@@ -50,7 +50,7 @@ function RightHeader({ avatar }: RightHeaderProps) {
       <TouchableOpacity
         style={styles.notification_container}
         activeOpacity={0.7}
-        onPress={handleNotificationPress}
+        onPressOut={handleNotificationPress}
       >
         <Ionicons name="notifications-circle" size={24} color="#B9FF66" />
         {notifCount > 0 && <Text style={styles.text}>{notifCount}</Text>}
@@ -62,7 +62,7 @@ function RightHeader({ avatar }: RightHeaderProps) {
       <TouchableOpacity 
         style={styles.avatar_container} 
         activeOpacity={0.7}
-        onPress={handleAvatarPress}
+        onPressOut={handleAvatarPress}
       >
         <Image
           source={userAvatar ? { uri: userAvatar } : sample_avatar}

@@ -301,6 +301,8 @@ export default function NewBlog() {
   };
 
   const handlePostBlogPress = () => {
+    console.log("Posted")
+
     if (
       !uploadedImg.current ||
       !chosenGroup ||
@@ -805,7 +807,7 @@ export default function NewBlog() {
         {/* Post button */}
         <ButtonGradient
           label="POST BLOG"
-          onPress={handlePostBlogPress}
+          onPressOut={handlePostBlogPress}
           style={styles.postButtonStyle}
           labelStyle={styles.postButtonLabel}
         />

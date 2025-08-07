@@ -649,7 +649,7 @@ GroupPageProps) {
               label={buttonLabel}
               labelStyle={styles.tabButtonText}
               style={styles.tabButton}
-              onPress={handleActionButtonPress}
+              onPressOut={handleActionButtonPress}
             />
           )}
         </View>

@@ -14,7 +14,7 @@ export interface BlogInteractNotification {
     interact_type: InteractType
     message: string
     title: string
-    blog_owner: RequestOwner
+    request_owner: RequestOwner
 }
 
 export interface RequestOwner {

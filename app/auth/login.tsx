@@ -41,6 +41,7 @@ import { LoginCredentials } from "@/interfaces/authInterface";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { getAuth, GoogleAuthProvider } from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { hideLoading, showLoading } from "@/redux/slices/loadingSlice";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -81,6 +82,8 @@ export default function LoginScreen() {
 
   const handleOnGoogleIconPress = async () => {
     try {
+      dispatch(showLoading("Logging into Google"))
+
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
       });
@@ -108,7 +111,9 @@ export default function LoginScreen() {
             })
           );
       }
+      dispatch(hideLoading())
     } catch (err) {
+      dispatch(hideLoading())
       console.log(err);
     }
   };

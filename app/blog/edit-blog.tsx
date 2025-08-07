@@ -842,7 +842,7 @@ export default function Editblog() {
         {/* Post button */}
         <ButtonGradient
           label="POST BLOG"
-          onPress={handlePostBlogPress}
+          onPressOut={handlePostBlogPress}
           style={styles.postButtonStyle}
           labelStyle={styles.postButtonLabel}
         />

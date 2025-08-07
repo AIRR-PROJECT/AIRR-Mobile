@@ -238,6 +238,7 @@ function NotificationsLayout() {
           sections={sections}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
+            console.log(item)
             let notifData;
 
             switch (item.type) {
@@ -253,9 +254,9 @@ function NotificationsLayout() {
                     date={item.time}
                     isRead={item.seen}
                     from={{
-                      _id: notifData.blog_owner._id,
-                      username: notifData.blog_owner.Username,
-                      avatarURL: notifData.blog_owner.AvatarURL,
+                      _id: notifData.request_owner._id,
+                      username: notifData.request_owner.Username,
+                      avatarURL: notifData.request_owner.AvatarURL,
                     }}
                     type={item.type}
                     data={item.data}

@@ -1,8 +1,8 @@
 "use dom";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import ReactQuill, { Quill } from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import ReactQuill, { Quill } from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 import "@enzedonline/quill-blot-formatter2";
 import BlotFormatter2 from "@enzedonline/quill-blot-formatter2";
 import "./QuillEditorStyles.css";

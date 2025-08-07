@@ -3,6 +3,7 @@ import {
   FontAwesome5,
   FontAwesome6,
   MaterialCommunityIcons,
+  MaterialIcons,
 } from "@expo/vector-icons";
 import {
   View,
@@ -92,6 +93,7 @@ export default function MemberApprovalsPage() {
   const [bottomSheetMode, setBottomSheetMode] = useState<
     "main" | "kick" | "ban" | "admin" | "unban" | "approve" | "reject"
   >("main");
+  const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
     if (groupID.length == 0) return;
 
@@ -344,6 +346,17 @@ export default function MemberApprovalsPage() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
+      {/* search bar */}
+      <View style={styles.searchBar}>
+        {/* Magnifying glass icon */}
+        <MaterialIcons name="search" size={24} color="black" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search members..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
       <View style={styles.optionBar}>
         <TouchableOpacity
           style={[
@@ -441,19 +454,18 @@ export default function MemberApprovalsPage() {
                 </View>
               </View>
               {/* More option */}
-              <TouchableOpacity
+              {!isMoreDisabled(item) && <TouchableOpacity
                 style={{
                   marginLeft: "auto",
-                  opacity: isMoreDisabled(item) ? 0.2 : 1,
                 }}
                 onPress={() => {
                   sheetRef.current?.snapToIndex(0);
                   setSelectedMember(item);
                 }}
-                disabled={isMoreDisabled(item)}
+                
               >
                 <Feather name="more-vertical" size={24} color="#000" />
-              </TouchableOpacity>
+              </TouchableOpacity>}
             </TouchableOpacity>
           )}
           keyExtractor={(item, index) => index.toString()}
@@ -1033,5 +1045,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+  },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
+  searchInput: {
+    padding: 10,
+    flex: 1,
+    color: "#000",
+    fontSize: 18,
   },
 });

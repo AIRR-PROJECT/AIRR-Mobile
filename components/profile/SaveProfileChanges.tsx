@@ -43,7 +43,7 @@ export default function SaveProfileChanges() {
   return (
     <ButtonGradient
       label="SAVE CHANGES"
-      onPressOut={handleSaveChanges}
+      onPress={handleSaveChanges}
       style={styles.buttonContainer}
       labelStyle={styles.buttonLabel}
     />

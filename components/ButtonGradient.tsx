@@ -15,7 +15,7 @@ const windowHeight = Dimensions.get("window").height;
 
 type ButtonGradientProps = {
   label: string;
-  onPressOut?: () => void; // Added onPressOut prop
+  onPress?: () => void; // Added onPressOut prop
   style?: StyleProp<ViewStyle>;
   buttonStyle?: ViewStyle;
   labelStyle?: TextStyle;
@@ -27,18 +27,18 @@ type ButtonGradientProps = {
 
 export default function ButtonGradient({
   label,
-  onPressOut, // Use onPressOut prop
+  onPress, // Use onPressOut prop
   style,
   buttonStyle,
   labelStyle,
   defaultAction,
   disabled,
 }: ButtonGradientProps) {
-  const handlePressOut = onPressOut || (() => {});
+  const handlePress = onPress || (() => {});
   return (
     <View style={[styles.buttonContainer, style]}>
       <TouchableOpacity
-        onPressOut={handlePressOut}
+        onPress={handlePress}
         disabled={disabled}
         activeOpacity={0.7}
       >

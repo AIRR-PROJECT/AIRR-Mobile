@@ -21,7 +21,7 @@ export default function LeftHeader() {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPressOut={handleSearchPress}
+        onPress={handleSearchPress}
         style={styles.searchBarButton}
       >
         <FontAwesome name="search" size={20} color="#B9FF66" />

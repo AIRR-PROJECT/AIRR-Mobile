@@ -9,20 +9,20 @@ import * as Linking from "expo-linking";
 export default function CareerPathSuggestion({ isFromCareerPath = false }) {
   const router = useRouter();
   const webUrl = "https://airr-fe.vercel.app/career";
-  const handleClick = () => {
-    // handle click
-    if (isFromCareerPath) {
-      // Linking.openURL(webUrl);
-      router.push({
-        pathname: "/webview-screen",
-        params: { url: webUrl },
-      });
-      return;
-    }
-    router.navigate("/(tabs)/career-path");
-  };
+  // const handleClick = () => {
+  //   // handle click
+  //   if (isFromCareerPath) {
+  //     // Linking.openURL(webUrl);
+  //     router.push({
+  //       pathname: "/webview-screen",
+  //       params: { url: webUrl },
+  //     });
+  //     return;
+  //   }
+  //   router.navigate("/(tabs)/career-path");
+  // };
   return (
-    <TouchableOpacity onPress={handleClick} activeOpacity={0.8}>
+    <View>
       {/* gradient background */}
       <LinearGradient
         colors={["#66ff8c", "#9DE8EE"]}
@@ -70,11 +70,11 @@ export default function CareerPathSuggestion({ isFromCareerPath = false }) {
         {/* Text */}
         <View style={styles.fourthRow}>
           <Text style={styles.fourthRowText}>
-            {!isFromCareerPath ? "Discover personalized career recommendations based on your skills and interests" : "This feature is currently only available on the web version. Click to view the career path workflow."}
+            {!isFromCareerPath ? "Discover personalized career recommendations based on your skills and interests" : "Coming soon..."}
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 

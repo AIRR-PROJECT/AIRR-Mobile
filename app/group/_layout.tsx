@@ -71,7 +71,7 @@ export default function GroupLayout() {
               <TouchableOpacity
                 style={styles.cancelButton}
                 activeOpacity={0.7}
-                onPressOut={handleGoBack}
+                onPress={handleGoBack}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
@@ -80,7 +80,7 @@ export default function GroupLayout() {
               <TouchableOpacity
                 style={styles.createButton}
                 activeOpacity={0.7}
-                onPressOut={handleCreateGroup}
+                onPress={handleCreateGroup}
               >
                 <Text style={styles.createButtonText}>+ New Group</Text>
               </TouchableOpacity>
@@ -125,7 +125,7 @@ export default function GroupLayout() {
               <TouchableOpacity
                 style={styles.cancelButton}
                 activeOpacity={0.7}
-                onPressOut={handleGoBack}
+                onPress={handleGoBack}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
@@ -134,7 +134,7 @@ export default function GroupLayout() {
               <TouchableOpacity
                 style={styles.createButton}
                 activeOpacity={0.7}
-                onPressOut={handleEditGroup}
+                onPress={handleEditGroup}
               >
                 <Text style={styles.createButtonText}>Edit Group</Text>
               </TouchableOpacity>

@@ -97,6 +97,7 @@ export default function MemberApprovalsPage() {
     "main" | "kick" | "ban" | "admin" | "unban" | "approve" | "reject"
   >("main");
   const [searchQuery, setSearchQuery] = useState("");
+  
   useEffect(() => {
     if (groupID.length == 0) return;
 
@@ -245,7 +246,10 @@ export default function MemberApprovalsPage() {
       }
     }
   }
-
+  const handleOnSetSearchQuery = (query: string) => {
+    setSearchQuery(query);
+    handleSearchSubmit();
+  };
   const [needApprovalUserID, setNeedApprovalUserID] = useState<string>("");
   
   const onPressApprove = (id: string) => {
@@ -415,7 +419,7 @@ export default function MemberApprovalsPage() {
           style={styles.searchInput}
           placeholder="Search members..."
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={handleOnSetSearchQuery}
           onSubmitEditing={handleSearchSubmit}
         />
       </View>

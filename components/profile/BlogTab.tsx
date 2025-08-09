@@ -89,15 +89,17 @@ type BlogTabProps = {
   setMoreOptionGroupId: Dispatch<SetStateAction<string>>
   handleHideBlog: MutableRefObject<() => void>
   handleDeleteBlog: MutableRefObject<() => void>
+  userID?: string
 }
 
-export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, setBlogStatus, setIsViewTypePrivateOrInProfile, setIsAlreadyReported, setMoreOptionBlogId, setMoreOptionGroupId, handleHideBlog, handleDeleteBlog }: BlogTabProps) {
-  const { userID, blogIdToRemove } = useLocalSearchParams<{ userID: string, blogIdToRemove: string }>()
+export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, setBlogStatus, setIsViewTypePrivateOrInProfile, setIsAlreadyReported, setMoreOptionBlogId, setMoreOptionGroupId, handleHideBlog, handleDeleteBlog, userID }: BlogTabProps) {
+  const { blogIdToRemove } = useLocalSearchParams<{ userID: string, blogIdToRemove: string }>()
   const { user } = useAppSelector(state => state.user)
 
   const dispatch = useAppDispatch();
   const [personalPage, setPersonalPage] = useState(1);
   const [isFetching, setIsFetching] = useState(false)
+  const [blogs, setBlogs] = useState<UserBlog[]>([])
 
   const handlePressMoreOption = (isUserWritten: boolean, blogId: string, groupId: string, role: string, blogStatus: string, isViewTypePrivateOrInProfile: boolean, isAlreadyReported: boolean) => {
     setIsUserWrittenBlog(isUserWritten);
@@ -141,7 +143,7 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
         return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
       }
       else {
-        const moreFetchedBlogs = await dispatch(fetchOtherPersonalBlogs({ otherUserID: userID, page: personalPage }));
+        const moreFetchedBlogs = await dispatch(fetchOtherPersonalBlogs({ otherUserID: userID, page: page }));
   
         return moreFetchedBlogs.payload.blogList.blogs as UserBlog[];
       }
@@ -155,9 +157,16 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
   });
   const personalBlogsReset = useMutation({
     mutationFn: async () => {
-      const refetchedBlog = await dispatch(fetchPersonalBlogs(1));
+      if (!userID) {
+        const refetchedBlog = await dispatch(fetchPersonalBlogs(1));
 
-      return refetchedBlog.payload.blogList.blogs as UserBlog[];
+        return refetchedBlog.payload.blogList.blogs as UserBlog[];
+      }
+      else {
+        const refetchedBlog = await dispatch(fetchOtherPersonalBlogs({ otherUserID: userID, page: 1 }));
+  
+        return refetchedBlog.payload.blogList.blogs as UserBlog[];
+      }
     },
     onSuccess: (data: any) => {
       queryClient.setQueryData(["feed-personal"], (oldData: any) => {
@@ -211,7 +220,6 @@ export default function BlogTab({ moreOptionRef, setIsUserWrittenBlog, setRole, 
         keyExtractor={(item, index) => index.toString()}
         ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
         renderItem={({ item }) => {
-          console.log(item)
           return <FeedBlogPreview blog={item} onPressMoreButton={
             () => handlePressMoreOption(item.Author._id === user._id, item._id, item.Group?._id,
               item.UserGroupStatus,

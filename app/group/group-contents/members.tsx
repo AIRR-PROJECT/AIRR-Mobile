@@ -125,6 +125,7 @@ export default function MemberApprovalsPage() {
     } else {
       dispatch(getBannedMemberList(groupID)).then((res) => {
         const list = res.payload as GroupBannedMember[];
+        console.log(list)
         setBannedMembers(list);
 
         setIsMemberFetching(false);
@@ -132,7 +133,7 @@ export default function MemberApprovalsPage() {
     }
   }, [selectedTab, groupID]);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = () => {
     setRefreshing(true);
     
     setIsMemberFetching(true)
@@ -151,6 +152,7 @@ export default function MemberApprovalsPage() {
     } else if (selectedTab == TabOptions.NeedApproval) {
       dispatch(getPendingMemberList(groupID)).then((res) => {
         const list = res.payload as PendingMemberRequest[];
+        console.log(list)
         setMembersApproval(list);
 
         setIsMemberFetching(false);
@@ -167,7 +169,7 @@ export default function MemberApprovalsPage() {
     setTimeout(() => {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
-  }, []);
+  };
 
   useEffect(() => {
     // Prevent scroll to member altogether
@@ -337,6 +339,7 @@ export default function MemberApprovalsPage() {
 
         if (result == true) {
           ToastAndroid.show("User banned", ToastAndroid.SHORT);
+          setDisplayMembers(displayMembers.filter(m => m.MemberInfo._id != selectedMember.MemberInfo._id))
         } else {
           ToastAndroid.show("User is already banned", ToastAndroid.LONG);
         }
@@ -493,7 +496,10 @@ export default function MemberApprovalsPage() {
                   ? { borderColor: colors.owner }
                   : { borderColor: colors.member },
               ]}
-              onPress={() => handleOnDisplayMemberPress(item.MemberInfo._id)}
+              onPress={() => {
+                console.log(item.MemberInfo)
+                handleOnDisplayMemberPress(item.MemberInfo._id)
+              }}
             >
               <Image source={item.MemberInfo.AvatarURL} style={styles.avatar} />
               <View style={styles.memberInfo}>
@@ -585,11 +591,11 @@ export default function MemberApprovalsPage() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          data={bannedMembers}
+          data={filteredBannedMembers}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[styles.memberContainer, { backgroundColor: "#fff" }]}
-              onPress={() => handleOnDisplayMemberPress(item._id)}
+              onPress={() => handleOnDisplayMemberPress(item.Owner._id)}
             >
               <Image source={item.Owner.AvatarURL} style={styles.avatar} />
               <View style={styles.memberInfo}>

@@ -231,7 +231,15 @@ export default function ProfileScreen() {
         {/* Readme if tab == readme */}
         <View style={{ padding: 20 }}>
           {selectedTab === "Social" &&
-            (user && user.profile && user.profile.link ? (
+            (studentInfo && studentInfo.profile && studentInfo.profile.link ? (
+              <SocialTab
+                link={""}
+                facebookLink={studentInfo.profile.link.Facebook}
+                linkedInLink={studentInfo.profile.link.LinkedIn}
+                githubLink={studentInfo.profile.link.Github}
+                showSignOut={isViewingOwnProfile}
+              />
+            ) : user && user.profile && user.profile.link ? (
               <SocialTab
                 link={""}
                 facebookLink={user.profile.link.Facebook}
@@ -262,6 +270,7 @@ export default function ProfileScreen() {
             setMoreOptionGroupId={setMoreOptionGroupId}
             handleHideBlog={handleHideBlog}
             handleDeleteBlog={handleDeleteBlog}
+            userID={userID != "undefined" ? userID : undefined}
           />
         )}
       </ParallaxFlatList>

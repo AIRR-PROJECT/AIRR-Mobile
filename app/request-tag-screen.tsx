@@ -8,15 +8,8 @@ import {
   Dimensions,
   ToastAndroid,
 } from "react-native";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetScrollView,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
-import { createTag } from "@/redux/slices/groupSlice";
-import { GroupTag } from "@/interfaces/groupInterface";
+import { useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
@@ -45,6 +38,7 @@ export default function RequestTagsScreen({
   );
 
   // State to hold the new tag input by user
+  const newTagInput = useRef<TextInput>()
   const [newTagToRequest, setNewTag] = useState<string>("");
 
   // Const state to hold valid tag
@@ -155,6 +149,7 @@ export default function RequestTagsScreen({
             style={{ paddingLeft: 10 }}
           />
           <TextInput
+            ref={newTagInput}
             style={styles.searchText}
             placeholder="Enter new tag name"
             placeholderTextColor="#888"
@@ -269,6 +264,7 @@ export default function RequestTagsScreen({
                 ]);
 
                 setValidTag(null);
+                newTagInput.current?.clear()
                 setNewTag("");
                 setShowError(false);
               } else {

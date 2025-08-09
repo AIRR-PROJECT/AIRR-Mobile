@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { setCurrentPassword, setNewPassword } from "@/redux/slices/userSlice";
 import { setCurrentPasswordIncorrect } from "@/redux/slices/authSlice";
+import validateNotEmpty from "@/utils/validateNotEmpty";
 
 type FormData = {
   currentPassword: string;
@@ -62,6 +63,7 @@ export default function ChangePasswordScreen() {
             required: "Current password is required",
             validate: (value) => {
               console.log(value);
+              if (!validateNotEmpty(value, "Current Password")) return validateNotEmpty(value, "Current Password");
               return (
                 !isCurrentPasswordIncorrect || "Current password is incorrect"
               );
@@ -118,19 +120,36 @@ export default function ChangePasswordScreen() {
           name="newPassword"
           rules={{
             required: "New password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
-            },
-            maxLength: {
-              value: 20,
-              message: "Password must be at most 20 characters",
-            },
-            pattern: {
-              value:
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,20}$/,
-              message:
-                "Password must contain uppercase, lowercase, number, and special character",
+            validate: (value) => {
+              if (!validateNotEmpty(value, "New Password")) return validateNotEmpty(value, "New Password");
+              
+              const errors = [];
+              
+              if (value.length < 6) {
+                errors.push("Password must be at least 6 characters long");
+              }
+              
+              if (value.length > 20) {
+                errors.push("Password must be at most 20 characters long");
+              }
+              
+              if (!/(?=.*[a-z])/.test(value)) {
+                errors.push("Password must contain at least one lowercase letter");
+              }
+              
+              if (!/(?=.*[A-Z])/.test(value)) {
+                errors.push("Password must contain at least one uppercase letter");
+              }
+              
+              if (!/(?=.*\d)/.test(value)) {
+                errors.push("Password must contain at least one number");
+              }
+              
+              if (!/(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(value)) {
+                errors.push("Password must contain at least one special character");
+              }
+              
+              return errors.length > 0 ? errors.join(", ") : true;
             },
           }}
           render={({ field: { onChange, onBlur, value } }) => {
@@ -180,21 +199,38 @@ export default function ChangePasswordScreen() {
           name="confirmNewPassword"
           rules={{
             required: "Confirm new password is required",
-            validate: (value) =>
-              value === newPassword || "Passwords do not match",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
-            },
-            maxLength: {
-              value: 20,
-              message: "Password must be at most 20 characters",
-            },
-            pattern: {
-              value:
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,20}$/,
-              message:
-                "Password must contain uppercase, lowercase, number, and special character",
+            validate: (value) => {
+              if (!validateNotEmpty(value, "Confirm New Password")) return validateNotEmpty(value, "Confirm New Password");
+              
+              if (value !== newPassword) return "Passwords do not match";
+              
+              const errors = [];
+              
+              if (value.length < 6) {
+                errors.push("Password must be at least 6 characters long");
+              }
+              
+              if (value.length > 20) {
+                errors.push("Password must be at most 20 characters long");
+              }
+              
+              if (!/(?=.*[a-z])/.test(value)) {
+                errors.push("Password must contain at least one lowercase letter");
+              }
+              
+              if (!/(?=.*[A-Z])/.test(value)) {
+                errors.push("Password must contain at least one uppercase letter");
+              }
+              
+              if (!/(?=.*\d)/.test(value)) {
+                errors.push("Password must contain at least one number");
+              }
+              
+              if (!/(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(value)) {
+                errors.push("Password must contain at least one special character");
+              }
+              
+              return errors.length > 0 ? errors.join(", ") : true;
             },
           }}
           render={({ field: { onChange, onBlur, value } }) => {

@@ -24,6 +24,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import validateNotEmpty from "@/utils/validateNotEmpty";
 
 const sample_avatar = require("@/assets/images/sample-avatar.png");
 const PROGRAM_OPTIONS = ["CQ", "CTTT", "CLC", "VP"];
@@ -161,7 +162,9 @@ export default function EditProfileScreen() {
       dispatch(setUserChangeValid(false));
       return;
     }
-    const gpaValue = gpaWatch ? parseFloat(gpaWatch.toString().replace(",", ".")) : 0;
+    const gpaValue = gpaWatch
+      ? parseFloat(gpaWatch.toString().replace(",", "."))
+      : 0;
     dispatch(setUserChangeValid(true));
     dispatch(
       setUserChange({
@@ -244,6 +247,8 @@ export default function EditProfileScreen() {
                 )}
                 name="firstName"
                 rules={{
+                  validate: (value) =>
+                    !value || validateNotEmpty(value, "First Name"),
                   maxLength: {
                     value: 20,
                     message: "First Name max 20 characters",
@@ -278,6 +283,8 @@ export default function EditProfileScreen() {
                 )}
                 name="lastName"
                 rules={{
+                  validate: (value) =>
+                    !value || validateNotEmpty(value, "Last Name"),
                   maxLength: {
                     value: 20,
                     message: "Last Name max 20 characters",
@@ -361,7 +368,7 @@ export default function EditProfileScreen() {
                         ? new Date(dateOfBirthWatch)
                         : user.dateOfBirth
                         ? new Date(user.dateOfBirth)
-                        : new Date(2000, 0, 1) 
+                        : new Date(2000, 0, 1)
                     }
                     mode="date"
                     display="default"
@@ -412,10 +419,15 @@ export default function EditProfileScreen() {
             )}
             name="phone"
             rules={{
-              validate: (v) =>
-                !v ||
-                (/^\d{10}$/.test(v) && v.length === 10) ||
-                "Phone must be 10 digits",
+              validate: (v) => {
+                if (!v) return true;
+                if (!validateNotEmpty(v, "Phone"))
+                  return validateNotEmpty(v, "Phone");
+                return (
+                  (/^\d{10}$/.test(v) && v.length === 10) ||
+                  "Phone must be 10 digits"
+                );
+              },
             }}
           />
           {errors.phone && (
@@ -608,12 +620,16 @@ export default function EditProfileScreen() {
             )}
             name="linkedin"
             rules={{
-              validate: (v) =>
-                !v ||
-                /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/.test(
-                  v
-                ) ||
-                "Invalid LinkedIn URL",
+              validate: (v) => {
+                if (!v) return true;
+                if (!validateNotEmpty(v, "LinkedIn"))
+                  return validateNotEmpty(v, "LinkedIn");
+                return (
+                  /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/.test(
+                    v
+                  ) || "Invalid LinkedIn URL"
+                );
+              },
               maxLength: { value: 60, message: "LinkedIn max 60 characters" },
             }}
           />
@@ -645,12 +661,16 @@ export default function EditProfileScreen() {
             )}
             name="github"
             rules={{
-              validate: (v) =>
-                !v ||
-                /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/.test(
-                  v
-                ) ||
-                "Invalid GitHub URL",
+              validate: (v) => {
+                if (!v) return true;
+                if (!validateNotEmpty(v, "GitHub"))
+                  return validateNotEmpty(v, "GitHub");
+                return (
+                  /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/.test(
+                    v
+                  ) || "Invalid GitHub URL"
+                );
+              },
               maxLength: { value: 60, message: "Github max 60 characters" },
             }}
           />
@@ -682,12 +702,16 @@ export default function EditProfileScreen() {
             )}
             name="facebook"
             rules={{
-              validate: (v) =>
-                !v ||
-                /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9._-]+\/?$/.test(
-                  v
-                ) ||
-                "Invalid Facebook URL",
+              validate: (v) => {
+                if (!v) return true;
+                if (!validateNotEmpty(v, "Facebook"))
+                  return validateNotEmpty(v, "Facebook");
+                return (
+                  /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9._-]+\/?$/.test(
+                    v
+                  ) || "Invalid Facebook URL"
+                );
+              },
               maxLength: { value: 60, message: "Facebook max 60 characters" },
             }}
           />

@@ -34,7 +34,7 @@ export default function UserInfoComponent({
 UserInfoProps) {
   const router = useRouter();
 
-  const { userAvatar } = useAppSelector((state) => state.user);
+  const { userAvatar, user } = useAppSelector((state) => state.user);
 
   const handleEditProfile = () => {
     router.push("/profile/edit-profile");
@@ -73,9 +73,12 @@ UserInfoProps) {
       {/* user info */}
       <View style={styles.userInfoSection}>
         {/* user full name */}
-        <Text style={styles.userFullName}>
+        {!isOwnProfile && <Text style={styles.userFullName}>
           {firstName || lastName ? firstName + " " + lastName : "No name"}
-        </Text>
+        </Text>}
+        {isOwnProfile && user && <Text style={styles.userFullName}>
+          {user.firstName || user.lastName ? user.firstName + " " + user.lastName : "No name"}
+        </Text>}
         {/* Edit profile button */}
         {/* {isOwnProfile && (
             <ButtonGradient

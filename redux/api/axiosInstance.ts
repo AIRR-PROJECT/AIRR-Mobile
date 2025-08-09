@@ -63,12 +63,12 @@ const processQueue = (error: any, token: string | null = null) => {
 api.interceptors.request.use(
   async (config: CustomAxiosRequestConfig) => {
     // Log every outgoing request
-    console.log(
-      `[API REQUEST] ${config.method?.toUpperCase() || "GET"} ${
-        config.baseURL
-      }${config.url}`,
-      config
-    );
+    // console.log(
+    //   `[API REQUEST] ${config.method?.toUpperCase() || "GET"} ${
+    //     config.baseURL
+    //   }${config.url}`,
+    //   config
+    // );
 
     const controller = new AbortController();
     config.signal = controller.signal;
@@ -111,9 +111,7 @@ api.interceptors.response.use(
     const config = response.config as CustomAxiosRequestConfig;
     if (config._abortTimeout) clearTimeout(config._abortTimeout);
 
-    if (!config["noLoadingScreen"]) {
-      store.dispatch(hideLoading());
-    }
+    store.dispatch(hideLoading());
     return response;
   },
   async (error) => {
@@ -122,9 +120,7 @@ api.interceptors.response.use(
 
     // On abort
     if (error.name && error.name === "CanceledError") {
-      if (!config["noLoadingScreen"]) {
-        store.dispatch(hideLoading());
-      }
+      store.dispatch(hideLoading());
       Alert.alert("Error", "Request timed out.");
       return Promise.reject(error);
     }

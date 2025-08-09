@@ -19,7 +19,11 @@ import { createTag } from "@/redux/slices/groupSlice";
 import { GroupTag } from "@/interfaces/groupInterface";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { searchTagCreateBlog, setCreateBlogRequestedTags, setCreateBlogTagCount } from "@/redux/slices/blogSlice";
+import {
+  searchTagCreateBlog,
+  setCreateBlogRequestedTags,
+  setCreateBlogTagCount,
+} from "@/redux/slices/blogSlice";
 import { CreateBlogTag } from "@/interfaces/blogInterface";
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -30,9 +34,15 @@ const mockTags: string[] = ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6"];
 export default function RequestTagsScreen({
   isCreate = false, // Default to false if not provided
 }: AddTagsComponentProps) {
-  const dispatch = useAppDispatch()
-  const { fieldID, groupID, currentTagCount } = useLocalSearchParams<{ fieldID: string, groupID: string, currentTagCount: string }>()
-  const { createBlogCurrentTags, createBlogRequestedTags } = useAppSelector(state => state.blog)
+  const dispatch = useAppDispatch();
+  const { fieldID, groupID, currentTagCount } = useLocalSearchParams<{
+    fieldID: string;
+    groupID: string;
+    currentTagCount: string;
+  }>();
+  const { createBlogCurrentTags, createBlogRequestedTags } = useAppSelector(
+    (state) => state.blog
+  );
 
   // State to hold the new tag input by user
   const [newTagToRequest, setNewTag] = useState<string>("");
@@ -44,35 +54,43 @@ export default function RequestTagsScreen({
   const [selectableTags, setSelectableTags] = useState<CreateBlogTag[]>([]);
 
   // Created/Requested Tag that user can deselect
-  const [requestedTags, setRequestedTags] = useState<CreateBlogTag[]>(createBlogRequestedTags);
+  const [requestedTags, setRequestedTags] = useState<CreateBlogTag[]>(
+    createBlogRequestedTags
+  );
 
   // Error if the tag selected already chosen for the blog
-  const [showError, setShowError] = useState(false)
+  const [showError, setShowError] = useState(false);
 
-  const [tagCount, setTagCount] = useState<number>(parseInt(currentTagCount))
+  const [tagCount, setTagCount] = useState<number>(parseInt(currentTagCount));
 
   const onChangeText = (text: string) => {
     setNewTag(text);
   };
 
   const handleCheckTag = async (tag: string) => {
-    setShowError(false)
+    setShowError(false);
     // Simulate API call to check tag validity
     if (tag.length > 0 && tag.length <= 20) {
-      dispatch(searchTagCreateBlog({ keyword: tag, fieldID: fieldID, groupID: groupID })).then((res) => {
-        const tags = res.payload as CreateBlogTag[]
-        setSelectableTags(tags)
+      dispatch(
+        searchTagCreateBlog({
+          keyword: tag,
+          fieldID: fieldID,
+          groupID: groupID,
+        })
+      ).then((res) => {
+        const tags = res.payload as CreateBlogTag[];
+        setSelectableTags(tags);
 
-        const isValid = checkTagValidity(tag, tags)
+        const isValid = checkTagValidity(tag, tags);
 
         if (isValid) {
           setValidTag(tag);
-          setShowError(false)
+          setShowError(false);
         } else {
           setValidTag(null);
-          setShowError(true)
+          setShowError(true);
         }
-      })
+      });
       // const isValid = await checkTagWithAPI(tag); // Replace with your API
       // if (isValid) {
       //   setValidTag(tag);
@@ -84,13 +102,13 @@ export default function RequestTagsScreen({
 
   // Dummy API function for illustration
   function checkTagValidity(tag: string, foundTags: CreateBlogTag[]): boolean {
-    if (foundTags.length == 0) return true
+    if (foundTags.length == 0) return true;
 
     for (let foundTag of foundTags) {
-      if (tag == foundTag.TagName) return false
+      if (tag == foundTag.TagName) return false;
     }
 
-    return true
+    return true;
   }
   // selectableTags.push(...mockTags); // Add mock tags to selectableTags for testing
   const handleSubmit = () => {
@@ -100,28 +118,27 @@ export default function RequestTagsScreen({
       const newTags: CreateBlogTag[] = requestedTags.map((tag) => ({
         _id: tag._id ?? "", // Generate a random _id
         TagName: tag.TagName,
-        OperationType: tag.OperationType
+        OperationType: tag.OperationType,
       }));
       setNewTag("");
       setValidTag(null);
       setSelectableTags([]);
       //Go Back and send the new tags to the parent component
-      dispatch(setCreateBlogRequestedTags(newTags))
+      dispatch(setCreateBlogRequestedTags(newTags));
 
       // Assign new tag count value
-      dispatch(setCreateBlogTagCount(tagCount))
-      router.back()
-    }
-    else {
+      dispatch(setCreateBlogTagCount(tagCount));
+      router.back();
+    } else {
       setNewTag("");
       setValidTag(null);
       setSelectableTags([]);
       //Go Back and send the new tags to the parent component
-      dispatch(setCreateBlogRequestedTags([]))
+      dispatch(setCreateBlogRequestedTags([]));
 
       // Assign new tag count value
-      dispatch(setCreateBlogTagCount(tagCount))
-      router.back()
+      dispatch(setCreateBlogTagCount(tagCount));
+      router.back();
     }
   };
 
@@ -145,8 +162,13 @@ export default function RequestTagsScreen({
             onChange={(e) => onChangeText(e.nativeEvent.text)}
             numberOfLines={1}
           />
+          {/* Text counter */}
+          <Text style={styles.textCounter}>
+            {newTagToRequest.length}/{20}
+          </Text>
         </View>
-        {/* Button to check if existing */}
+      </View>
+      {/* Button to check if existing */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
@@ -157,9 +179,8 @@ export default function RequestTagsScreen({
         >
           <Text style={styles.buttonText}>Check existing</Text>
         </TouchableOpacity>
-      </View>
       {/* Select tag to add or deselect */}
-      <View style={[{flex: 1, gap: 10, marginBottom: 10},]}>
+      <View style={[{ flex: 1, gap: 10, marginBottom: 10 }]}>
         <View style={styles.selectTagBox}>
           <Text style={styles.selectTagText}>
             Your Tag match, please select:
@@ -169,34 +190,43 @@ export default function RequestTagsScreen({
             contentContainerStyle={{}}
           >
             <View style={styles.tagsContainer}>
-              {selectableTags.length != 0 && selectableTags.map((tag, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.selectTagButton}
-                  onPress={() => {
-                    if (!createBlogCurrentTags.includes(tag.TagName) && !requestedTags.find((t) => t.TagName == tag.TagName)) {
-                      // Don't allow add more tags if tag count exceeds 10
-                      if (tagCount == 10) {
-                        ToastAndroid.show("Total number of tags must not exceed 10", ToastAndroid.SHORT)
-                        return
+              {selectableTags.length != 0 &&
+                selectableTags.map((tag, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.selectTagButton}
+                    onPress={() => {
+                      if (
+                        !createBlogCurrentTags.includes(tag.TagName) &&
+                        !requestedTags.find((t) => t.TagName == tag.TagName)
+                      ) {
+                        // Don't allow add more tags if tag count exceeds 10
+                        if (tagCount == 10) {
+                          ToastAndroid.show(
+                            "Total number of tags must not exceed 10",
+                            ToastAndroid.SHORT
+                          );
+                          return;
+                        }
+                        // Add to tag count
+                        setTagCount(tagCount + 1);
+
+                        setSelectableTags((prev) =>
+                          prev.filter((t) => t._id !== tag._id)
+                        );
+                        setRequestedTags(() => [tag, ...requestedTags]);
+                        setShowError(false);
+                      } else {
+                        setShowError(true);
                       }
-                      // Add to tag count
-                      setTagCount(tagCount + 1)
-                      
-                      setSelectableTags((prev) => prev.filter((t) => t._id !== tag._id));
-                      setRequestedTags(() => [tag, ...requestedTags])
-                      setShowError(false)
-                    }
-                    else {
-                      setShowError(true)
-                    }
-                  }}
-                >
-                  <Text style={styles.selectTagButtonText}>{tag.TagName}</Text>
-                  <FontAwesome name="plus" size={20} color="#fff" />
-                  
-                </TouchableOpacity>
-              ))}
+                    }}
+                  >
+                    <Text style={styles.selectTagButtonText}>
+                      {tag.TagName}
+                    </Text>
+                    <FontAwesome name="plus" size={20} color="#fff" />
+                  </TouchableOpacity>
+                ))}
             </View>
           </ScrollView>
           {/* Create new Tag button */}
@@ -205,43 +235,64 @@ export default function RequestTagsScreen({
             style={styles.createTagButton}
             onPress={() => {
               // Handle tag creation logic here
-              if (validTag && !requestedTags.find((t) => t.TagName == validTag)) {
+              if (
+                validTag &&
+                !requestedTags.find((t) => t.TagName == validTag)
+              ) {
                 // Length check
                 if (validTag.length < 3) {
-                  ToastAndroid.show("Tag name must be at least 3 characters long", ToastAndroid.SHORT)
-                  return
+                  ToastAndroid.show(
+                    "Tag name must be at least 3 characters long",
+                    ToastAndroid.SHORT
+                  );
+                  return;
                 }
                 // Don't allow add more tags if tag count exceeds 10
-                console.log(tagCount)
+                console.log(tagCount);
                 if (tagCount == 10) {
-                  ToastAndroid.show("Total number of tags must not exceed 10", ToastAndroid.SHORT)
-                  return
+                  ToastAndroid.show(
+                    "Total number of tags must not exceed 10",
+                    ToastAndroid.SHORT
+                  );
+                  return;
                 }
                 // Add to tag count
-                setTagCount(tagCount + 1)
+                setTagCount(tagCount + 1);
 
-                setRequestedTags((prev) => [...prev, { _id: Math.random().toString(36).substring(2, 15), TagName: validTag, OperationType: "new-tag" }]);
+                setRequestedTags((prev) => [
+                  ...prev,
+                  {
+                    _id: Math.random().toString(36).substring(2, 15),
+                    TagName: validTag,
+                    OperationType: "new-tag",
+                  },
+                ]);
 
                 setValidTag(null);
                 setNewTag("");
-                setShowError(false)
-              }
-              else {
-                setShowError(true)
+                setShowError(false);
+              } else {
+                setShowError(true);
               }
             }}
             disabled={validTag === null}
           >
-            <AntDesign name="pluscircle" size={24} color={validTag ? "#B9FF66" : "grey"} />
-            <Text style={validTag ? styles.selectTagText : styles.selectTagTextDisabled}>
+            <AntDesign
+              name="pluscircle"
+              size={24}
+              color={validTag ? "#B9FF66" : "grey"}
+            />
+            <Text
+              style={
+                validTag ? styles.selectTagText : styles.selectTagTextDisabled
+              }
+            >
               Create {validTag === null ? "new" : validTag} Tag
             </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.deselectTagBox}>
-          <Text style={styles.deselectTagText}>
-            Requested Tags:
-          </Text>
+          <Text style={styles.deselectTagText}>Requested Tags:</Text>
           <ScrollView
             style={styles.listTagsScrollView}
             contentContainerStyle={{}}
@@ -253,12 +304,16 @@ export default function RequestTagsScreen({
                   style={styles.deselectTagButton}
                   onPress={() => {
                     // Subtract from tag count
-                    setTagCount(tagCount - 1)
-                    
-                    setRequestedTags((prev) => prev.filter((t) => t._id !== tag._id));
+                    setTagCount(tagCount - 1);
+
+                    setRequestedTags((prev) =>
+                      prev.filter((t) => t._id !== tag._id)
+                    );
                   }}
                 >
-                  <Text style={styles.deselectTagButtonText}>{tag.TagName}</Text>
+                  <Text style={styles.deselectTagButtonText}>
+                    {tag.TagName}
+                  </Text>
                   <FontAwesome name="times" size={20} color="#000" />
                 </TouchableOpacity>
               ))}
@@ -267,9 +322,9 @@ export default function RequestTagsScreen({
           {/* Create new Tag button */}
 
           {/* If user create a new tag that already existing, makje this component appear */}
-          {showError && <Text style={styles.errorText}>
-            This tag is already existing!
-          </Text>}
+          {showError && (
+            <Text style={styles.errorText}>This tag is already existing!</Text>
+          )}
         </View>
       </View>
       {/* Done button */}
@@ -293,6 +348,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#B9FF66",
     padding: 10,
     borderRadius: 20,
+    marginBottom: 10,
     alignItems: "center",
   },
   buttonText: {
@@ -345,19 +401,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
-    gap: 5
+    gap: 5,
   },
   selectTagText: {
     color: "#000",
     fontSize: 16,
     fontWeight: "bold",
-    marginLeft: 10,
+    marginLeft: 5,
   },
   selectTagTextDisabled: {
     color: "grey",
     fontSize: 16,
     fontWeight: "bold",
-    marginLeft: 10,
+    marginLeft: 5,
   },
   selectTagButtonText: {
     color: "#fff",
@@ -378,13 +434,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
-    gap: 5
+    gap: 5,
   },
   deselectTagText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    marginLeft: 10,
+    marginLeft: 5,
   },
   deselectTagButtonText: {
     color: "#000",
@@ -419,5 +475,9 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#FF6666",
     fontSize: 16,
-  }
+  },
+  textCounter: {
+    color: "#B9FF66",
+    fontSize: 14,
+  },
 });

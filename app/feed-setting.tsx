@@ -78,7 +78,7 @@ function FeedSettingScreen() {
   };
 
   const handleSaveTags = () => {
-    const saveTagsPayload = { tags: selectedTags };
+    const saveTagsPayload = { tags: selectedTags.filter(((t, index) => selectedTagsShow[index] === true)) };
     dispatch(saveTags(saveTagsPayload)).then(() => {
       dispatch(getUserInfo());
       ToastAndroid.show("Tags saved!", ToastAndroid.SHORT);

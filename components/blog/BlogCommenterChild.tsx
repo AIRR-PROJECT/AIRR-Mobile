@@ -27,11 +27,15 @@ import {
 // reply to là tên của người mà user reply lại trong content
 // nó có thể khác với parent comment
 type BlogCommenterChildProps = {
-  parentComment: UserBlogComment,
-  comment: UserBlogChildComment
+  parentComment: UserBlogComment;
+  comment: UserBlogChildComment;
   replyTo: string;
   onReturnContentPress: (childCommentContent: string) => void;
-  onMorePress?: (isUserWrittenComment: boolean, chosenComment: UserBlogComment, chosenChildComment: UserBlogChildComment) => void;
+  onMorePress?: (
+    isUserWrittenComment: boolean,
+    chosenComment: UserBlogComment,
+    chosenChildComment: UserBlogChildComment
+  ) => void;
 } & { rootCommentID: string };
 
 export default function BlogCommenterChild({
@@ -123,7 +127,10 @@ export default function BlogCommenterChild({
         >
           {/* User avatar */}
           <View style={styles.rowContainer}>
-            <Image style={styles.avatar} source={{ uri: comment.User.AvatarURL }} />
+            <Image
+              style={styles.avatar}
+              source={{ uri: comment.User.AvatarURL }}
+            />
             {/* name and date */}
             <View>
               <View>
@@ -143,7 +150,8 @@ export default function BlogCommenterChild({
         </View>
         {/* Actual Comment */}
         <Text style={styles.comment}>
-          <Text style={[styles.otherUserUserName]}>@{replyTo}</Text> {comment.Content}
+          <Text style={[styles.otherUserUserName]}>@{replyTo}</Text>{" "}
+          {comment.Content}
         </Text>
         <Divider />
         {/* Like, Comment, Share */}
@@ -169,11 +177,15 @@ export default function BlogCommenterChild({
           <View
             style={[styles.rowContainer, { justifyContent: "space-between" }]}
           >
-            <Text style={styles.replyTo}>
-              Replying to{" "}
-              <Text style={styles.otherUserUserName}>@{comment.User.UserName}</Text>{" "}
-              comment
-            </Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.replyTo}>
+                Replying to{" "}
+                <Text style={styles.otherUserUserName}>
+                  @{comment.User.UserName}
+                </Text>{" "}
+                comment
+              </Text>
+            </View>
             <TouchableOpacity onPress={handleCloseReply}>
               <AntDesign name="close" size={24} color="white" />
             </TouchableOpacity>
@@ -187,7 +199,9 @@ export default function BlogCommenterChild({
               textAlignVertical="top"
               onChangeText={setReplyText}
             >
-              <Text style={[styles.otherUserUserName]}>@{comment.User.UserName} </Text>{" "}
+              <Text style={[styles.otherUserUserName]}>
+                @{comment.User.UserName}{" "}
+              </Text>{" "}
             </TextInput>
             {/* Send button */}
             <TouchableOpacity
@@ -246,7 +260,6 @@ const styles = StyleSheet.create({
   replyTo: {
     color: "#fff",
     fontSize: 16,
-    textAlign: "justify",
   },
   replyWriteContainer: {
     borderWidth: 1,

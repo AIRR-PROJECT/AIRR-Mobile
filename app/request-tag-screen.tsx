@@ -64,7 +64,8 @@ export default function RequestTagsScreen({
   const handleCheckTag = async (tag: string) => {
     setShowError(false);
     // Simulate API call to check tag validity
-    if (tag.length > 0 && tag.length <= 20) {
+    const trimmedTag = tag.trim();
+    if (trimmedTag.length > 0 && trimmedTag.length <= 20) {
       dispatch(
         searchTagCreateBlog({
           keyword: tag,

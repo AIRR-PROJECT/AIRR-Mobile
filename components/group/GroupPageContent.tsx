@@ -722,7 +722,7 @@ GroupPageProps) {
               <View style={{ flex: 1, gap: 10 }}>
                 <View style={{}}>
                   <Text style={styles.joinModalTitle}>
-                    Are You Ready to Join the Group?
+                    Are you ready to join the group?
                   </Text>
                 </View>
                 <View style={[styles.rowContainer, { gap: 20 }]}>
@@ -733,7 +733,7 @@ GroupPageProps) {
                     style={styles.joinCancelButton}
                   >
                     <Text style={styles.joinCancelButtonText}>
-                      Let Me Rethink
+                      Let me rethink
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -745,7 +745,7 @@ GroupPageProps) {
                     style={styles.joinConfirmButton}
                   >
                     <Text style={styles.joinConfirmButtonText}>
-                      Count Me In!
+                      Count me in!
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -762,7 +762,7 @@ GroupPageProps) {
               <View style={{ flex: 1, gap: 10 }}>
                 <View style={{}}>
                   <Text style={styles.joinModalTitle}>
-                    Cancel Request to Join Group?
+                    Cancel request to join group?
                   </Text>
                 </View>
                 <View style={[styles.rowContainer, { gap: 20 }]}>
@@ -773,7 +773,7 @@ GroupPageProps) {
                     style={styles.joinCancelButton}
                   >
                     <Text style={styles.joinCancelButtonText}>
-                      Let Me Rethink
+                      Let me rethink
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -785,7 +785,7 @@ GroupPageProps) {
                     style={styles.joinConfirmButton}
                   >
                     <Text style={styles.joinConfirmButtonText}>
-                      Yes, Cancel it!
+                      Yes, cancel it!
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -802,7 +802,7 @@ GroupPageProps) {
                 <View style={{ flex: 1, gap: 10 }}>
                   <View style={{}}>
                     <Text style={styles.joinModalTitle}>
-                      Are You Sure You Want To Leave the Group?
+                      Are you sure you want to leave the group?
                     </Text>
                   </View>
                   <View style={[styles.rowContainer, { gap: 20 }]}>
@@ -813,7 +813,7 @@ GroupPageProps) {
                       style={styles.joinCancelButton}
                     >
                       <Text style={styles.joinCancelButtonText}>
-                        Let Me Rethink
+                        Let me rethink
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -825,7 +825,7 @@ GroupPageProps) {
                       style={styles.joinConfirmButton}
                     >
                       <Text style={styles.joinConfirmButtonText}>
-                        Sure, I'm Out!
+                        Sure, I'm out!
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -846,9 +846,9 @@ GroupPageProps) {
                 ]}
               >
                 <Text style={styles.joinModalTitle}>
-                  Are You Sure For Leaving?
+                  Are you sure you want to leave the group?
                 </Text>
-                <View style={styles.rowContainer}>
+                <View style={[styles.rowContainer, { width: "100%" }]}>
                   <Entypo name="warning" size={24} color="#FFA500" />
                   <Text style={styles.warningText}>
                     You are the only member left in this group. Want to delete
@@ -871,7 +871,7 @@ GroupPageProps) {
                     onPress={handleLeaveGroupConfirm}
                   >
                     <Text style={styles.joinConfirmButtonText}>
-                      Delete Group
+                      Delete group
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -891,7 +891,7 @@ GroupPageProps) {
                 ]}
               >
                 <Text style={styles.joinModalTitle}>
-                  Are You Sure For Leaving?
+                  Are you sure you want to leave the group?
                 </Text>
                 <View style={styles.rowContainer}>
                   <Text style={styles.warningText}>

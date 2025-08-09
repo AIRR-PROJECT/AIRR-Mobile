@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   },
   approveButton: {
     backgroundColor: "#B9FF66",
-    padding: 20,
+    padding: 15,
     paddingBlock: 10,
     borderRadius: 20,
     marginRight: 10,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   rejectButton: {
     backgroundColor: "#FF6E6E",
-    padding: 20,
+    padding: 15,
     paddingBlock: 10,
     borderRadius: 20,
     borderWidth: 2,

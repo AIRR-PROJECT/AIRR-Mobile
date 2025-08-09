@@ -116,7 +116,7 @@ export default function GroupPage() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <ScrollView style={styles.contentStyle}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: 40, flexGrow: 1}}
         showsVerticalScrollIndicator={false}
       >
         <GroupPageContent

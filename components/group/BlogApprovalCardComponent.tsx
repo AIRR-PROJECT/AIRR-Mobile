@@ -26,14 +26,16 @@ export default function BlogApprovalCardComponent({
   onApprove,
   onReject,
 }: BlogApprovalCardComponentProps) {
-  const dispatch = useAppDispatch()
-  const [title, setTitle] = useState("")
-  const [thumbnail, setThumbnail] = useState("")
-  
+  const dispatch = useAppDispatch();
+  const [title, setTitle] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
+
   useEffect(() => {
-    setTitle(Title)
-    setThumbnail("https://res.cloudinary.com/dvjiwyc6g/image/upload/q_auto,f_auto/v1751523534/z4zzyvqnvhutgudzhnn2.webp")
-  }, [])
+    setTitle(Title);
+    setThumbnail(
+      "https://res.cloudinary.com/dvjiwyc6g/image/upload/q_auto,f_auto/v1751523534/z4zzyvqnvhutgudzhnn2.webp"
+    );
+  }, []);
 
   function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {
     const styleAnimation = useAnimatedStyle(() => {
@@ -59,7 +61,7 @@ export default function BlogApprovalCardComponent({
   const handlePress = () => {
     console.log("Press blog with id: ", BlogID);
     route.push(`/group/pending-blog?blogID=${BlogID}`);
-  }
+  };
   return (
     <ReanimatedSwipeable
       containerStyle={styles.swipeable}
@@ -110,33 +112,30 @@ export default function BlogApprovalCardComponent({
               addSuffix: true,
             })}
           </Text>
-          {/* Approve and Reject Button */}
-          {
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.approveButton}
-                onPress={() => {
-                  onApprove(BlogID, Owner._id);
-                }}
-                activeOpacity={0.7}
-              >
-                <AntDesign name="checkcircle" size={14} color="black" />
-                <Text style={styles.approveButtonText}>Approve</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.rejectButton}
-                onPress={() => {
-                  onReject(BlogID, Owner._id);
-                }}
-                activeOpacity={0.7}
-              >
-                <AntDesign name="closecircle" size={14} color="black" />
-                <Text style={styles.rejectButtonText}>Reject</Text>
-              </TouchableOpacity>
-            </View>
-          }
         </View>
       </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.approveButton}
+          onPress={() => {
+            onApprove(BlogID, Owner._id);
+          }}
+          activeOpacity={0.7}
+        >
+          <AntDesign name="checkcircle" size={14} color="black" />
+          <Text style={styles.approveButtonText}>Approve</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rejectButton}
+          onPress={() => {
+            onReject(BlogID, Owner._id);
+          }}
+          activeOpacity={0.7}
+        >
+          <AntDesign name="closecircle" size={14} color="black" />
+          <Text style={styles.rejectButtonText}>Reject</Text>
+        </TouchableOpacity>
+      </View>
     </ReanimatedSwipeable>
   );
 }
@@ -153,6 +152,9 @@ const styles = StyleSheet.create({
   },
   swipeable: {
     flex: 1,
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 20,
   },
   thumbnail: {
     width: 80,
@@ -227,6 +229,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
     flex: 1,
   },

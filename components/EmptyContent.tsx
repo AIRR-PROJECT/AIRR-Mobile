@@ -5,8 +5,6 @@ import { StyleSheet, Text, View, Image } from "react-native";
 import Svg, { Path, SvgProps } from "react-native-svg";
 
 export function EmptyContent() {
-    const image = "https://acmi-website-media-prod.s3.amazonaws.com/media/images/confused_travolta_original_acmi.original.jpg"
-
     return (
         <View style={styles.container}>
             <SvgComponent/>
@@ -19,8 +17,8 @@ export function EmptyContent() {
 const styles = StyleSheet.create({
     container: {
       borderRadius: 20,
-      height: 400,
-      margin: 10,
+      height: 250,
+      margin: 20,
       padding: 10,
       alignItems: 'center',
     },
@@ -35,12 +33,14 @@ const styles = StyleSheet.create({
     title: { 
         color: "#fff",
         marginTop: 20,
-        fontSize: 12.5
+        fontSize: 12.5,
+        textAlign: 'center'
     },
     description: { 
         color: "#ffffff80",
         marginTop: 17,
-        fontSize: 12.5
+        fontSize: 12.5,
+        textAlign: 'center'
     }
 })
 

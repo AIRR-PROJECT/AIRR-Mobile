@@ -1,20 +1,14 @@
 import {
   View,
-  Text,
   StyleSheet,
   FlatList,
   RefreshControl,
   Dimensions,
 } from "react-native";
-import ParallaxFlatList from "@/components/ParallaxFlatList";
-import ParallaxFlashList from "@/components/ParallaxFlashList";
 import GradientText from "@/components/GradientText";
-import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { AIBlog, UserBlog } from "@/interfaces/blogInterface";
-import { loremIpsum } from "lorem-ipsum";
 import AIBlogPreview from "@/components/tabs/feed/AIBlogPreview";
 import FeedBlogPreview from "@/components/tabs/feed/FeedBlogPreview";
-import { useWatch } from "react-hook-form";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import {
@@ -46,23 +40,19 @@ import queryClient from "@/redux/api/queryClient";
 // };
 // const Data = [mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog,mockBlog, mockBlog, mockBlog];
 
-import { FlashList } from "@shopify/flash-list";
 import AIBlogPreviewSkeleton from "@/components/tabs/feed/AIBlogPreviewSkeleton";
 import FeedBlogPreviewSkeleton from "@/components/tabs/feed/FeedBlogPreviewSkeleton";
-import { router, useLocalSearchParams, useSegments } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, {
   ICarouselInstance,
-  Pagination,
 } from "react-native-reanimated-carousel";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MoreOptionBottomList from "@/components/blog/MoreOptionBottomList";
-import { string } from "zod";
-import { BlogStatus, BlogViewType } from "@/enums/blog_properties.enum";
-import { getUserGroupStatus } from "@/redux/slices/groupSlice";
+import { BlogViewType } from "@/enums/blog_properties.enum";
 import { EmptyContent } from "@/components/EmptyContent";
-import { min } from "lodash";
+import { EmptyFeed } from "@/components/EmptyFeed";
 const { width, height } = Dimensions.get("window");
 const carouselHeight = 280;
 export default function MyFeed() {
@@ -284,7 +274,7 @@ export default function MyFeed() {
             keyExtractor={(item, index) => index.toString()}
             ItemSeparatorComponent={() => <View style={{ height: 25 }} />}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => <EmptyContent />}
+            renderItem={({ item }) => <EmptyFeed />}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={
               <View>

@@ -137,7 +137,7 @@ export default function NotificationsItem({
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
       <View
-        style={[styles.container, { backgroundColor: seen ? "#fff" : "#000" }]}
+        style={[styles.container, { backgroundColor: seen ? "#000" : "#fff" }]}
       >
         {/* Image from user noti */}
         <Image
@@ -155,19 +155,19 @@ export default function NotificationsItem({
               width: type !== NotificationType.OTHER ? "100%" : "100%",
             }}
           >
-            <Text style={[styles.name, { color: seen ? "#000" : "#fff" }]}>
+            <Text style={[styles.name, { color: seen ? "#fff" : "#000" }]}>
               {/* {from.firstName} {from.lastName} */}
               {from.username}
             </Text>
             <View style={styles.rowContainer}>
               <Text
-                style={[styles.description, { color: seen ? "#000" : "#fff" }]}
+                style={[styles.description, { color: seen ? "#fff" : "#000" }]}
               >
                 {description}.
               </Text>
             </View>
             <Text
-              style={[styles.date, { color: isRead ? "#9E9E9E" : "#9E9E9E" }]}
+              style={[styles.date, { color: seen ? "#9E9E9E" : "#9E9E9E" }]}
             >
               {formatDistance(new Date(date), new Date(), {
                 addSuffix: true,

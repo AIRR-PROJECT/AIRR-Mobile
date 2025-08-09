@@ -10,6 +10,7 @@ import AnimatedPressable from "@/components/AnimatedPressable";
 import GradientText from "@/components/GradientText";
 import AuthButtonTransparent from "@/components/auth/AuthButtonTransparent";
 import { TouchableOpacity } from "react-native";
+import validateNotEmpty from "@/utils/validateNotEmpty";
 type FormData = {
   email: string;
 };
@@ -32,7 +33,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <ThemedView
         style={styles.container}
         darkColor="#1E1E1E"
@@ -73,6 +74,7 @@ export default function ForgotPasswordScreen() {
             control={control}
             rules={{
               required: "Email is required",
+              validate: (value) => validateNotEmpty(value, "Email"),
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 message: "Enter a valid email address",

@@ -14,7 +14,12 @@ import { router, useLocalSearchParams } from "expo-router";
 import Checkbox from "expo-checkbox";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { SignUpCredentials } from "@/interfaces/authInterface";
-import { resetAccountCreated, setLoggedIn, signup } from "@/redux/slices/authSlice";
+import {
+  resetAccountCreated,
+  setLoggedIn,
+  signup,
+} from "@/redux/slices/authSlice";
+import validateNotEmpty from "@/utils/validateNotEmpty";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -40,7 +45,7 @@ export default function SignUpSecondPage() {
   const password = watch("password");
   const { isAccountCreated } = useAppSelector((state) => state.auth);
 
-  const emailToSendOTP = useRef("")
+  const emailToSendOTP = useRef("");
   const [isTermChecked, setTermChecked] = useState(false);
   const handleToggleCheckbox = () => {
     setTermChecked(!isTermChecked);
@@ -48,15 +53,17 @@ export default function SignUpSecondPage() {
 
   useEffect(() => {
     dispatch(resetAccountCreated(false));
-    dispatch(setLoggedIn(false))
+    dispatch(setLoggedIn(false));
   }, []);
 
   useEffect(() => {
     if (isAccountCreated) {
       if (router.canDismiss()) {
-        router.back()
-        router.push(`/auth/verify-account-otp?resendEmail=${emailToSendOTP.current}`);
-        dispatch(setLoggedIn(true))
+        router.back();
+        router.push(
+          `/auth/verify-account-otp?resendEmail=${emailToSendOTP.current}`
+        );
+        dispatch(setLoggedIn(true));
         dispatch(resetAccountCreated(false));
       }
     }
@@ -66,7 +73,7 @@ export default function SignUpSecondPage() {
     if (!isTermChecked) {
       Alert.alert("Please accept the terms and conditions");
     } else {
-      emailToSendOTP.current = data.email
+      emailToSendOTP.current = data.email;
       const signUpData: SignUpCredentials = {
         email: data.email,
         username: data.username,
@@ -78,6 +85,39 @@ export default function SignUpSecondPage() {
   };
   const handleBackToLogin = () => {
     router.push("/auth/login");
+  };
+  const validatePassword = (value: string) => {
+    const errors = [];
+
+    if (!value || value.trim() === "") {
+      errors.push("Password cannot be empty");
+    }
+
+    if (value.length < 6) {
+      errors.push("Password must be at least 6 characters long");
+    }
+
+    if (value.length > 20) {
+      errors.push("Password must be at most 20 characters long");
+    }
+
+    if (!/(?=.*[a-z])/.test(value)) {
+      errors.push("Password must contain at least one lowercase letter");
+    }
+
+    if (!/(?=.*[A-Z])/.test(value)) {
+      errors.push("Password must contain at least one uppercase letter");
+    }
+
+    if (!/(?=.*\d)/.test(value)) {
+      errors.push("Password must contain at least one number");
+    }
+
+    if (!/(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(value)) {
+      errors.push("Password must contain at least one special character");
+    }
+
+    return errors.length > 0 ? errors.join(", ") : true;
   };
   return (
     // change light color to #000 later because figma didn't have a color for light mode
@@ -96,7 +136,9 @@ export default function SignUpSecondPage() {
             <Text style={styles.text}> now.</Text>
           </View>
           <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
-            <Text style={styles.smalltext}>Let's set up your account, new user!</Text>
+            <Text style={styles.smalltext}>
+              Let's set up your account, new user!
+            </Text>
           </View>
         </View>
         <ThemedView style={styles.formContainer}>
@@ -106,6 +148,7 @@ export default function SignUpSecondPage() {
             control={control}
             rules={{
               required: "Username is required",
+              validate: (value) => validateNotEmpty(value, "Username"),
               minLength: {
                 value: 6,
                 message: "Username must be at least 6 characters",
@@ -142,6 +185,7 @@ export default function SignUpSecondPage() {
             control={control}
             rules={{
               required: "Email is required",
+              validate: (value) => validateNotEmpty(value, "Email"),
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 message: "Enter a valid email address",
@@ -179,20 +223,7 @@ export default function SignUpSecondPage() {
             control={control}
             rules={{
               required: "Password is required",
-              minLength: {
-                value: 6,
-                message: "Password must be at least 6 characters long",
-              },
-              maxLength: {
-                value: 20,
-                message: "Password must be at most 20 characters long",
-              },
-              pattern: {
-                value:
-                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,20}$/,
-                message:
-                  "Password must contain uppercase, lowercase, number, and special character",
-              },
+              validate: validatePassword, // CHANGED: Use custom validation function
             }}
             render={({ field: { onChange, onBlur, value } }) => {
               const [showPassword, setShowPassword] = useState(false);
@@ -249,21 +280,12 @@ export default function SignUpSecondPage() {
             control={control}
             rules={{
               required: "Confirm Password is required",
-              validate: (value) =>
-                value === password || "Passwords do not match",
-              minLength: {
-                value: 6,
-                message: "Password must be at least 6 characters long",
-              },
-              maxLength: {
-                value: 20,
-                message: "Password must be at most 20 characters long",
-              },
-              pattern: {
-                value:
-                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,20}$/,
-                message:
-                  "Password must contain uppercase, lowercase, number, and special character",
+              validate: {
+                notEmpty: (value) =>
+                  validateNotEmpty(value, "Confirm Password"),
+                passwordMatch: (value) =>
+                  value === password || "Passwords do not match",
+                passwordRequirements: validatePassword, // ADD: Same validation as password
               },
             }}
             render={({ field: { onChange, onBlur, value } }) => {
@@ -349,7 +371,7 @@ export default function SignUpSecondPage() {
                 },
               ]}
             >
-              Have an account yet,{" "}
+              Have an account,{" "}
               <ThemedText
                 type="link"
                 style={[
@@ -412,6 +434,7 @@ const styles = StyleSheet.create({
     marginBottom: -10,
     padding: 10,
     fontSize: 12,
+    textAlign: "justify",
   },
 
   section: {

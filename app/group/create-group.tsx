@@ -101,65 +101,107 @@ export default function CreateGroup() {
     if (createGroupSubmitted) {
       dispatch(setCreateGroupSubmitted(false));
 
-      if (
-        !uploadedImg.current ||
-        !groupName ||
-        (chosenTags.length == 0 && createGroupCreatedTags.length == 0) ||
-        !groupField ||
-        !groupDescription
-        // !groupRules
-      ) {
-        Alert.alert("Error", "Missing field");
+      // Trim all text fields
+      const trimmedGroupName = groupName.trim();
+      const trimmedGroupDescription = groupDescription.trim();
+      const trimmedGroupRules = groupRules?.map((rule) => ({
+        ...rule,
+        RuleName: rule.RuleName.trim(),
+        RuleDescription: rule.RuleDescription.trim(),
+      }));
 
+      // Individual field validation with specific error messages
+      if (!uploadedImg.current) {
+        Alert.alert("Error", "Please upload a group avatar");
         return;
       }
 
-      if (groupName.length < 10) {
-        Alert.alert("Error", "Name must be at least 10 characters long");
+      if (!trimmedGroupName) {
+        Alert.alert("Error", "Group name is required");
         return;
       }
-      if (groupDescription.length < 10) {
-        Alert.alert("Error", "Description must be at least 10 characters long");
+
+      if (trimmedGroupName.length < 10) {
+        Alert.alert("Error", "Group name must be at least 10 characters long");
         return;
       }
-      let isGroupRuleLengthViolated = false;
-      if (groupRules && groupRules.length != 0) {
-        groupRules.forEach((r) => {
-          if (r.RuleDescription.length < 10) isGroupRuleLengthViolated = true;
-        });
+
+      if (!groupField) {
+        Alert.alert("Error", "Please select a group field");
+        return;
       }
-      if (isGroupRuleLengthViolated) {
+
+      if (chosenTags.length === 0 && createGroupCreatedTags.length === 0) {
         Alert.alert(
           "Error",
-          "Rule description must be at least 10 characters long"
+          "Please select or create at least one tag for the group"
         );
         return;
       }
 
+      if (!trimmedGroupDescription) {
+        Alert.alert("Error", "Group description is required");
+        return;
+      }
+
+      if (trimmedGroupDescription.length < 10) {
+        Alert.alert(
+          "Error",
+          "Group description must be at least 10 characters long"
+        );
+        return;
+      }
+
+      // Validate group rules if they exist
+      if (trimmedGroupRules && trimmedGroupRules.length > 0) {
+        for (let i = 0; i < trimmedGroupRules.length; i++) {
+          const rule = trimmedGroupRules[i];
+
+          if (!rule.RuleName) {
+            Alert.alert("Error", `Rule ${i + 1} name is required`);
+            return;
+          }
+
+          if (!rule.RuleDescription) {
+            Alert.alert("Error", `Rule ${i + 1} description is required`);
+            return;
+          }
+
+          if (rule.RuleDescription.length < 10) {
+            Alert.alert(
+              "Error",
+              `Rule ${i + 1} description must be at least 10 characters long`
+            );
+            return;
+          }
+        }
+      }
+
+      // If all validations pass, create the group with trimmed values
       const formData = new FormData();
       formData.append("coverImage", {
         uri: uploadedImg.current?.uri,
         name: uploadedImg.current?.fileName,
         type: uploadedImg.current?.mimeType,
       });
-      formData.append("Name", groupName);
+      formData.append("Name", trimmedGroupName);
       formData.append(
         "Tags",
         JSON.stringify([...chosenTags, ...createGroupCreatedTags])
       );
       formData.append("GroupField", JSON.stringify(groupField));
-      formData.append("Description", groupDescription);
-      formData.append("GroupRules", groupRules ? JSON.stringify(groupRules) : JSON.stringify([]));
+      formData.append("Description", trimmedGroupDescription);
+      formData.append(
+        "GroupRules",
+        trimmedGroupRules
+          ? JSON.stringify(trimmedGroupRules)
+          : JSON.stringify([])
+      );
 
       dispatch(createGroup(formData)).then((res) => {
         const data = res.payload as string;
         if (data.length != 0) {
-          // router.back()
-          // router.setParams({
-          //   newGroupID: data
-          // })
           router.replace(`/(tabs)/group-list/(my-group)?newGroupID=${data}`);
-          // router.push(`/group?groupId=${res.payload}`)
         }
       });
     }

@@ -147,19 +147,88 @@ export default function EditGroup() {
     if (createGroupSubmitted) {
       dispatch(setCreateGroupSubmitted(false));
 
-      if (
-        !uploadedImg.current ||
-        !groupName ||
-        !groupTags ||
-        !groupField ||
-        !groupDescription
-        // !groupRules
-      ) {
-        Alert.alert("Error", "Missing field");
+      // Trim all text fields
+      const trimmedGroupName = groupName.trim();
+      const trimmedGroupDescription = groupDescription.trim();
+      const trimmedGroupRules = groupRules?.map((rule) => ({
+        ...rule,
+        RuleName: rule.RuleName.trim(),
+        RuleDescription: rule.RuleDescription.trim(),
+      }));
 
+      // Individual field validation with specific error messages
+      if (!uploadedImg.current) {
+        Alert.alert("Error", "Please upload a group avatar");
         return;
       }
 
+      if (!trimmedGroupName) {
+        Alert.alert("Error", "Group name is required");
+        return;
+      }
+
+      if (trimmedGroupName.length < 10) {
+        Alert.alert("Error", "Group name must be at least 10 characters long");
+        return;
+      }
+
+      if (!groupField) {
+        Alert.alert("Error", "Please select a group field");
+        return;
+      }
+
+      if (!groupTags || groupTags.length === 0) {
+        Alert.alert("Error", "Group field must have available tags");
+        return;
+      }
+
+      if (chosenTags.length === 0 && createGroupCreatedTags.length === 0) {
+        Alert.alert(
+          "Error",
+          "Please select or create at least one tag for the group"
+        );
+        return;
+      }
+
+      if (!trimmedGroupDescription) {
+        Alert.alert("Error", "Group description is required");
+        return;
+      }
+
+      if (trimmedGroupDescription.length < 10) {
+        Alert.alert(
+          "Error",
+          "Group description must be at least 10 characters long"
+        );
+        return;
+      }
+
+      // Validate group rules if they exist
+      if (trimmedGroupRules && trimmedGroupRules.length > 0) {
+        for (let i = 0; i < trimmedGroupRules.length; i++) {
+          const rule = trimmedGroupRules[i];
+
+          if (!rule.RuleName.trim()) {
+            Alert.alert("Error", `Rule ${i + 1} name is required`);
+            return;
+          }
+
+          if (!rule.RuleDescription.trim()) {
+            Alert.alert("Error", `Rule ${i + 1} description is required`);
+            return;
+          }
+
+          if (rule.RuleDescription.trim().length < 10) {
+            Alert.alert(
+              "Error",
+              `Rule ${i + 1} description must be at least 10 characters long`
+            );
+            return;
+          }
+        }
+      }
+
+      // If all validations pass, update the group with trimmed values
       const formData = new FormData();
       formData.append("coverImage", {
         uri: uploadedImg.current?.uri,
@@ -167,14 +236,19 @@ export default function EditGroup() {
         type: uploadedImg.current?.mimeType,
       });
       formData.append("GroupID", groupID);
-      formData.append("Name", groupName);
+      formData.append("Name", trimmedGroupName);
       formData.append(
         "Tags",
         JSON.stringify([...chosenTags, ...createGroupCreatedTags])
       );
       formData.append("GroupField", JSON.stringify(groupField));
-      formData.append("Description", groupDescription);
-      formData.append("GroupRules", groupRules ? JSON.stringify(groupRules) : JSON.stringify([]));
+      formData.append("Description", trimmedGroupDescription);
+      formData.append(
+        "GroupRules",
+        trimmedGroupRules
+          ? JSON.stringify(trimmedGroupRules)
+          : JSON.stringify([])
+      );
 
       dispatch(updateGroup(formData)).then((res) => {
         if ((res.payload as boolean) == true) {

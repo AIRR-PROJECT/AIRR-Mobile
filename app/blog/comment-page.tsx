@@ -62,70 +62,76 @@ export default function CommentBlogScreen() {
     isCurrentBlogSaved,
   } = useAppSelector((state) => state.blog);
   const { user } = useAppSelector((state) => state.user);
-  const [blogComments, setBlogComments] = useState(currentBlogComments)
+  // CHANGE: Initialize with empty array instead of currentBlogComments
+  const [blogComments, setBlogComments] = useState<UserBlogComment[]>([]);
   // Post comment
   const [postCommentContent, setPostCommentContent] = useState("");
   const [commentText, setCommentText] = useState("");
   // Comment options
   const [editCommentContent, setEditCommentContent] = useState("");
-  const [chosenComment, setChosenComment] = useState<UserBlogComment>()
-  const [chosenChildComment, setChosenChildComment] = useState<UserBlogChildComment>()
+  const [chosenComment, setChosenComment] = useState<UserBlogComment>();
+  const [chosenChildComment, setChosenChildComment] =
+    useState<UserBlogChildComment>();
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const textInputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList>(null);
 
+  // FETCH COMMENTS ONLY ONCE ON MOUNT
   useEffect(() => {
-    dispatch(getBlogComment(searchParams.blogId));
-  }, []);
+    if (searchParams.blogId && !hasInitiallyLoaded) {
+      console.log("Fetching comments for blogId:", searchParams.blogId);
+      dispatch(getBlogComment(searchParams.blogId));
+      setHasInitiallyLoaded(true);
+    }
+  }, [searchParams.blogId, dispatch, hasInitiallyLoaded]);
 
+  // UPDATE LOCAL STATE WHEN REDUX STATE CHANGES
   useEffect(() => {
-    if (currentBlogComments) {
-      setBlogComments(currentBlogComments)
+    if (currentBlogComments && Array.isArray(currentBlogComments)) {
+      console.log(
+        "Updating blogComments from Redux:",
+        currentBlogComments.length
+      );
+      setBlogComments(currentBlogComments);
     }
   }, [currentBlogComments]);
 
+  // SCROLL TO SPECIFIC COMMENT AFTER DATA IS LOADED
   useEffect(() => {
     if (
-      blogComments != null &&
-      blogComments != undefined &&
-      blogComments.length != 0 &&
-      searchParams.commentId != undefined &&
-      searchParams.commentId != ""
+      blogComments?.length > 0 &&
+      searchParams.commentId &&
+      searchParams.commentId !== "" &&
+      flatListRef.current
     ) {
-      blogComments.forEach((value, index) => {
-        if (value._id == searchParams.commentId) {
-          flatListRef.current?.scrollToIndex({ animated: true, index: index });
-          return;
-        }
-      });
+      const commentIndex = blogComments.findIndex(
+        (value) => value._id === searchParams.commentId
+      );
+
+      if (commentIndex !== -1) {
+        console.log("Scrolling to comment index:", commentIndex);
+        setTimeout(() => {
+          flatListRef.current?.scrollToIndex({
+            animated: true,
+            index: commentIndex,
+          });
+        }, 1000); // Increased delay
+      }
     }
-  }, [currentBlogComments, searchParams.commentId]);
+  }, [blogComments, searchParams.commentId]);
 
-  // // Handle keyboard events
-  // useEffect(() => {
-  //   const keyboardDidShowListener = Keyboard.addListener(
-  //     "keyboardDidShow",
-  //     () => {
-  //       // Scroll to the bottom when keyboard shows
-  //       scrollViewRef.current?.scrollToEnd({ animated: true });
-  //     }
-  //   );
-
-  //   return () => {
-  //     keyboardDidShowListener.remove();
-  //   };
-  // }, []);
-
+  // FIX 4: Improve refresh handler
   const handleRefresh = () => {
-    setRefreshing(true);
-    // Simulate fetching data
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000); // 2 seconds refresh
+    if (refreshing) return; // Prevent multiple simultaneous refreshes
 
-    dispatch(getBlogComment(searchParams.blogId));
+    setRefreshing(true);
+
+    dispatch(getBlogComment(searchParams.blogId)).finally(() => {
+      setRefreshing(false);
+    });
   };
 
   const handleInputUserPostComment = (val: string) => {
@@ -158,101 +164,146 @@ export default function CommentBlogScreen() {
   };
   const handleEditCommentPress = () => {
     if (chosenComment) {
-      sheetRef.current?.close()
-      setIsEditingComment(true)
+      sheetRef.current?.close();
+      setIsEditingComment(true);
     }
-  }
+  };
   const handleEditCommentSubmit = () => {
     if (chosenComment) {
       if (!chosenChildComment) {
-        dispatch(editComment({
-          BlogID: searchParams.blogId,
-          Content: editCommentContent,
-          CommentID: chosenComment._id
-        })).then((res) => {
-          const result = res.payload as boolean
+        dispatch(
+          editComment({
+            BlogID: searchParams.blogId,
+            Content: editCommentContent,
+            CommentID: chosenComment._id,
+          })
+        ).then((res) => {
+          const result = res.payload as boolean;
 
           if (result === true) {
-            ToastAndroid.showWithGravity("Comment edited", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            ToastAndroid.showWithGravity(
+              "Comment edited",
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM
+            );
 
-            setIsEditingComment(false)
+            setIsEditingComment(false);
 
-            let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as any[]
-            const index = blogCommentsClone.findIndex((c) => c._id == chosenComment._id)
+            let blogCommentsClone = JSON.parse(
+              JSON.stringify(blogComments)
+            ) as any[];
+            const index = blogCommentsClone.findIndex(
+              (c) => c._id == chosenComment._id
+            );
             if (index != -1) {
-              blogCommentsClone[index].Content = editCommentContent
-              setBlogComments(blogCommentsClone)
+              blogCommentsClone[index].Content = editCommentContent;
+              setBlogComments(blogCommentsClone);
             }
           }
-        })
-      }
-      else {
-        dispatch(editComment({
-          BlogID: searchParams.blogId,
-          Content: editCommentContent,
-          CommentID: chosenChildComment._id
-        })).then((res) => {
-          const result = res.payload as boolean
+        });
+      } else {
+        dispatch(
+          editComment({
+            BlogID: searchParams.blogId,
+            Content: editCommentContent,
+            CommentID: chosenChildComment._id,
+          })
+        ).then((res) => {
+          const result = res.payload as boolean;
 
           if (result === true) {
-            ToastAndroid.showWithGravity("Comment edited", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            ToastAndroid.showWithGravity(
+              "Comment edited",
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM
+            );
 
-            setIsEditingComment(false)
+            setIsEditingComment(false);
 
-            let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as UserBlogComment[]
-            const index = blogCommentsClone.findIndex((c: UserBlogComment) => c._id == chosenComment._id)
+            let blogCommentsClone = JSON.parse(
+              JSON.stringify(blogComments)
+            ) as UserBlogComment[];
+            const index = blogCommentsClone.findIndex(
+              (c: UserBlogComment) => c._id == chosenComment._id
+            );
             if (index != -1) {
-              const innerIndex = blogCommentsClone[index].ChildrenComments.findIndex((c: UserBlogChildComment) => c._id == chosenChildComment._id)
+              const innerIndex = blogCommentsClone[
+                index
+              ].ChildrenComments.findIndex(
+                (c: UserBlogChildComment) => c._id == chosenChildComment._id
+              );
               if (innerIndex != -1) {
-                blogCommentsClone[index].ChildrenComments[innerIndex].Content = editCommentContent
-                setBlogComments(blogCommentsClone)
+                blogCommentsClone[index].ChildrenComments[innerIndex].Content =
+                  editCommentContent;
+                setBlogComments(blogCommentsClone);
               }
             }
           }
-        })
+        });
       }
     }
-  }
+  };
   const handleDeleteComment = () => {
     if (chosenComment) {
       if (!chosenChildComment) {
-        dispatch(deleteComment({
-          BlogID: searchParams.blogId,
-          CommentID: chosenComment._id
-        })).then((res) => {
-          const result = res.payload as boolean
-  
-          if (result === true) {
-            ToastAndroid.showWithGravity("Comment deleted", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-            setBlogComments(blogComments.filter((c) => c._id != chosenComment._id))
-            sheetRef.current?.close()
-          }
-        })
-      }
-      else {
-        dispatch(deleteComment({
-          BlogID: searchParams.blogId,
-          CommentID: chosenChildComment._id
-        })).then((res) => {
-          const result = res.payload as boolean
-  
-          if (result === true) {
-            ToastAndroid.showWithGravity("Comment deleted", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+        dispatch(
+          deleteComment({
+            BlogID: searchParams.blogId,
+            CommentID: chosenComment._id,
+          })
+        ).then((res) => {
+          const result = res.payload as boolean;
 
-            let blogCommentsClone = JSON.parse(JSON.stringify(blogComments)) as UserBlogComment[]
-            let index = blogCommentsClone.findIndex((c: UserBlogComment) => c._id == chosenComment._id)
+          if (result === true) {
+            ToastAndroid.showWithGravity(
+              "Comment deleted",
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM
+            );
+            setBlogComments(
+              blogComments.filter((c) => c._id != chosenComment._id)
+            );
+            sheetRef.current?.close();
+          }
+        });
+      } else {
+        dispatch(
+          deleteComment({
+            BlogID: searchParams.blogId,
+            CommentID: chosenChildComment._id,
+          })
+        ).then((res) => {
+          const result = res.payload as boolean;
+
+          if (result === true) {
+            ToastAndroid.showWithGravity(
+              "Comment deleted",
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM
+            );
+
+            let blogCommentsClone = JSON.parse(
+              JSON.stringify(blogComments)
+            ) as UserBlogComment[];
+            let index = blogCommentsClone.findIndex(
+              (c: UserBlogComment) => c._id == chosenComment._id
+            );
             if (index != -1) {
-              let editedChild = blogCommentsClone[index].ChildrenComments.filter((c: UserBlogChildComment) => c._id != chosenChildComment._id)
-              blogCommentsClone[index].ChildrenComments = editedChild
-              setBlogComments(blogCommentsClone)
+              let editedChild = blogCommentsClone[
+                index
+              ].ChildrenComments.filter(
+                (c: UserBlogChildComment) => c._id != chosenChildComment._id
+              );
+              blogCommentsClone[index].ChildrenComments = editedChild;
+              setBlogComments(blogCommentsClone);
             }
 
-            sheetRef.current?.close()
+            sheetRef.current?.close();
           }
-        })
+        });
       }
     }
-  }
+  };
   useEffect(() => {
     console.log(`Current blog saved: ${isCurrentBlogSaved}`);
   }, [isCurrentBlogSaved]);
@@ -261,16 +312,20 @@ export default function CommentBlogScreen() {
   const [isEditingComment, setIsEditingComment] = useState(false);
   const sheetRef = useRef<BottomSheet>(null);
   const [isUserWrittenComment, setIsUserWrittenComment] = useState(false);
-  const handleMorePress = (isUserWrittenComment: boolean, chosenComment: UserBlogComment, chosenChildComment?: UserBlogChildComment) => {
+  const handleMorePress = (
+    isUserWrittenComment: boolean,
+    chosenComment: UserBlogComment,
+    chosenChildComment?: UserBlogChildComment
+  ) => {
     setIsUserWrittenComment(isUserWrittenComment);
     if (sheetRef.current) {
       if (isUserWrittenComment) {
-        setChosenComment(chosenComment)
-        setChosenChildComment(chosenChildComment)
+        setChosenComment(chosenComment);
+        setChosenChildComment(chosenChildComment);
         sheetRef.current.snapToIndex(0);
       }
     }
-  }
+  };
   return (
     <GestureHandlerRootView
       // behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -298,10 +353,7 @@ export default function CommentBlogScreen() {
             <View style={[styles.rowContainer, { alignItems: "center" }]}>
               {/* User avatar */}
               <View style={styles.rowContainer}>
-                <Image
-                  style={styles.avatar}
-                  source={{ uri: user.avatarURL }}
-                />
+                <Image style={styles.avatar} source={{ uri: user.avatarURL }} />
                 {/* name and date */}
                 <View>
                   <View>
@@ -340,10 +392,7 @@ export default function CommentBlogScreen() {
             <View style={[styles.rowContainer, { alignItems: "center" }]}>
               {/* User avatar */}
               <View style={styles.rowContainer}>
-                <Image
-                  style={styles.avatar}
-                  source={{ uri: user.avatarURL }}
-                />
+                <Image style={styles.avatar} source={{ uri: user.avatarURL }} />
                 {/* name and date */}
                 <View>
                   <View>
@@ -363,7 +412,11 @@ export default function CommentBlogScreen() {
               placeholderTextColor="#565656"
               multiline
               numberOfLines={4}
-              defaultValue={chosenChildComment ? chosenChildComment.Content : chosenComment?.Content}
+              defaultValue={
+                chosenChildComment
+                  ? chosenChildComment.Content
+                  : chosenComment?.Content
+              }
               onChangeText={handleInputUserEditComment}
               textAlignVertical="top"
             />
@@ -400,9 +453,7 @@ export default function CommentBlogScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          initialNumToRender={
-            blogComments ? blogComments.length : 100
-          }
+          initialNumToRender={blogComments ? blogComments.length : 100}
           onScrollToIndexFailed={(info) => {
             const wait = new Promise((resolve) => setTimeout(resolve, 500));
             wait.then(() => {
@@ -622,13 +673,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 90,
     marginTop: 20,
-    width: "40%",
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: "flex-start", // ADD: Makes button wrap to content width
   },
   commentWriteButtonText: {
     color: "#000",
     fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center", // ADD: Center text
   },
 });

@@ -46,7 +46,7 @@ export default function ReportCardComponent({
   const [isOpenStartDrag, setIsOpenStartDrag] = useState(false);
   const route = useRouter();
   const handlePress = () => {
-    route.push(`/blog?userBlogId=${Blog._id}`)
+    route.push(`/blog?userBlogId=${Blog._id}`);
   };
   return (
     <ReanimatedSwipeable
@@ -96,36 +96,40 @@ export default function ReportCardComponent({
 
         <View style={styles.detailContainer}>
           {Reports.map((report) => (
-            <View key={report.User._id} style={styles.userReportContainer}>
-              <Image source={report.User.AvatarURL} style={styles.avatar} />
+            <View key={report.User._id}>
+              <View key={report.User._id} style={styles.userReportContainer}>
+                <Image source={report.User.AvatarURL} style={styles.avatar} />
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    marginLeft: 5,
+                    flex: 1,
+                  }}
+                >
+                  {report.User.UserName}
+                </Text>
+              </View>
               <View style={styles.userReportDetail}>
                 <View style={styles.usernameContainer}>
-                  <Text style={{ fontWeight: "bold", width: "50%" }}>
-                    {report.User.UserName}
-                  </Text>
-                  <View
-                    style={[
-                      styles.reportContainer,
-                      { flexShrink: 1, maxWidth: "50%" },
-                    ]}
-                  >
+                  <View style={[styles.reportContainer, { flexShrink: 1 }]}>
                     <Text
                       style={{
                         fontWeight: "bold",
                         color: "red",
                         flexWrap: "wrap",
                       }}
-                      
                     >
                       {report.ReportType}
                     </Text>
                   </View>
                 </View>
-                <Text style={styles.description}>{report.Details}</Text>
+                <Text style={styles.description}>
+                  {report.Details ?? "*No details provided*"}
+                </Text>
               </View>
             </View>
           ))}
-
+      
           {/* Approve and Reject Button */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -191,7 +195,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   imageContainer: { alignItems: "center", width: 80, gap: 5, marginRight: 10 },
-  detailContainer: { flex: 1, gap: 4 },
+  detailContainer: { flex: 1, gap: 10 },
   title: {
     fontSize: 16,
     fontWeight: "bold",
@@ -209,7 +213,7 @@ const styles = StyleSheet.create({
   },
   approveButton: {
     backgroundColor: "#B9FF66",
-    padding: 20,
+    padding: 10,
     paddingBlock: 10,
     borderRadius: 20,
     marginRight: 10,
@@ -225,7 +229,7 @@ const styles = StyleSheet.create({
   },
   rejectButton: {
     backgroundColor: "#FF6E6E",
-    padding: 20,
+    padding: 10,
     paddingBlock: 10,
     borderRadius: 20,
     borderWidth: 2,
@@ -259,11 +263,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     backgroundColor: "#F0F0F0",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   userReportDetail: {
     flex: 1,
-    marginLeft: 10,
   },
   reportSymbolContainer: {
     alignItems: "center",

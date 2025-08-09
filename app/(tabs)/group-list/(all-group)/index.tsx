@@ -131,6 +131,7 @@ export default function GroupPopularTab() {
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
+     
         />
         <TouchableOpacity onPress={handleArrowPress} activeOpacity={0.8}>
           <FontAwesome name="caret-right" size={30} color="white" />

@@ -114,6 +114,7 @@ export default function GroupTab(props: {type: string, fieldID?: string}) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
         ItemSeparatorComponent={() => <View style={{ height: 20 }} />} // Add space between items
+        ListFooterComponent={<View style={{ height: 100 }} />}
       />
     </View>
   );

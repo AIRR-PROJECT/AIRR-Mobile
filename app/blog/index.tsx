@@ -348,12 +348,14 @@ export default function BlogScreen() {
       currentBlogComments != null &&
       currentBlogComments != undefined &&
       currentBlogComments.length != 0 &&
-      searchParams.userBlogCommentId != undefined &&
-      searchParams.userBlogCommentId != ""
-    )
+      searchParams.userBlogCommentId !== undefined &&
+      searchParams.userBlogCommentId != "" && searchParams.userBlogCommentId != "undefined"
+    ) {
       route.push(
         `/blog/comment-page?blogId=${searchParams.userBlogId}&commentId=${searchParams.userBlogCommentId}`
       );
+    }
+      
   }, [currentBlogComments, searchParams.userBlogCommentId]);
 
   useEffect(() => {

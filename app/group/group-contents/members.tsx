@@ -82,10 +82,13 @@ export default function MemberApprovalsPage() {
   }>();
 
   const [displayMembers, setDisplayMembers] = useState<GroupMember[]>([]);
+  const [filteredMembers, setFilteredMembers] = useState<GroupMember[]>([]);
   const [membersApproval, setMembersApproval] = useState<
     PendingMemberRequest[]
   >([]);
+  const [filteredMembersApproval, setFilteredMembersApproval] = useState<PendingMemberRequest[]>([]);
   const [bannedMembers, setBannedMembers] = useState<GroupBannedMember[]>([]);
+  const [filteredBannedMembers, setFilteredBannedMembers] = useState<GroupBannedMember[]>([]);
   const [selectedTab, setSelectedTab] = useState<TabOptions>(TabOptions.All);
   const [isMemberFetching, setIsMemberFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false)
@@ -186,7 +189,65 @@ export default function MemberApprovalsPage() {
       });
     }
   }, [membersApproval, memberIDToScroll.current, selectedTab]);
+
+  useEffect(() => {
+    if (displayMembers) {
+      if (searchQuery.length != 0) {
+        setFilteredMembers(displayMembers.filter(m => m.MemberInfo.Username.toLowerCase().includes(searchQuery.toLowerCase())))
+      }
+      else {
+        setFilteredMembers(displayMembers);
+      }
+    }
+  }, [displayMembers])
+  useEffect(() => {
+    if (membersApproval) {
+      if (searchQuery.length != 0) {
+        setFilteredMembersApproval(membersApproval.filter(m => m.Owner.Username.toLowerCase().includes(searchQuery.toLowerCase())))
+      }
+      else {
+        setFilteredMembersApproval(membersApproval);
+      }
+    }
+  }, [membersApproval])
+  useEffect(() => {
+    if (bannedMembers) {
+      if (searchQuery.length != 0) {
+        setFilteredBannedMembers(bannedMembers.filter(m => m.Owner.Username.toLowerCase().includes(searchQuery.toLowerCase())))
+      }
+      else {
+        setFilteredBannedMembers(bannedMembers);
+      }
+    }
+  }, [bannedMembers])
+
+  const handleSearchSubmit = () => {
+    if (searchQuery.length != 0) {
+      if (selectedTab === TabOptions.All) {
+        setFilteredMembers(displayMembers.filter(m => m.MemberInfo.Username.toLowerCase().includes(searchQuery.toLowerCase())))
+      }
+      else if (selectedTab === TabOptions.Banned) {
+        setFilteredBannedMembers(bannedMembers.filter(m => m.Owner.Username.toLowerCase().includes(searchQuery.toLowerCase())))
+      }
+      else {
+        setFilteredMembersApproval(membersApproval.filter(m => m.Owner.Username.toLowerCase().includes(searchQuery.toLowerCase())))
+      }
+    }
+    else {
+      if (selectedTab === TabOptions.All) {
+        setFilteredMembers(displayMembers)
+      }
+      else if (selectedTab === TabOptions.Banned) {
+        setFilteredBannedMembers(bannedMembers)
+      }
+      else {
+        setFilteredMembersApproval(membersApproval)
+      }
+    }
+  }
+
   const [needApprovalUserID, setNeedApprovalUserID] = useState<string>("");
+  
   const onPressApprove = (id: string) => {
     setBottomSheetMode("approve");
     setNeedApprovalUserID(id);
@@ -355,6 +416,7 @@ export default function MemberApprovalsPage() {
           placeholder="Search members..."
           value={searchQuery}
           onChangeText={setSearchQuery}
+          onSubmitEditing={handleSearchSubmit}
         />
       </View>
       <View style={styles.optionBar}>
@@ -399,13 +461,13 @@ export default function MemberApprovalsPage() {
       {isMemberFetching ? (
         <FeedBlogPreviewSkeleton />
       ) : selectedTab == TabOptions.All ? 
-      displayMembers && displayMembers.length == 0 ?
+      filteredMembers && filteredMembers.length == 0 ?
       (
         <Animated.FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          data={[]}
+          data={["1"]}
           renderItem={() => <EmptyContent/>}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
@@ -416,7 +478,7 @@ export default function MemberApprovalsPage() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          data={displayMembers}
+          data={filteredMembers}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
@@ -473,7 +535,7 @@ export default function MemberApprovalsPage() {
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
         />
       ) : selectedTab == TabOptions.NeedApproval ? 
-      membersApproval && membersApproval.length == 0 ?
+      filteredMembersApproval && filteredMembersApproval.length == 0 ?
       (
         <Animated.FlatList
           refreshControl={
@@ -492,7 +554,7 @@ export default function MemberApprovalsPage() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          data={membersApproval}
+          data={filteredMembersApproval}
           renderItem={renderItem}
           keyExtractor={(item) => item._id}
           showsVerticalScrollIndicator={false}
@@ -501,7 +563,7 @@ export default function MemberApprovalsPage() {
           ref={memberApprovalsFlatlistRef}
         />
       ) : 
-      bannedMembers && bannedMembers.length == 0 ?
+      filteredBannedMembers && filteredBannedMembers.length == 0 ?
       (
         <FlatList
           refreshControl={

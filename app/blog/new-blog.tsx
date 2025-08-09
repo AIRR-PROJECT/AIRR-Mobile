@@ -807,7 +807,7 @@ export default function NewBlog() {
         {/* Post button */}
         <ButtonGradient
           label="POST BLOG"
-          onPressOut={handlePostBlogPress}
+          onPress={handlePostBlogPress}
           style={styles.postButtonStyle}
           labelStyle={styles.postButtonLabel}
         />

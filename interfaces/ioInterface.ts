@@ -1,4 +1,4 @@
-interface APIResponse {
+export interface APIResponse {
     failcode?: number,
     message?: string,
     success: boolean,

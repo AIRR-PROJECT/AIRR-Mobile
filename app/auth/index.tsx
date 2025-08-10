@@ -56,6 +56,10 @@ export default function AuthScreen() {
   }, []);
 
   useEffect(() => {
+    console.log(`isLoggedIn: ${isLoggedIn} - isAccountVerified: ${isAccountVerified}`)
+  }, [isAccountVerified])
+
+  useEffect(() => {
     // console.log(user)
     if (user != undefined) {
       router.replace("/(tabs)/dashboard");

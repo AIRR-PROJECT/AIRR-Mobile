@@ -72,8 +72,9 @@ export default function CreateTagsScreen({
     setShowError(false);
     console.log(fieldID);
     // Simulate API call to check tag validity
-    if (tag.length > 0 && tag.length <= 20) {
-      dispatch(searchTagCreateGroup({ keyword: tag, fieldID: fieldID })).then(
+    const trimmedTag = tag.trim();
+    if (trimmedTag.length > 0 && trimmedTag.length <= 20) {
+      dispatch(searchTagCreateGroup({ keyword: trimmedTag, fieldID: fieldID })).then(
         (res) => {
           const tags = res.payload as CreateGroupTag[];
           setSelectableTags(tags);

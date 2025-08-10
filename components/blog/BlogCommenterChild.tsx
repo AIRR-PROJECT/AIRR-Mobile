@@ -8,10 +8,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  ToastAndroid,
 } from "react-native";
 import { Image } from "expo-image";
 import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/base";
+import validateNotEmpty from "@/utils/validateNotEmpty";
 import {
   ReplyToBlogComment,
   UserBlogChildComment,
@@ -84,10 +86,24 @@ export default function BlogCommenterChild({
   };
 
   const handleSendReply = (commentID: string, rootCommentID: string) => {
+    // Extract the reply content (removing the @username part)
+    const replyContent = replyText.split(" ").slice(1).join("");
+    
+    // Validate the reply content
+    const validation = validateNotEmpty(replyContent, "Reply");
+    if (validation !== true) {
+      ToastAndroid.showWithGravity(
+        validation,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+      return;
+    }
+
     const comment: ReplyToBlogComment = {
       UserID: user._id,
       BlogID: currentUserBlog._id,
-      Content: replyText.split(" ").slice(1).join(""),
+      Content: replyContent.trim(),
       Method: "Reply",
       ReplyToCommentID: commentID,
       RootCommentID: rootCommentID,

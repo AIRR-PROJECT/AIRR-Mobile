@@ -106,9 +106,9 @@ export default function SignUpScreen() {
         if (result.meta.requestStatus === "fulfilled") {
           ToastAndroid.show("OTP resent successfully", ToastAndroid.SHORT);
 
-          // Start 5-minute countdown
+          // Start 1-minute countdown
           setCanResend(false);
-          setResendTimeout(60 * 5); // 5 minutes
+          setResendTimeout(60); // 1 minute
         } else {
           ToastAndroid.show(
             "Failed to resend OTP. Please try again.",

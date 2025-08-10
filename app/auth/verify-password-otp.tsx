@@ -12,11 +12,12 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  ToastAndroid,
 } from "react-native";
 import GradientText from "@/components/GradientText";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // ADD: Import useState
 import { useDispatch } from "react-redux";
 import {
   sendAccountOTP,
@@ -42,6 +43,10 @@ export default function SignUpScreen() {
   const searchParams = useLocalSearchParams<{ resendEmail: string }>();
   const { isPasswordVerified } = useAppSelector((state) => state.auth);
 
+  // ADD: Timeout state for resend functionality
+  const [resendTimeout, setResendTimeout] = useState(0);
+  const [canResend, setCanResend] = useState(true);
+
   // Init
   useEffect(() => {
     dispatch(sendPasswordOTP({ email: searchParams.resendEmail }));
@@ -55,6 +60,29 @@ export default function SignUpScreen() {
     }
   }, [isPasswordVerified]);
 
+  // ADD: Countdown effect for resend timeout
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+
+    if (resendTimeout > 0) {
+      interval = setInterval(() => {
+        setResendTimeout((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [resendTimeout]);
+
   const onSubmit = (data: FormData) => {
     dispatch(
       verifyPasswordOTP({
@@ -63,12 +91,45 @@ export default function SignUpScreen() {
       })
     );
   };
+
   const handleBackToForgotPassword = () => {
     router.push("/auth/forgot-password");
   };
+
+  // MODIFIED: Add timeout logic to resend function
   const handleResend = () => {
-    dispatch(sendPasswordOTP({ email: searchParams.resendEmail }));
+    if (!canResend) {
+      ToastAndroid.show(
+        `Please wait ${resendTimeout} seconds before resending`,
+        ToastAndroid.SHORT
+      );
+      return;
+    }
+
+    dispatch(sendPasswordOTP({ email: searchParams.resendEmail }))
+      .then((result) => {
+        // Check if the request was successful
+        if (result.meta.requestStatus === "fulfilled") {
+          ToastAndroid.show("OTP resent successfully", ToastAndroid.SHORT);
+
+          // Start 60-second (1 minute) countdown
+          setCanResend(false);
+          setResendTimeout(60);
+        } else {
+          ToastAndroid.show(
+            "Failed to resend OTP. Please try again.",
+            ToastAndroid.SHORT
+          );
+        }
+      })
+      .catch(() => {
+        ToastAndroid.show(
+          "Failed to resend OTP. Please try again.",
+          ToastAndroid.SHORT
+        );
+      });
   };
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <ThemedView
@@ -140,7 +201,7 @@ export default function SignUpScreen() {
           )}
 
           <ThemedText
-            type="link"
+            type="default"
             style={[
               {
                 color: "#fff",
@@ -151,17 +212,24 @@ export default function SignUpScreen() {
             ]}
           >
             Didn't receive a code?{" "}
-            <TouchableOpacity onPress={handleResend}>
+            <TouchableOpacity
+              onPress={handleResend}
+              disabled={!canResend}
+              style={{
+                opacity: canResend ? 1 : 0.5,
+              }}
+            >
               <ThemedText
                 type="default"
                 style={[
                   {
-                    color: "#B9FF66",
+                    color: canResend ? "#B9FF66" : "#888",
                     fontWeight: "bold",
+                    marginTop: 5,
                   },
                 ]}
               >
-                Resend
+                {canResend ? "Resend" : `Resend (${resendTimeout}s)`}
               </ThemedText>
             </TouchableOpacity>
           </ThemedText>

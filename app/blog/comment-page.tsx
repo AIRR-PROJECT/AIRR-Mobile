@@ -16,6 +16,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
+import validateNotEmpty from "@/utils/validateNotEmpty";
 
 import BlogCommenter from "@/components/blog/BlogCommenter";
 
@@ -138,10 +139,16 @@ export default function CommentBlogScreen() {
     setPostCommentContent(val);
   };
   const handlePostUserComment = () => {
+    const trimmedPostComment = postCommentContent.trim();
+    if (!trimmedPostComment) {
+      ToastAndroid.show("Comment cannot be empty or just spaces", ToastAndroid.SHORT);
+      return;
+    }
+
     const comment: PostComment = {
       UserID: user._id,
-      BlogID: currentUserBlog._id,
-      Content: postCommentContent,
+      BlogID: currentUserBlog._id,  
+      Content: trimmedPostComment,
       Method: "Post",
     };
     dispatch(commentOnBlog(comment)).then((res) => {
@@ -170,11 +177,21 @@ export default function CommentBlogScreen() {
   };
   const handleEditCommentSubmit = () => {
     if (chosenComment) {
+      // Trim the content before submitting
+      const trimmedContent = editCommentContent.trim();
+      if (!trimmedContent) {
+        ToastAndroid.showWithGravity(
+          "Comment cannot be empty or just spaces",
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+        return;
+      }
       if (!chosenChildComment) {
         dispatch(
           editComment({
             BlogID: searchParams.blogId,
-            Content: editCommentContent,
+            Content: trimmedContent,
             CommentID: chosenComment._id,
           })
         ).then((res) => {
@@ -196,7 +213,7 @@ export default function CommentBlogScreen() {
               (c) => c._id == chosenComment._id
             );
             if (index != -1) {
-              blogCommentsClone[index].Content = editCommentContent;
+              blogCommentsClone[index].Content = trimmedContent;
               setBlogComments(blogCommentsClone);
             }
           }
@@ -205,7 +222,7 @@ export default function CommentBlogScreen() {
         dispatch(
           editComment({
             BlogID: searchParams.blogId,
-            Content: editCommentContent,
+            Content: trimmedContent,
             CommentID: chosenChildComment._id,
           })
         ).then((res) => {
@@ -234,7 +251,7 @@ export default function CommentBlogScreen() {
               );
               if (innerIndex != -1) {
                 blogCommentsClone[index].ChildrenComments[innerIndex].Content =
-                  editCommentContent;
+                  trimmedContent;
                 setBlogComments(blogCommentsClone);
               }
             }

@@ -11,6 +11,7 @@ import { useAppSelector } from "../hook";
 import { ToastAndroid } from "react-native";
 import { setCurrentBlogDisliked, setCurrentBlogLiked, setCurrentBlogSaved } from "./blogSlice";
 import { router } from "expo-router";
+import { APIResponse } from "@/interfaces/ioInterface";
 
 const initialState = {
     rememberedSignUpUser: "",
@@ -790,8 +791,10 @@ const authSlice = createSlice({
                 // }
             })
             .addCase(loadToken.fulfilled, (state, action) => {
-                state.isLoggedIn = true
-                state.isAccountVerified = true
+                if (action.payload != null) {
+                    state.isAccountVerified = true
+                    state.isLoggedIn = true
+                }
             })
             .addCase(loadToken.rejected, (state, action) => {
                 console.log("Where tokens :<")

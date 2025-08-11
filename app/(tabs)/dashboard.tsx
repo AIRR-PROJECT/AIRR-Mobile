@@ -492,7 +492,7 @@ export default function DashboardScreen() {
               ]}
             >
               <Text style={{ color: "#fff", fontWeight: "bold" }}>
-                View Group
+                View group
               </Text>
               <FontAwesome6 name="user-group" size={16} color="#fff" />
             </View>

@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   Button,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
@@ -382,22 +383,23 @@ export default function BlogScreen() {
       setRefreshing(false);
     }, 2000); // 2 seconds refresh
 
-    dispatch(getUserBlogDetail(searchParams.userBlogId));
-    dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
-      (data) => {
-        setBlogLiked(data.payload as boolean);
-      }
-    );
-    dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
-      (data) => {
-        setBlogDisliked(data.payload as boolean);
-      }
-    );
-    dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
-      (data) => {
-        setBlogSaved(data.payload as boolean);
-      }
-    );
+    dispatch(getUserBlogDetail(searchParams.userBlogId)).then(() => {
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogLiked(data.payload as boolean);
+        }
+      );
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogDisliked(data.payload as boolean);
+        }
+      );
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogSaved(data.payload as boolean);
+        }
+      );
+    });
   };
 
   const handleBack = () => {
@@ -524,7 +526,12 @@ export default function BlogScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#1E1E1E" }}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
         {/* Back button */}
         <View
           style={[styles.rowContainer, { width: "100%", paddingBottom: 20 }]}

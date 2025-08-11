@@ -297,6 +297,7 @@ export default function BlogScreen() {
   const [blogSaved, setBlogSaved] = useState<boolean>(false);
   const [html, setHtml] = useState(mockHtml);
   const [commentsDetail, setCommentsDetail] = useState<UserBlogComment[]>(mockComments);
+  const [currentCommentId, setCurrentCommentId] = useState(searchParams.userBlogCommentId)
   // Simulate refresh
   const [refreshing, setRefreshing] = useState(false);
 
@@ -317,7 +318,6 @@ export default function BlogScreen() {
         setBlogSaved(data.payload as boolean);
       }
     );
-    dispatch(getBlogComment(searchParams.userBlogId));
   }, []);
 
   useEffect(() => {
@@ -344,12 +344,15 @@ export default function BlogScreen() {
   }, [currentBlogComments]);
 
   useEffect(() => {
+    if (searchParams.userBlogCommentId !== undefined && searchParams.userBlogCommentId != "undefined" && searchParams.userBlogCommentId != currentCommentId) {
+      setCurrentCommentId(searchParams.userBlogCommentId)
+    }
+  }, [searchParams.userBlogCommentId])
+
+  useEffect(() => {
     if (
-      currentBlogComments != null &&
-      currentBlogComments != undefined &&
-      currentBlogComments.length != 0 &&
-      searchParams.userBlogCommentId !== undefined &&
-      searchParams.userBlogCommentId != "" && searchParams.userBlogCommentId != "undefined"
+      currentCommentId !== undefined &&
+      currentCommentId != ""
     ) {
       // route.push(
       //   `/blog/comment-page?blogId=${searchParams.userBlogId}&commentId=${searchParams.userBlogCommentId}`
@@ -359,7 +362,7 @@ export default function BlogScreen() {
       );
     }
       
-  }, [currentBlogComments, searchParams.userBlogCommentId]);
+  }, [currentCommentId]);
 
   useEffect(() => {
     console.log(`Comment added: ${commentAdded}`);
@@ -393,7 +396,6 @@ export default function BlogScreen() {
         setBlogSaved(data.payload as boolean);
       }
     );
-    dispatch(getBlogComment(searchParams.userBlogId));
   };
 
   const handleBack = () => {

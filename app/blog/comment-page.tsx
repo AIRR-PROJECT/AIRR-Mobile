@@ -80,6 +80,14 @@ export default function CommentBlogScreen() {
   const textInputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList>(null);
 
+  useEffect(() => {
+    setRefreshing(true);
+
+    dispatch(getBlogComment(searchParams.blogId)).then(() => {
+      setRefreshing(false);
+    })
+  }, [])
+
   // FETCH COMMENTS ONLY ONCE ON MOUNT
   useEffect(() => {
     if (searchParams.blogId && !hasInitiallyLoaded) {

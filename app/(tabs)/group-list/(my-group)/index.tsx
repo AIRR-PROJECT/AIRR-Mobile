@@ -195,12 +195,12 @@ export default function MyGroupTab() {
         activeOpacity={0.7}
       >
         <FontAwesome name="plus" size={24} color="#000" />
-        <Text style={styles.createGroupButtonText}>Create Group</Text>
+        <Text style={styles.createGroupButtonText}>Create group</Text>
       </TouchableOpacity>
       
       {/* Refresh group */}
       <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-        <Text style={styles.refreshText}>Refresh Groups</Text>
+        <Text style={styles.refreshText}>Refresh groups</Text>
       </TouchableOpacity>
 
       {groups && groups.size == 0 ?

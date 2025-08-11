@@ -491,7 +491,7 @@ export default function Editblog() {
         />
         <TextInput
           style={styles.searchText}
-          placeholder="Search Tags"
+          placeholder="Search tags"
           placeholderTextColor="#888"
         />
       </BottomSheetFooter>

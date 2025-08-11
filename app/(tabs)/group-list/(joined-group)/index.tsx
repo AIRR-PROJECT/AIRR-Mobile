@@ -87,7 +87,7 @@ export default function JoinedGroupTab() {
     <View style={styles.container}>
       {/* Refresh group */}
       <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-        <Text style={styles.refreshText}>Refresh Fields</Text>
+        <Text style={styles.refreshText}>Refresh fields</Text>
       </TouchableOpacity>
 
       <EmptyContent/>
@@ -95,7 +95,7 @@ export default function JoinedGroupTab() {
     <View style={styles.container}>
       {/* Refresh group */}
       <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-        <Text style={styles.refreshText}>Refresh Group Fields</Text>
+        <Text style={styles.refreshText}>Refresh group fields</Text>
       </TouchableOpacity>
 
       {/* list tags */}

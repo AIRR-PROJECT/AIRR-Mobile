@@ -3,6 +3,7 @@ import { GroupRole } from "@/enums/group.enum";
 import { useAppSelector } from "@/redux/hook";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 import { Text, View } from "react-native";
 export default function ContentsPageTabLayout() {
   const { groupID, memberID, requestID } = useLocalSearchParams<{
@@ -11,9 +12,15 @@ export default function ContentsPageTabLayout() {
     requestID: string;
   }>();
   const { userCurrentGroupRole } = useAppSelector((state) => state.user);
+  const { loading } = useAppSelector((state) => state.loading);
   const canAccessReportsTab =
     userCurrentGroupRole === GroupRole.Admin ||
     userCurrentGroupRole === GroupRole.Owner;
+
+  useEffect(() => {
+    console.log(loading)
+  }, [loading])
+  
   return (
     <MaterialTopTabs
       style={{ flex: 1 }}

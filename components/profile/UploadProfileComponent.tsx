@@ -58,7 +58,7 @@ export default function UploadProfileComponent({ imgSource }: imageProps) {
         <ImageViewer imgSource={userAvatar ?? image} style={styles.image} contentFit="cover"/>
       )}
       <Entypo name="camera" size={40} color="#fff" />
-      <ThemedText style={styles.description}>Upload Your Photo</ThemedText>
+      <ThemedText style={styles.description}>Upload your photo</ThemedText>
     </TouchableOpacity>
   );
 }

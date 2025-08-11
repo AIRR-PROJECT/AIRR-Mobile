@@ -177,13 +177,13 @@ GroupPageProps) {
   useEffect(() => {
     console.log(userCurrentGroupMembershipStage)
     if (userCurrentGroupMembershipStage === GroupMembershipStage.JOINED) {
-      setButtonLabel("Leave Group");
+      setButtonLabel("Leave group");
     } else if (
       userCurrentGroupMembershipStage === GroupMembershipStage.REQUESTED
     ) {
-      setButtonLabel("Cancel Request");
+      setButtonLabel("Cancel request");
     } else {
-      setButtonLabel("Join Group");
+      setButtonLabel("Join group");
     }
   }, [userCurrentGroupMembershipStage]);
 
@@ -688,7 +688,7 @@ GroupPageProps) {
               fontWeight: "bold",
             }}
           >
-            See Group Content
+            See group content
           </Text>
         </TouchableOpacity>
       )}

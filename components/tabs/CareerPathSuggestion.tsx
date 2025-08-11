@@ -64,7 +64,7 @@ export default function CareerPathSuggestion({ isFromCareerPath = false }) {
             darkColor="#fff"
             lightColor="#fff"
           >
-            Get Career Path Suggestion
+            Get Career Path suggestion
           </ThemedText>
         </View>
         {/* Text */}

@@ -453,7 +453,7 @@ export default function NewBlog() {
       <BottomSheetFooter {...props} style={styles.searchBar}>
         <TextInput
           style={styles.searchText}
-          placeholder="Search Tags"
+          placeholder="Search tags"
           placeholderTextColor="#888"
         />
         <FontAwesome

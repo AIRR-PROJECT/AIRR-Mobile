@@ -189,7 +189,7 @@ function FeedSettingScreen() {
         <FontAwesome6 name="magnifying-glass" size={24} color="#fff" />
         <TextInput
           style={styles.searchBar}
-          placeholder="Search Tags"
+          placeholder="Search tags"
           placeholderTextColor="#fff"
           onChangeText={setSearchText}
           onSubmitEditing={handleSearchSubmit}

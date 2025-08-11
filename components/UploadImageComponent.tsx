@@ -36,7 +36,7 @@ export default function UploadImageComponent({ imgSource }: imageProps) {
     <TouchableOpacity style={styles.container} onPress={pickImage}>
       {image && <ImageViewer imgSource={image} style={styles.image} />}
       <Entypo name="camera" size={40} color="#fff" />
-      <Text style={styles.description}>Upload Your Photo</Text>
+      <Text style={styles.description}>Upload your photo</Text>
     </TouchableOpacity>
   );
 }

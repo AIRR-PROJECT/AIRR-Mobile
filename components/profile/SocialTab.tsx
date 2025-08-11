@@ -180,7 +180,7 @@ export default function SocialTab({
             onPress={handleSignOut}
           >
             <Feather name="log-out" size={24} color="#fff" />
-            <Text style={styles.signOutText}>Sign Out</Text>
+            <Text style={styles.signOutText}>Sign out</Text>
           </TouchableOpacity>
         </View>
       )}

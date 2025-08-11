@@ -302,22 +302,24 @@ export default function BlogScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    dispatch(getUserBlogDetail(searchParams.userBlogId));
-    dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
-      (data) => {
-        setBlogLiked(data.payload as boolean);
-      }
-    );
-    dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
-      (data) => {
-        setBlogDisliked(data.payload as boolean);
-      }
-    );
-    dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
-      (data) => {
-        setBlogSaved(data.payload as boolean);
-      }
-    );
+    dispatch(getUserBlogDetail(searchParams.userBlogId)).then(() => {
+      dispatch(getUserBlogLikeActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogLiked(data.payload as boolean);
+        }
+      );
+      dispatch(getUserBlogDislikeActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogDisliked(data.payload as boolean);
+        }
+      );
+      dispatch(getUserBlogSaveActivities(searchParams.userBlogId)).then(
+        (data) => {
+          setBlogSaved(data.payload as boolean);
+        }
+      );
+    })
+    
   }, []);
 
   useEffect(() => {

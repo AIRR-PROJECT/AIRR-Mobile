@@ -97,7 +97,7 @@ export default function GroupPopularTab() {
     <View style={styles.container}>
       {/* Refresh group */}
       <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-        <Text style={styles.refreshText}>Refresh Groups</Text>
+        <Text style={styles.refreshText}>Refresh groups</Text>
       </TouchableOpacity>
 
       {/* list tags */}

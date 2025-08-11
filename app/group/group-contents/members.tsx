@@ -125,7 +125,6 @@ export default function MemberApprovalsPage() {
     } else {
       dispatch(getBannedMemberList(groupID)).then((res) => {
         const list = res.payload as GroupBannedMember[];
-        console.log(list)
         setBannedMembers(list);
 
         setIsMemberFetching(false);

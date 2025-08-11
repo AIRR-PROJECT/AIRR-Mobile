@@ -805,7 +805,7 @@ GroupPageProps) {
                       Are you sure you want to leave the group?
                     </Text>
                   </View>
-                  <View style={[styles.rowContainer, { gap: 20 }]}>
+                  <View style={[styles.rowContainer, { gap: 5 }]}>
                     <TouchableOpacity
                       onPress={() => {
                         ownSheetRef.current?.close();
@@ -1026,7 +1026,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
-    margin: 20,
     justifyContent: "center",
     alignItems: "center",
     gap: 10,

@@ -25,6 +25,10 @@ export default function QuillEditor({
   const [value, setValue] = useState("");
   const reactQuillRef = useRef<ReactQuill>(null);
   const [editorReady, setEditorReady] = useState(false);
+  const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [initializationAttempted, setInitializationAttempted] = useState(false);
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const uploadToCloudinary = async (file: File): Promise<string> => {
     try {
@@ -83,10 +87,63 @@ export default function QuillEditor({
       throw error;
     }
   };
+
+  // Enhanced initialization with error handling and retry logic
+  const initializeQuill = useCallback(async () => {
+    if (initializationAttempted && retryCount >= 3) {
+      setLoadingError("Failed to load editor after multiple attempts");
+      return;
+    }
+
+    try {
+      setLoadingError(null);
+      setIsRetrying(retryCount > 0);
+      setInitializationAttempted(true);
+
+      // Check if Quill is available
+      if (typeof Quill === 'undefined') {
+        throw new Error("Quill library not loaded");
+      }
+
+      // Check if BlotFormatter2 is available
+      if (typeof BlotFormatter2 === 'undefined') {
+        throw new Error("BlotFormatter2 plugin not loaded");
+      }
+
+      // Register the module with error handling
+      try {
+        Quill.register("modules/blotFormatter2", BlotFormatter2);
+      } catch (registerError) {
+        console.warn("BlotFormatter2 already registered or registration failed:", registerError);
+        // Continue anyway as it might already be registered
+      }
+
+      // Small delay to ensure DOM is ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      setEditorReady(true);
+      setIsRetrying(false);
+      setRetryCount(0);
+      
+    } catch (error) {
+      console.error("Quill initialization failed:", error);
+      setLoadingError(error instanceof Error ? error.message : "Unknown initialization error");
+      setEditorReady(false);
+      setIsRetrying(false);
+      
+      // Retry logic
+      if (retryCount < 3) {
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          initializeQuill();
+        }, 1000 * (retryCount + 1)); // Exponential backoff
+      }
+    }
+  }, [retryCount, initializationAttempted]);
+
   useEffect(() => {
-    Quill.register("modules/blotFormatter2", BlotFormatter2);
-    setEditorReady(true);
-  }, []);
+    initializeQuill();
+  }, [initializeQuill]);
   const getQuillInstance = () => {
     return reactQuillRef.current ? reactQuillRef.current.getEditor() : null;
   };
@@ -98,34 +155,44 @@ export default function QuillEditor({
   // Fix: Get Quill instance from ref
 
   const applyTemplate = (templateContent: string) => {
-    const quillInstance = getQuillInstance();
-    if (quillInstance) {
-      quillInstance.setContents(JSON.parse(templateContent));
-      setIsTemplateDialogOpen(false);
+    try {
+      const quillInstance = getQuillInstance();
+      if (quillInstance) {
+        quillInstance.setContents(JSON.parse(templateContent));
+        setIsTemplateDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to apply template:", error);
+      alert("Failed to apply template. Please try again.");
     }
   };
   const imageHandler = useCallback(() => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
-    input.click();
-    input.onchange = async () => {
-      if (input.files && input.files[0]) {
-        try {
-          const url = await uploadToCloudinary(input.files[0]);
-          const quillInstance = getQuillInstance();
-          if (quillInstance) {
-            const range = quillInstance.getSelection();
-            if (range) {
-              quillInstance.insertEmbed(range.index, "image", url);
+    try {
+      const input = document.createElement("input");
+      input.setAttribute("type", "file");
+      input.setAttribute("accept", "image/*");
+      input.click();
+      input.onchange = async () => {
+        if (input.files && input.files[0]) {
+          try {
+            const url = await uploadToCloudinary(input.files[0]);
+            const quillInstance = getQuillInstance();
+            if (quillInstance) {
+              const range = quillInstance.getSelection();
+              if (range) {
+                quillInstance.insertEmbed(range.index, "image", url);
+              }
             }
+          } catch (error) {
+            console.error("Failed to upload image:", error);
           }
-        } catch (error) {
-          console.error("Failed to upload image:", error);
         }
-      }
-    };
-  }, []);
+      };
+    } catch (error) {
+      console.error("Failed to create image input:", error);
+      alert("Failed to open image selector. Please try again.");
+    }
+  }, [VITE_CLOUDINARY_CLOUD_NAME, VITE_CLOUDINARY_PRESET]);
 
   const modules = {
     toolbar: {
@@ -191,6 +258,76 @@ export default function QuillEditor({
     "clean",
   ];
 
+  // Retry function for user-triggered retries
+  const handleRetry = () => {
+    setRetryCount(0);
+    setInitializationAttempted(false);
+    setLoadingError(null);
+    setEditorReady(false);
+    initializeQuill();
+  };
+
+  // Better loading states and error handling
+  if (loadingError) {
+    return (
+      <div style={{ 
+        width: "100%", 
+        padding: "20px", 
+        textAlign: "center",
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #dee2e6",
+        borderRadius: "4px"
+      }}>
+        <div style={{ color: "#dc3545", marginBottom: "10px" }}>
+          ⚠️ Editor failed to load: {loadingError}
+        </div>
+        <button 
+          onClick={handleRetry}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          Retry Loading Editor
+        </button>
+      </div>
+    );
+  }
+
+  if (isRetrying) {
+    return (
+      <div style={{ 
+        width: "100%", 
+        padding: "20px", 
+        textAlign: "center",
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #dee2e6",
+        borderRadius: "4px"
+      }}>
+        <div>🔄 Retrying editor initialization... (Attempt {retryCount}/3)</div>
+      </div>
+    );
+  }
+
+  if (!editorReady) {
+    return (
+      <div style={{ 
+        width: "100%", 
+        padding: "20px", 
+        textAlign: "center",
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #dee2e6",
+        borderRadius: "4px"
+      }}>
+        <div>📝 Loading editor...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="" style={{ width: "100%" }}>
       {editorReady ? (
@@ -199,8 +336,12 @@ export default function QuillEditor({
           theme="snow"
           value={value}
           onChange={(val: string) => {
-            setValue(val);
-            onValueChange(val);
+            try {
+              setValue(val);
+              onValueChange(val);
+            } catch (error) {
+              console.error("Failed to update editor value:", error);
+            }
           }}
           modules={modules}
           formats={formats}

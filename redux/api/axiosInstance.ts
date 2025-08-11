@@ -122,7 +122,22 @@ api.interceptors.response.use(
     if (error.name && error.name === "CanceledError") {
       store.dispatch(hideLoading());
       Alert.alert("Error", "Request timed out.");
-      return Promise.reject(error);
+      
+      
+      // Handle refresh failure - logout user
+      store.dispatch(reset());
+    //   store.dispatch(logout());
+
+      try {
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");
+      } catch (deleteError) {
+        console.error("Error deleting tokens:", deleteError);
+      }
+
+      router.dismissTo("/auth");
+
+      return
     }
 
     const originalRequest = error.config;

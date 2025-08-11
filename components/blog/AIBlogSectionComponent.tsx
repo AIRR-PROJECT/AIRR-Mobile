@@ -1,7 +1,8 @@
 import { Entypo } from "@expo/vector-icons";
 import { sub } from "date-fns";
 import { LinearGradient } from "expo-linear-gradient";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import * as Linking from "expo-linking";
 
 type SubDetailGroupCardComponentProps = {
   SubHeading: string;
@@ -18,6 +19,35 @@ type DetailGroupCardComponentProps = {
 export default function AIBlogSectionComponent({
   Sections
 }: DetailGroupCardComponentProps) {
+  
+  const handleLinkPress = async (url: string) => {
+    try {
+      // Check if the URL is valid
+      if (!url || typeof url !== 'string') {
+        Alert.alert("Error", "Invalid link");
+        return;
+      }
+      
+      // Add protocol if missing
+      let formattedUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        formattedUrl = `https://${url}`;
+      }
+      
+      // Check if the link can be opened
+      const supported = await Linking.canOpenURL(formattedUrl);
+      
+      if (supported) {
+        await Linking.openURL(formattedUrl);
+      } else {
+        Alert.alert("Error", "Cannot open this link");
+      }
+    } catch (error) {
+      console.error("Error opening link:", error);
+      Alert.alert("Error", "Failed to open link");
+    }
+  };
+
   return (
     <View style={styles.container}>
       {Sections.map((section, secIndex) => {
@@ -46,15 +76,18 @@ export default function AIBlogSectionComponent({
                 <View style={styles.sourceContainer}>
                   <Entypo name="link" size={24} color="#84b0c1" />
                   <Text style={styles.sourceText}>Source: </Text>
-                  <View style={{ flex: 1, justifyContent: "center" }}>
+                  <TouchableOpacity 
+                    style={{ flex: 1, justifyContent: "center" }}
+                    onPress={() => handleLinkPress(item.Source)}
+                  >
                     <Text
-                      style={styles.source}
+                      style={[styles.source, { textDecorationLine: 'underline' }]}
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
                       {item.Source}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))}

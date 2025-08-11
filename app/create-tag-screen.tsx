@@ -14,7 +14,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createTag,
   searchTagCreateGroup,
@@ -48,6 +48,7 @@ export default function CreateTagsScreen({
   );
 
   // State to hold the new tag input by user
+  const newTagInput = useRef<TextInput>()
   const [newTagToRequest, setNewTag] = useState<string>("");
 
   // Const state to hold valid tag
@@ -149,6 +150,7 @@ export default function CreateTagsScreen({
             style={{ paddingLeft: 10 }}
           />
           <TextInput
+            ref={newTagInput}
             style={styles.searchText}
             placeholder="Enter new tag name"
             placeholderTextColor="#888"
@@ -237,6 +239,7 @@ export default function CreateTagsScreen({
                 ]);
 
                 setValidTag(null);
+                newTagInput.current?.clear()
                 setNewTag("");
                 setShowError(false);
               } else {

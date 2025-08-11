@@ -741,10 +741,10 @@ export const cancelJoinGroupRequest = createAsyncThunk(
             const res = await api.post(`groups/cancelJoinGroupRequest`, data) as AxiosResponse
 
             if (res.data.success) {
-                return res.data.status as string
+                return true
             }
             else {
-                return thunkAPI.rejectWithValue(res.data)
+                return false
             }
         }
         catch (error: any) {

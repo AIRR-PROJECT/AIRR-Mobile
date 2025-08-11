@@ -351,8 +351,11 @@ export default function BlogScreen() {
       searchParams.userBlogCommentId !== undefined &&
       searchParams.userBlogCommentId != "" && searchParams.userBlogCommentId != "undefined"
     ) {
+      // route.push(
+      //   `/blog/comment-page?blogId=${searchParams.userBlogId}&commentId=${searchParams.userBlogCommentId}`
+      // );
       route.push(
-        `/blog/comment-page?blogId=${searchParams.userBlogId}&commentId=${searchParams.userBlogCommentId}`
+        `/blog/comment-page?blogId=${searchParams.userBlogId}`
       );
     }
       

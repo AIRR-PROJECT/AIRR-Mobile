@@ -175,6 +175,7 @@ GroupPageProps) {
   }, [groupID]);
 
   useEffect(() => {
+    console.log(userCurrentGroupMembershipStage)
     if (userCurrentGroupMembershipStage === GroupMembershipStage.JOINED) {
       setButtonLabel("Leave Group");
     } else if (
@@ -342,7 +343,6 @@ GroupPageProps) {
   };
   const ownSheetRef = useRef<BottomSheet>(null);
   const handleActionButtonPress = () => {
-    console.log(userCurrentGroupRole === GroupRole.Owner);
     if (
       groupInfo?.NumberOfMembers! > 1 &&
       userCurrentGroupRole === GroupRole.Owner

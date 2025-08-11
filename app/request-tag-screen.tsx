@@ -382,7 +382,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     flex: 1,
-    marginRight: 10,
   },
   selectTagBox: {
     backgroundColor: "#fff",

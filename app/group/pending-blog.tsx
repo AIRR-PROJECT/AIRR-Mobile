@@ -311,7 +311,13 @@ export default function PendingBlogInGroup() {
         />
 
         {/* Blog content (render from html) */}
-        <QuillRenderer dom={{ matchContents: true }} content={html} />
+        {html ? (
+          <QuillRenderer dom={{ matchContents: true }} content={html} />
+        ) : (
+          <View style={{ padding: 20, alignItems: 'center' }}>
+            <Text style={{ color: '#fff', fontSize: 16 }}>Loading content...</Text>
+          </View>
+        )}
 
         {/* <Divider
           orientation="vertical"

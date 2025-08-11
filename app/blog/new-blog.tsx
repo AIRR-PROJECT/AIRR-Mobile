@@ -127,8 +127,8 @@ const parsedContents = templates.map((template) => {
   };
 });
 
-const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g"
-const VITE_CLOUDINARY_PRESET = "blog_images_preset"
+const VITE_CLOUDINARY_CLOUD_NAME = "dvjiwyc6g";
+const VITE_CLOUDINARY_PRESET = "blog_images_preset";
 
 export default function NewBlog() {
   const dispatch = useAppDispatch();
@@ -301,7 +301,7 @@ export default function NewBlog() {
   };
 
   const handlePostBlogPress = () => {
-    console.log("Posted")
+    console.log("Posted");
 
     if (
       !uploadedImg.current ||
@@ -627,45 +627,40 @@ export default function NewBlog() {
                     activeOpacity={0.8}
                   >
                     <View
-                    // style={[
-                    //   styles.tagsColumn,
-                    //   {
-                    //     flexDirection: createBlogRequestedTags.length > 0 ? "row" : "column",
-                    //     flexWrap: createBlogRequestedTags.length > 0 ? "wrap" : "nowrap",
-                    //   },
-                    // ]}
+                      style={{
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
                     >
-                      {createBlogRequestedTags.length > 0 &&
-                        createBlogRequestedTags.map((tag) => (
-                          <TagWrapper key={tag._id} tag={tag} />
-                        ))}
-
                       <AntDesign
                         name="pluscircleo"
                         size={24}
                         color="#B9FF66"
                         style={{}}
                       />
+                      {createBlogRequestedTags.length > 0 &&
+                        createBlogRequestedTags.map((tag) => (
+                          <TagWrapper key={tag._id} tag={tag} />
+                        ))}
+
                       {requestedTags.length > 0 ? (
                         requestedTags.map((tag) => (
                           <TagWrapper key={tag._id} tag={tag} />
                         ))
                       ) : (
-                        <View style={{ flex: 1 }}>
-                          <Text
-                            style={[
-                              styles.headingTitle,
-                              {
-                                alignSelf: "center",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                textAlign: "justify",
-                              },
-                            ]}
-                          >
-                            Request new Tags
-                          </Text>
-                        </View>
+                        <Text
+                          style={[
+                            styles.headingTitle,
+                            {
+                              textAlign: "center",
+                              marginLeft: 8,
+                            },
+                          ]}
+                        >
+                          Request new Tags
+                        </Text>
                       )}
                     </View>
                   </TouchableOpacity>
@@ -885,7 +880,7 @@ export default function NewBlog() {
         )}
       >
         {/* Template Selection Content */}
-        <BottomSheetView style={{ padding: 20}}>
+        <BottomSheetView style={{ padding: 20 }}>
           <Text
             style={[styles.headingTitle, { fontSize: 20, marginBottom: 8 }]}
           >
@@ -901,7 +896,7 @@ export default function NewBlog() {
             Note: This will override your current content.
           </Text>
 
-          <View >
+          <View>
             <View style={{ gap: 16, paddingBottom: 20 }}>
               <TouchableOpacity
                 style={styles.templateCard}

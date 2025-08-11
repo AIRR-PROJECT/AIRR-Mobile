@@ -658,46 +658,41 @@ export default function Editblog() {
                     activeOpacity={0.8}
                   >
                     <View
-                    // style={[
-                    //   styles.tagsColumn,
-                    //   {
-                    //     flexDirection: createBlogRequestedTags.length > 0 ? "row" : "column",
-                    //     flexWrap: createBlogRequestedTags.length > 0 ? "wrap" : "nowrap",
-                    //   },
-                    // ]}
+                      style={{
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
                     >
-                      {displayRequestedTags.length > 0 &&
-                        displayRequestedTags.map((tag) => (
-                          <TagWrapper key={tag._id} tag={tag} />
-                        ))}
-
                       <AntDesign
                         name="pluscircleo"
                         size={24}
                         color="#B9FF66"
                         style={{}}
                       />
+                      {displayRequestedTags.length > 0 &&
+                        displayRequestedTags.map((tag) => (
+                          <TagWrapper key={tag._id} tag={tag} />
+                        ))}
+
                       {requestedTags.length > 0 ? (
                         requestedTags.map((tag) => (
                           // TODO: Check the API for the what should the _id be before request it
                           <TagWrapper key={tag._id} tag={tag} />
                         ))
                       ) : (
-                        <View style={{ flex: 1 }}>
-                          <Text
-                            style={[
-                              styles.headingTitle,
-                              {
-                                alignSelf: "center",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                textAlign: "justify",
-                              },
-                            ]}
-                          >
-                            Request new Tags
-                          </Text>
-                        </View>
+                        <Text
+                          style={[
+                            styles.headingTitle,
+                            {
+                              textAlign: "center",
+                              marginLeft: 8,
+                            },
+                          ]}
+                        >
+                          Request new Tags
+                        </Text>
                       )}
                     </View>
                   </TouchableOpacity>

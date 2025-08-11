@@ -374,6 +374,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    flex: 1,
   },
   searchBar: {
     backgroundColor: "#2E3B40",
